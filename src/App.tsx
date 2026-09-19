@@ -10,13 +10,15 @@ import VerifyOtpPage from './pages/auth/VerifyOtpPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import DashboardPage from './pages/DashboardPage';
 import TravelerHomePage from './pages/TravelerHomePage';
+import StationBookingPage from './pages/StationBookingPage';
 
 /** Các trang có trong hệ thống */
-type Page = 'home' | 'login' | 'register' | 'verify-otp' | 'forgot-password' | 'dashboard' | 'map';
+type Page = 'home' | 'login' | 'register' | 'verify-otp' | 'forgot-password' | 'dashboard' | 'map' | 'station-booking';
 
 /** Dữ liệu truyền giữa các trang (ví dụ email khi chuyển register → verify-otp) */
 interface PageData {
     email?: string;
+    stationId?: string;
 }
 
 function App() {
@@ -76,6 +78,14 @@ function App() {
                     onNavigateLogin={() => navigateTo('login')}
                     onNavigateRegister={() => navigateTo('register')}
                     onNavigateDashboard={() => navigateTo('dashboard')}
+                    onNavigateBooking={(stationId) => navigateTo('station-booking', { stationId })}
+                />
+            )}
+
+            {currentPage === 'station-booking' && (
+                <StationBookingPage
+                    onNavigate={(mode, data) => navigateTo(mode as Page, data)}
+                    stationId={pageData.stationId}
                 />
             )}
         </>
