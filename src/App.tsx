@@ -78,6 +78,7 @@ function App() {
                     onNavigateLogin={() => navigateTo('login')}
                     onNavigateRegister={() => navigateTo('register')}
                     onNavigateDashboard={() => navigateTo('dashboard')}
+                    onNavigateBooking={(stationId) => navigateTo('station-booking', { stationId })}
                 />
             )}
 

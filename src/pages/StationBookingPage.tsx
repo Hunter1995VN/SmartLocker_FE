@@ -27,6 +27,7 @@ import {
   Key,
   BadgeCheck
 } from 'lucide-react';
+import { MOCK_STATIONS } from '../api/stationService';
 
 interface StationBookingPageProps {
   onNavigate: (page: string, props?: any) => void;
@@ -34,9 +35,23 @@ interface StationBookingPageProps {
 }
 
 const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, stationId }) => {
+  const currentStation = MOCK_STATIONS.find(s => s.id === stationId) || {
+    id: '3',
+    name: 'SmartLocker Phố Đi Bộ Nguyễn Huệ',
+    address: '89 Nguyễn Huệ, Phường Bến Nghé, Q.1, TP.HCM',
+    latitude: 10.7752,
+    longitude: 106.7031,
+    status: 'ACTIVE' as const,
+    opensAt: '08:00',
+    closesAt: '22:30',
+    totalS: 10, totalM: 10, totalL: 5,
+    availableS: 3, availableM: 7, availableL: 2,
+    contactPhone: '028 3822 1234',
+  };
+
   const [selectedSize, setSelectedSize] = useState<'S' | 'M' | 'L' | null>('M');
   const [selectedDuration, setSelectedDuration] = useState<number>(3);
-  const [storageDate, setStorageDate] = useState<string>('Today, 24 Oct 2025');
+  const [storageDate, setStorageDate] = useState<string>('Hôm nay, ' + new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }));
   const [dropOffTime, setDropOffTime] = useState<string>('14:00');
 
   const basePrices = {
@@ -67,11 +82,11 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
             Home
           </button>
           <span className="mx-2">/</span>
-          <button onClick={() => onNavigate('stations')} className="hover:text-primary transition-colors">
+          <button onClick={() => onNavigate('map')} className="hover:text-primary transition-colors">
             Stations
           </button>
           <span className="mx-2">/</span>
-          <span className="font-medium text-on-surface">Da Nang Airport - Terminal 1</span>
+          <span className="font-medium text-on-surface">{currentStation.name}</span>
         </div>
       </div>
 
@@ -98,17 +113,17 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                 <div>
                   <div className="flex items-center space-x-3 mb-2">
                     <span className="bg-primary/10 text-primary text-xs font-bold px-2.5 py-1 rounded-md border border-primary/20">
-                      HUB #DAD-01
+                      HUB #{currentStation.id.padStart(2, '0')}
                     </span>
                     <span className="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-md flex items-center border border-green-200">
                       <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5 animate-pulse"></div>
                       ACTIVE
                     </span>
                   </div>
-                  <h1 className="text-2xl font-bold text-[#0F172A] mb-2">Da Nang Airport - Terminal 1</h1>
+                  <h1 className="text-2xl font-bold text-[#0F172A] mb-2">{currentStation.name}</h1>
                   <div className="flex items-center text-secondary text-sm">
                     <MapPin className="w-4 h-4 mr-1.5 shrink-0" />
-                    <span>Arrivals Hall, Ground Floor, Near Gate A3, Da Nang International Airport</span>
+                    <span>{currentStation.address}</span>
                   </div>
                 </div>
                 <div className="hidden sm:flex flex-col items-end">
@@ -425,7 +440,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   <div className="flex justify-between items-start pb-4 border-b border-outline-variant/30">
                     <div>
                       <p className="text-xs text-secondary mb-1">Station</p>
-                      <p className="text-sm font-semibold text-[#0F172A]">Da Nang Airport (T1)</p>
+                      <p className="text-sm font-semibold text-[#0F172A]">{currentStation.name}</p>
                     </div>
                   </div>
 

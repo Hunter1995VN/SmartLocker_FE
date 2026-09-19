@@ -45,10 +45,12 @@ interface Props {
     onNavigateRegister?: () => void;
     /** Chỉ dùng khi traveler: quay về Dashboard */
     onNavigateDashboard?: () => void;
+    /** Điều hướng sang trang Đặt tủ */
+    onNavigateBooking?: (stationId?: string) => void;
 }
 
 // ─── Main Component ──────────────────────────────────────────────────────────
-export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigateRegister, onNavigateDashboard }: Props) {
+export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigateRegister, onNavigateDashboard, onNavigateBooking }: Props) {
     const user: AuthUser = JSON.parse(localStorage.getItem('smartlocker_user') || '{}');
     /** true nếu chưa đăng nhập (khách vãng lai) */
     const isGuest = !user.fullName;
@@ -504,7 +506,10 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                                     onCloseClick={() => setSelectedStation(null)}
                                     options={{ pixelOffset: new google.maps.Size(0, -52) }}
                                 >
-                                    <MapInfoWindow station={selectedStation} />
+                                    <MapInfoWindow 
+                                        station={selectedStation} 
+                                        onBook={(s) => onNavigateBooking?.(s.id)}
+                                    />
                                 </InfoWindow>
                             )}
                         </GoogleMap>
@@ -651,7 +656,7 @@ function StationCard({ station, isSelected, onClick }: {
     );
 }
 
-function MapInfoWindow({ station }: { station: Station }) {
+function MapInfoWindow({ station, onBook }: { station: Station; onBook?: (s: Station) => void }) {
     const totalAvail = station.availableS + station.availableM + station.availableL;
     const isActive = station.status === 'ACTIVE';
 
@@ -691,7 +696,10 @@ function MapInfoWindow({ station }: { station: Station }) {
             </div>
 
             {isActive && totalAvail > 0 && (
-                <button className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition-colors">
+                <button 
+                    onClick={() => onBook?.(station)}
+                    className="w-full py-2 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white text-xs font-bold rounded-lg transition-all cursor-pointer shadow-sm"
+                >
                     Đặt tủ tại đây →
                 </button>
             )}
