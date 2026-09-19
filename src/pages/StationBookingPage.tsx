@@ -499,7 +499,21 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
 
                   <button 
                     disabled={!selectedSize}
-                    className={`w-full py-3.5 rounded-xl text-white font-bold text-lg flex items-center justify-center transition-all ${
+                    onClick={() => {
+                      onNavigate('booking-payment', {
+                        bookingData: {
+                          stationId: currentStation.id,
+                          stationName: currentStation.name,
+                          stationAddress: currentStation.address,
+                          size: selectedSize,
+                          duration: selectedDuration,
+                          storageDate,
+                          dropOffTime,
+                          amount: currentPrice,
+                        }
+                      });
+                    }}
+                    className={`w-full py-3.5 rounded-xl text-white font-bold text-lg flex items-center justify-center transition-all cursor-pointer ${
                       selectedSize ? 'bg-primary hover:bg-primary-container shadow-md shadow-primary/20 hover:shadow-lg hover:-translate-y-0.5' : 'bg-gray-300 cursor-not-allowed'
                     }`}
                   >
