@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import {
   ShieldCheck,
-  Compass,
-  Clock,
   HelpCircle,
   Bell,
   ChevronRight,
@@ -19,13 +17,10 @@ import {
   SlidersHorizontal,
   LockOpen,
   Ban,
-  Receipt,
-  RotateCcw,
-  CheckCircle,
-  ExternalLink,
-  X,
-  CreditCard
+  CheckCircle
 } from 'lucide-react';
+import { ExtendBookingModal } from '../components/booking/ExtendBookingModal';
+import { CancelBookingModal } from '../components/booking/CancelBookingModal';
 
 interface MyBookingsPageProps {
   onNavigate: (page: string, props?: any) => void;
@@ -97,7 +92,6 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
   const [showOverdueModal, setShowOverdueModal] = useState<boolean>(false);
   const [showExtendModal, setShowExtendModal] = useState<boolean>(false);
   const [showCancelModal, setShowCancelModal] = useState<boolean>(false);
-  const [extendHours, setExtendHours] = useState<number>(1);
   const [overduePaid, setOverduePaid] = useState<boolean>(false);
   const [bookingCancelled, setBookingCancelled] = useState<boolean>(false);
 
@@ -613,109 +607,33 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
       )}
 
       {/* EXTEND BOOKING MODAL (UC-T07) */}
-      {showExtendModal && (
-        <div className="fixed inset-0 z-50 bg-[#0b1c30]/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md rounded-2xl border border-outline-variant/30 shadow-2xl p-6 space-y-5 animate-fade-in-up">
-            <div className="flex items-center justify-between border-b border-outline-variant/30 pb-3">
-              <div className="flex items-center gap-2">
-                <PlusCircle className="w-5 h-5 text-primary" />
-                <h3 className="text-base font-bold text-[#0b1c30]">Gia hạn thời gian gửi tủ</h3>
-              </div>
-              <button onClick={() => setShowExtendModal(false)} className="text-secondary hover:text-[#0b1c30]">✕</button>
-            </div>
-
-            <p className="text-xs text-[#434655]">
-              Đơn hàng <strong>#SL-8942A</strong> (Ô M-04 tại Sân bay Đà Nẵng). Chọn số giờ gia hạn:
-            </p>
-
-            <div className="grid grid-cols-3 gap-3">
-              {[1, 2, 3].map(h => (
-                <button
-                  key={h}
-                  onClick={() => setExtendHours(h)}
-                  className={`py-3 rounded-xl border text-center font-bold text-xs transition-all cursor-pointer ${
-                    extendHours === h
-                      ? 'border-primary bg-[#eff4ff] text-primary shadow-xs ring-2 ring-primary/20'
-                      : 'border-outline-variant/40 bg-white text-[#434655] hover:bg-slate-50'
-                  }`}
-                >
-                  <div className="text-base">+{h} Giờ</div>
-                  <div className="text-[11px] font-normal text-secondary mt-0.5">{formatCurrency(h * 15000)} VND</div>
-                </button>
-              ))}
-            </div>
-
-            <div className="bg-[#eff4ff] p-3 rounded-xl flex justify-between items-center text-xs">
-              <span className="text-[#434655]">Số tiền thanh toán:</span>
-              <span className="text-base font-bold text-primary">{formatCurrency(extendHours * 15000)} VND</span>
-            </div>
-
-            <div className="flex gap-3 pt-2">
-              <button
-                onClick={() => setShowExtendModal(false)}
-                className="flex-1 py-2.5 rounded-xl border border-outline-variant text-xs font-semibold text-secondary hover:bg-slate-50 cursor-pointer"
-              >
-                Hủy bỏ
-              </button>
-              <button
-                onClick={() => {
-                  setShowExtendModal(false);
-                  showToast(`Đã gia hạn thành công thêm +${extendHours} giờ!`);
-                }}
-                className="flex-1 py-2.5 rounded-xl bg-primary hover:bg-[#2563eb] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
-              >
-                Xác nhận gia hạn
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ExtendBookingModal
+        isOpen={showExtendModal}
+        onClose={() => setShowExtendModal(false)}
+        onSuccess={(addedHours, amount) => {
+          setShowExtendModal(false);
+          showToast(`Đã gia hạn thành công thêm +${addedHours} giờ (${formatCurrency(amount)} VND)! Ô tủ tiếp tục sẵn sàng.`);
+        }}
+        lockerCode="Locker M-04"
+        stationName="Sân bay Quốc tế Đà Nẵng (Nhà ga T1)"
+        currentEndTime="17:00 Hôm nay"
+      />
 
       {/* CANCEL BOOKING MODAL (UC-T08) */}
-      {showCancelModal && (
-        <div className="fixed inset-0 z-50 bg-[#0b1c30]/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md rounded-2xl border border-outline-variant/30 shadow-2xl p-6 space-y-4 animate-fade-in-up">
-            <div className="flex items-center justify-between border-b border-outline-variant/30 pb-3">
-              <div className="flex items-center gap-2">
-                <XCircle className="w-5 h-5 text-rose-600" />
-                <h3 className="text-base font-bold text-[#0b1c30]">Hủy đơn đặt tủ</h3>
-              </div>
-              <button onClick={() => setShowCancelModal(false)} className="text-secondary hover:text-[#0b1c30]">✕</button>
-            </div>
+      <CancelBookingModal
+        isOpen={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        onSuccess={(_reason, refundAmount) => {
+          setShowCancelModal(false);
+          setBookingCancelled(true);
+          showToast(`Đã hủy đơn thành công. ${formatCurrency(refundAmount)} VND sẽ được hoàn về MB Bank trong 24h.`);
+        }}
+        bookingCode="#SL-8942A"
+        lockerCode="Locker M-04 (Medium Size)"
+        stationName="Sân bay Quốc tế Đà Nẵng (Nhà ga T1)"
+        paidAmount={35000}
+      />
 
-            <p className="text-xs text-[#434655] leading-relaxed">
-              Bạn có chắc chắn muốn hủy đơn hàng <strong>#SL-8942A</strong> tại Sân bay Đà Nẵng không?
-            </p>
-
-            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-800 space-y-1">
-              <p className="font-bold flex items-center gap-1">
-                <CheckCircle className="w-4 h-4 text-emerald-600" />
-                Chính sách hoàn tiền 100%
-              </p>
-              <p>Đơn của bạn đủ điều kiện hoàn 100% số tiền (35,000 VND) về tài khoản gốc do hủy trước 2 giờ.</p>
-            </div>
-
-            <div className="flex gap-3 pt-2">
-              <button
-                onClick={() => setShowCancelModal(false)}
-                className="flex-1 py-2.5 rounded-xl border border-outline-variant text-xs font-semibold text-secondary hover:bg-slate-50 cursor-pointer"
-              >
-                Giữ lại đơn
-              </button>
-              <button
-                onClick={() => {
-                  setShowCancelModal(false);
-                  setBookingCancelled(true);
-                  showToast('Đã hủy đơn thành công. 35,000 VND sẽ được hoàn về trong 2-5 phút.');
-                }}
-                className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95"
-              >
-                Xác nhận hủy đơn
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* TOAST NOTIFICATION */}
       {toastMessage && (
