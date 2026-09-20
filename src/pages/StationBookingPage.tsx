@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Calendar,
   Clock,
@@ -24,7 +24,8 @@ import {
   Key,
   BadgeCheck
 } from 'lucide-react';
-import { MOCK_STATIONS } from '../api/stationService';
+import { MOCK_STATIONS, getStationById, type StationDetail } from '../api/stationService';
+import { createBooking } from '../api/bookingService';
 
 interface StationBookingPageProps {
   onNavigate: (page: string, props?: any) => void;
@@ -32,7 +33,35 @@ interface StationBookingPageProps {
 }
 
 const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, stationId }) => {
-  const currentStation = MOCK_STATIONS.find(s => s.id === stationId) || {
+  const [stationDetail, setStationDetail] = useState<StationDetail | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+
+  const [selectedSize, setSelectedSize] = useState<'S' | 'M' | 'L' | null>('M');
+  const [selectedDuration, setSelectedDuration] = useState<number>(3);
+
+  useEffect(() => {
+    const fetchStation = async () => {
+      if (!stationId) {
+        setIsLoading(false);
+        return;
+      }
+      setIsLoading(true);
+      setApiError(null);
+      try {
+        const data = await getStationById(stationId);
+        setStationDetail(data);
+      } catch (error) {
+        setApiError('Không thể tải thông tin trạm. Vui lòng thử lại sau.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchStation();
+  }, [stationId]);
+
+  const currentStation = stationDetail || MOCK_STATIONS.find(s => s.id === stationId) || {
     id: '3',
     name: 'SmartLocker Phố Đi Bộ Nguyễn Huệ',
     address: '89 Nguyễn Huệ, Phường Bến Nghé, Q.1, TP.HCM',
@@ -46,15 +75,13 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
     contactPhone: '028 3822 1234',
   };
 
-  const [selectedSize, setSelectedSize] = useState<'S' | 'M' | 'L' | null>('M');
-  const [selectedDuration, setSelectedDuration] = useState<number>(3);
   const storageDate = 'Hôm nay, ' + new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
   const dropOffTime = '14:00';
 
   const basePrices = {
-    S: 20000,
-    M: 35000,
-    L: 50000
+    S: stationDetail?.priceS ?? 20000,
+    M: stationDetail?.priceM ?? 35000,
+    L: stationDetail?.priceL ?? 50000
   };
 
   const getPrice = (size: 'S' | 'M' | 'L' | null, duration: number) => {
@@ -68,6 +95,17 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
   };
+
+  if (isLoading) {
+    return (
+      <div className="bg-[#F8FAFC] min-h-screen pb-20 flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <p className="mt-4 text-secondary font-medium">Đang tải thông tin trạm...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#F8FAFC] min-h-screen pb-20">
@@ -263,7 +301,9 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                       <div className={`p-3 rounded-xl ${selectedSize === 'S' ? 'bg-primary/10 text-primary' : 'bg-[#F1F5F9] text-secondary'}`}>
                         <Backpack className="w-6 h-6" />
                       </div>
-                      <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded">4 left</span>
+                      <span className={`text-xs font-bold px-2 py-1 rounded ${currentStation.availableS && currentStation.availableS > 0 ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'}`}>
+                        {currentStation.availableS && currentStation.availableS > 0 ? `${currentStation.availableS} left` : 'Full'}
+                      </span>
                     </div>
                     <h3 className="text-lg font-bold text-[#0F172A]">Small (S)</h3>
                     <div className="flex items-center text-xs text-secondary mt-1 mb-3">
@@ -306,7 +346,9 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                       <div className={`p-3 rounded-xl ${selectedSize === 'M' ? 'bg-primary/10 text-primary' : 'bg-[#F1F5F9] text-secondary'}`}>
                         <Package className="w-6 h-6" />
                       </div>
-                      <span className="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded">2 left</span>
+                      <span className={`text-xs font-bold px-2 py-1 rounded ${currentStation.availableM && currentStation.availableM > 0 ? 'text-orange-600 bg-orange-50' : 'text-red-600 bg-red-50'}`}>
+                        {currentStation.availableM && currentStation.availableM > 0 ? `${currentStation.availableM} left` : 'Full'}
+                      </span>
                     </div>
                     <h3 className="text-lg font-bold text-[#0F172A]">Medium (M)</h3>
                     <div className="flex items-center text-xs text-secondary mt-1 mb-3">
@@ -327,29 +369,51 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   </div>
                 </div>
 
-                {/* Large Size - Disabled */}
-                <div className="relative rounded-xl border-2 border-outline-variant/30 bg-[#F8FAFC] opacity-75 overflow-hidden flex flex-col cursor-not-allowed">
-                  <div className="absolute inset-0 bg-white/40 z-10"></div>
+                {/* Large Size */}
+                <div 
+                  onClick={() => {
+                    if (currentStation.availableL && currentStation.availableL > 0) setSelectedSize('L');
+                  }}
+                  className={`relative rounded-xl border-2 transition-all overflow-hidden flex flex-col ${
+                    (!currentStation.availableL || currentStation.availableL === 0)
+                      ? 'border-outline-variant/30 bg-[#F8FAFC] opacity-75 cursor-not-allowed'
+                      : selectedSize === 'L' 
+                        ? 'border-primary bg-[#F4F8FF] shadow-sm cursor-pointer' 
+                        : 'border-outline-variant/30 bg-white hover:border-primary/40 cursor-pointer'
+                  }`}
+                >
+                  {(!currentStation.availableL || currentStation.availableL === 0) && (
+                    <div className="absolute inset-0 bg-white/40 z-10"></div>
+                  )}
+                  {selectedSize === 'L' && (
+                    <div className="absolute top-0 right-0 bg-primary text-white px-2 py-1 rounded-bl-lg z-20">
+                      <CheckCircle className="w-4 h-4" />
+                    </div>
+                  )}
                   <div className="p-5 flex-grow relative z-0">
                     <div className="flex justify-between items-start mb-4">
-                      <div className="p-3 rounded-xl bg-gray-200 text-gray-500">
-                        <Package className="w-6 h-6" /> {/* Using Package as fallback for luggage if not available in lucide-react */}
+                      <div className={`p-3 rounded-xl ${selectedSize === 'L' ? 'bg-primary/10 text-primary' : 'bg-[#F1F5F9] text-secondary'}`}>
+                        <Package className="w-6 h-6" />
                       </div>
-                      <span className="text-xs font-bold text-red-600 bg-red-50 px-2 py-1 rounded">Full</span>
+                      <span className={`text-xs font-bold px-2 py-1 rounded ${currentStation.availableL && currentStation.availableL > 0 ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'}`}>
+                        {currentStation.availableL && currentStation.availableL > 0 ? `${currentStation.availableL} left` : 'Full'}
+                      </span>
                     </div>
-                    <h3 className="text-lg font-bold text-gray-500">Large (L)</h3>
-                    <div className="flex items-center text-xs text-gray-400 mt-1 mb-3">
+                    <h3 className={`text-lg font-bold ${(!currentStation.availableL || currentStation.availableL === 0) ? 'text-gray-500' : 'text-[#0F172A]'}`}>Large (L)</h3>
+                    <div className={`flex items-center text-xs mt-1 mb-3 ${(!currentStation.availableL || currentStation.availableL === 0) ? 'text-gray-400' : 'text-secondary'}`}>
                       <Ruler className="w-3.5 h-3.5 mr-1" /> 90 x 60 x 50 cm
                     </div>
-                    <p className="text-sm text-gray-500 mb-4">Fits full-size check-in suitcases and bulky items.</p>
+                    <p className={`text-sm mb-4 ${(!currentStation.availableL || currentStation.availableL === 0) ? 'text-gray-500' : 'text-[#475569]'}`}>Fits full-size check-in suitcases and bulky items.</p>
                   </div>
-                  <div className="p-4 border-t border-outline-variant/30 bg-gray-100 relative z-0">
+                  <div className={`p-4 border-t relative z-0 ${(!currentStation.availableL || currentStation.availableL === 0) ? 'border-outline-variant/30 bg-gray-100' : selectedSize === 'L' ? 'border-primary/20 bg-primary/5' : 'border-outline-variant/30 bg-[#F8FAFC]'}`}>
                     <div className="flex items-baseline justify-between">
-                      <span className="text-lg font-bold text-gray-400">{formatCurrency(basePrices.L)}</span>
-                      <span className="text-xs text-gray-400 font-medium">/ 3 hrs</span>
+                      <span className={`text-lg font-bold ${(!currentStation.availableL || currentStation.availableL === 0) ? 'text-gray-400' : 'text-primary'}`}>{formatCurrency(basePrices.L)}</span>
+                      <span className={`text-xs font-medium ${(!currentStation.availableL || currentStation.availableL === 0) ? 'text-gray-400' : 'text-secondary'}`}>/ 3 hrs</span>
                     </div>
-                    <button disabled className="w-full mt-3 py-2 rounded-lg text-sm font-semibold bg-gray-200 text-gray-400 cursor-not-allowed">
-                      Unavailable
+                    <button disabled={(!currentStation.availableL || currentStation.availableL === 0)} className={`w-full mt-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                      (!currentStation.availableL || currentStation.availableL === 0) ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : selectedSize === 'L' ? 'bg-primary text-white' : 'bg-white border border-outline-variant hover:bg-gray-50 text-[#0F172A]'
+                    }`}>
+                      {(!currentStation.availableL || currentStation.availableL === 0) ? 'Unavailable' : selectedSize === 'L' ? 'Selected' : 'Select'}
                     </button>
                   </div>
                 </div>
@@ -494,27 +558,66 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                     </p>
                   </div>
 
+                  {apiError && <div className="text-red-500 text-sm mb-3 text-center bg-red-50 p-2 rounded">{apiError}</div>}
                   <button 
-                    disabled={!selectedSize}
-                    onClick={() => {
-                      onNavigate('booking-payment', {
-                        bookingData: {
+                    disabled={!selectedSize || isSubmitting}
+                    onClick={async () => {
+                      if (!selectedSize || !currentStation.id) return;
+                      setIsSubmitting(true);
+                      setApiError(null);
+                      try {
+                        const startAtDate = new Date();
+                        startAtDate.setHours(14, 0, 0, 0); // dropOffTime is hardcoded 14:00
+                        const endAtDate = new Date(startAtDate.getTime() + selectedDuration * 3600 * 1000);
+                        
+                        const res = await createBooking({
                           stationId: currentStation.id,
-                          stationName: currentStation.name,
-                          stationAddress: currentStation.address,
                           size: selectedSize,
-                          duration: selectedDuration,
-                          storageDate,
-                          dropOffTime,
-                          amount: currentPrice,
+                          startAt: startAtDate.toISOString(),
+                          endAt: endAtDate.toISOString()
+                        });
+                        
+                        if (res.success && res.data) {
+                          onNavigate('booking-payment', {
+                            bookingData: {
+                              stationId: currentStation.id,
+                              stationName: currentStation.name,
+                              stationAddress: currentStation.address,
+                              size: selectedSize,
+                              duration: selectedDuration,
+                              storageDate,
+                              dropOffTime,
+                              amount: res.data.amount || currentPrice,
+                              paymentUrl: res.data.paymentUrl,
+                              bookingId: res.data.bookingId,
+                              bookingCode: res.data.bookingCode,
+                              paymentExpiresAt: res.data.paymentExpiresAt,
+                            }
+                          });
+                        } else {
+                          setApiError(res.message || 'Đã xảy ra lỗi khi tạo đơn.');
                         }
-                      });
+                      } catch (error: any) {
+                        setApiError(error.response?.data?.message || 'Lỗi kết nối đến máy chủ.');
+                      } finally {
+                        setIsSubmitting(false);
+                      }
                     }}
                     className={`w-full py-3.5 rounded-xl text-white font-bold text-lg flex items-center justify-center transition-all cursor-pointer ${
-                      selectedSize ? 'bg-primary hover:bg-primary-container shadow-md shadow-primary/20 hover:shadow-lg hover:-translate-y-0.5' : 'bg-gray-300 cursor-not-allowed'
+                      (selectedSize && !isSubmitting) ? 'bg-primary hover:bg-primary-container shadow-md shadow-primary/20 hover:shadow-lg hover:-translate-y-0.5' : 'bg-gray-300 cursor-not-allowed'
                     }`}
                   >
-                    Continue to Booking <ArrowRight className="w-5 h-5 ml-2" />
+                    {isSubmitting ? (
+                      <span className="flex items-center">
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Đang xử lý...
+                      </span>
+                     ) : (
+                      <>Continue to Booking <ArrowRight className="w-5 h-5 ml-2" /></>
+                     )}
                   </button>
 
                   <div className="flex items-center justify-center text-xs text-secondary mt-4 space-x-4">

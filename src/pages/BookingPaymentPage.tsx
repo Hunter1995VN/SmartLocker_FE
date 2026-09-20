@@ -20,6 +20,7 @@ import {
   Lock,
   Headphones
 } from 'lucide-react';
+import { getBookingById } from '../api/bookingService';
 
 interface BookingPaymentPageProps {
   onNavigate: (page: string, props?: any) => void;
@@ -32,6 +33,10 @@ interface BookingPaymentPageProps {
     storageDate?: string;
     dropOffTime?: string;
     amount?: number;
+    paymentUrl?: string;
+    bookingId?: string;
+    bookingCode?: string;
+    paymentExpiresAt?: string;
   };
 }
 
@@ -51,16 +56,24 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
   const travelerPhone = savedUser.phone || '0901 234 567';
   const travelerEmail = savedUser.email || 'nguyenvana@gmail.com';
 
-  const orderCode = 'BK' + Math.floor(10000000 + Math.random() * 90000000).toString().substring(0, 8);
+  const orderCode = bookingData?.bookingCode || 'BK' + Math.floor(10000000 + Math.random() * 90000000).toString().substring(0, 8);
 
-  // Countdown timer: 10 phút (600 giây)
-  const [secondsLeft, setSecondsLeft] = useState<number>(9 * 60 + 45);
+  // Countdown timer
+  const [secondsLeft, setSecondsLeft] = useState<number>(0);
   useEffect(() => {
+    const calculateTimeLeft = () => {
+      if (!bookingData?.paymentExpiresAt) return 600;
+      const diff = new Date(bookingData.paymentExpiresAt).getTime() - new Date().getTime();
+      return Math.max(0, Math.floor(diff / 1000));
+    };
+    
+    setSecondsLeft(calculateTimeLeft());
+    
     const timer = setInterval(() => {
-      setSecondsLeft(prev => (prev > 0 ? prev - 1 : 0));
+      setSecondsLeft(calculateTimeLeft());
     }, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [bookingData?.paymentExpiresAt]);
 
   const formatTimer = (totalSec: number) => {
     const m = Math.floor(totalSec / 60);
@@ -87,6 +100,33 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
   // Success modal state
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
   const [agreedTerms, setAgreedTerms] = useState<boolean>(true);
+  const [successData, setSuccessData] = useState<{lockerCode?: string, accessCode?: string} | null>(null);
+
+  useEffect(() => {
+    if (!bookingData?.bookingId) return;
+    
+    const interval = setInterval(async () => {
+      try {
+        const res = await getBookingById(bookingData.bookingId!);
+        if (res.success && res.data) {
+          if (res.data.status === 'CONFIRMED' || res.data.status === 'STORED' || res.data.status === 'CHECKED_IN') {
+            clearInterval(interval);
+            setSuccessData({
+              lockerCode: res.data.lockerCode || 'N/A',
+              accessCode: res.data.lockerCode ? `LK-${res.data.lockerCode}` : '729 416' 
+            });
+            setShowSuccessModal(true);
+          } else if (res.data.status !== 'PENDING_PAYMENT') {
+            clearInterval(interval);
+          }
+        }
+      } catch (error) {
+        console.error("Polling error", error);
+      }
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, [bookingData?.bookingId]);
 
   return (
     <div className="bg-[#F8FAFC] text-[#0F172A] font-body-md text-body-md antialiased min-h-screen flex flex-col justify-between selection:bg-primary-container selection:text-white pb-12">
@@ -365,6 +405,23 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
 
             {/* Main Payment Card */}
             <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6 sm:p-8 shadow-md">
+              {/* PayOS Button */}
+              {bookingData?.paymentUrl && (
+                <div className="mb-6 p-4 rounded-xl bg-[#EFF6FF] border border-[#BFDBFE] flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-sm font-bold text-[#0F172A]">Thanh toán qua PayOS</h3>
+                    <p className="text-xs text-[#64748B] mt-1">Chuyển hướng đến cổng thanh toán an toàn của PayOS</p>
+                  </div>
+                  <button
+                    onClick={() => window.open(bookingData.paymentUrl, '_blank')}
+                    className="shrink-0 w-full sm:w-auto px-6 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-bold rounded-xl transition-all shadow-md active:scale-95 cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                    Mở trang thanh toán PayOS
+                  </button>
+                </div>
+              )}
+
               {/* Payment Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-6 border-b border-[#F1F5F9]">
                 <div>
@@ -608,11 +665,11 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
             <div className="my-5 p-4 rounded-xl bg-[#EFF6FF] border border-[#BFDBFE] text-left">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-xs text-[#64748B]">Assigned Locker Bay:</span>
-                <span className="font-mono text-base font-bold text-[#2563EB]">BAY M-04</span>
+                <span className="font-mono text-base font-bold text-[#2563EB]">{successData?.lockerCode || (size === 'S' ? 'Bay S-02' : size === 'M' ? 'Bay M-04' : 'Bay L-02')}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-xs text-[#64748B]">Access One-Time PIN:</span>
-                <span className="font-mono text-xl font-extrabold text-[#0F172A] tracking-widest">729 416</span>
+                <span className="font-mono text-xl font-extrabold text-[#0F172A] tracking-widest">{successData?.accessCode || '729 416'}</span>
               </div>
             </div>
             <p className="text-xs text-[#64748B] mb-5">
@@ -630,8 +687,8 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                       duration,
                       amount,
                       orderCode,
-                      accessCode: 'LK-' + orderCode.substring(2, 7) + 'A',
-                      bayCode: size === 'S' ? 'Bay S-02' : size === 'M' ? 'Bay M-04' : 'Bay L-02',
+                      accessCode: successData?.accessCode || ('LK-' + orderCode.substring(2, 7) + 'A'),
+                      bayCode: successData?.lockerCode || (size === 'S' ? 'Bay S-02' : size === 'M' ? 'Bay M-04' : 'Bay L-02'),
                     }
                   });
                 }}

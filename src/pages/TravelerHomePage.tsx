@@ -5,7 +5,7 @@ import {
     LogOut, User, Zap, Navigation, Phone, Lock,
     CheckCircle, AlertTriangle, X, Menu, RefreshCw, ArrowRight,
 } from 'lucide-react';
-import { MOCK_STATIONS, MOCK_ACTIVE_BOOKING, calcDistance } from '../api/stationService';
+import { MOCK_STATIONS, MOCK_ACTIVE_BOOKING, calcDistance, getStations } from '../api/stationService';
 import type { Station, Booking } from '../api/stationService';
 
 // ─── Config ──────────────────────────────────────────────────────────────────
@@ -55,7 +55,8 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
     /** true nếu chưa đăng nhập (khách vãng lai) */
     const isGuest = !user.fullName;
 
-    const [stations, setStations] = useState<Station[]>(MOCK_STATIONS);
+    const [stations, setStations] = useState<Station[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     const [activeBooking] = useState<Booking | null>(MOCK_ACTIVE_BOOKING);
     const [selectedStation, setSelectedStation] = useState<Station | null>(null);
     const [hoveredStation, setHoveredStation] = useState<Station | null>(null);
@@ -85,7 +86,7 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                     setMapCenter(loc);
                     // Tính khoảng cách cho mỗi station
                     setStations(prev =>
-                        prev
+                        [...prev]
                             .map(s => ({ ...s, distanceKm: calcDistance(loc.lat, loc.lng, s.latitude, s.longitude) }))
                             .sort((a, b) => (a.distanceKm ?? 99) - (b.distanceKm ?? 99))
                     );
@@ -94,6 +95,47 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
             );
         }
     }, []);
+
+    // Fetch stations with debounce
+    useEffect(() => {
+        let isMounted = true;
+        const fetchStations = async () => {
+            setIsLoading(true);
+            try {
+                let data = await getStations(searchQuery || undefined);
+                if (isMounted) {
+                    if (userLocation) {
+                        data = data
+                            .map(s => ({ ...s, distanceKm: calcDistance(userLocation.lat, userLocation.lng, s.latitude, s.longitude) }))
+                            .sort((a, b) => (a.distanceKm ?? 99) - (b.distanceKm ?? 99));
+                    }
+                    setStations(data);
+                }
+            } catch (err) {
+                console.error("Failed to fetch stations, falling back to mock", err);
+                if (isMounted) {
+                    let fallback = MOCK_STATIONS;
+                    if (userLocation) {
+                        fallback = fallback
+                            .map(s => ({ ...s, distanceKm: calcDistance(userLocation.lat, userLocation.lng, s.latitude, s.longitude) }))
+                            .sort((a, b) => (a.distanceKm ?? 99) - (b.distanceKm ?? 99));
+                    }
+                    setStations(fallback);
+                }
+            } finally {
+                if (isMounted) setIsLoading(false);
+            }
+        };
+
+        const timeoutId = setTimeout(() => {
+            fetchStations();
+        }, 500);
+
+        return () => {
+            isMounted = false;
+            clearTimeout(timeoutId);
+        };
+    }, [searchQuery, userLocation]);
 
     // Đếm ngược thời gian booking
     useEffect(() => {
@@ -378,7 +420,20 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
 
                         {/* Station List */}
                         <div className="pb-4">
-                            {filtered.length === 0 ? (
+                            {isLoading ? (
+                                <div className="px-4 py-2 space-y-4">
+                                    {[1, 2, 3, 4, 5].map(i => (
+                                        <div key={i} className="animate-pulse flex items-start space-x-3">
+                                            <div className="rounded-xl bg-gray-200 h-9 w-9 shrink-0"></div>
+                                            <div className="flex-1 space-y-2 py-1">
+                                                <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+                                                <div className="h-2 bg-gray-200 rounded w-full"></div>
+                                                <div className="h-2 bg-gray-200 rounded w-5/6"></div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : filtered.length === 0 ? (
                                 <div className="text-center py-10 text-gray-400">
                                     <MapPin className="w-8 h-8 mx-auto mb-2 opacity-30" />
                                     <p className="text-sm">Không tìm thấy trạm tủ</p>
@@ -614,7 +669,7 @@ function QuickAction({ icon, label, color, onClick }: {
 function StationCard({ station, isSelected, onClick }: {
     station: Station; isSelected: boolean; onClick: () => void;
 }) {
-    const totalAvail = station.availableS + station.availableM + station.availableL;
+    const totalAvail = (station.availableS ?? 0) + (station.availableM ?? 0) + (station.availableL ?? 0);
     const isActive = station.status === 'ACTIVE';
 
     return (
@@ -661,9 +716,9 @@ function StationCard({ station, isSelected, onClick }: {
                     {isActive && (
                         <div className="flex gap-1.5 mt-2">
                             {[
-                                { key: 'S', avail: station.availableS, total: station.totalS },
-                                { key: 'M', avail: station.availableM, total: station.totalM },
-                                { key: 'L', avail: station.availableL, total: station.totalL },
+                                { key: 'S', avail: station.availableS ?? 0, total: station.totalS },
+                                { key: 'M', avail: station.availableM ?? 0, total: station.totalM },
+                                { key: 'L', avail: station.availableL ?? 0, total: station.totalL },
                             ].map(({ key, avail, total }) => (
                                 <div key={key} className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold ${SIZE_COLOR[key]}`}>
                                     {key} <span className="opacity-70">{avail}/{total}</span>
@@ -679,7 +734,7 @@ function StationCard({ station, isSelected, onClick }: {
 }
 
 function MapInfoWindow({ station, onBook }: { station: Station; onBook?: (s: Station) => void }) {
-    const totalAvail = station.availableS + station.availableM + station.availableL;
+    const totalAvail = (station.availableS ?? 0) + (station.availableM ?? 0) + (station.availableL ?? 0);
     const isActive = station.status === 'ACTIVE';
 
     return (
@@ -695,11 +750,11 @@ function MapInfoWindow({ station, onBook }: { station: Station; onBook?: (s: Sta
             {isActive && (
                 <div className="flex gap-1.5 mb-2">
                     {[
-                        { key: 'S', avail: station.availableS, total: station.totalS },
-                        { key: 'M', avail: station.availableM, total: station.totalM },
-                        { key: 'L', avail: station.availableL, total: station.totalL },
+                        { key: 'S', avail: station.availableS ?? 0, total: station.totalS },
+                        { key: 'M', avail: station.availableM ?? 0, total: station.totalM },
+                        { key: 'L', avail: station.availableL ?? 0, total: station.totalL },
                     ].map(({ key, avail, total }) => (
-                        <div key={key} className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${avail > 0 ? SIZE_COLOR[key] : 'bg-gray-100 text-gray-400'}`}>
+                        <div key={key} className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${(avail ?? 0) > 0 ? SIZE_COLOR[key] : 'bg-gray-100 text-gray-400'}`}>
                             {key}: {avail}/{total}
                         </div>
                     ))}
