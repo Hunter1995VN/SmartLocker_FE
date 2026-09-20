@@ -5,47 +5,6 @@ import { Lock, Shield, WifiOff, CreditCard, RefreshCw, ShieldCheck, AlertCircle,
  * Bento grid layout cải thiện cân bằng visual
  */
 const Security = () => {
-  const securityFeatures = [
-    {
-      icon: WifiOff,
-      title: 'Mở tủ Offline độc quyền',
-      subtitle: 'Kể cả khi mất kết nối Internet',
-      description: 'Trạm tủ thông minh tích hợp chip vi xử lý nhúng lưu trữ Public Key Cryptographic cục bộ. Khi điện thoại bạn mất mạng 4G/WiFi hoặc trạm bị nghẽn mạng, thuật toán JWS (JSON Web Signature) vẫn giải mã token và mở tủ ngay lập tức trong 0.5s.',
-      badge: 'Bản quyền công nghệ',
-      badgeColor: 'emerald',
-      footer: { left: 'CHỮ KÝ MẬT MÃ ED25519', right: 'HOẠT ĐỘNG 100% OFFLINE' },
-      stats: { value: '0.5s', label: 'Tốc độ mở tủ offline' },
-      colSpan: 'lg:col-span-7',
-      gradient: 'bg-gradient-to-br from-primary-container via-primary to-primary',
-      textOnDark: true,
-    },
-    {
-      icon: Shield,
-      title: 'Giám sát an ninh 24/7',
-      description: 'Cảm biến hồng ngoại phát hiện vật thể bên trong ô tủ, ngăn chặn tình trạng quên đồ. Cảm biến gia tốc rung chấn cảnh báo lập tức nếu có tác động cạy phá.',
-      footer: { icon: AlertCircle, text: 'Kết nối trực tiếp trung tâm bảo vệ khu vực', textColor: 'text-primary' },
-      colSpan: 'lg:col-span-5',
-      gradient: null,
-    },
-    {
-      icon: CreditCard,
-      title: 'Thanh toán VietQR Napas',
-      description: 'Tích hợp cổng thanh toán ngân hàng quốc gia. Tự động xác thực giao dịch sau 2 giây.',
-      footer: { banks: ['Vietcombank', 'Techcombank', 'MBBank', 'Apple Pay'] },
-      colSpan: 'lg:col-span-5',
-      gradient: null,
-    },
-    {
-      icon: RefreshCw,
-      title: 'Hoàn tiền 100% tự động',
-      description: 'Kế hoạch chuyến đi bị thay đổi? Bạn được phép hủy đặt chỗ trước 2 giờ và nhận hoàn tiền 100% tự động.',
-      footer: { icon: ShieldCheck, text: 'Cam kết minh bạch tài chính tuyệt đối', textColor: 'text-emerald-700' },
-      colSpan: 'lg:col-span-7',
-      gradient: 'bg-gradient-to-br from-emerald-50 via-white to-blue-50',
-      stats: { value: '100%', label: 'Hoàn tiền nếu hủy trước 2h' },
-    },
-  ];
-
   return (
     <>
       {/* Security Section */}

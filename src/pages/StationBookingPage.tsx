@@ -3,7 +3,6 @@ import {
   Calendar,
   Clock,
   MapPin,
-  Phone,
   Video,
   QrCode,
   Plug,
@@ -16,13 +15,11 @@ import {
   Backpack,
   Package,
   Home,
-  Check,
   ChevronDown,
   Navigation,
   Star,
   CheckCircle,
   Timer,
-  LockOpen,
   Lock,
   Key,
   BadgeCheck
@@ -51,8 +48,8 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
 
   const [selectedSize, setSelectedSize] = useState<'S' | 'M' | 'L' | null>('M');
   const [selectedDuration, setSelectedDuration] = useState<number>(3);
-  const [storageDate, setStorageDate] = useState<string>('Hôm nay, ' + new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }));
-  const [dropOffTime, setDropOffTime] = useState<string>('14:00');
+  const storageDate = 'Hôm nay, ' + new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const dropOffTime = '14:00';
 
   const basePrices = {
     S: 20000,

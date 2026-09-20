@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   Check,
   ChevronRight,
-  Phone,
   ShieldCheck,
   DoorOpen,
   MapPin,
@@ -19,9 +18,7 @@ import {
   CheckCircle,
   QrCode,
   Lock,
-  Headphones,
-  ArrowRight,
-  X
+  Headphones
 } from 'lucide-react';
 
 interface BookingPaymentPageProps {
