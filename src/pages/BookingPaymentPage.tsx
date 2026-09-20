@@ -625,7 +625,18 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
               <button
                 onClick={() => {
                   setShowSuccessModal(false);
-                  onNavigate('map'); // Hoặc sau này là 'booking-detail'
+                  onNavigate('booking-detail', {
+                    bookingData: {
+                      stationName,
+                      stationAddress,
+                      size,
+                      duration,
+                      amount,
+                      orderCode,
+                      accessCode: 'LK-' + orderCode.substring(2, 7) + 'A',
+                      bayCode: size === 'S' ? 'Bay S-02' : size === 'M' ? 'Bay M-04' : 'Bay L-02',
+                    }
+                  });
                 }}
                 className="w-full py-2.5 px-4 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-bold rounded-xl transition-colors shadow-sm cursor-pointer"
               >

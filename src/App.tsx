@@ -12,14 +12,16 @@ import DashboardPage from './pages/DashboardPage';
 import TravelerHomePage from './pages/TravelerHomePage';
 import StationBookingPage from './pages/StationBookingPage';
 import BookingPaymentPage from './pages/BookingPaymentPage';
+import BookingDetailPage from './pages/BookingDetailPage';
 
 /** Các trang có trong hệ thống */
-type Page = 'home' | 'login' | 'register' | 'verify-otp' | 'forgot-password' | 'dashboard' | 'map' | 'station-booking' | 'booking-payment';
+type Page = 'home' | 'login' | 'register' | 'verify-otp' | 'forgot-password' | 'dashboard' | 'map' | 'station-booking' | 'booking-payment' | 'booking-detail';
 
 /** Dữ liệu truyền giữa các trang (ví dụ email khi chuyển register → verify-otp) */
 interface PageData {
     email?: string;
     stationId?: string;
+    bookingId?: string;
     bookingData?: any;
 }
 
@@ -94,6 +96,14 @@ function App() {
             {currentPage === 'booking-payment' && (
                 <BookingPaymentPage
                     onNavigate={(mode, data) => navigateTo(mode as Page, data)}
+                    bookingData={pageData.bookingData}
+                />
+            )}
+
+            {currentPage === 'booking-detail' && (
+                <BookingDetailPage
+                    onNavigate={(mode, data) => navigateTo(mode as Page, data)}
+                    bookingId={pageData.bookingId}
                     bookingData={pageData.bookingData}
                 />
             )}
