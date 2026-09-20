@@ -1,4 +1,8 @@
-// Types đồng bộ với bảng Stations + Lockers trong DB
+import apiClient from './client';
+
+// ─── Types đồng bộ với Backend DTOs ──────────────────────────────────────────
+
+/** Trạm tủ (danh sách — StationListItemDto) */
 export interface Station {
     id: string;
     name: string;
@@ -6,18 +10,33 @@ export interface Station {
     latitude: number;
     longitude: number;
     status: 'ACTIVE' | 'MAINTENANCE' | 'INACTIVE';
-    opensAt: string;   // "06:00"
-    closesAt: string;  // "22:00"
     totalS: number;
     totalM: number;
     totalL: number;
+    // Client-side fields (không từ API)
+    opensAt?: string;   // "06:00"
+    closesAt?: string;  // "22:00"
+    availableS?: number;
+    availableM?: number;
+    availableL?: number;
+    contactPhone?: string;
+    distanceKm?: number;
+}
+
+/** Chi tiết trạm (StationDto — bao gồm giá & availability) */
+export interface StationDetail extends Station {
+    opensAt: string;
+    closesAt: string;
     availableS: number;
     availableM: number;
     availableL: number;
     contactPhone?: string;
-    distanceKm?: number; // tính toán client-side
+    priceS?: number;
+    priceM?: number;
+    priceL?: number;
 }
 
+/** Đơn đặt tủ đang hoạt động (dùng cho Dashboard / Map sidebar) */
 export interface Booking {
     id: string;
     bookingCode: string;
@@ -25,16 +44,86 @@ export interface Booking {
     stationAddress: string;
     lockerCode: string;
     size: 'S' | 'M' | 'L';
-    status: 'PENDING_PAYMENT' | 'CONFIRMED' | 'CHECKED_IN' | 'CHECKED_OUT' | 'CANCELLED' | 'OVERDUE';
+    status: 'PENDING_PAYMENT' | 'CONFIRMED' | 'CHECKED_IN' | 'CHECKED_OUT' | 'CANCELLED' | 'OVERDUE' | 'STORED' | 'COMPLETED';
     startAt: string;
     endAt: string;
     baseAmount: number;
     isOverdue: boolean;
 }
 
-// =====================================================
-// MOCK DATA — thay bằng API call thật khi có backend
-// =====================================================
+/** Backend API response wrapper */
+interface ApiResponse<T> {
+    success: boolean;
+    message: string;
+    data: T;
+    errors?: string[];
+}
+
+// ─── API Functions ───────────────────────────────────────────────────────────
+
+/**
+ * Lấy danh sách trạm tủ đang hoạt động (public, không cần auth).
+ * GET /api/Stations?search=...
+ * Fallback về MOCK_STATIONS nếu API không khả dụng.
+ */
+export async function getStations(search?: string): Promise<Station[]> {
+    try {
+        const params = new URLSearchParams();
+        if (search) params.append('search', search);
+        const query = params.toString() ? `?${params.toString()}` : '';
+        const response = await apiClient.get<ApiResponse<Station[]>>(`/api/Stations${query}`);
+        if (response.data.success && response.data.data) {
+            return response.data.data;
+        }
+        return MOCK_STATIONS;
+    } catch {
+        console.warn('[StationService] API không khả dụng, sử dụng dữ liệu mẫu.');
+        return MOCK_STATIONS;
+    }
+}
+
+/**
+ * Lấy chi tiết 1 trạm (bao gồm giá & availability theo khoảng thời gian).
+ * GET /api/Stations/{id}?startAt=...&endAt=...
+ */
+export async function getStationById(
+    id: string,
+    startAt?: string,
+    endAt?: string
+): Promise<StationDetail | null> {
+    try {
+        const params = new URLSearchParams();
+        if (startAt) params.append('startAt', startAt);
+        if (endAt) params.append('endAt', endAt);
+        const query = params.toString() ? `?${params.toString()}` : '';
+        const response = await apiClient.get<ApiResponse<StationDetail>>(`/api/Stations/${id}${query}`);
+        if (response.data.success && response.data.data) {
+            return response.data.data;
+        }
+        return null;
+    } catch {
+        console.warn('[StationService] Không thể lấy chi tiết trạm, thử fallback mock.');
+        // Fallback: tìm trong mock data
+        const mock = MOCK_STATIONS.find(s => s.id === id);
+        if (mock) {
+            return {
+                ...mock,
+                opensAt: mock.opensAt || '06:00',
+                closesAt: mock.closesAt || '22:00',
+                availableS: mock.availableS ?? mock.totalS,
+                availableM: mock.availableM ?? mock.totalM,
+                availableL: mock.availableL ?? mock.totalL,
+                priceS: 15000,
+                priceM: 25000,
+                priceL: 40000,
+            } as StationDetail;
+        }
+        return null;
+    }
+}
+
+// ─── MOCK DATA — Fallback khi Backend không khả dụng ─────────────────────────
+
 export const MOCK_STATIONS: Station[] = [
     {
         id: '1', name: 'SmartLocker Sân Bay Tân Sơn Nhất',
@@ -102,7 +191,9 @@ export const MOCK_ACTIVE_BOOKING: Booking | null = {
     isOverdue: false,
 };
 
-// Hàm tính khoảng cách km giữa 2 tọa độ (Haversine)
+// ─── Utility ─────────────────────────────────────────────────────────────────
+
+/** Tính khoảng cách km giữa 2 tọa độ GPS (Haversine) */
 export function calcDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
     const R = 6371;
     const dLat = ((lat2 - lat1) * Math.PI) / 180;

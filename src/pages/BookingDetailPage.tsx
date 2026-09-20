@@ -19,9 +19,11 @@ import {
   Compass,
   FileText,
   PlusCircle,
-  QrCode
+  QrCode,
+  AlertTriangle
 } from 'lucide-react';
 import { ExtendBookingModal } from '../components/booking/ExtendBookingModal';
+import { getBookingById, type BookingDto } from '../api/bookingService';
 
 interface BookingDetailPageProps {
   onNavigate: (page: string, props?: any) => void;
@@ -47,14 +49,79 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
     : 'NV';
   const userName = savedUser.fullName || 'Nguyen Van A';
 
-  const stationName = bookingData?.stationName || 'Da Nang Airport Station - Terminal 1';
-  const stationAddress = bookingData?.stationAddress || 'Arrival Hall Gate A2, Ground Floor (Kiosk Tower B)';
-  const size = bookingData?.size || 'M';
-  const duration = bookingData?.duration || 3;
-  const amount = bookingData?.amount || 45000;
-  const orderId = bookingData?.orderCode || bookingId || 'SL-8942A';
-  const passcode = bookingData?.accessCode || 'LK-8942A';
-  const bayCode = bookingData?.bayCode || (size === 'S' ? 'Bay S-02' : size === 'M' ? 'Bay M-04' : 'Bay L-02');
+  const [booking, setBooking] = useState<BookingDto | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchBooking = async () => {
+      if (!bookingId) {
+        setIsLoading(false);
+        return;
+      }
+      setIsLoading(true);
+      try {
+        const response = await getBookingById(bookingId);
+        if (mounted && response.success && response.data) {
+          setBooking(response.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch booking', error);
+      } finally {
+        if (mounted) setIsLoading(false);
+      }
+    };
+    fetchBooking();
+    return () => { mounted = false; };
+  }, [bookingId]);
+
+  // Fallback to props or mock while loading, or if API fails
+  const stationName = booking?.stationName || bookingData?.stationName || 'Da Nang Airport Station - Terminal 1';
+  const stationAddress = booking?.stationAddress || bookingData?.stationAddress || 'Arrival Hall Gate A2, Ground Floor (Kiosk Tower B)';
+  const size = booking?.size || bookingData?.size || 'M';
+  const duration = booking?.durationHours || bookingData?.duration || 3;
+  const amount = booking?.baseAmount || bookingData?.amount || 45000;
+  const orderId = booking?.bookingCode || bookingData?.orderCode || bookingId || 'SL-8942A';
+  const passcode = booking?.passcode || bookingData?.accessCode || 'LK-8942A';
+  const bayCode = booking?.lockerCode || bookingData?.bayCode || (size === 'S' ? 'Bay S-02' : size === 'M' ? 'Bay M-04' : 'Bay L-02');
+  const status = booking?.status || 'STORED';
+
+  const formatCurrency = (val: number) => new Intl.NumberFormat('vi-VN').format(val);
+
+  // Time calculations
+  const calculateTimeInfo = () => {
+    if (!booking) return { remainingText: '02h 15m remaining', progress: 35, startedText: '14:00 Today', expiresText: '17:00 Today' };
+    const now = new Date().getTime();
+    const start = new Date(booking.startAt).getTime();
+    const end = new Date(booking.endAt).getTime();
+    
+    const startedText = new Date(booking.startAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date(booking.startAt).toLocaleDateString('vi-VN');
+    const expiresText = new Date(booking.endAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date(booking.endAt).toLocaleDateString('vi-VN');
+    
+    if (now >= end) {
+      return { remainingText: '0m remaining', progress: 100, startedText, expiresText };
+    }
+    if (now <= start) {
+      return { remainingText: `${duration}h 0m remaining`, progress: 0, startedText, expiresText };
+    }
+
+    const total = end - start;
+    const elapsed = now - start;
+    const remaining = end - now;
+    
+    const hours = Math.floor(remaining / 3600000);
+    const minutes = Math.floor((remaining % 3600000) / 60000);
+    const progress = Math.min(100, Math.max(0, (elapsed / total) * 100));
+
+    return { 
+      remainingText: `${hours}h ${minutes}m remaining`, 
+      progress, 
+      startedText, 
+      expiresText 
+    };
+  };
+
+  const { remainingText, progress, startedText, expiresText } = calculateTimeInfo();
 
   // Token anti-screenshot refresh timer: đếm lùi từ 30s -> 0 -> 30s
   const [tokenSeconds, setTokenSeconds] = useState<number>(28);
@@ -77,9 +144,13 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
   const [showExtendModal, setShowExtendModal] = useState<boolean>(false);
   const [extendSuccessToast, setExtendSuccessToast] = useState<string | null>(null);
 
-  const formatCurrency = (val: number) => {
-    return new Intl.NumberFormat('vi-VN').format(val);
-  };
+  if (isLoading) {
+    return (
+      <div className="bg-[#f8f9ff] min-h-screen flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#f8f9ff] text-[#0b1c30] font-body-md antialiased min-h-screen flex flex-col selection:bg-[#dbe1ff] selection:text-[#004ac6] pb-12">
@@ -156,6 +227,17 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
 
       {/* MAIN CANVAS */}
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 md:px-8 py-6 space-y-6">
+        {/* Overdue Banner */}
+        {booking?.isOverdue && (
+           <div className="p-4 rounded-xl bg-red-50 border border-red-200 flex items-start gap-3.5 shadow-xs mb-4">
+             <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5 shrink-0" />
+             <div className="flex-1">
+               <p className="text-xs text-red-900 font-bold">Locker Overdue</p>
+               <p className="text-xs text-red-800 mt-0.5">This locker is currently overdue. Current overdue fee: <strong>{formatCurrency(booking.currentOverdueFee || 0)} VND</strong>.</p>
+             </div>
+           </div>
+        )}
+
         {/* BREADCRUMB & STATUS HEADER */}
         <section className="space-y-3">
           {/* Breadcrumb trail */}
@@ -177,7 +259,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
                   </span>
-                  <span>STORED - IN USE</span>
+                  <span>{status.replace('_', ' ')}</span>
                 </div>
                 {/* Booking Reference ID Badge */}
                 <span className="px-2.5 py-0.5 rounded-md bg-[#e5eeff] text-xs text-secondary font-mono font-bold">ID: #{orderId}</span>
@@ -360,22 +442,22 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                     <Timer className="w-5 h-5 text-primary" />
                     <span className="text-sm font-bold text-[#0b1c30]">Remaining Duration</span>
                   </div>
-                  <span className="text-lg font-bold text-primary">02h 15m remaining</span>
+                  <span className="text-lg font-bold text-primary">{remainingText}</span>
                 </div>
                 {/* Progress bar */}
                 <div className="space-y-1.5">
                   <div className="w-full bg-[#d3e4fe] rounded-full h-2.5 overflow-hidden">
-                    <div className="bg-primary h-2.5 rounded-full transition-all duration-500" style={{ width: '35%' }}></div>
+                    <div className="bg-primary h-2.5 rounded-full transition-all duration-500" style={{ width: `${progress}%` }}></div>
                   </div>
                   <div className="flex justify-between text-xs text-secondary">
-                    <span>Started: 14:00 Today</span>
-                    <span>Expires: 17:00 Today ({duration}h total)</span>
+                    <span>Started: {startedText}</span>
+                    <span>Expires: {expiresText}</span>
                   </div>
                 </div>
                 {/* Grace Note Callout */}
                 <div className="flex items-start gap-2 pt-2 text-xs text-[#434655] border-t border-outline-variant/20">
                   <Info className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
-                  <span><strong>Grace period until 17:15</strong>. Overdue fee of 15,000 VND per 30 minutes applies automatically after the grace period expires.</span>
+                  <span><strong>Grace period applies</strong>. Overdue fee of 15,000 VND per 30 minutes applies automatically after the grace period expires.</span>
                 </div>
               </div>
 
@@ -396,7 +478,8 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
               <div className="mt-6 pt-5 border-t border-outline-variant/20 grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <button
                   onClick={() => setShowExtendModal(true)}
-                  className="h-11 px-3 bg-white hover:bg-[#eff4ff] border border-primary/40 rounded-xl text-xs text-primary font-bold flex items-center justify-center gap-1.5 transition-colors shadow-xs cursor-pointer"
+                  disabled={booking?.canExtend === false}
+                  className={`h-11 px-3 bg-white border border-primary/40 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors shadow-xs ${booking?.canExtend === false ? 'opacity-50 cursor-not-allowed text-gray-500 border-gray-300' : 'hover:bg-[#eff4ff] text-primary cursor-pointer'}`}
                 >
                   <PlusCircle className="w-4 h-4" />
                   <span>Extend (+1h · 15k)</span>
@@ -433,7 +516,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                 <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white">
                   <div className="text-sm font-semibold flex items-center gap-1.5">
                     <MapPin className="w-4 h-4 text-primary-fixed" />
-                    Terminal 1 - Central Hub
+                    {stationName}
                   </div>
                   <span className="px-2 py-0.5 rounded bg-black/40 backdrop-blur-sm text-xs font-mono">Cluster B</span>
                 </div>
@@ -441,7 +524,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
               <div className="p-4 bg-[#eff4ff]/40 flex items-center justify-between border-t border-outline-variant/20">
                 <div className="flex items-center gap-2">
                   <Navigation className="w-4 h-4 text-primary" />
-                  <span className="text-xs text-[#0b1c30] font-medium">Located 50m past baggage carousel 3</span>
+                  <span className="text-xs text-[#0b1c30] font-medium">Located nearby</span>
                 </div>
                 <button onClick={() => onNavigate('map')} className="text-xs text-primary font-bold hover:underline cursor-pointer">
                   View Map
@@ -482,12 +565,12 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                       L-01
                     </div>
                   </div>
-                  {/* Column 2 (Contains User's Bay M-04) */}
+                  {/* Column 2 (Contains User's Bay) */}
                   <div className="space-y-2">
                     <div className="h-12 rounded-lg bg-white border border-outline-variant/40 flex items-center justify-center text-xs text-secondary">
                       S-02
                     </div>
-                    {/* Highlighted Active Bay M-04 */}
+                    {/* Highlighted Active Bay */}
                     <div className="h-16 rounded-lg bg-[#2563eb] text-white border-2 border-primary shadow-md flex flex-col items-center justify-center relative ring-2 ring-primary/30">
                       <span className="font-bold text-xs">{bayCode.replace('Bay ', '')}</span>
                       <span className="text-[9px] uppercase tracking-wider font-semibold bg-white/20 px-1 rounded">YOUR LOCKER</span>
@@ -524,15 +607,15 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
               <div className="divide-y divide-outline-variant/20 text-xs">
                 <div className="py-2.5 flex justify-between">
                   <span className="text-[#434655]">Check-in Timestamp</span>
-                  <span className="font-mono text-[#0b1c30] font-medium">Hôm nay, 14:00:12 ICT</span>
+                  <span className="font-mono text-[#0b1c30] font-medium">{booking?.startAt ? new Date(booking.startAt).toLocaleString('vi-VN') : 'N/A'}</span>
                 </div>
                 <div className="py-2.5 flex justify-between">
                   <span className="text-[#434655]">Baggage Declaration</span>
-                  <span className="text-[#0b1c30] font-medium">1x Hard Shell Cabin Luggage</span>
+                  <span className="text-[#0b1c30] font-medium">Standard Storage</span>
                 </div>
                 <div className="py-2.5 flex justify-between">
                   <span className="text-[#434655]">Security Seal ID</span>
-                  <span className="font-mono font-semibold text-primary">SEC-VN-90412</span>
+                  <span className="font-mono font-semibold text-primary">{orderId}</span>
                 </div>
                 <div className="py-2.5 flex justify-between">
                   <span className="text-[#434655]">Total Rate Billed</span>
@@ -563,10 +646,11 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
           setTimeout(() => {
             setExtendSuccessToast(null);
           }, 4000);
+          // Optional: we can reload the booking details here if needed, but typically window will redirect to payment
         }}
         lockerCode={bayCode}
         stationName={stationName}
-        currentEndTime="17:00 Today"
+        currentEndTime={expiresText}
       />
 
       {/* EXTEND SUCCESS TOAST */}
