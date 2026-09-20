@@ -19,9 +19,9 @@ import {
   Compass,
   FileText,
   PlusCircle,
-  ExternalLink,
   QrCode
 } from 'lucide-react';
+import { ExtendBookingModal } from '../components/booking/ExtendBookingModal';
 
 interface BookingDetailPageProps {
   onNavigate: (page: string, props?: any) => void;
@@ -75,14 +75,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
 
   // Extend Modal state (UC-T07 preview)
   const [showExtendModal, setShowExtendModal] = useState<boolean>(false);
-  const [extendHours, setExtendHours] = useState<number>(1);
   const [extendSuccessToast, setExtendSuccessToast] = useState<string | null>(null);
-
-  const handleConfirmExtend = () => {
-    setShowExtendModal(false);
-    setExtendSuccessToast(`Gia hạn thành công +${extendHours}h cho ô ${bayCode}!`);
-    setTimeout(() => setExtendSuccessToast(null), 3000);
-  };
 
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat('vi-VN').format(val);
@@ -561,61 +554,20 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
       </main>
 
       {/* EXTEND BOOKING MODAL (UC-T07) */}
-      {showExtendModal && (
-        <div className="fixed inset-0 z-50 bg-[#0b1c30]/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md rounded-2xl border border-outline-variant/30 shadow-2xl p-6 space-y-5 animate-fade-in-up">
-            <div className="flex items-center justify-between border-b border-outline-variant/30 pb-3">
-              <div className="flex items-center gap-2">
-                <PlusCircle className="w-5 h-5 text-primary" />
-                <h3 className="text-lg font-bold text-[#0b1c30]">Gia hạn thời gian gửi tủ</h3>
-              </div>
-              <button onClick={() => setShowExtendModal(false)} className="text-secondary hover:text-[#0b1c30] text-sm">✕</button>
-            </div>
-
-            <p className="text-xs text-[#434655]">
-              Bạn đang sử dụng ô <strong>{bayCode}</strong> tại <strong>{stationName}</strong>. Chọn số giờ muốn gia hạn thêm:
-            </p>
-
-            {/* Hour options */}
-            <div className="grid grid-cols-3 gap-3">
-              {[1, 2, 3].map(h => (
-                <button
-                  key={h}
-                  onClick={() => setExtendHours(h)}
-                  className={`py-3 rounded-xl border text-center font-bold text-xs transition-all cursor-pointer ${
-                    extendHours === h
-                      ? 'border-primary bg-[#eff4ff] text-primary shadow-xs ring-2 ring-primary/20'
-                      : 'border-outline-variant/40 bg-white text-[#434655] hover:bg-slate-50'
-                  }`}
-                >
-                  <div className="text-base">+{h} Giờ</div>
-                  <div className="text-[11px] font-normal text-secondary mt-0.5">{formatCurrency(h * 15000)} VND</div>
-                </button>
-              ))}
-            </div>
-
-            <div className="bg-[#eff4ff] p-3 rounded-xl flex justify-between items-center text-xs">
-              <span className="text-[#434655]">Phí gia hạn thêm:</span>
-              <span className="text-base font-bold text-primary">{formatCurrency(extendHours * 15000)} VND</span>
-            </div>
-
-            <div className="flex gap-3 pt-2">
-              <button
-                onClick={() => setShowExtendModal(false)}
-                className="flex-1 py-2.5 rounded-xl border border-outline-variant text-xs font-semibold text-secondary hover:bg-slate-50 cursor-pointer"
-              >
-                Hủy bỏ
-              </button>
-              <button
-                onClick={handleConfirmExtend}
-                className="flex-1 py-2.5 rounded-xl bg-primary hover:bg-[#2563eb] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
-              >
-                Xác nhận gia hạn
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ExtendBookingModal
+        isOpen={showExtendModal}
+        onClose={() => setShowExtendModal(false)}
+        onSuccess={(addedHours, fee) => {
+          setShowExtendModal(false);
+          setExtendSuccessToast(`Gia hạn thành công thêm +${addedHours} giờ (${new Intl.NumberFormat('vi-VN').format(fee)} VND)! Mã mở khóa đã cập nhật.`);
+          setTimeout(() => {
+            setExtendSuccessToast(null);
+          }, 4000);
+        }}
+        lockerCode={bayCode}
+        stationName={stationName}
+        currentEndTime="17:00 Today"
+      />
 
       {/* EXTEND SUCCESS TOAST */}
       {extendSuccessToast && (

@@ -340,6 +340,28 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                             </div>
                         </div>
 
+                        {/* Search Input */}
+                        <div className="px-4 py-1.5">
+                            <div className="relative">
+                                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={e => setSearchQuery(e.target.value)}
+                                    placeholder="Tìm kiếm trạm tủ..."
+                                    className="w-full pl-9 pr-8 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
+                                />
+                                {searchQuery && (
+                                    <button
+                                        onClick={() => setSearchQuery('')}
+                                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+                                    >
+                                        <X className="w-3.5 h-3.5" />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
                         {/* Station count */}
                         <div className="px-4 py-1.5 flex items-center justify-between">
                             <p className="text-xs text-gray-400">
