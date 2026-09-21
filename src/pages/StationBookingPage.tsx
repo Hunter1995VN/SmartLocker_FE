@@ -79,14 +79,14 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
   const dropOffTime = '14:00';
 
   const basePrices = {
-    S: stationDetail?.priceS ?? 20000,
-    M: stationDetail?.priceM ?? 35000,
-    L: stationDetail?.priceL ?? 50000
+    S: stationDetail?.priceS ?? 15000,
+    M: stationDetail?.priceM ?? 25000,
+    L: stationDetail?.priceL ?? 40000
   };
 
   const getPrice = (size: 'S' | 'M' | 'L' | null, duration: number) => {
     if (!size) return 0;
-    return (basePrices[size] * duration) / 3;
+    return basePrices[size] * duration;
   };
 
   const currentPrice = getPrice(selectedSize, selectedDuration);
@@ -235,7 +235,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
               <div>
                 <label className="text-sm font-medium text-[#0F172A] mb-3 block">Storage Duration</label>
                 <div className="flex flex-wrap gap-3">
-                  {[3, 6, 12, 24].map((duration) => (
+                  {[1, 3, 6, 12, 24].map((duration) => (
                     <button
                       key={duration}
                       onClick={() => setSelectedDuration(duration)}
@@ -245,7 +245,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                           : 'bg-white text-[#475569] border border-outline-variant/50 hover:border-primary/50 hover:bg-[#F8FAFC]'
                       }`}
                     >
-                      {duration} Hours
+                      {duration} {duration === 1 ? 'Hour' : 'Hours'}
                     </button>
                   ))}
                   <button className="px-5 py-2.5 rounded-full text-sm font-medium bg-white text-[#475569] border border-outline-variant/50 hover:border-primary/50 hover:bg-[#F8FAFC] flex items-center">
@@ -314,7 +314,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   <div className={`p-4 border-t ${selectedSize === 'S' ? 'border-primary/20 bg-primary/5' : 'border-outline-variant/30 bg-[#F8FAFC]'}`}>
                     <div className="flex items-baseline justify-between">
                       <span className="text-lg font-bold text-primary">{formatCurrency(basePrices.S)}</span>
-                      <span className="text-xs text-secondary font-medium">/ 3 hrs</span>
+                      <span className="text-xs text-secondary font-medium">/ giờ</span>
                     </div>
                     <button className={`w-full mt-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
                       selectedSize === 'S' ? 'bg-primary text-white' : 'bg-white border border-outline-variant hover:bg-gray-50 text-[#0F172A]'
@@ -359,7 +359,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   <div className={`p-4 border-t ${selectedSize === 'M' ? 'border-primary/20 bg-primary/5' : 'border-outline-variant/30 bg-[#F8FAFC]'}`}>
                     <div className="flex items-baseline justify-between">
                       <span className="text-lg font-bold text-primary">{formatCurrency(basePrices.M)}</span>
-                      <span className="text-xs text-secondary font-medium">/ 3 hrs</span>
+                      <span className="text-xs text-secondary font-medium">/ giờ</span>
                     </div>
                     <button className={`w-full mt-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
                       selectedSize === 'M' ? 'bg-primary text-white' : 'bg-white border border-outline-variant hover:bg-gray-50 text-[#0F172A]'
@@ -408,7 +408,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   <div className={`p-4 border-t relative z-0 ${(!currentStation.availableL || currentStation.availableL === 0) ? 'border-outline-variant/30 bg-gray-100' : selectedSize === 'L' ? 'border-primary/20 bg-primary/5' : 'border-outline-variant/30 bg-[#F8FAFC]'}`}>
                     <div className="flex items-baseline justify-between">
                       <span className={`text-lg font-bold ${(!currentStation.availableL || currentStation.availableL === 0) ? 'text-gray-400' : 'text-primary'}`}>{formatCurrency(basePrices.L)}</span>
-                      <span className={`text-xs font-medium ${(!currentStation.availableL || currentStation.availableL === 0) ? 'text-gray-400' : 'text-secondary'}`}>/ 3 hrs</span>
+                      <span className={`text-xs font-medium ${(!currentStation.availableL || currentStation.availableL === 0) ? 'text-gray-400' : 'text-secondary'}`}>/ giờ</span>
                     </div>
                     <button disabled={(!currentStation.availableL || currentStation.availableL === 0)} className={`w-full mt-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
                       (!currentStation.availableL || currentStation.availableL === 0) ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : selectedSize === 'L' ? 'bg-primary text-white' : 'bg-white border border-outline-variant hover:bg-gray-50 text-[#0F172A]'
@@ -525,7 +525,9 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   </div>
 
                   <div className="flex justify-between items-center pt-2">
-                    <p className="text-sm text-secondary">Base Rate</p>
+                    <p className="text-sm text-secondary">
+                      Base Rate ({formatCurrency(selectedSize ? basePrices[selectedSize] : 0)}/h × {selectedDuration}h)
+                    </p>
                     <p className="text-sm font-medium text-[#0F172A]">{formatCurrency(currentPrice)}</p>
                   </div>
                   
