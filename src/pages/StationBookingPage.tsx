@@ -62,7 +62,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
   }, [stationId]);
 
   const currentStation = stationDetail || MOCK_STATIONS.find(s => s.id === stationId) || {
-    id: '3',
+    id: '33333333-3333-3333-3333-333333333333',
     name: 'SmartLocker Phố Đi Bộ Nguyễn Huệ',
     address: '89 Nguyễn Huệ, Phường Bến Nghé, Q.1, TP.HCM',
     latitude: 10.7752,
@@ -70,8 +70,8 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
     status: 'ACTIVE' as const,
     opensAt: '08:00',
     closesAt: '22:30',
-    totalS: 10, totalM: 10, totalL: 5,
-    availableS: 3, availableM: 7, availableL: 2,
+    totalS: 8, totalM: 6, totalL: 4,
+    availableS: 8, availableM: 6, availableL: 4,
     contactPhone: '028 3822 1234',
   };
 
@@ -598,7 +598,21 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                           setApiError(res.message || 'Đã xảy ra lỗi khi tạo đơn.');
                         }
                       } catch (error: any) {
-                        setApiError(error.response?.data?.message || 'Lỗi kết nối đến máy chủ.');
+                        let errorMsg = 'Lỗi kết nối đến máy chủ.';
+                        if (error.response?.data) {
+                          const data = error.response.data;
+                          if (data.message) {
+                            errorMsg = data.message;
+                          } else if (data.errors && typeof data.errors === 'object') {
+                            const errorList = Object.values(data.errors).flat();
+                            errorMsg = errorList.join('; ') || data.title || errorMsg;
+                          } else if (data.title) {
+                            errorMsg = data.title;
+                          }
+                        } else if (error.message) {
+                          errorMsg = error.message;
+                        }
+                        setApiError(errorMsg);
                       } finally {
                         setIsSubmitting(false);
                       }
