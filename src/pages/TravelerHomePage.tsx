@@ -669,7 +669,10 @@ function QuickAction({ icon, label, color, onClick }: {
 function StationCard({ station, isSelected, onClick }: {
     station: Station; isSelected: boolean; onClick: () => void;
 }) {
-    const totalAvail = (station.availableS ?? 0) + (station.availableM ?? 0) + (station.availableL ?? 0);
+    const availS = station.availableS ?? station.totalS;
+    const availM = station.availableM ?? station.totalM;
+    const availL = station.availableL ?? station.totalL;
+    const totalAvail = availS + availM + availL;
     const isActive = station.status === 'ACTIVE';
 
     return (
@@ -704,7 +707,7 @@ function StationCard({ station, isSelected, onClick }: {
                                     {totalAvail} ô trống
                                 </span>
                                 <span className="text-gray-200">|</span>
-                                <span className="text-xs text-gray-400">{station.opensAt}–{station.closesAt}</span>
+                                <span className="text-xs text-gray-400">{station.opensAt || '06:00'}–{station.closesAt || '22:00'}</span>
                             </>
                         ) : (
                             <span className="flex items-center gap-1 text-xs text-amber-600 font-semibold">
@@ -716,9 +719,9 @@ function StationCard({ station, isSelected, onClick }: {
                     {isActive && (
                         <div className="flex gap-1.5 mt-2">
                             {[
-                                { key: 'S', avail: station.availableS ?? 0, total: station.totalS },
-                                { key: 'M', avail: station.availableM ?? 0, total: station.totalM },
-                                { key: 'L', avail: station.availableL ?? 0, total: station.totalL },
+                                { key: 'S', avail: availS, total: station.totalS },
+                                { key: 'M', avail: availM, total: station.totalM },
+                                { key: 'L', avail: availL, total: station.totalL },
                             ].map(({ key, avail, total }) => (
                                 <div key={key} className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold ${SIZE_COLOR[key]}`}>
                                     {key} <span className="opacity-70">{avail}/{total}</span>
@@ -734,7 +737,10 @@ function StationCard({ station, isSelected, onClick }: {
 }
 
 function MapInfoWindow({ station, onBook }: { station: Station; onBook?: (s: Station) => void }) {
-    const totalAvail = (station.availableS ?? 0) + (station.availableM ?? 0) + (station.availableL ?? 0);
+    const availS = station.availableS ?? station.totalS;
+    const availM = station.availableM ?? station.totalM;
+    const availL = station.availableL ?? station.totalL;
+    const totalAvail = availS + availM + availL;
     const isActive = station.status === 'ACTIVE';
 
     return (
@@ -750,9 +756,9 @@ function MapInfoWindow({ station, onBook }: { station: Station; onBook?: (s: Sta
             {isActive && (
                 <div className="flex gap-1.5 mb-2">
                     {[
-                        { key: 'S', avail: station.availableS ?? 0, total: station.totalS },
-                        { key: 'M', avail: station.availableM ?? 0, total: station.totalM },
-                        { key: 'L', avail: station.availableL ?? 0, total: station.totalL },
+                        { key: 'S', avail: availS, total: station.totalS },
+                        { key: 'M', avail: availM, total: station.totalM },
+                        { key: 'L', avail: availL, total: station.totalL },
                     ].map(({ key, avail, total }) => (
                         <div key={key} className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${(avail ?? 0) > 0 ? SIZE_COLOR[key] : 'bg-gray-100 text-gray-400'}`}>
                             {key}: {avail}/{total}
@@ -763,7 +769,7 @@ function MapInfoWindow({ station, onBook }: { station: Station; onBook?: (s: Sta
 
             <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
                 <span className="flex items-center gap-1">
-                    <Clock className="w-3 h-3" /> {station.opensAt}–{station.closesAt}
+                    <Clock className="w-3 h-3" /> {station.opensAt || '06:00'}–{station.closesAt || '22:00'}
                 </span>
                 {station.contactPhone && (
                     <span className="flex items-center gap-1">

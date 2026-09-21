@@ -875,7 +875,10 @@ function LockerCell({ code, status, span }: { code: string; status: 'AVAILABLE' 
 }
 
 function NearbyStationCard({ station }: { station: Station }) {
-    const totalAvail = (station.availableS ?? 0) + (station.availableM ?? 0) + (station.availableL ?? 0);
+    const availS = station.availableS ?? station.totalS;
+    const availM = station.availableM ?? station.totalM;
+    const availL = station.availableL ?? station.totalL;
+    const totalAvail = availS + availM + availL;
     const isPrimary = station.distanceKm != null && station.distanceKm < 1;
 
     const distLabel = station.distanceKm != null
@@ -890,14 +893,14 @@ function NearbyStationCard({ station }: { station: Station }) {
                 <span className="text-sm font-bold text-[#0b1c30]">{station.name}</span>
                 <span className={`text-xs font-bold ${isPrimary ? 'text-[#004ac6]' : 'text-[#434655]'}`}>{distLabel}</span>
             </div>
-            <p className="text-xs text-[#434655]">{station.address.split(',').slice(-2).join(',').trim()} · Mở {station.opensAt}–{station.closesAt}</p>
+            <p className="text-xs text-[#434655]">{station.address.split(',').slice(-2).join(',').trim()} · Mở {station.opensAt || '06:00'}–{station.closesAt || '22:00'}</p>
             <div className="flex items-center justify-between pt-1">
                 <div className="flex items-center gap-2 text-xs font-mono text-[#434655]">
-                    <span>S: <strong className="text-[#006242]">{station.availableS}</strong></span>
+                    <span>S: <strong className="text-[#006242]">{availS}</strong></span>
                     <span>·</span>
-                    <span>M: <strong className="text-[#006242]">{station.availableM}</strong></span>
+                    <span>M: <strong className="text-[#006242]">{availM}</strong></span>
                     <span>·</span>
-                    <span>L: <strong className="text-[#006242]">{station.availableL}</strong></span>
+                    <span>L: <strong className="text-[#006242]">{availL}</strong></span>
                 </div>
                 <button
                     disabled={totalAvail === 0}
