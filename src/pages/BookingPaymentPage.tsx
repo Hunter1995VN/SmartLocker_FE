@@ -295,7 +295,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
               </div>
               <div className="flex flex-col min-w-0">
                 <span className="text-[10px] uppercase font-bold text-blue-600 tracking-wider">Bước 2 (Đang thực hiện)</span>
-                <span className="text-sm font-bold text-blue-600 truncate">Quét mã VietQR (PayOS)</span>
+                <span className="text-sm font-bold text-blue-600 truncate">Thanh toán PayOS</span>
               </div>
             </div>
 
@@ -518,11 +518,11 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">Thanh toán VietQR qua PayOS</h2>
-                      <span className="bg-blue-100 text-blue-700 font-bold text-[10px] px-2 py-0.5 rounded">Tự động</span>
+                      <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">Thanh toán qua PayOS</h2>
+                      <span className="bg-blue-100 text-blue-700 font-bold text-[10px] px-2 py-0.5 rounded">Cổng bảo mật</span>
                     </div>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      Quét mã bằng ứng dụng của hơn 40+ ngân hàng Việt Nam hoặc ví điện tử
+                      Quét mã QR bằng ứng dụng của hơn 40+ ngân hàng hoặc ví điện tử
                     </p>
                   </div>
                 </div>
