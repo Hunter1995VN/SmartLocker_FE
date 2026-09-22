@@ -533,77 +533,36 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                 </div>
               </div>
 
-              {/* KHUNG HIỂN THỊ MÃ VIETQR PAYOS SINH ĐỘNG & BẮT MẮT */}
-              <div className="my-5 flex flex-col items-center justify-center p-6 bg-gradient-to-b from-blue-50/40 via-slate-50/50 to-white rounded-2xl border border-blue-100 shadow-xs relative overflow-hidden">
-                {/* Vòng sáng nền trang trí */}
-                <div className="absolute top-0 right-0 w-40 h-40 bg-blue-400/5 rounded-full blur-2xl pointer-events-none"></div>
-                <div className="absolute bottom-0 left-0 w-40 h-40 bg-emerald-400/5 rounded-full blur-2xl pointer-events-none"></div>
-
-                {/* Khung thẻ QR trung tâm */}
-                <div className="relative p-4 bg-white rounded-2xl shadow-md border border-slate-200/90 flex flex-col items-center transition-all hover:shadow-lg">
-                  {/* Badge nhỏ trên đỉnh thẻ QR */}
-                  <div className="mb-2.5 flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-[11px] font-bold">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span>Mã thanh toán tự động VietQR</span>
-                  </div>
-
-                  {/* Ảnh VietQR hoặc Fallback SVG */}
-                  <div className="overflow-hidden rounded-xl bg-white p-1">
-                    {vietQrImgUrl && !useFallbackQr ? (
-                      <img
-                        src={vietQrImgUrl}
-                        alt="VietQR PayOS"
-                        className="w-64 sm:w-72 h-auto rounded-lg object-contain"
-                        onError={() => setUseFallbackQr(true)}
+              {/* KHUNG HIỂN THỊ MÃ VIETQR CHUẨN PAYOS */}
+              <div className="my-5 flex flex-col items-center justify-center p-5 bg-gradient-to-b from-slate-50 to-white rounded-2xl border border-slate-200">
+                <div className="p-3.5 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center">
+                  {vietQrImgUrl && !useFallbackQr ? (
+                    <img
+                      src={vietQrImgUrl}
+                      alt="VietQR PayOS"
+                      className="w-60 sm:w-64 h-auto rounded-xl object-contain"
+                      onError={() => setUseFallbackQr(true)}
+                    />
+                  ) : (
+                    <div className="p-3 bg-white rounded-xl">
+                      <QRCodeSVG
+                        value={effectiveQrCode}
+                        size={220}
+                        level="M"
+                        includeMargin={false}
                       />
-                    ) : (
-                      <div className="p-3 bg-white rounded-xl">
-                        <QRCodeSVG
-                          value={effectiveQrCode}
-                          size={230}
-                          level="M"
-                          includeMargin={false}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Dải logo Napas, MoMo, VNPAY, ZaloPay sinh động ngay dưới chân mã */}
-                  <div className="mt-3 pt-2.5 border-t border-slate-100 w-full flex flex-col items-center gap-1.5">
-                    <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                      Hỗ trợ quét tức thì qua:
-                    </span>
-                    <div className="flex flex-wrap items-center justify-center gap-1.5">
-                      <span className="bg-[#003B7A] text-white font-extrabold text-[10px] px-2 py-0.5 rounded shadow-2xs">
-                        NAPAS 247
-                      </span>
-                      <span className="bg-[#A50064] text-white font-extrabold text-[10px] px-2 py-0.5 rounded shadow-2xs tracking-tight">
-                        MoMo
-                      </span>
-                      <span className="bg-[#005BAA] text-white font-extrabold text-[10px] px-2 py-0.5 rounded shadow-2xs tracking-tight">
-                        VNPAY
-                      </span>
-                      <span className="bg-[#008FE5] text-white font-extrabold text-[10px] px-2 py-0.5 rounded shadow-2xs tracking-tight">
-                        ZaloPay
-                      </span>
-                      <span className="bg-[#004B87] text-white font-extrabold text-[10px] px-2 py-0.5 rounded shadow-2xs">
-                        MB
-                      </span>
-                      <span className="bg-[#006837] text-white font-extrabold text-[10px] px-2 py-0.5 rounded shadow-2xs">
-                        VCB
-                      </span>
                     </div>
-                  </div>
+                  )}
                 </div>
 
-                {/* Số tiền và hướng dẫn quét */}
-                <div className="mt-4 text-center space-y-1.5">
-                  <div className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-800 px-4 py-1.5 rounded-full border border-emerald-200/80 text-xs font-extrabold shadow-2xs">
-                    <CheckCircle className="w-4 h-4 text-emerald-600" />
+                {/* Số tiền và hướng dẫn dưới QR */}
+                <div className="mt-3 text-center space-y-1">
+                  <div className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-3.5 py-1 rounded-full border border-emerald-200 text-xs font-bold">
+                    <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
                     <span>Số tiền chính xác: {formatCurrency(amount)} ₫</span>
                   </div>
                   <p className="text-xs text-slate-600 font-medium">
-                    Mở app bất kỳ ➔ Chọn <strong>Quét mã QR</strong> để chuyển tiền khớp đơn tự động
+                    Mở app ngân hàng ➔ Chọn <strong>Quét mã QR</strong> để chuyển khoản tự động
                   </p>
                 </div>
               </div>
