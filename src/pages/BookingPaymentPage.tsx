@@ -10,15 +10,17 @@ import {
   Verified,
   Info,
   User,
-  Edit,
-  Badge,
   MessageSquare,
   Mail,
   Copy,
   CheckCircle,
-  QrCode,
   Lock,
-  Headphones
+  Headphones,
+  ExternalLink,
+  RefreshCw,
+  CreditCard,
+  Sparkles,
+  ArrowRight
 } from 'lucide-react';
 import { getBookingById } from '../api/bookingService';
 
@@ -44,21 +46,21 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
   // Lấy thông tin user đăng nhập nếu có
   const savedUser = JSON.parse(localStorage.getItem('smartlocker_user') || '{}');
 
-  const stationName = bookingData?.stationName || 'Da Nang Airport Station (Terminal 1)';
-  const stationAddress = bookingData?.stationAddress || 'Gate 3, Arrival Hall Gate A2, Da Nang Airport (DAD)';
+  const stationName = bookingData?.stationName || 'Trạm Sân Bay Đà Nẵng (Ga T1)';
+  const stationAddress = bookingData?.stationAddress || 'Cửa 3, Sảnh đến A2, Sân bay Quốc tế Đà Nẵng (DAD)';
   const size = bookingData?.size || 'M';
   const duration = bookingData?.duration || 3;
-  const amount = bookingData?.amount || 35000;
+  const amount = bookingData?.amount || 75000;
   const storageDate = bookingData?.storageDate || 'Hôm nay';
   const dropOffTime = bookingData?.dropOffTime || '14:00';
 
-  const travelerName = savedUser.fullName || 'Nguyen Van A';
+  const travelerName = savedUser.fullName || 'Nguyễn Văn A';
   const travelerPhone = savedUser.phone || '0901 234 567';
   const travelerEmail = savedUser.email || 'nguyenvana@gmail.com';
 
   const orderCode = bookingData?.bookingCode || 'BK' + Math.floor(10000000 + Math.random() * 90000000).toString().substring(0, 8);
 
-  // Countdown timer
+  // Đếm ngược thời gian giữ chỗ
   const [secondsLeft, setSecondsLeft] = useState<number>(0);
   useEffect(() => {
     const calculateTimeLeft = () => {
@@ -66,9 +68,9 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
       const diff = new Date(bookingData.paymentExpiresAt).getTime() - new Date().getTime();
       return Math.max(0, Math.floor(diff / 1000));
     };
-    
+
     setSecondsLeft(calculateTimeLeft());
-    
+
     const timer = setInterval(() => {
       setSecondsLeft(calculateTimeLeft());
     }, 1000);
@@ -85,7 +87,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
     return new Intl.NumberFormat('vi-VN').format(val);
   };
 
-  // Toast notification state
+  // Toast thông báo
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -97,14 +99,18 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
     showToast(`Đã sao chép ${label}: ${text}`);
   };
 
-  // Success modal state
+  // Trạng thái modal thành công
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
   const [agreedTerms, setAgreedTerms] = useState<boolean>(true);
-  const [successData, setSuccessData] = useState<{lockerCode?: string, accessCode?: string} | null>(null);
+  const [successData, setSuccessData] = useState<{ lockerCode?: string; accessCode?: string } | null>(null);
 
+  // Trạng thái kiểm tra thủ công
+  const [isCheckingStatus, setIsCheckingStatus] = useState<boolean>(false);
+
+  // Polling tự động kiểm tra trạng thái thanh toán mỗi 5 giây
   useEffect(() => {
     if (!bookingData?.bookingId) return;
-    
+
     const interval = setInterval(async () => {
       try {
         const res = await getBookingById(bookingData.bookingId!);
@@ -113,7 +119,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
             clearInterval(interval);
             setSuccessData({
               lockerCode: res.data.lockerCode || 'N/A',
-              accessCode: res.data.lockerCode ? `LK-${res.data.lockerCode}` : '729 416' 
+              accessCode: res.data.passcode || (res.data.lockerCode ? `LK-${res.data.lockerCode}` : '729 416')
             });
             setShowSuccessModal(true);
           } else if (res.data.status !== 'PENDING_PAYMENT') {
@@ -121,615 +127,604 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
           }
         }
       } catch (error) {
-        console.error("Polling error", error);
+        console.error('Polling payment error:', error);
       }
     }, 5000);
-    
+
     return () => clearInterval(interval);
   }, [bookingData?.bookingId]);
 
+  // Hàm kiểm tra thanh toán ngay khi người dùng bấm nút
+  const handleCheckPaymentNow = async () => {
+    if (!bookingData?.bookingId) {
+      showToast('Không có mã đơn để kiểm tra.');
+      return;
+    }
+    setIsCheckingStatus(true);
+    try {
+      const res = await getBookingById(bookingData.bookingId);
+      if (res.success && res.data) {
+        if (res.data.status === 'CONFIRMED' || res.data.status === 'STORED' || res.data.status === 'CHECKED_IN') {
+          setSuccessData({
+            lockerCode: res.data.lockerCode || 'N/A',
+            accessCode: res.data.passcode || (res.data.lockerCode ? `LK-${res.data.lockerCode}` : '729 416')
+          });
+          setShowSuccessModal(true);
+        } else {
+          showToast('Chưa nhận được giao dịch. Vui lòng thanh toán trên PayOS.');
+        }
+      } else {
+        showToast('Chưa ghi nhận thanh toán. Vui lòng thử lại sau vài giây.');
+      }
+    } catch (error) {
+      showToast('Lỗi khi kiểm tra. Vui lòng thử lại sau.');
+    } finally {
+      setIsCheckingStatus(false);
+    }
+  };
+
+  const handleOpenPayOS = () => {
+    if (bookingData?.paymentUrl) {
+      window.open(bookingData.paymentUrl, '_blank');
+    } else {
+      showToast('Chưa có liên kết thanh toán PayOS.');
+    }
+  };
+
   return (
-    <div className="bg-[#F8FAFC] text-[#0F172A] font-body-md text-body-md antialiased min-h-screen flex flex-col justify-between selection:bg-primary-container selection:text-white pb-12">
-      {/* TOP APP BAR */}
-      <header className="w-full bg-white sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm">
+    <div className="bg-[#F8FAFC] text-[#0F172A] min-h-screen flex flex-col justify-between selection:bg-blue-100 selection:text-blue-900 pb-12">
+      {/* HEADER APP BAR */}
+      <header className="w-full bg-white sticky top-0 z-40 border-b border-slate-200/80 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          {/* Left: Logo & Breadcrumbs */}
+          {/* Logo & Breadcrumb */}
           <div className="flex items-center gap-4">
-            <button onClick={() => onNavigate('home')} className="flex items-center gap-2.5 transition-transform active:scale-[0.98]">
-              <div className="w-10 h-10 rounded-xl bg-[#2563EB]/10 flex items-center justify-center p-1.5 border border-[#2563EB]/20">
-                <Lock className="w-5 h-5 text-primary" />
+            <button
+              onClick={() => onNavigate('home')}
+              className="flex items-center gap-2.5 transition-transform active:scale-[0.98]"
+            >
+              <div className="w-10 h-10 rounded-xl bg-blue-600/10 flex items-center justify-center border border-blue-600/20">
+                <Lock className="w-5 h-5 text-blue-600" />
               </div>
               <div className="flex flex-col text-left">
-                <span className="font-headline-md text-headline-md text-primary tracking-tight font-extrabold flex items-center gap-1.5">
+                <span className="text-lg font-extrabold text-blue-600 tracking-tight flex items-center gap-1.5">
                   SmartLocker
-                  <span className="bg-primary-container/10 text-primary-container text-[10px] uppercase font-bold px-1.5 py-0.5 rounded tracking-normal">Pay</span>
+                  <span className="bg-blue-100 text-blue-700 text-[10px] uppercase font-bold px-1.5 py-0.5 rounded tracking-normal">
+                    Thanh toán
+                  </span>
                 </span>
               </div>
             </button>
-            <div className="hidden lg:flex items-center gap-2 pl-4 border-l border-outline-variant/40 text-[#64748B] text-sm">
-              <span onClick={() => onNavigate('home')} className="hover:text-primary transition-colors cursor-pointer">Home</span>
-              <ChevronRight className="w-3.5 h-3.5 text-outline" />
-              <span onClick={() => onNavigate('map')} className="hover:text-primary transition-colors cursor-pointer">Stations</span>
-              <ChevronRight className="w-3.5 h-3.5 text-outline" />
-              <span onClick={() => onNavigate('station-booking')} className="hover:text-primary transition-colors cursor-pointer">{stationName.split('(')[0].trim()}</span>
-              <ChevronRight className="w-3.5 h-3.5 text-outline" />
-              <span className="text-[#0F172A] font-semibold">Checkout &amp; Payment</span>
+            <div className="hidden lg:flex items-center gap-2 pl-4 border-l border-slate-200 text-slate-500 text-sm">
+              <span onClick={() => onNavigate('home')} className="hover:text-blue-600 transition-colors cursor-pointer">
+                Trang chủ
+              </span>
+              <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+              <span onClick={() => onNavigate('map')} className="hover:text-blue-600 transition-colors cursor-pointer">
+                Danh sách trạm
+              </span>
+              <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+              <span
+                onClick={() => onNavigate('station-booking')}
+                className="hover:text-blue-600 transition-colors cursor-pointer"
+              >
+                {stationName.split('(')[0].trim()}
+              </span>
+              <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+              <span className="text-slate-900 font-semibold">Xác nhận &amp; Thanh toán</span>
             </div>
           </div>
-          {/* Right: Hotline, Currency, Trust Badge */}
+
+          {/* Hotline & Security Badge */}
           <div className="flex items-center gap-3 sm:gap-5">
-            <a className="hidden sm:flex items-center gap-1.5 text-[#434655] hover:text-primary transition-colors text-sm" href="tel:19001234">
-              <Headphones className="w-4 h-4 text-[#2563EB]" />
-              <span>Hotline <strong className="text-[#0F172A]">1900 1234</strong></span>
+            <a
+              className="hidden sm:flex items-center gap-1.5 text-slate-600 hover:text-blue-600 transition-colors text-sm"
+              href="tel:19001234"
+            >
+              <Headphones className="w-4 h-4 text-blue-600" />
+              <span>
+                Hotline <strong className="text-slate-900">1900 1234</strong>
+              </span>
             </a>
-            <div className="hidden md:flex items-center gap-1 bg-[#F1F5F9] px-2.5 py-1 rounded-lg border border-[#E2E8F0] text-sm text-[#434655]">
-              <span className="font-semibold text-[#0F172A]">VND ₫</span>
-              <span className="text-outline-variant">|</span>
-              <span>EN</span>
-            </div>
-            <div className="flex items-center gap-1.5 bg-[#ECFDF5] text-[#047857] px-3 py-1.5 rounded-full border border-[#A7F3D0] text-sm font-semibold">
-              <ShieldCheck className="w-4 h-4" />
-              <span>Secure Checkout</span>
+            <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full border border-emerald-200 text-xs font-semibold">
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <span>Bảo mật 100% qua PayOS</span>
             </div>
           </div>
         </div>
       </header>
 
-      {/* MAIN CANVAS */}
+      {/* MAIN CONTENT */}
       <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 w-full">
-        {/* PROGRESS STEPPER */}
-        <nav aria-label="Progress Steps" className="mb-6 md:mb-8 bg-white border border-[#E2E8F0] rounded-2xl p-4 shadow-sm">
+        {/* STEP PROGRESS BAR */}
+        <nav aria-label="Tiến trình đặt tủ" className="mb-6 md:mb-8 bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
           <div className="grid grid-cols-3 gap-2 sm:gap-4 items-center">
-            {/* Step 1 */}
-            <button onClick={() => onNavigate('station-booking')} className="flex items-center gap-2 sm:gap-3 text-left">
-              <div className="w-8 h-8 rounded-full bg-[#ECFDF5] text-[#047857] border border-[#A7F3D0] flex items-center justify-center shrink-0">
+            {/* Bước 1 */}
+            <button
+              onClick={() => onNavigate('station-booking')}
+              className="flex items-center gap-2 sm:gap-3 text-left group cursor-pointer"
+            >
+              <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center shrink-0 group-hover:bg-emerald-100 transition-colors">
                 <Check className="w-4 h-4 stroke-[3]" />
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="text-[10px] uppercase font-bold text-[#64748B] tracking-wider">Step 1</span>
-                <span className="text-sm font-semibold text-[#0F172A] truncate">Station &amp; Size</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Bước 1</span>
+                <span className="text-sm font-semibold text-slate-700 truncate group-hover:text-blue-600 transition-colors">
+                  Chọn trạm &amp; Tủ
+                </span>
               </div>
             </button>
-            {/* Step 2 (Active) */}
-            <div className="flex items-center gap-2 sm:gap-3 border-x border-[#E2E8F0] px-2 sm:px-4">
-              <div className="w-8 h-8 rounded-full bg-[#2563EB] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm shadow-[#2563EB]/30">
+
+            {/* Bước 2 (Hiện tại) */}
+            <div className="flex items-center gap-2 sm:gap-3 border-x border-slate-200 px-2 sm:px-4">
+              <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm shadow-blue-500/30">
                 2
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="text-[10px] uppercase font-bold text-[#2563EB] tracking-wider">Step 2 (Active)</span>
-                <span className="text-sm font-bold text-[#2563EB] truncate">Review &amp; Payment</span>
+                <span className="text-[10px] uppercase font-bold text-blue-600 tracking-wider">Bước 2 (Đang thực hiện)</span>
+                <span className="text-sm font-bold text-blue-600 truncate">Thanh toán PayOS</span>
               </div>
             </div>
-            {/* Step 3 (Upcoming) */}
+
+            {/* Bước 3 */}
             <div className="flex items-center gap-2 sm:gap-3 justify-end sm:justify-start opacity-70">
-              <div className="w-8 h-8 rounded-full bg-[#F1F5F9] text-[#64748B] border border-[#E2E8F0] flex items-center justify-center font-bold text-xs shrink-0">
+              <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-400 border border-slate-200 flex items-center justify-center font-bold text-xs shrink-0">
                 3
               </div>
               <div className="hidden sm:flex flex-col min-w-0">
-                <span className="text-[10px] uppercase font-bold text-[#94A3B8] tracking-wider">Step 3</span>
-                <span className="text-sm font-medium text-[#64748B] truncate">Access PIN</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Bước 3</span>
+                <span className="text-sm font-medium text-slate-500 truncate">Nhận mã mở tủ</span>
               </div>
             </div>
           </div>
         </nav>
 
-        {/* TWO COLUMN LAYOUT */}
+        {/* CỘT ĐÔI CÂN XỨNG: BÊN TRÁI THÔNG TIN ĐƠN, BÊN PHẢI THANH TOÁN PAYOS */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-          {/* LEFT COLUMN: Order Details & Information (5 cols) */}
-          <section className="lg:col-span-5 space-y-6">
-            {/* Card 1: Booking Summary Card */}
-            <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5 sm:p-6 shadow-sm">
-              <div className="flex items-center justify-between pb-4 border-b border-[#F1F5F9] mb-5">
+          {/* CỘT TRÁI (5 CỘT): CHI TIẾT ĐƠN HÀNG */}
+          <section className="lg:col-span-5 space-y-5">
+            {/* Card 1: Tóm tắt đơn đặt */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-xs">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
                     <DoorOpen className="w-5 h-5" />
                   </div>
-                  <h2 className="text-lg font-bold text-[#0F172A]">Booking Summary</h2>
-                </div>
-                <span className="bg-[#EFF6FF] text-[#1D4ED8] text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md border border-[#BFDBFE]">
-                  Airport Terminal
-                </span>
-              </div>
-              {/* Station Info */}
-              <div className="space-y-4">
-                <div className="flex items-start gap-3 bg-[#F8FAFC] p-3.5 rounded-xl border border-[#E2E8F0]">
-                  <MapPin className="text-[#2563EB] w-5 h-5 mt-0.5 shrink-0" />
-                  <div className="min-w-0">
-                    <h3 className="text-sm font-bold text-[#0F172A]">{stationName}</h3>
-                    <p className="text-xs text-[#64748B] mt-0.5">{stationAddress}</p>
+                  <div>
+                    <h2 className="text-base font-bold text-slate-900">Thông tin đặt tủ</h2>
+                    <span className="text-xs text-slate-500">Mã đơn: <strong className="font-mono text-slate-800">{orderCode}</strong></span>
                   </div>
                 </div>
-                {/* Compartment Details */}
-                <div className="border border-[#E2E8F0] rounded-xl p-4 flex items-center justify-between">
+                <span className="bg-blue-50 text-blue-700 text-[11px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-md border border-blue-200">
+                  Chờ thanh toán
+                </span>
+              </div>
+
+              <div className="space-y-4">
+                {/* Trạm lưu trữ */}
+                <div className="flex items-start gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
+                  <MapPin className="text-blue-600 w-5 h-5 mt-0.5 shrink-0" />
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-bold text-slate-900 leading-snug">{stationName}</h3>
+                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">{stationAddress}</p>
+                  </div>
+                </div>
+
+                {/* Ngăn tủ đã chọn */}
+                <div className="border border-slate-200 rounded-xl p-3.5 flex items-center justify-between bg-white">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-[#EFF6FF] text-[#2563EB] flex items-center justify-center border border-[#DBEAFE] shrink-0">
-                      <Luggage className="w-6 h-6" />
+                    <div className="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shrink-0">
+                      <Luggage className="w-5 h-5" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-[#0F172A]">
-                          {size === 'S' ? 'Small (S)' : size === 'M' ? 'Medium (M)' : 'Large (L)'}
+                        <span className="text-sm font-bold text-slate-900">
+                          {size === 'S' ? 'Ngăn Nhỏ (S)' : size === 'M' ? 'Ngăn Vừa (M)' : 'Ngăn Lớn (L)'}
                         </span>
-                        <span className="bg-[#ECFDF5] text-[#047857] text-[10px] font-bold uppercase px-2 py-0.5 rounded border border-[#A7F3D0]">
-                          {size === 'S' ? 'Backpack' : size === 'M' ? 'Cabin Size' : 'Checked Bag'}
+                        <span className="bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase px-2 py-0.5 rounded border border-emerald-200">
+                          {size === 'S' ? 'Balo / Túi xách' : size === 'M' ? 'Vali xách tay' : 'Vali ký gửi'}
                         </span>
                       </div>
-                      <p className="text-xs text-[#64748B] mt-0.5">
-                        {size === 'S' ? 'Dimensions: 35 x 45 x 50 cm' : size === 'M' ? 'Dimensions: 45 x 60 x 60 cm' : 'Dimensions: 60 x 85 x 80 cm'}
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        {size === 'S'
+                          ? 'Kích thước: 35 x 45 x 50 cm'
+                          : size === 'M'
+                          ? 'Kích thước: 45 x 60 x 60 cm'
+                          : 'Kích thước: 60 x 85 x 80 cm'}
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <span className="text-[11px] font-semibold text-[#64748B] block">Assignment</span>
-                    <span className="text-xs text-primary font-bold">On Check-in</span>
-                  </div>
-                </div>
-                {/* Schedule */}
-                <div className="grid grid-cols-2 gap-3 bg-[#F8FAFC] p-3.5 rounded-xl border border-[#E2E8F0]">
-                  <div>
-                    <span className="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider block">Duration</span>
-                    <span className="text-xs font-bold text-[#0F172A] flex items-center gap-1 mt-1">
-                      <Clock className="w-3.5 h-3.5 text-[#2563EB]" />
-                      {duration} Hours
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider block">Time Window</span>
-                    <span className="text-xs font-bold text-[#0F172A] mt-1 block">
-                      {storageDate}, {dropOffTime} - +{duration}h
+                  <div className="text-right shrink-0">
+                    <span className="text-[11px] font-semibold text-slate-400 block">Số ô tủ</span>
+                    <span className="text-xs text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                      Cấp tự động
                     </span>
                   </div>
                 </div>
-                {/* Price Breakdown */}
-                <div className="pt-2 border-t border-[#F1F5F9] space-y-2.5">
-                  <div className="flex justify-between items-center text-xs text-[#434655]">
-                    <span>Base Locker Storage Fee ({duration}h)</span>
-                    <span className="font-mono text-sm text-[#0F172A]">{formatCurrency(amount)} VND</span>
+
+                {/* Thời gian lưu trữ */}
+                <div className="grid grid-cols-2 gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
+                  <div>
+                    <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Thời lượng</span>
+                    <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5 mt-1">
+                      <Clock className="w-3.5 h-3.5 text-blue-600" />
+                      {duration} Giờ
+                    </span>
                   </div>
-                  <div className="flex justify-between items-center text-xs text-[#434655]">
+                  <div>
+                    <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Khung giờ sử dụng</span>
+                    <span className="text-xs font-bold text-slate-900 mt-1 block">
+                      {storageDate}, {dropOffTime}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Chi tiết thanh toán */}
+                <div className="pt-2 border-t border-slate-100 space-y-2">
+                  <div className="flex justify-between items-center text-xs text-slate-600">
+                    <span>Phí thuê tủ ({duration} giờ)</span>
+                    <span className="font-mono font-medium text-slate-900">{formatCurrency(amount)} ₫</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs text-slate-600">
                     <span className="flex items-center gap-1.5">
-                      Luggage Protection Insurance
+                      Bảo hiểm an toàn hành lý
                       <Verified className="w-3.5 h-3.5 text-emerald-600" />
                     </span>
-                    <span className="text-emerald-700 font-medium">Included (0 VND)</span>
+                    <span className="text-emerald-600 font-medium">Đã bao gồm (0 ₫)</span>
                   </div>
-                  <div className="flex justify-between items-center text-xs text-[#434655]">
-                    <span>Electronic Access &amp; SMS Notification</span>
-                    <span className="text-emerald-700 font-medium">Free</span>
+                  <div className="flex justify-between items-center text-xs text-slate-600">
+                    <span>Mã khóa điện tử &amp; Thông báo SMS</span>
+                    <span className="text-emerald-600 font-medium">Miễn phí</span>
                   </div>
-                  {/* Total */}
-                  <div className="pt-3 border-t border-[#E2E8F0] flex justify-between items-baseline">
+
+                  {/* Tổng tiền */}
+                  <div className="pt-3 border-t border-slate-200 flex justify-between items-baseline">
                     <div>
-                      <span className="text-base font-bold text-[#0F172A]">Total Amount</span>
-                      <span className="block text-[11px] text-[#64748B]">VAT inclusive (10%)</span>
+                      <span className="text-sm font-bold text-slate-900">Tổng thanh toán</span>
+                      <span className="block text-[11px] text-slate-400">Đã bao gồm thuế GTGT (VAT)</span>
                     </div>
                     <div className="text-right">
-                      <span className="font-mono text-2xl font-bold text-[#2563EB] tracking-tight">{formatCurrency(amount)}</span>
-                      <span className="text-sm font-bold text-[#0F172A] ml-1">VND</span>
+                      <span className="font-mono text-2xl font-extrabold text-blue-600 tracking-tight">
+                        {formatCurrency(amount)}
+                      </span>
+                      <span className="text-sm font-bold text-slate-700 ml-1">₫</span>
                     </div>
                   </div>
                 </div>
-                {/* Smart Notice Pill */}
-                <div className="bg-[#EFF6FF] border border-[#BFDBFE] rounded-xl p-3 flex items-start gap-2.5">
-                  <Info className="text-[#2563EB] w-4 h-4 mt-0.5 shrink-0" />
-                  <p className="text-xs text-[#1E40AF] leading-relaxed">
-                    Your physical locker compartment number (e.g. <strong>M-04</strong>) will be automatically assigned upon check-in at the station kiosk or via web access link.
+
+                {/* Ghi chú nhận ô tủ */}
+                <div className="bg-blue-50/80 border border-blue-200 rounded-xl p-3 flex items-start gap-2.5">
+                  <Info className="text-blue-600 w-4 h-4 mt-0.5 shrink-0" />
+                  <p className="text-xs text-blue-900 leading-relaxed">
+                    Sau khi thanh toán thành công, hệ thống sẽ tự động gán vị trí ô tủ (ví dụ: <strong>M-04</strong>) và cấp mã PIN mở tủ ngay trên màn hình.
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Card 2: Traveler Contact Information */}
-            <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5 sm:p-6 shadow-sm">
-              <div className="flex items-center justify-between pb-3 border-b border-[#F1F5F9] mb-4">
+            {/* Card 2: Thông tin liên hệ khách hàng */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
                 <div className="flex items-center gap-2">
-                  <User className="text-[#2563EB] w-5 h-5" />
-                  <h3 className="text-base font-bold text-[#0F172A]">Traveler Contact Details</h3>
+                  <User className="text-blue-600 w-4 h-4" />
+                  <h3 className="text-sm font-bold text-slate-900">Thông tin người sử dụng</h3>
                 </div>
-                <button className="text-[#2563EB] hover:text-primary text-xs font-semibold flex items-center gap-1 hover:underline" type="button">
-                  <Edit className="w-3.5 h-3.5" />
-                  Edit
-                </button>
               </div>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 p-2.5 rounded-lg bg-[#F8FAFC]">
-                  <div className="w-8 h-8 rounded-full bg-white border border-[#E2E8F0] flex items-center justify-center text-[#64748B]">
-                    <Badge className="w-4 h-4" />
-                  </div>
-                  <div className="min-w-0">
-                    <span className="text-[11px] text-[#64748B] uppercase font-bold block">Primary Traveler</span>
-                    <span className="text-sm font-bold text-[#0F172A]">{travelerName}</span>
-                  </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 sm:col-span-2">
+                  <span className="text-slate-400 block text-[11px]">Họ và tên người sử dụng</span>
+                  <span className="font-bold text-slate-800 mt-0.5 block truncate">{travelerName}</span>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="p-2.5 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
-                    <div className="flex items-center gap-1.5 text-[11px] text-[#64748B] font-semibold uppercase">
-                      <MessageSquare className="w-3 h-3 text-emerald-600" />
-                      Phone (SMS Access)
-                    </div>
-                    <span className="font-mono text-sm font-bold text-[#0F172A] mt-1 block">{travelerPhone}</span>
-                  </div>
-                  <div className="p-2.5 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
-                    <div className="flex items-center gap-1.5 text-[11px] text-[#64748B] font-semibold uppercase">
-                      <Mail className="w-3 h-3 text-[#2563EB]" />
-                      E-Receipt &amp; QR Backup
-                    </div>
-                    <span className="text-xs font-semibold text-[#0F172A] mt-1 block truncate">{travelerEmail}</span>
-                  </div>
+                <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                  <span className="text-slate-400 block text-[11px] flex items-center gap-1">
+                    <MessageSquare className="w-3 h-3 text-emerald-600" />
+                    Số điện thoại nhận mã
+                  </span>
+                  <span className="font-mono font-bold text-slate-800 mt-0.5 block">{travelerPhone}</span>
+                </div>
+                <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                  <span className="text-slate-400 block text-[11px] flex items-center gap-1">
+                    <Mail className="w-3 h-3 text-blue-600" />
+                    Email nhận biên lai
+                  </span>
+                  <span className="font-medium text-slate-800 mt-0.5 block truncate">{travelerEmail}</span>
                 </div>
               </div>
             </div>
 
-            {/* Terms Acceptance Card */}
-            <div className="bg-white rounded-2xl border border-[#E2E8F0] p-4 sm:p-5 shadow-sm space-y-3">
-              <label className="flex items-start gap-3 cursor-pointer select-none">
+            {/* Card 3: Điều khoản & Cam kết */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-2.5">
+              <label className="flex items-start gap-2.5 cursor-pointer select-none">
                 <input
                   checked={agreedTerms}
                   onChange={(e) => setAgreedTerms(e.target.checked)}
-                  className="mt-0.5 w-5 h-5 rounded border-[#CBD5E1] text-[#2563EB] focus:ring-[#2563EB] focus:ring-offset-0 cursor-pointer"
+                  className="mt-0.5 w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                   type="checkbox"
                 />
-                <span className="text-sm text-[#0F172A]">
-                  I agree to the <a className="text-[#2563EB] font-semibold hover:underline" href="#">SmartLocker Terms of Service</a> &amp; <a className="text-[#2563EB] font-semibold hover:underline" href="#">Locker Usage Policy</a>.
+                <span className="text-xs text-slate-700 leading-snug">
+                  Tôi đồng ý với <span className="text-blue-600 font-semibold hover:underline">Điều khoản dịch vụ</span> &amp;{' '}
+                  <span className="text-blue-600 font-semibold hover:underline">Chính sách sử dụng tủ SmartLocker</span>.
                 </span>
               </label>
-              <p className="text-[12px] text-[#64748B] leading-relaxed pl-8">
-                • <strong>Free cancellation:</strong> Up to 2 hours before 14:00.<br/>
-                • <strong>Security policy:</strong> Hazardous materials, flammables, and perishable goods are strictly prohibited.
-              </p>
+              <div className="text-[11px] text-slate-500 leading-relaxed pl-6 space-y-1">
+                <p>• <strong>Hủy miễn phí:</strong> Được hỗ trợ hủy trước 2 giờ so với thời điểm nhận tủ.</p>
+                <p>• <strong>An toàn:</strong> Nghiêm cấm lưu trữ chất dễ cháy nổ, đồ tươi sống hoặc hàng cấm.</p>
+              </div>
             </div>
           </section>
 
-          {/* RIGHT COLUMN: VietQR Instant Payment (7 cols) */}
-          <section className="lg:col-span-7 space-y-6">
-            {/* Countdown Timer Alert */}
-            <div className="bg-[#FFFBEB] border-2 border-[#FDE68A] rounded-2xl p-4 sm:p-5 shadow-sm flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3.5">
-                <div className="relative w-10 h-10 rounded-full bg-[#FEF3C7] text-[#D97706] flex items-center justify-center shrink-0">
-                  <Clock className="w-6 h-6 animate-pulse" />
-                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-[#EF4444] rounded-full ring-2 ring-white animate-ping"></span>
+          {/* CỘT PHẢI (7 CỘT): CỔNG THANH TOÁN PAYOS CHÍNH THỨC */}
+          <section className="lg:col-span-7 space-y-5">
+            {/* Thanh đếm ngược giữ chỗ */}
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 shadow-xs flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                  <Clock className="w-5 h-5 animate-pulse" />
                 </div>
                 <div>
-                  <p className="text-sm text-[#92400E] font-bold">
-                    Locker Slot Reserved: Complete payment in{' '}
-                    <span className="font-mono text-[#B45309] font-bold text-base bg-white/80 px-2 py-0.5 rounded border border-[#FCD34D]">
+                  <p className="text-xs sm:text-sm text-amber-900 font-bold">
+                    Vị trí ngăn tủ đang được giữ chỗ trong:{' '}
+                    <span className="font-mono text-amber-900 font-extrabold text-sm sm:text-base bg-white/90 px-2 py-0.5 rounded border border-amber-300">
                       {formatTimer(secondsLeft)}
                     </span>
                   </p>
-                  <p className="text-xs text-[#B45309]/90 mt-0.5">
-                    Physical compartment releases automatically back to public inventory if unpaid.
+                  <p className="text-[11px] text-amber-800/80 mt-0.5">
+                    Sau thời gian này, ô tủ sẽ tự động được giải phóng để phục vụ khách hàng khác.
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Main Payment Card */}
-            <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6 sm:p-8 shadow-md">
-              {/* PayOS Button */}
-              {bookingData?.paymentUrl && (
-                <div className="mb-6 p-4 rounded-xl bg-[#EFF6FF] border border-[#BFDBFE] flex flex-col sm:flex-row items-center justify-between gap-4">
+            {/* Thẻ thanh toán PayOS trung tâm */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+              {/* Header Cổng Thanh toán */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 shrink-0">
+                    <CreditCard className="w-6 h-6" />
+                  </div>
                   <div>
-                    <h3 className="text-sm font-bold text-[#0F172A]">Thanh toán qua PayOS</h3>
-                    <p className="text-xs text-[#64748B] mt-1">Chuyển hướng đến cổng thanh toán an toàn của PayOS</p>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-xl font-bold text-slate-900 tracking-tight">Thanh toán qua PayOS</h2>
+                      <span className="bg-blue-100 text-blue-700 font-bold text-[10px] px-2 py-0.5 rounded">Cổng bảo mật</span>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Quét mã VietQR tiện lợi với 40+ ứng dụng ngân hàng và ví điện tử Việt Nam
+                    </p>
                   </div>
-                  <button
-                    onClick={() => window.open(bookingData.paymentUrl, '_blank')}
-                    className="shrink-0 w-full sm:w-auto px-6 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-bold rounded-xl transition-all shadow-md active:scale-95 cursor-pointer flex items-center justify-center gap-2"
-                  >
-                    <ShieldCheck className="w-4 h-4" />
-                    Mở trang thanh toán PayOS
-                  </button>
                 </div>
-              )}
 
-              {/* Payment Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-6 border-b border-[#F1F5F9]">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <QrCode className="text-[#2563EB] w-6 h-6" />
-                    <h2 className="text-2xl font-bold text-[#0F172A] tracking-tight">Instant Bank Transfer via VietQR</h2>
-                  </div>
-                  <p className="text-xs text-[#64748B] mt-1">
-                    Scan with any Vietnam Banking App or E-Wallet (Napas 247 Instant Settlement)
-                  </p>
-                </div>
-                {/* VietQR & Napas Badges */}
-                <div className="flex items-center gap-1.5 shrink-0 self-start sm:self-center">
-                  <span className="bg-[#003B7A] text-white font-bold text-[10px] px-2 py-1 rounded tracking-wider shadow-sm">VIETQR</span>
-                  <span className="bg-[#D9251D] text-white font-bold text-[10px] px-2 py-1 rounded tracking-wider shadow-sm">NAPAS 247</span>
+                <div className="flex items-center gap-1.5 self-start sm:self-center shrink-0">
+                  <span className="bg-[#003B7A] text-white font-bold text-[10px] px-2.5 py-1 rounded shadow-xs">VIETQR</span>
+                  <span className="bg-[#D9251D] text-white font-bold text-[10px] px-2.5 py-1 rounded shadow-xs">NAPAS 247</span>
                 </div>
               </div>
 
-              {/* Supported Banks Pills */}
-              <div className="py-3 px-3.5 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0] my-6 flex flex-wrap items-center justify-between gap-2 text-[11px] font-semibold text-[#64748B]">
-                <span className="text-[#0F172A] font-bold flex items-center gap-1">
-                  <CheckCircle className="w-3.5 h-3.5 text-[#2563EB]" />
-                  Instant Recognition:
-                </span>
-                <div className="flex flex-wrap gap-1.5">
-                  {['Vietcombank', 'MB Bank', 'Techcombank', 'ACB', 'MoMo', 'ZaloPay'].map(b => (
-                    <span key={b} className="bg-white px-2 py-0.5 rounded border border-[#E2E8F0] text-[#0F172A]">
-                      {b}
+              {/* Tóm tắt nhanh số tiền & mã đơn */}
+              <div className="mt-5 p-4 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
+                  <span className="text-xs text-slate-500 font-medium">Mã đơn thanh toán:</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono text-sm font-bold text-slate-900 bg-white px-2 py-0.5 rounded border border-slate-200">
+                      {orderCode}
                     </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* VietQR Code Presentation */}
-              <div className="flex flex-col items-center justify-center p-6 bg-gradient-to-b from-[#F8FAFC] to-white rounded-2xl border-2 border-dashed border-[#CBD5E1] relative">
-                <div className="relative p-4 bg-white rounded-2xl shadow-md border border-[#E2E8F0]">
-                  <div className="w-64 h-64 sm:w-72 sm:h-72 relative flex items-center justify-center bg-white rounded-xl overflow-hidden border border-[#E2E8F0]/60 p-2">
-                    {/* SVG VietQR Authentic Display */}
-                    <svg className="w-full h-full" fill="none" viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
-                      <rect fill="white" height="280" width="280"></rect>
-                      <rect fill="#003B7A" height="64" rx="8" width="64" x="16" y="16"></rect>
-                      <rect fill="white" height="48" rx="4" width="48" x="24" y="24"></rect>
-                      <rect fill="#2563EB" height="28" rx="3" width="28" x="34" y="34"></rect>
-                      <rect fill="#003B7A" height="64" rx="8" width="64" x="200" y="16"></rect>
-                      <rect fill="white" height="48" rx="4" width="48" x="208" y="24"></rect>
-                      <rect fill="#2563EB" height="28" rx="3" width="28" x="218" y="34"></rect>
-                      <rect fill="#003B7A" height="64" rx="8" width="64" x="16" y="200"></rect>
-                      <rect fill="white" height="48" rx="4" width="48" x="24" y="208"></rect>
-                      <rect fill="#2563EB" height="28" rx="3" width="28" x="34" y="218"></rect>
-                      <g fill="#0F172A">
-                        <rect height="12" rx="2" width="12" x="92" y="44"></rect>
-                        <rect height="12" rx="2" width="12" x="116" y="44"></rect>
-                        <rect height="12" rx="2" width="12" x="144" y="44"></rect>
-                        <rect height="12" rx="2" width="12" x="168" y="44"></rect>
-                        <rect height="12" rx="2" width="20" x="92" y="68"></rect>
-                        <rect height="12" rx="2" width="12" x="132" y="68"></rect>
-                        <rect height="12" rx="2" width="20" x="156" y="68"></rect>
-                        <rect height="20" rx="2" width="12" x="44" y="92"></rect>
-                        <rect height="12" rx="2" width="12" x="68" y="92"></rect>
-                        <rect height="12" rx="2" width="12" x="92" y="92"></rect>
-                        <rect height="12" rx="2" width="12" x="176" y="92"></rect>
-                        <rect height="12" rx="2" width="20" x="204" y="92"></rect>
-                        <rect height="12" rx="2" width="12" x="236" y="92"></rect>
-                        <rect height="12" rx="2" width="20" x="44" y="124"></rect>
-                        <rect height="12" rx="2" width="12" x="76" y="124"></rect>
-                        <rect height="12" rx="2" width="12" x="192" y="124"></rect>
-                        <rect height="12" rx="2" width="20" x="220" y="124"></rect>
-                        <rect height="12" rx="2" width="12" x="44" y="148"></rect>
-                        <rect height="12" rx="2" width="20" x="68" y="148"></rect>
-                        <rect height="12" rx="2" width="24" x="180" y="148"></rect>
-                        <rect height="20" rx="2" width="12" x="216" y="148"></rect>
-                        <rect height="12" rx="2" width="12" x="240" y="148"></rect>
-                        <rect height="12" rx="2" width="12" x="44" y="172"></rect>
-                        <rect height="12" rx="2" width="12" x="68" y="172"></rect>
-                        <rect height="12" rx="2" width="12" x="92" y="172"></rect>
-                        <rect height="12" rx="2" width="12" x="116" y="172"></rect>
-                        <rect height="12" rx="2" width="20" x="160" y="172"></rect>
-                        <rect height="12" rx="2" width="12" x="240" y="172"></rect>
-                        <rect height="12" rx="2" width="12" x="92" y="196"></rect>
-                        <rect height="12" rx="2" width="20" x="116" y="196"></rect>
-                        <rect height="12" rx="2" width="12" x="148" y="196"></rect>
-                        <rect height="20" rx="2" width="12" x="172" y="196"></rect>
-                        <rect height="12" rx="2" width="24" x="196" y="196"></rect>
-                        <rect height="12" rx="2" width="12" x="232" y="196"></rect>
-                        <rect height="12" rx="2" width="20" x="92" y="220"></rect>
-                        <rect height="12" rx="2" width="12" x="124" y="220"></rect>
-                        <rect height="12" rx="2" width="12" x="148" y="220"></rect>
-                        <rect height="12" rx="2" width="12" x="196" y="220"></rect>
-                        <rect height="12" rx="2" width="24" x="220" y="220"></rect>
-                        <rect height="12" rx="2" width="12" x="92" y="244"></rect>
-                        <rect height="12" rx="2" width="12" x="116" y="244"></rect>
-                        <rect height="12" rx="2" width="24" x="140" y="244"></rect>
-                        <rect height="12" rx="2" width="12" x="176" y="244"></rect>
-                        <rect height="12" rx="2" width="12" x="200" y="244"></rect>
-                        <rect height="12" rx="2" width="20" x="224" y="244"></rect>
-                      </g>
-                      <rect fill="white" height="68" rx="14" stroke="#2563EB" strokeWidth="2.5" width="68" x="106" y="106"></rect>
-                      <rect fill="#003B7A" height="56" rx="10" width="56" x="112" y="112"></rect>
-                      <text fill="white" fontFamily="Plus Jakarta Sans" fontSize="11" fontWeight="800" letterSpacing="1" textAnchor="middle" x="140" y="136">VIET</text>
-                      <text fill="#FEF08A" fontFamily="Plus Jakarta Sans" fontSize="13" fontWeight="900" letterSpacing="1" textAnchor="middle" x="140" y="152">QR</text>
-                    </svg>
+                    <button
+                      onClick={() => handleCopy(orderCode, 'Mã đơn')}
+                      className="p-1 text-slate-400 hover:text-blue-600 hover:bg-white rounded transition-colors"
+                      title="Sao chép mã"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </div>
-
-                <div className="mt-4 text-center">
-                  <div className="inline-flex items-center gap-1.5 bg-[#ECFDF5] text-[#047857] px-3.5 py-1.5 rounded-full border border-[#A7F3D0] shadow-sm mb-2">
-                    <CheckCircle className="w-4 h-4 text-emerald-600" />
-                    <span className="text-sm font-bold">Exact Amount: {formatCurrency(amount)} VND</span>
-                  </div>
-                  <p className="text-xs text-[#434655] font-medium">
-                    Open banking app → Tap <strong className="text-[#0F172A]">Scan QR</strong> → Confirm transfer
-                  </p>
-                </div>
-              </div>
-
-              {/* Divider */}
-              <div className="relative my-8 text-center">
-                <div aria-hidden="true" className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-[#E2E8F0]"></div>
-                </div>
-                <div className="relative flex justify-center">
-                  <span className="bg-white px-4 text-xs font-semibold text-[#64748B] uppercase tracking-wider">
-                    Or pay via manual bank transfer
+                <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+                  <span className="text-xs text-slate-500 font-medium">Số tiền chuyển:</span>
+                  <span className="font-mono text-lg font-extrabold text-blue-600">
+                    {formatCurrency(amount)} ₫
                   </span>
                 </div>
               </div>
 
-              {/* Manual Bank Transfer Details Table */}
-              <div className="bg-[#F8FAFC] rounded-xl border border-[#E2E8F0] divide-y divide-[#E2E8F0]">
-                {/* Bank Name */}
-                <div className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <span className="text-xs text-[#64748B] font-medium">Receiving Bank:</span>
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded bg-[#003B7A] text-white font-bold text-[10px] flex items-center justify-center">MB</span>
-                    <span className="text-xs font-bold text-[#0F172A]">MB Bank (Military Joint Stock Bank)</span>
+              {/* Nút Hero CTA mở PayOS */}
+              <div className="my-6 p-6 rounded-2xl bg-gradient-to-br from-blue-50 via-indigo-50/40 to-blue-50 border border-blue-200/80 text-center">
+                <div className="max-w-md mx-auto space-y-3">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100/80 text-blue-700 text-xs font-semibold">
+                    <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                    <span>Cổng thanh toán tự động PayOS</span>
                   </div>
-                </div>
-                {/* Account Number */}
-                <div className="p-3.5 flex items-center justify-between gap-3">
-                  <span className="text-xs text-[#64748B] font-medium">Account Number:</span>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-base font-bold text-[#0F172A] tracking-wider">9876543210</span>
+
+                  <h3 className="text-base sm:text-lg font-bold text-slate-900">
+                    Nhấn để mở giao diện thanh toán bảo mật
+                  </h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    Trang thanh toán chính thức của PayOS sẽ hiển thị mã VietQR động cùng thông tin số tiền chính xác, giúp bạn thanh toán nhanh chóng chỉ bằng 1 thao tác quét mã.
+                  </p>
+
+                  <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center items-center">
                     <button
-                      onClick={() => handleCopy('9876543210', 'Số tài khoản')}
-                      className="bg-white hover:bg-[#F1F5F9] border border-[#CBD5E1] text-[#2563EB] text-xs font-semibold px-2.5 py-1 rounded-lg flex items-center gap-1 transition-all active:scale-95 shadow-2xs"
+                      onClick={handleOpenPayOS}
+                      className="w-full sm:w-auto px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl transition-all shadow-md shadow-blue-500/25 hover:shadow-lg active:scale-98 cursor-pointer flex items-center justify-center gap-2"
                     >
-                      <Copy className="w-3.5 h-3.5" />
-                      <span>Copy</span>
+                      <ShieldCheck className="w-5 h-5" />
+                      <span>Mở trang thanh toán PayOS</span>
+                      <ExternalLink className="w-4 h-4 ml-0.5 opacity-80" />
                     </button>
-                  </div>
-                </div>
-                {/* Account Name */}
-                <div className="p-3.5 flex items-center justify-between gap-3">
-                  <span className="text-xs text-[#64748B] font-medium">Account Name:</span>
-                  <span className="font-mono text-sm font-bold text-[#0F172A] tracking-wide text-right">CONG TY CP SMARTLOCKER</span>
-                </div>
-                {/* Transfer Amount */}
-                <div className="p-3.5 flex items-center justify-between gap-3 bg-[#EFF6FF]/40">
-                  <span className="text-xs text-[#1D4ED8] font-semibold">Amount to Transfer:</span>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-base font-bold text-[#2563EB]">{formatCurrency(amount)} VND</span>
-                    <button
-                      onClick={() => handleCopy(amount.toString(), 'Số tiền')}
-                      className="bg-white hover:bg-[#F1F5F9] border border-[#93C5FD] text-[#2563EB] text-xs font-semibold px-2.5 py-1 rounded-lg flex items-center gap-1 transition-all active:scale-95 shadow-2xs"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                      <span>Copy</span>
-                    </button>
-                  </div>
-                </div>
-                {/* Transfer Memo */}
-                <div className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-[#FFFBEB]/50">
-                  <div>
-                    <span className="text-xs text-[#92400E] font-bold block">Transfer Description / Memo:</span>
-                    <span className="text-[11px] text-[#B45309]">Crucial for automated 2-second locker release</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-base font-extrabold text-[#B45309] tracking-widest bg-[#FEF3C7] px-2.5 py-1 rounded border border-[#FDE68A]">
-                      {orderCode}
-                    </span>
-                    <button
-                      onClick={() => handleCopy(orderCode, 'Nội dung chuyển khoản')}
-                      className="bg-white hover:bg-[#FEF3C7] border border-[#FCD34D] text-[#B45309] text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition-all active:scale-95 shadow-2xs"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                      <span>Copy</span>
-                    </button>
+
+                    {bookingData?.paymentUrl && (
+                      <button
+                        onClick={() => handleCopy(bookingData.paymentUrl!, 'Liên kết PayOS')}
+                        className="w-full sm:w-auto px-4 py-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition-all shadow-2xs active:scale-98 cursor-pointer flex items-center justify-center gap-1.5"
+                      >
+                        <Copy className="w-4 h-4 text-slate-400" />
+                        <span>Sao chép link</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
 
-              {/* Live Webhook Status Box */}
-              <div className="mt-6 p-4 rounded-xl bg-[#F0FDF4] border border-[#BBF7D0] flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="relative w-8 h-8 flex items-center justify-center shrink-0">
-                    <div className="w-8 h-8 rounded-full border-2 border-[#2563EB] border-t-transparent animate-spin"></div>
-                    <div className="w-2 h-2 rounded-full bg-[#2563EB] absolute"></div>
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-xs font-bold text-[#0F172A]">
-                        Listening for bank webhook confirmation...
-                      </p>
-                      <span className="inline-block w-2 h-2 rounded-full bg-[#22C55E] animate-pulse"></span>
+              {/* Hướng dẫn 3 bước thanh toán */}
+              <div className="space-y-3 pt-2 pb-6 border-b border-slate-100">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                  Quy trình thanh toán đơn giản:
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 text-left">
+                    <div className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center mb-2">
+                      1
                     </div>
-                    <p className="text-xs text-[#434655] mt-0.5">
-                      System auto-detects transfer in 2–5 seconds. Please do not close or refresh this tab.
+                    <h5 className="text-xs font-bold text-slate-900">Mở cổng PayOS</h5>
+                    <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                      Bấm nút màu xanh ở trên để mở trang thanh toán chính thức của PayOS.
+                    </p>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 text-left">
+                    <div className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center mb-2">
+                      2
+                    </div>
+                    <h5 className="text-xs font-bold text-slate-900">Quét mã VietQR</h5>
+                    <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                      Dùng app ngân hàng bất kỳ để quét mã QR (số tiền &amp; nội dung được điền tự động).
+                    </p>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 text-left">
+                    <div className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center mb-2">
+                      3
+                    </div>
+                    <h5 className="text-xs font-bold text-slate-900">Nhận mã mở tủ</h5>
+                    <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                      Sau khi chuyển khoản, màn hình này sẽ tự động cập nhật và cấp mã PIN nhận tủ.
                     </p>
                   </div>
                 </div>
+              </div>
+
+              {/* Khung trạng thái lắng nghe Webhook thời gian thực */}
+              <div className="mt-6 p-4 rounded-xl bg-emerald-50/70 border border-emerald-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="relative w-8 h-8 flex items-center justify-center shrink-0">
+                    <div className="w-8 h-8 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin"></div>
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 absolute"></div>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs font-bold text-slate-900">
+                        Đang đợi xác nhận thanh toán từ ngân hàng...
+                      </p>
+                      <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      Hệ thống tự động phát hiện trong 2 – 5 giây khi giao dịch thành công. Không cần tải lại trang.
+                    </p>
+                  </div>
+                </div>
+
                 <button
-                  onClick={() => setShowSuccessModal(true)}
-                  className="shrink-0 w-full sm:w-auto px-4 py-2 bg-white hover:bg-[#F8FAFC] border border-[#CBD5E1] hover:border-[#2563EB] text-[#2563EB] text-xs font-bold rounded-xl transition-all shadow-xs active:scale-95 cursor-pointer"
+                  onClick={handleCheckPaymentNow}
+                  disabled={isCheckingStatus}
+                  className="shrink-0 w-full sm:w-auto px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 hover:border-blue-400 text-blue-600 text-xs font-bold rounded-xl transition-all shadow-2xs active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-60"
                   type="button"
                 >
-                  I have transferred
+                  <RefreshCw className={`w-3.5 h-3.5 ${isCheckingStatus ? 'animate-spin' : ''}`} />
+                  <span>{isCheckingStatus ? 'Đang kiểm tra...' : 'Kiểm tra ngay'}</span>
                 </button>
               </div>
 
-              {/* Security Footer Badge */}
-              <div className="mt-5 flex items-center justify-center gap-2 text-xs text-[#64748B]">
-                <Lock className="w-3.5 h-3.5 text-emerald-700" />
-                <span>256-bit Encrypted Settlement • Official VietQR Partner • Napas 24/7 Verified</span>
+              {/* Footer bảo mật */}
+              <div className="mt-5 flex items-center justify-center gap-2 text-xs text-slate-500">
+                <Lock className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Thanh toán an toàn với mã hóa SSL 256-bit • Cổng thanh toán đối tác PayOS</span>
               </div>
             </div>
           </section>
         </div>
       </main>
 
-      {/* SUCCESS MODAL POPUP */}
+      {/* POPUP XÁC NHẬN THANH TOÁN THÀNH CÔNG */}
       {showSuccessModal && (
-        <div className="fixed inset-0 z-50 bg-[#0F172A]/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md rounded-2xl border border-[#E2E8F0] shadow-2xl p-6 text-center transform transition-all animate-fade-in-up">
-            <div className="w-16 h-16 rounded-full bg-[#ECFDF5] text-[#047857] border-2 border-[#A7F3D0] mx-auto flex items-center justify-center mb-4">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white w-full max-w-md rounded-2xl border border-slate-200 shadow-2xl p-6 text-center transform transition-all animate-fade-in-up">
+            <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 border-2 border-emerald-200 mx-auto flex items-center justify-center mb-4 shadow-sm">
               <CheckCircle className="w-9 h-9 text-emerald-600" />
             </div>
-            <h3 className="text-xl font-bold text-[#0F172A]">Payment Confirmed!</h3>
-            <p className="text-sm text-[#434655] mt-1">
-              We have received {formatCurrency(amount)} VND for booking <strong className="text-[#0F172A]">{orderCode}</strong>.
+            <h3 className="text-xl font-bold text-slate-900">Thanh toán thành công!</h3>
+            <p className="text-sm text-slate-600 mt-1">
+              Đã nhận thành công <strong className="text-blue-600">{formatCurrency(amount)} ₫</strong> cho đơn đặt{' '}
+              <strong className="text-slate-900">{orderCode}</strong>.
             </p>
-            <div className="my-5 p-4 rounded-xl bg-[#EFF6FF] border border-[#BFDBFE] text-left">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-xs text-[#64748B]">Assigned Locker Bay:</span>
-                <span className="font-mono text-base font-bold text-[#2563EB]">{successData?.lockerCode || (size === 'S' ? 'Bay S-02' : size === 'M' ? 'Bay M-04' : 'Bay L-02')}</span>
+
+            <div className="my-5 p-4 rounded-xl bg-blue-50/70 border border-blue-200 text-left space-y-2.5">
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-slate-500">Vị trí ngăn tủ được cấp:</span>
+                <span className="font-mono text-base font-bold text-blue-600 bg-white px-2.5 py-0.5 rounded border border-blue-200">
+                  {successData?.lockerCode || (size === 'S' ? 'Ngăn S-02' : size === 'M' ? 'Ngăn M-04' : 'Ngăn L-02')}
+                </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-xs text-[#64748B]">Access One-Time PIN:</span>
-                <span className="font-mono text-xl font-extrabold text-[#0F172A] tracking-widest">{successData?.accessCode || '729 416'}</span>
+                <span className="text-xs text-slate-500">Mã PIN mở tủ một lần:</span>
+                <span className="font-mono text-xl font-extrabold text-slate-900 tracking-wider">
+                  {successData?.accessCode || '729 416'}
+                </span>
               </div>
             </div>
-            <p className="text-xs text-[#64748B] mb-5">
-              A copy of your access barcode and PIN has been sent via SMS to <strong>{travelerPhone}</strong>.
+
+            <p className="text-xs text-slate-500 mb-5">
+              Thông tin ngăn tủ và mã khóa đã được lưu vào mục quản lý đơn đặt của bạn.
             </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  setShowSuccessModal(false);
-                  onNavigate('booking-detail', {
-                    bookingData: {
-                      stationName,
-                      stationAddress,
-                      size,
-                      duration,
-                      amount,
-                      orderCode,
-                      accessCode: successData?.accessCode || ('LK-' + orderCode.substring(2, 7) + 'A'),
-                      bayCode: successData?.lockerCode || (size === 'S' ? 'Bay S-02' : size === 'M' ? 'Bay M-04' : 'Bay L-02'),
-                    }
-                  });
-                }}
-                className="w-full py-2.5 px-4 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-bold rounded-xl transition-colors shadow-sm cursor-pointer"
-              >
-                Open Digital Locker Key
-              </button>
-            </div>
+
+            <button
+              onClick={() => {
+                setShowSuccessModal(false);
+                onNavigate('booking-detail', {
+                  bookingData: {
+                    stationName,
+                    stationAddress,
+                    size,
+                    duration,
+                    amount,
+                    orderCode,
+                    accessCode: successData?.accessCode || ('LK-' + orderCode.substring(2, 7) + 'A'),
+                    bayCode: successData?.lockerCode || (size === 'S' ? 'Ngăn S-02' : size === 'M' ? 'Ngăn M-04' : 'Ngăn L-02'),
+                  }
+                });
+              }}
+              className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-md shadow-blue-500/20 active:scale-98 cursor-pointer flex items-center justify-center gap-2"
+            >
+              <span>Xem chi tiết tủ &amp; Mã mở</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
       )}
 
-      {/* TOAST NOTIFICATION */}
+      {/* TOAST THÔNG BÁO */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 bg-[#0F172A] text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg border border-[#334155] z-50 flex items-center gap-2 animate-fade-in-up">
+        <div className="fixed bottom-6 right-6 bg-slate-900 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg border border-slate-700 z-50 flex items-center gap-2 animate-fade-in-up">
           <CheckCircle className="w-4 h-4 text-emerald-400" />
           <span>{toastMessage}</span>
         </div>
       )}
 
       {/* FOOTER */}
-      <footer className="w-full bg-surface-container-low border-t border-outline-variant/30 mt-12">
+      <footer className="w-full bg-slate-50 border-t border-slate-200 mt-12">
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <div className="flex items-center justify-center md:justify-start gap-2">
-                <span className="text-lg text-primary tracking-tight font-extrabold">SmartLocker</span>
-                <span className="text-xs text-[#64748B] font-medium">VietQR Instant Luggage Storage</span>
+                <span className="text-base text-blue-600 font-extrabold tracking-tight">SmartLocker</span>
+                <span className="text-xs text-slate-500 font-medium">Hệ thống tủ lưu trữ hành lý thông minh</span>
               </div>
-              <p className="text-xs text-[#64748B]">
-                © 2025 SmartLocker Systems Inc. Telemetry &amp; Cryptographic Access Active. All rights reserved.
+              <p className="text-xs text-slate-400">
+                © 2026 SmartLocker Systems. Cổng thanh toán tích hợp PayOS &amp; VietQR Napas 24/7.
               </p>
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-5 text-xs text-[#434655]">
-              <a className="hover:text-primary transition-colors" href="#">Security Architecture</a>
-              <span className="text-outline-variant/60">•</span>
-              <a className="hover:text-primary transition-colors" href="#">Compliance &amp; SOC2</a>
-              <span className="text-outline-variant/60">•</span>
-              <a className="hover:text-primary transition-colors" href="#">Terms of Service</a>
-              <span className="text-outline-variant/60">•</span>
-              <a className="hover:text-primary transition-colors" href="#">Support Telemetry</a>
+            <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-500">
+              <a className="hover:text-blue-600 transition-colors" href="#">Chính sách bảo mật</a>
+              <span>•</span>
+              <a className="hover:text-blue-600 transition-colors" href="#">Điều khoản sử dụng</a>
+              <span>•</span>
+              <a className="hover:text-blue-600 transition-colors" href="#">Hỗ trợ khách hàng</a>
             </div>
           </div>
         </div>
