@@ -19,9 +19,10 @@ import {
   ExternalLink,
   RefreshCw,
   CreditCard,
-  Sparkles,
+  QrCode,
   ArrowRight
 } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { getBookingById } from '../api/bookingService';
 
 interface BookingPaymentPageProps {
@@ -39,6 +40,10 @@ interface BookingPaymentPageProps {
     bookingId?: string;
     bookingCode?: string;
     paymentExpiresAt?: string;
+    qrCode?: string;
+    accountNumber?: string;
+    accountName?: string;
+    bin?: string;
   };
 }
 
@@ -59,6 +64,32 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
   const travelerEmail = savedUser.email || 'nguyenvana@gmail.com';
 
   const orderCode = bookingData?.bookingCode || 'BK' + Math.floor(10000000 + Math.random() * 90000000).toString().substring(0, 8);
+
+  const qrCodeData = bookingData?.qrCode;
+  const accountNumber = bookingData?.accountNumber;
+  const accountName = bookingData?.accountName;
+  const bin = bookingData?.bin;
+
+  const getBankName = (b?: string) => {
+    switch (b) {
+      case '970422': return 'MB Bank (Ngân hàng Quân Đội)';
+      case '970436': return 'Vietcombank';
+      case '970407': return 'Techcombank';
+      case '970415': return 'VietinBank';
+      case '970418': return 'BIDV';
+      case '970416': return 'ACB';
+      case '970423': return 'TPBank';
+      case '970432': return 'VPBank';
+      default: return 'Ngân hàng đối tác PayOS';
+    }
+  };
+
+  // VietQR URL nếu có BIN và AccountNumber
+  const vietQrImgUrl = (bin && accountNumber)
+    ? `https://img.vietqr.io/image/${bin}-${accountNumber}-compact2.png?amount=${amount}&addInfo=${encodeURIComponent('Dat tu ' + orderCode)}&accountName=${encodeURIComponent(accountName || '')}`
+    : null;
+
+  const [useFallbackQr, setUseFallbackQr] = useState(false);
 
   // Đếm ngược thời gian giữ chỗ
   const [secondsLeft, setSecondsLeft] = useState<number>(0);
@@ -151,7 +182,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
           });
           setShowSuccessModal(true);
         } else {
-          showToast('Chưa nhận được giao dịch. Vui lòng thanh toán trên PayOS.');
+          showToast('Chưa nhận được giao dịch. Vui lòng thanh toán qua VietQR.');
         }
       } else {
         showToast('Chưa ghi nhận thanh toán. Vui lòng thử lại sau vài giây.');
@@ -170,6 +201,9 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
       showToast('Chưa có liên kết thanh toán PayOS.');
     }
   };
+
+  // Giá trị chuỗi mã QR để render
+  const effectiveQrCode = qrCodeData || bookingData?.paymentUrl || `https://pay.payos.vn/web/${orderCode}`;
 
   return (
     <div className="bg-[#F8FAFC] text-[#0F172A] min-h-screen flex flex-col justify-between selection:bg-blue-100 selection:text-blue-900 pb-12">
@@ -261,7 +295,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
               </div>
               <div className="flex flex-col min-w-0">
                 <span className="text-[10px] uppercase font-bold text-blue-600 tracking-wider">Bước 2 (Đang thực hiện)</span>
-                <span className="text-sm font-bold text-blue-600 truncate">Thanh toán PayOS</span>
+                <span className="text-sm font-bold text-blue-600 truncate">Quét mã VietQR (PayOS)</span>
               </div>
             </div>
 
@@ -278,7 +312,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
           </div>
         </nav>
 
-        {/* CỘT ĐÔI CÂN XỨNG: BÊN TRÁI THÔNG TIN ĐƠN, BÊN PHẢI THANH TOÁN PAYOS */}
+        {/* CỘT ĐÔI CÂN XỨNG: BÊN TRÁI THÔNG TIN ĐƠN, BÊN PHẢI MÃ VIETQR PAYOS */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
           {/* CỘT TRÁI (5 CỘT): CHI TIẾT ĐƠN HÀNG */}
           <section className="lg:col-span-5 space-y-5">
@@ -294,7 +328,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                     <span className="text-xs text-slate-500">Mã đơn: <strong className="font-mono text-slate-800">{orderCode}</strong></span>
                   </div>
                 </div>
-                <span className="bg-blue-50 text-blue-700 text-[11px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-md border border-blue-200">
+                <span className="bg-amber-50 text-amber-700 text-[11px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-md border border-amber-200">
                   Chờ thanh toán
                 </span>
               </div>
@@ -395,7 +429,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                 <div className="bg-blue-50/80 border border-blue-200 rounded-xl p-3 flex items-start gap-2.5">
                   <Info className="text-blue-600 w-4 h-4 mt-0.5 shrink-0" />
                   <p className="text-xs text-blue-900 leading-relaxed">
-                    Sau khi thanh toán thành công, hệ thống sẽ tự động gán vị trí ô tủ (ví dụ: <strong>M-04</strong>) và cấp mã PIN mở tủ ngay trên màn hình.
+                    Sau khi chuyển khoản thành công, hệ thống sẽ tự động gán vị trí ô tủ (ví dụ: <strong>M-04</strong>) và cấp mã PIN mở tủ ngay trên màn hình.
                   </p>
                 </div>
               </div>
@@ -452,7 +486,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
             </div>
           </section>
 
-          {/* CỘT PHẢI (7 CỘT): CỔNG THANH TOÁN PAYOS CHÍNH THỨC */}
+          {/* CỘT PHẢI (7 CỘT): MÃ VIETQR TRỰC TIẾP CỦA PAYOS */}
           <section className="lg:col-span-7 space-y-5">
             {/* Thanh đếm ngược giữ chỗ */}
             <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 shadow-xs flex items-center justify-between gap-3">
@@ -468,140 +502,141 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                     </span>
                   </p>
                   <p className="text-[11px] text-amber-800/80 mt-0.5">
-                    Sau thời gian này, ô tủ sẽ tự động được giải phóng để phục vụ khách hàng khác.
+                    Sau thời gian này, ô tủ sẽ tự động được giải phóng nếu chưa nhận được thanh toán.
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Thẻ thanh toán PayOS trung tâm */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+            {/* Thẻ thanh toán VietQR PayOS trung tâm */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-7 shadow-sm">
               {/* Header Cổng Thanh toán */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-100">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 shrink-0">
-                    <CreditCard className="w-6 h-6" />
+                  <div className="w-11 h-11 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 shrink-0">
+                    <QrCode className="w-6 h-6" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h2 className="text-xl font-bold text-slate-900 tracking-tight">Thanh toán qua PayOS</h2>
-                      <span className="bg-blue-100 text-blue-700 font-bold text-[10px] px-2 py-0.5 rounded">Cổng bảo mật</span>
+                      <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">Thanh toán VietQR qua PayOS</h2>
+                      <span className="bg-blue-100 text-blue-700 font-bold text-[10px] px-2 py-0.5 rounded">Tự động</span>
                     </div>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      Quét mã VietQR tiện lợi với 40+ ứng dụng ngân hàng và ví điện tử Việt Nam
+                      Quét mã bằng ứng dụng của hơn 40+ ngân hàng Việt Nam hoặc ví điện tử
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-1.5 self-start sm:self-center shrink-0">
-                  <span className="bg-[#003B7A] text-white font-bold text-[10px] px-2.5 py-1 rounded shadow-xs">VIETQR</span>
-                  <span className="bg-[#D9251D] text-white font-bold text-[10px] px-2.5 py-1 rounded shadow-xs">NAPAS 247</span>
+                  <span className="bg-[#003B7A] text-white font-bold text-[10px] px-2 py-1 rounded shadow-xs">VIETQR</span>
+                  <span className="bg-[#D9251D] text-white font-bold text-[10px] px-2 py-1 rounded shadow-xs">NAPAS 247</span>
                 </div>
               </div>
 
-              {/* Tóm tắt nhanh số tiền & mã đơn */}
-              <div className="mt-5 p-4 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
-                  <span className="text-xs text-slate-500 font-medium">Mã đơn thanh toán:</span>
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-mono text-sm font-bold text-slate-900 bg-white px-2 py-0.5 rounded border border-slate-200">
-                      {orderCode}
-                    </span>
-                    <button
-                      onClick={() => handleCopy(orderCode, 'Mã đơn')}
-                      className="p-1 text-slate-400 hover:text-blue-600 hover:bg-white rounded transition-colors"
-                      title="Sao chép mã"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
+              {/* KHUNG HIỂN THỊ MÃ VIETQR CHUẨN PAYOS */}
+              <div className="my-5 flex flex-col items-center justify-center p-5 bg-gradient-to-b from-slate-50 to-white rounded-2xl border border-slate-200">
+                <div className="p-3.5 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center">
+                  {vietQrImgUrl && !useFallbackQr ? (
+                    <img
+                      src={vietQrImgUrl}
+                      alt="VietQR PayOS"
+                      className="w-60 sm:w-64 h-auto rounded-xl object-contain"
+                      onError={() => setUseFallbackQr(true)}
+                    />
+                  ) : (
+                    <div className="p-3 bg-white rounded-xl">
+                      <QRCodeSVG
+                        value={effectiveQrCode}
+                        size={220}
+                        level="M"
+                        includeMargin={false}
+                      />
+                    </div>
+                  )}
                 </div>
-                <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
-                  <span className="text-xs text-slate-500 font-medium">Số tiền chuyển:</span>
-                  <span className="font-mono text-lg font-extrabold text-blue-600">
-                    {formatCurrency(amount)} ₫
-                  </span>
-                </div>
-              </div>
 
-              {/* Nút Hero CTA mở PayOS */}
-              <div className="my-6 p-6 rounded-2xl bg-gradient-to-br from-blue-50 via-indigo-50/40 to-blue-50 border border-blue-200/80 text-center">
-                <div className="max-w-md mx-auto space-y-3">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100/80 text-blue-700 text-xs font-semibold">
-                    <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-                    <span>Cổng thanh toán tự động PayOS</span>
+                {/* Số tiền và hướng dẫn dưới QR */}
+                <div className="mt-3 text-center space-y-1">
+                  <div className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-3.5 py-1 rounded-full border border-emerald-200 text-xs font-bold">
+                    <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Số tiền chính xác: {formatCurrency(amount)} ₫</span>
                   </div>
-
-                  <h3 className="text-base sm:text-lg font-bold text-slate-900">
-                    Nhấn để mở giao diện thanh toán bảo mật
-                  </h3>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    Trang thanh toán chính thức của PayOS sẽ hiển thị mã VietQR động cùng thông tin số tiền chính xác, giúp bạn thanh toán nhanh chóng chỉ bằng 1 thao tác quét mã.
+                  <p className="text-xs text-slate-600 font-medium">
+                    Mở app ngân hàng ➔ Chọn <strong>Quét mã QR</strong> để chuyển khoản tự động
                   </p>
+                </div>
+              </div>
 
-                  <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center items-center">
-                    <button
-                      onClick={handleOpenPayOS}
-                      className="w-full sm:w-auto px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl transition-all shadow-md shadow-blue-500/25 hover:shadow-lg active:scale-98 cursor-pointer flex items-center justify-center gap-2"
-                    >
-                      <ShieldCheck className="w-5 h-5" />
-                      <span>Mở trang thanh toán PayOS</span>
-                      <ExternalLink className="w-4 h-4 ml-0.5 opacity-80" />
-                    </button>
+              {/* THÔNG TIN CHUYỂN KHOẢN THỰC TẾ CỦA PAYOS (NẾU CẦN CHUYỂN KHOẢN THỦ CÔNG) */}
+              <div className="bg-slate-50 rounded-xl border border-slate-200 divide-y divide-slate-200/80 text-xs mb-5">
+                <div className="p-3 flex items-center justify-between gap-2">
+                  <span className="text-slate-500">Ngân hàng thụ hưởng:</span>
+                  <span className="font-bold text-slate-900">{getBankName(bin)}</span>
+                </div>
 
-                    {bookingData?.paymentUrl && (
+                <div className="p-3 flex items-center justify-between gap-2">
+                  <span className="text-slate-500">Số tài khoản:</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-sm font-bold text-slate-900">
+                      {accountNumber || 'Xem trên mã QR'}
+                    </span>
+                    {accountNumber && (
                       <button
-                        onClick={() => handleCopy(bookingData.paymentUrl!, 'Liên kết PayOS')}
-                        className="w-full sm:w-auto px-4 py-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition-all shadow-2xs active:scale-98 cursor-pointer flex items-center justify-center gap-1.5"
+                        onClick={() => handleCopy(accountNumber, 'Số tài khoản')}
+                        className="bg-white hover:bg-slate-100 border border-slate-300 text-blue-600 font-semibold px-2 py-0.5 rounded text-[11px] flex items-center gap-1 transition-colors active:scale-95"
                       >
-                        <Copy className="w-4 h-4 text-slate-400" />
-                        <span>Sao chép link</span>
+                        <Copy className="w-3 h-3" />
+                        <span>Sao chép</span>
                       </button>
                     )}
                   </div>
                 </div>
-              </div>
 
-              {/* Hướng dẫn 3 bước thanh toán */}
-              <div className="space-y-3 pt-2 pb-6 border-b border-slate-100">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  Quy trình thanh toán đơn giản:
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 text-left">
-                    <div className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center mb-2">
-                      1
-                    </div>
-                    <h5 className="text-xs font-bold text-slate-900">Mở cổng PayOS</h5>
-                    <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
-                      Bấm nút màu xanh ở trên để mở trang thanh toán chính thức của PayOS.
-                    </p>
+                {accountName && (
+                  <div className="p-3 flex items-center justify-between gap-2">
+                    <span className="text-slate-500">Tên người nhận:</span>
+                    <span className="font-bold text-slate-900 uppercase font-mono">{accountName}</span>
                   </div>
+                )}
 
-                  <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 text-left">
-                    <div className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center mb-2">
-                      2
-                    </div>
-                    <h5 className="text-xs font-bold text-slate-900">Quét mã VietQR</h5>
-                    <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
-                      Dùng app ngân hàng bất kỳ để quét mã QR (số tiền &amp; nội dung được điền tự động).
-                    </p>
+                <div className="p-3 flex items-center justify-between gap-2 bg-blue-50/50">
+                  <div>
+                    <span className="text-blue-900 font-semibold block">Nội dung chuyển khoản:</span>
+                    <span className="text-[11px] text-blue-700/80">Bắt buộc để hệ thống tự động nhận diện</span>
                   </div>
-
-                  <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 text-left">
-                    <div className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center mb-2">
-                      3
-                    </div>
-                    <h5 className="text-xs font-bold text-slate-900">Nhận mã mở tủ</h5>
-                    <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
-                      Sau khi chuyển khoản, màn hình này sẽ tự động cập nhật và cấp mã PIN nhận tủ.
-                    </p>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs font-extrabold text-blue-700 bg-white px-2 py-1 rounded border border-blue-200">
+                      Dat tu {orderCode}
+                    </span>
+                    <button
+                      onClick={() => handleCopy(`Dat tu ${orderCode}`, 'Nội dung chuyển khoản')}
+                      className="bg-white hover:bg-blue-50 border border-blue-300 text-blue-600 font-bold px-2 py-1 rounded text-[11px] flex items-center gap-1 transition-colors active:scale-95"
+                    >
+                      <Copy className="w-3 h-3" />
+                      <span>Sao chép</span>
+                    </button>
                   </div>
                 </div>
               </div>
 
+              {/* TÙY CHỌN PHỤ: NÚT MỞ TRANG PAYOS TRỰC TIẾP */}
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 mb-5">
+                <div className="text-left">
+                  <span className="text-xs font-bold text-slate-800 block">Bạn muốn thanh toán trên trình duyệt riêng?</span>
+                  <span className="text-[11px] text-slate-500">Hỗ trợ thanh toán qua cổng PayOS hoặc thẻ ngân hàng</span>
+                </div>
+                <button
+                  onClick={handleOpenPayOS}
+                  className="shrink-0 w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <CreditCard className="w-3.5 h-3.5" />
+                  <span>Mở cổng PayOS</span>
+                  <ExternalLink className="w-3.5 h-3.5 opacity-80" />
+                </button>
+              </div>
+
               {/* Khung trạng thái lắng nghe Webhook thời gian thực */}
-              <div className="mt-6 p-4 rounded-xl bg-emerald-50/70 border border-emerald-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div className="relative w-8 h-8 flex items-center justify-center shrink-0">
                     <div className="w-8 h-8 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin"></div>
@@ -632,9 +667,9 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
               </div>
 
               {/* Footer bảo mật */}
-              <div className="mt-5 flex items-center justify-center gap-2 text-xs text-slate-500">
+              <div className="mt-4 flex items-center justify-center gap-2 text-xs text-slate-500">
                 <Lock className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Thanh toán an toàn với mã hóa SSL 256-bit • Cổng thanh toán đối tác PayOS</span>
+                <span>Thanh toán an toàn mã hóa SSL 256-bit • VietQR Napas 24/7 • Cổng PayOS</span>
               </div>
             </div>
           </section>

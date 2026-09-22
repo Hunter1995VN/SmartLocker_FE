@@ -34,6 +34,10 @@ export interface CreateBookingResponse {
   amount: number;
   paymentUrl: string;
   paymentExpiresAt: string;
+  qrCode?: string;
+  accountNumber?: string;
+  accountName?: string;
+  bin?: string;
 }
 
 export interface PaymentDto {

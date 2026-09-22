@@ -594,6 +594,10 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                               bookingId: res.data.bookingId,
                               bookingCode: res.data.bookingCode,
                               paymentExpiresAt: res.data.paymentExpiresAt,
+                              qrCode: res.data.qrCode,
+                              accountNumber: res.data.accountNumber,
+                              accountName: res.data.accountName,
+                              bin: res.data.bin,
                             }
                           });
                         } else {
