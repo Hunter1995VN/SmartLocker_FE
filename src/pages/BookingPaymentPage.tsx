@@ -84,10 +84,16 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
     }
   };
 
-  // VietQR URL nếu có BIN và AccountNumber
+  // VietQR URL mẫu tùy biến SmartLocker (có logo ở tâm, Napas, MoMo, VNPAY)
   const vietQrImgUrl = (bin && accountNumber)
-    ? `https://img.vietqr.io/image/${bin}-${accountNumber}-compact2.png?amount=${amount}&addInfo=${encodeURIComponent('Dat tu ' + orderCode)}&accountName=${encodeURIComponent(accountName || '')}`
+    ? `https://img.vietqr.io/image/${bin}-${accountNumber}-e4hph02.png?amount=${amount}&addInfo=${encodeURIComponent('Dat tu ' + orderCode)}&accountName=${encodeURIComponent(accountName || '')}`
     : null;
+
+  const maskAccountNumber = (acc?: string) => {
+    if (!acc) return 'Xem trên mã QR';
+    if (acc.length <= 6) return acc;
+    return `${acc.substring(0, 4)} •••• ${acc.substring(acc.length - 4)}`;
+  };
 
   const [useFallbackQr, setUseFallbackQr] = useState(false);
 
@@ -578,7 +584,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                   <span className="text-slate-500">Số tài khoản:</span>
                   <div className="flex items-center gap-2">
                     <span className="font-mono text-sm font-bold text-slate-900">
-                      {accountNumber || 'Xem trên mã QR'}
+                      {maskAccountNumber(accountNumber)}
                     </span>
                     {accountNumber && (
                       <button
