@@ -33,8 +33,10 @@ interface BookingPaymentPageProps {
     stationAddress?: string;
     size?: 'S' | 'M' | 'L';
     duration?: number;
-    storageDate?: string;
+    bookingMode?: 'NOW' | 'SCHEDULE';
+    dropOffDate?: string;
     dropOffTime?: string;
+    storageDate?: string;
     amount?: number;
     paymentUrl?: string;
     bookingId?: string;
@@ -58,6 +60,22 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
   const amount = bookingData?.amount || 75000;
   const storageDate = bookingData?.storageDate || 'Hôm nay';
   const dropOffTime = bookingData?.dropOffTime || '14:00';
+
+  // Điều hướng quay lại Bước 1 mà giữ nguyên toàn bộ lựa chọn cũ
+  const handleBackToStep1 = () => {
+    onNavigate('station-booking', {
+      stationId: bookingData?.stationId,
+      bookingData: {
+        ...bookingData,
+        stationId: bookingData?.stationId,
+        size: bookingData?.size || size,
+        duration: bookingData?.duration || duration,
+        bookingMode: bookingData?.bookingMode || (bookingData?.storageDate === 'Right Now' ? 'NOW' : 'SCHEDULE'),
+        dropOffDate: bookingData?.dropOffDate,
+        dropOffTime: bookingData?.dropOffTime || dropOffTime,
+      }
+    });
+  };
 
   const travelerName = savedUser.fullName || 'Nguyễn Văn A';
   const travelerPhone = savedUser.phone || '0901 234 567';
@@ -244,7 +262,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
               </span>
               <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
               <span
-                onClick={() => onNavigate('station-booking')}
+                onClick={handleBackToStep1}
                 className="hover:text-blue-600 transition-colors cursor-pointer"
               >
                 {stationName.split('(')[0].trim()}
@@ -280,7 +298,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
           <div className="grid grid-cols-3 gap-2 sm:gap-4 items-center">
             {/* Bước 1 */}
             <button
-              onClick={() => onNavigate('station-booking')}
+              onClick={handleBackToStep1}
               className="flex items-center gap-2 sm:gap-3 text-left group cursor-pointer"
             >
               <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center shrink-0 group-hover:bg-emerald-100 transition-colors">
@@ -334,9 +352,17 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                     <span className="text-xs text-slate-500">Mã đơn: <strong className="font-mono text-slate-800">{orderCode}</strong></span>
                   </div>
                 </div>
-                <span className="bg-amber-50 text-amber-700 text-[11px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-md border border-amber-200">
-                  Chờ thanh toán
-                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleBackToStep1}
+                    className="text-xs font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-lg border border-blue-200 transition-colors cursor-pointer"
+                  >
+                    Thay đổi
+                  </button>
+                  <span className="bg-amber-50 text-amber-700 text-[11px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-md border border-amber-200">
+                    Chờ thanh toán
+                  </span>
+                </div>
               </div>
 
               <div className="space-y-4">
