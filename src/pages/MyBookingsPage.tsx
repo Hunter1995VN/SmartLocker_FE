@@ -292,7 +292,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                       <div className="h-4 w-px bg-slate-200 hidden sm:block"></div>
                       {/* Compartment Details */}
                       <h3 className="text-lg text-slate-900 font-bold">
-                        Compartment {booking.lockerCode}
+                        {booking.lockerCode ? `Ngăn ${booking.lockerCode}` : `Cấp tại Kiosk (Size ${booking.size})`}
                       </h3>
                       <span className="text-xs text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md font-semibold">
                         {booking.size === 'S' ? 'Small' : booking.size === 'M' ? 'Medium' : 'Large'} Size
@@ -372,7 +372,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                         </div>
                         <div className="overflow-hidden">
                           <p className="text-xs text-slate-900 font-bold truncate">Quick Scan at Kiosk</p>
-                          <p className="text-[11px] text-secondary truncate font-mono">PIN: {booking.passcode}</p>
+                          <p className="text-[11px] text-secondary truncate font-mono">PIN: {booking.accessCode || booking.passcode || 'Quét QR'}</p>
                         </div>
                       </div>
                     </div>

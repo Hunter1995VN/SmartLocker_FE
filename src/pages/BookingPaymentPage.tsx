@@ -157,7 +157,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
   // Trạng thái modal thành công
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
   const [agreedTerms, setAgreedTerms] = useState<boolean>(true);
-  const [successData, setSuccessData] = useState<{ lockerCode?: string; accessCode?: string } | null>(null);
+  const [successData, setSuccessData] = useState<{ lockerCode?: string | null; accessCode?: string } | null>(null);
 
   // Trạng thái kiểm tra thủ công
   const [isCheckingStatus, setIsCheckingStatus] = useState<boolean>(false);
@@ -173,7 +173,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
           if (res.data.status === 'CONFIRMED' || res.data.status === 'STORED' || res.data.status === 'CHECKED_IN') {
             clearInterval(interval);
             setSuccessData({
-              lockerCode: res.data.lockerCode || 'N/A',
+              lockerCode: res.data.lockerCode || null,
               accessCode: res.data.passcode || (res.data.lockerCode ? `LK-${res.data.lockerCode}` : '729 416')
             });
             setShowSuccessModal(true);
@@ -201,7 +201,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
       if (res.success && res.data) {
         if (res.data.status === 'CONFIRMED' || res.data.status === 'STORED' || res.data.status === 'CHECKED_IN') {
           setSuccessData({
-            lockerCode: res.data.lockerCode || 'N/A',
+            lockerCode: res.data.lockerCode || null,
             accessCode: res.data.passcode || (res.data.lockerCode ? `LK-${res.data.lockerCode}` : '729 416')
           });
           setShowSuccessModal(true);
@@ -723,10 +723,16 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
 
             <div className="my-5 p-4 rounded-xl bg-blue-50/70 border border-blue-200 text-left space-y-2.5">
               <div className="flex justify-between items-center">
-                <span className="text-xs text-slate-500">Vị trí ngăn tủ được cấp:</span>
-                <span className="font-mono text-base font-bold text-blue-600 bg-white px-2.5 py-0.5 rounded border border-blue-200">
-                  {successData?.lockerCode || (size === 'S' ? 'Ngăn S-02' : size === 'M' ? 'Ngăn M-04' : 'Ngăn L-02')}
-                </span>
+                <span className="text-xs text-slate-500">Vị trí ngăn tủ:</span>
+                {successData?.lockerCode ? (
+                  <span className="font-mono text-base font-bold text-blue-600 bg-white px-2.5 py-0.5 rounded border border-blue-200">
+                    {successData.lockerCode}
+                  </span>
+                ) : (
+                  <span className="text-xs font-bold text-blue-700 bg-blue-100/90 px-2.5 py-1 rounded-md border border-blue-200">
+                    Cấp tự động tại Kiosk (Size {size})
+                  </span>
+                )}
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-xs text-slate-500">Mã PIN mở tủ một lần:</span>
@@ -734,6 +740,11 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                   {successData?.accessCode || '729 416'}
                 </span>
               </div>
+              {!successData?.lockerCode && (
+                <p className="text-[11px] text-blue-800/80 pt-1 border-t border-blue-200/60 leading-relaxed">
+                  ℹ️ Trạm Kiosk sẽ tự động gán ô tủ và bật mở cửa khi bạn quét mã check-in tại trạm.
+                </p>
+              )}
             </div>
 
             <p className="text-xs text-slate-500 mb-5">
@@ -744,7 +755,9 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
               onClick={() => {
                 setShowSuccessModal(false);
                 onNavigate('booking-detail', {
+                  bookingId: bookingData?.bookingId,
                   bookingData: {
+                    stationId: bookingData?.stationId,
                     stationName,
                     stationAddress,
                     size,
