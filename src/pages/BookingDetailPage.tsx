@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { ExtendBookingModal } from '../components/booking/ExtendBookingModal';
 import { getBookingById, type BookingDto } from '../api/bookingService';
+import { QRCodeSVG } from 'qrcode.react';
 
 interface BookingDetailPageProps {
   onNavigate: (page: string, props?: any) => void;
@@ -82,9 +83,12 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
   const duration = booking?.durationHours || bookingData?.duration || 3;
   const amount = booking?.baseAmount || bookingData?.amount || 45000;
   const orderId = booking?.bookingCode || bookingData?.orderCode || bookingId || 'SL-8942A';
-  const passcode = booking?.passcode || bookingData?.accessCode || 'LK-8942A';
-  const bayCode = booking?.lockerCode || bookingData?.bayCode || (size === 'S' ? 'Bay S-02' : size === 'M' ? 'Bay M-04' : 'Bay L-02');
-  const status = booking?.status || 'STORED';
+  const isLockerAssigned = Boolean(booking?.lockerCode || bookingData?.bayCode);
+  const bayCode = isLockerAssigned
+    ? `Ngăn ${booking?.lockerCode || bookingData?.bayCode}`
+    : `Cấp tại Kiosk (Size ${size})`;
+  const passcode = booking?.accessCode || booking?.passcode || bookingData?.accessCode || 'Chờ cấp tại trạm';
+  const status = booking?.status || 'CONFIRMED';
 
   const formatCurrency = (val: number) => new Intl.NumberFormat('vi-VN').format(val);
 
@@ -312,7 +316,9 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                     <h2 className="text-xl font-bold text-[#0b1c30]">Digital Access Pass &amp; Unlock Key</h2>
                   </div>
                   <p className="text-xs text-[#434655]">
-                    Present this digital key at the Station Kiosk scanner or enter the passcode to release locker door {bayCode.replace('Bay ', '')}.
+                    {isLockerAssigned
+                      ? `Đưa mã QR này vào trước camera quét tại trạm Kiosk hoặc nhập mã mở tủ để mở ô ${bayCode}.`
+                      : `Đưa mã QR này vào trước camera quét của trạm Kiosk hoặc nhập mã mở tủ 8 ký tự bên dưới để trạm tự động cấp ô tủ và mở cửa gửi đồ.`}
                   </p>
                 </div>
                 <div className="hidden sm:flex items-center gap-1 text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full text-xs font-semibold">
@@ -326,63 +332,18 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                 <div className="relative group">
                   <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-primary/30 to-blue-400/30 blur-md opacity-75 group-hover:opacity-100 transition duration-500"></div>
                   {/* QR Frame */}
-                  <div className="relative p-4 bg-white rounded-2xl border-2 border-primary/20 shadow-md">
-                    {/* SVG High-Contrast QR Pattern */}
-                    <svg className="w-52 h-52 sm:w-56 sm:h-56" fill="none" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
-                      <rect fill="white" height="220" width="220"></rect>
-                      <rect fill="#0F172A" height="56" rx="8" width="56" x="15" y="15"></rect>
-                      <rect fill="white" height="40" rx="4" width="40" x="23" y="23"></rect>
-                      <rect fill="#2563EB" height="24" rx="2" width="24" x="31" y="31"></rect>
-                      <rect fill="#0F172A" height="56" rx="8" width="56" x="149" y="15"></rect>
-                      <rect fill="white" height="40" rx="4" width="40" x="157" y="23"></rect>
-                      <rect fill="#2563EB" height="24" rx="2" width="24" x="165" y="31"></rect>
-                      <rect fill="#0F172A" height="56" rx="8" width="56" x="15" y="149"></rect>
-                      <rect fill="white" height="40" rx="4" width="40" x="23" y="157"></rect>
-                      <rect fill="#2563EB" height="24" rx="2" width="24" x="31" y="165"></rect>
-                      <rect fill="#0F172A" height="10" width="10" x="85" y="18"></rect>
-                      <rect fill="#0F172A" height="10" width="10" x="105" y="18"></rect>
-                      <rect fill="#0F172A" height="10" width="10" x="125" y="18"></rect>
-                      <rect fill="#2563EB" height="10" width="10" x="95" y="35"></rect>
-                      <rect fill="#0F172A" height="10" width="10" x="115" y="35"></rect>
-                      <rect fill="#0F172A" height="10" width="10" x="85" y="52"></rect>
-                      <rect fill="#0F172A" height="10" width="10" x="105" y="52"></rect>
-                      <rect fill="#2563EB" height="10" width="10" x="125" y="52"></rect>
-                      <rect fill="#0F172A" height="10" width="10" x="40" y="85"></rect>
-                      <rect fill="#0F172A" height="10" width="10" x="58" y="85"></rect>
-                      <rect fill="#2563EB" height="10" width="10" x="85" y="85"></rect>
-                      <rect fill="#0F172A" height="10" width="10" x="103" y="85"></rect>
-                      <rect fill="#0F172A" height="10" width="10" x="121" y="85"></rect>
-                      <rect fill="#0F172A" height="10" width="10" x="139" y="85"></rect>
-                      <rect fill="#2563EB" height="10" width="10" x="157" y="85"></rect>
-                      <rect fill="#0F172A" height="10" width="10" x="175" y="85"></rect>
-                      <rect fill="#0F172A" height="10" width="10" x="85" y="103"></rect>
-                      <rect fill="#0F172A" height="10" width="18" x="103" y="103"></rect>
-                      <rect fill="#2563EB" height="10" width="10" x="130" y="103"></rect>
-                      <rect fill="#0F172A" height="10" width="18" x="148" y="103"></rect>
-                      <rect fill="#0F172A" height="10" width="10" x="18" y="103"></rect>
-                      <rect fill="#0F172A" height="10" width="18" x="36" y="103"></rect>
-                      <rect fill="#2563EB" height="10" width="10" x="63" y="103"></rect>
-                      <rect fill="#0F172A" height="10" width="10" x="175" y="103"></rect>
-                      <rect fill="white" height="48" rx="8" stroke="#2563EB" strokeWidth="2" width="48" x="86" y="86"></rect>
-                      <path d="M100 100 H120 V120 H100 Z" fill="#2563EB"></path>
-                      <circle cx="110" cy="110" fill="white" r="3"></circle>
-                      <rect fill="#0F172A" height="10" width="10" x="85" y="148"></rect>
-                      <rect fill="#2563EB" height="10" width="10" x="103" y="148"></rect>
-                      <rect fill="#0F172A" height="10" width="18" x="121" y="148"></rect>
-                      <rect fill="#0F172A" height="10" width="10" x="148" y="148"></rect>
-                      <rect fill="#2563EB" height="10" width="10" x="166" y="148"></rect>
-                      <rect fill="#0F172A" height="10" width="18" x="184" y="148"></rect>
-                      <rect fill="#0F172A" height="10" width="18" x="85" y="166"></rect>
-                      <rect fill="#0F172A" height="10" width="10" x="112" y="166"></rect>
-                      <rect fill="#0F172A" height="10" width="18" x="130" y="166"></rect>
-                      <rect fill="#2563EB" height="10" width="10" x="157" y="166"></rect>
-                      <rect fill="#0F172A" height="10" width="18" x="175" y="166"></rect>
-                      <rect fill="#0F172A" height="10" width="10" x="85" y="184"></rect>
-                      <rect fill="#2563EB" height="10" width="18" x="103" y="184"></rect>
-                      <rect fill="#0F172A" height="10" width="10" x="130" y="184"></rect>
-                      <rect fill="#0F172A" height="10" width="18" x="148" y="184"></rect>
-                      <rect fill="#0F172A" height="10" width="10" x="175" y="184"></rect>
-                    </svg>
+                  <div className="relative p-5 bg-white rounded-2xl border-2 border-primary/20 shadow-md flex items-center justify-center">
+                    <QRCodeSVG
+                      value={booking?.qrPayload || JSON.stringify({
+                        bookingId: booking?.id || bookingId,
+                        bookingCode: orderId,
+                        stationId: booking?.stationId,
+                        accessCode: passcode
+                      })}
+                      size={210}
+                      level="H"
+                      includeMargin={false}
+                    />
                   </div>
                 </div>
 

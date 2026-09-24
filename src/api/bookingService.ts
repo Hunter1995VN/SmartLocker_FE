@@ -83,6 +83,8 @@ export interface BookingDto {
   estimatedRefundAmount?: number;
   canExtend: boolean;
   canCancel: boolean;
+  accessCode?: string;
+  qrPayload?: string;
   passcode?: string;
   durationHours?: number;
 }
@@ -94,6 +96,7 @@ export interface BookingListItemDto {
   stationName: string;
   stationAddress?: string;
   lockerCode?: string;
+  accessCode?: string;
   size: string;
   status: string;
   startAt: string;
