@@ -28,6 +28,7 @@ import IoTTelemetryCard from '../../components/admin/IoTTelemetryCard';
 import CriticalTriageCard from '../../components/admin/CriticalTriageCard';
 import StationFleetTable from '../../components/admin/StationFleetTable';
 import StationManagementView from '../../components/admin/stations/StationManagementView';
+import RealtimeLockerGridView from '../../components/admin/lockers/RealtimeLockerGridView';
 
 interface AdminPortalPageProps {
     onLogout: () => void;
@@ -72,7 +73,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
     const [chartError, setChartError] = useState<string | null>(null);
     const [selectedDays, setSelectedDays] = useState<number>(30);
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-    const [activeMenu, setActiveMenu] = useState<'dashboard' | 'stations'>('stations');
+    const [activeMenu, setActiveMenu] = useState<'dashboard' | 'stations' | 'lockers'>('lockers');
 
     // 4. API Fetch Functions
     const fetchStats = useCallback(async () => {
@@ -183,7 +184,9 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
             {/* Right Main Viewport */}
             <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
                 <main className="p-4 sm:p-6 lg:p-7 space-y-5 max-w-7xl w-full mx-auto">
-                    {activeMenu === 'stations' ? (
+                    {activeMenu === 'lockers' ? (
+                        <RealtimeLockerGridView />
+                    ) : activeMenu === 'stations' ? (
                         <StationManagementView />
                     ) : (
                         <>
@@ -250,7 +253,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
 
                 {/* Footer */}
                 <footer className="w-full py-4 text-center text-xs text-slate-400 border-t border-slate-200/80 bg-white mt-auto">
-                    <span>SmartLocker Management System (SLMS) · Station & Locker Management (AD-FE-03)</span>
+                    <span>SmartLocker Management System (SLMS) · Realtime Locker Monitoring & Status Control (AD-FE-04)</span>
                 </footer>
             </div>
         </div>
