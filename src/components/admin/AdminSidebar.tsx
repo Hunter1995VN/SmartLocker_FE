@@ -25,8 +25,8 @@ interface AdminSidebarProps {
     openIncidentsCount: number;
     offlineDevicesCount: number;
     onLogout: () => void;
-    activeMenu?: 'dashboard' | 'stations';
-    onSelectMenu?: (menu: 'dashboard' | 'stations') => void;
+    activeMenu?: 'dashboard' | 'stations' | 'users' | 'lockers';
+    onSelectMenu?: (menu: 'dashboard' | 'stations' | 'users' | 'lockers') => void;
 }
 
 export default function AdminSidebar({
@@ -34,7 +34,7 @@ export default function AdminSidebar({
     openIncidentsCount,
     offlineDevicesCount,
     onLogout,
-    activeMenu = 'stations',
+    activeMenu = 'users',
     onSelectMenu,
 }: AdminSidebarProps) {
     const role = (user?.role || '').trim();
@@ -147,10 +147,20 @@ export default function AdminSidebar({
                                 <DollarSign className="w-4 h-4 text-slate-400" />
                                 <span>Pricing Policies</span>
                             </div>
-                            <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-default">
-                                <Users className="w-4 h-4 text-slate-400" />
-                                <span>Accounts</span>
-                            </div>
+                            <button
+                                type="button"
+                                onClick={() => onSelectMenu?.('users')}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition cursor-pointer text-left ${
+                                    activeMenu === 'users'
+                                        ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-600/30'
+                                        : 'text-slate-600 hover:bg-slate-50'
+                                }`}
+                            >
+                                <span className="flex items-center gap-2.5">
+                                    <Users className={`w-4 h-4 ${activeMenu === 'users' ? 'text-white' : 'text-slate-400'}`} />
+                                    <span>Accounts</span>
+                                </span>
+                            </button>
                             <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-default">
                                 <CreditCard className="w-4 h-4 text-slate-400" />
                                 <span>Bookings & Pay</span>
