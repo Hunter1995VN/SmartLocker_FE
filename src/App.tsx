@@ -14,9 +14,11 @@ import StationBookingPage from './pages/StationBookingPage';
 import BookingPaymentPage from './pages/BookingPaymentPage';
 import BookingDetailPage from './pages/BookingDetailPage';
 import MyBookingsPage from './pages/MyBookingsPage';
+import AdminLoginPage from './pages/admin/AdminLoginPage';
+import AdminPortalPage from './pages/admin/AdminPortalPage';
 
 /** Các trang có trong hệ thống */
-type Page = 'home' | 'login' | 'register' | 'verify-otp' | 'forgot-password' | 'dashboard' | 'map' | 'station-booking' | 'booking-payment' | 'booking-detail' | 'my-bookings';
+type Page = 'home' | 'login' | 'register' | 'verify-otp' | 'forgot-password' | 'dashboard' | 'map' | 'station-booking' | 'booking-payment' | 'booking-detail' | 'my-bookings' | 'admin-login' | 'admin';
 
 /** Dữ liệu truyền giữa các trang (ví dụ email khi chuyển register → verify-otp) */
 interface PageData {
@@ -28,8 +30,18 @@ interface PageData {
 
 /** Chuyển đổi từ URL Pathname sang mã Page tương ứng */
 const pathToPage = (pathname: string): Page => {
-    const clean = pathname.replace(/^\//, '').split('?')[0].split('/')[0];
-    switch (clean) {
+    const clean = pathname.replace(/^\//, '').split('?')[0];
+    const segments = clean.split('/');
+    const first = segments[0];
+    const second = segments[1];
+
+    if (first === 'admin') {
+        if (second === 'login') return 'admin-login';
+        return 'admin';
+    }
+    if (first === 'admin-login') return 'admin-login';
+
+    switch (first) {
         case '': return 'home';
         case 'login': return 'login';
         case 'register': return 'register';
@@ -76,6 +88,19 @@ function App() {
             if (['dashboard', 'my-bookings'].includes(pageFromUrl) && !savedUser) {
                 return 'login';
             }
+            // Protected route cho Admin Portal: yêu cầu đăng nhập và role Admin hoặc Staff
+            if (pageFromUrl === 'admin') {
+                if (!savedUser) return 'admin-login';
+                try {
+                    const parsed = JSON.parse(savedUser);
+                    const role = (parsed.role || '').toLowerCase();
+                    if (role !== 'admin' && role !== 'staff') {
+                        return 'admin-login';
+                    }
+                } catch {
+                    return 'admin-login';
+                }
+            }
             return pageFromUrl;
         }
         return savedUser ? 'dashboard' : 'home';
@@ -105,7 +130,7 @@ function App() {
 
     /** Chuyển trang và thay đổi URL thật trên trình duyệt (chuẩn web 100%) */
     const navigateTo = (page: Page, data: PageData = {}) => {
-        let targetUrl = page === 'home' ? '/' : `/${page}`;
+        let targetUrl = page === 'home' ? '/' : page === 'admin-login' ? '/admin/login' : `/${page}`;
         const params = new URLSearchParams();
         if (data.stationId) params.set('stationId', data.stationId);
         if (data.bookingId) params.set('bookingId', data.bookingId);
@@ -132,8 +157,19 @@ function App() {
             sessionStorage.removeItem('smartlocker_booking_data');
             localStorage.removeItem('smartlocker_user');
             localStorage.removeItem('smartlocker_token');
+            localStorage.removeItem('smartlocker_refresh');
         } catch {}
         navigateTo('home');
+    };
+
+    const handleAdminLogout = () => {
+        try {
+            sessionStorage.removeItem('smartlocker_booking_data');
+            localStorage.removeItem('smartlocker_user');
+            localStorage.removeItem('smartlocker_token');
+            localStorage.removeItem('smartlocker_refresh');
+        } catch {}
+        navigateTo('admin-login');
     };
 
     return (
@@ -210,6 +246,20 @@ function App() {
             {currentPage === 'my-bookings' && (
                 <MyBookingsPage
                     onNavigate={(mode, data) => navigateTo(mode as Page, data)}
+                />
+            )}
+
+            {currentPage === 'admin-login' && (
+                <AdminLoginPage
+                    onLoginSuccess={() => navigateTo('admin')}
+                    onNavigateHome={() => navigateTo('home')}
+                />
+            )}
+
+            {currentPage === 'admin' && (
+                <AdminPortalPage
+                    onLogout={handleAdminLogout}
+                    onNavigateLogin={() => navigateTo('admin-login')}
                 />
             )}
         </>
