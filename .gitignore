@@ -18,7 +18,8 @@ dist-ssr
 .env.development
 .env.production
 .env.*.local
-# .env.example ĐƯỢC PHÉP push - đây là template cho member khác
+# .env.example được track để làm mẫu cho thành viên
+!.env.example
 
 # Editor directories and files
 .vscode/*

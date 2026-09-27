@@ -3,10 +3,12 @@ import {
     LogOut, Search, Bell, Lock, MapPin, Navigation, Zap,
     Shield, User, Clock, RefreshCw, X, ChevronRight,
     Wifi, Info, ArrowRight, Phone, CheckCircle,
-    Package, ReceiptText, AlertTriangle, Key,
+    Package, ReceiptText, Key,
 } from 'lucide-react';
-import { MOCK_STATIONS, MOCK_ACTIVE_BOOKING } from '../api/stationService';
+import { MOCK_STATIONS, MOCK_ACTIVE_BOOKING, getStations } from '../api/stationService';
 import type { Station, Booking } from '../api/stationService';
+import { getMyBookings } from '../api/bookingService';
+import type { BookingListItemDto } from '../api/bookingService';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface AuthUser {
@@ -105,6 +107,49 @@ export default function DashboardPage({ onLogout, onNavigateToMap }: DashboardPa
     const [unlockState, setUnlockState] = useState<'idle' | 'unlocking' | 'success'>('idle');
     const [searchQuery, setSearchQuery] = useState('');
 
+    const [recentBookings, setRecentBookings] = useState<BookingListItemDto[]>(MOCK_RECENT_BOOKINGS as unknown as BookingListItemDto[]);
+    const [apiStations, setApiStations] = useState<Station[]>(MOCK_STATIONS);
+    const [isLoadingBookings, setIsLoadingBookings] = useState(true);
+    const [isLoadingStations, setIsLoadingStations] = useState(true);
+
+    useEffect(() => {
+        let isMounted = true;
+        const fetchDashboardData = async () => {
+            try {
+                const bRes = await getMyBookings(undefined, 1, 5);
+                if (isMounted && bRes.success) {
+                    const mappedBookings = bRes.data.items.map(b => ({
+                        id: b.id,
+                        bookingCode: b.bookingCode,
+                        stationName: b.stationName,
+                        lockerCode: `Size ${b.size}`,
+                        date: `${new Date(b.startAt).toLocaleDateString('vi-VN')} · ${new Date(b.startAt).getHours().toString().padStart(2, '0')}:${new Date(b.startAt).getMinutes().toString().padStart(2, '0')} - ${new Date(b.endAt).getHours().toString().padStart(2, '0')}:${new Date(b.endAt).getMinutes().toString().padStart(2, '0')}`,
+                        amount: `${b.baseAmount.toLocaleString('vi-VN')}đ`,
+                        status: b.status,
+                        type: 'walk',
+                        refundNote: null,
+                    }));
+                    setRecentBookings(mappedBookings as unknown as BookingListItemDto[]);
+                }
+            } catch (error) {
+                console.error("Failed to load bookings", error);
+            } finally {
+                if (isMounted) setIsLoadingBookings(false);
+            }
+
+            try {
+                const sRes = await getStations();
+                if (isMounted) setApiStations(sRes);
+            } catch (error) {
+                console.error("Failed to load stations", error);
+            } finally {
+                if (isMounted) setIsLoadingStations(false);
+            }
+        };
+        fetchDashboardData();
+        return () => { isMounted = false; };
+    }, []);
+
     // Countdown timer
     useEffect(() => {
         if (!activeBooking || activeBooking.status !== 'CHECKED_IN') return;
@@ -143,7 +188,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap }: DashboardPa
         }, 2000);
     };
 
-    const nearbyStations = MOCK_STATIONS.filter(s => s.status === 'ACTIVE').slice(0, 2);
+    const nearbyStations = apiStations.filter(s => s.status === 'ACTIVE').slice(0, 2);
 
     if (!user.fullName) {
         return (
@@ -435,9 +480,15 @@ export default function DashboardPage({ onLogout, onNavigateToMap }: DashboardPa
                                         </a>
                                     </div>
                                     <div className="flex flex-col gap-2">
-                                        {MOCK_RECENT_BOOKINGS.map(b => (
-                                            <BookingRow key={b.id} booking={b} />
-                                        ))}
+                                        {isLoadingBookings ? (
+                                            <div className="flex justify-center p-4"><RefreshCw className="w-5 h-5 animate-spin text-[#2563eb]" /></div>
+                                        ) : recentBookings.length > 0 ? (
+                                            recentBookings.map(b => (
+                                                <BookingRow key={b.id} booking={b} />
+                                            ))
+                                        ) : (
+                                            <p className="text-sm text-[#434655] text-center p-4">Chưa có lịch sử đặt chỗ.</p>
+                                        )}
                                     </div>
                                 </div>
 
@@ -521,9 +572,15 @@ export default function DashboardPage({ onLogout, onNavigateToMap }: DashboardPa
 
                                     {/* Station compact list */}
                                     <div className="flex flex-col gap-2">
-                                        {nearbyStations.map(s => (
-                                            <NearbyStationCard key={s.id} station={s} />
-                                        ))}
+                                        {isLoadingStations ? (
+                                            <div className="flex justify-center p-4"><RefreshCw className="w-5 h-5 animate-spin text-[#2563eb]" /></div>
+                                        ) : nearbyStations.length > 0 ? (
+                                            nearbyStations.map(s => (
+                                                <NearbyStationCard key={s.id} station={s} />
+                                            ))
+                                        ) : (
+                                            <p className="text-sm text-[#434655] text-center p-4">Không tìm thấy trạm gần đây.</p>
+                                        )}
                                     </div>
 
                                     <button
@@ -711,7 +768,7 @@ function TelemetryCell({ label, value, icon, valueClass = 'text-[#0b1c30]', mono
     );
 }
 
-function BookingRow({ booking }: { booking: typeof MOCK_RECENT_BOOKINGS[0] }) {
+function BookingRow({ booking }: { booking: any }) {
     const isCompleted = booking.status === 'COMPLETED';
     const isCancelled = booking.status === 'CANCELLED';
 
@@ -818,7 +875,10 @@ function LockerCell({ code, status, span }: { code: string; status: 'AVAILABLE' 
 }
 
 function NearbyStationCard({ station }: { station: Station }) {
-    const totalAvail = station.availableS + station.availableM + station.availableL;
+    const availS = station.availableS ?? station.totalS;
+    const availM = station.availableM ?? station.totalM;
+    const availL = station.availableL ?? station.totalL;
+    const totalAvail = availS + availM + availL;
     const isPrimary = station.distanceKm != null && station.distanceKm < 1;
 
     const distLabel = station.distanceKm != null
@@ -833,14 +893,14 @@ function NearbyStationCard({ station }: { station: Station }) {
                 <span className="text-sm font-bold text-[#0b1c30]">{station.name}</span>
                 <span className={`text-xs font-bold ${isPrimary ? 'text-[#004ac6]' : 'text-[#434655]'}`}>{distLabel}</span>
             </div>
-            <p className="text-xs text-[#434655]">{station.address.split(',').slice(-2).join(',').trim()} · Mở {station.opensAt}–{station.closesAt}</p>
+            <p className="text-xs text-[#434655]">{station.address.split(',').slice(-2).join(',').trim()} · Mở {station.opensAt || '06:00'}–{station.closesAt || '22:00'}</p>
             <div className="flex items-center justify-between pt-1">
                 <div className="flex items-center gap-2 text-xs font-mono text-[#434655]">
-                    <span>S: <strong className="text-[#006242]">{station.availableS}</strong></span>
+                    <span>S: <strong className="text-[#006242]">{availS}</strong></span>
                     <span>·</span>
-                    <span>M: <strong className="text-[#006242]">{station.availableM}</strong></span>
+                    <span>M: <strong className="text-[#006242]">{availM}</strong></span>
                     <span>·</span>
-                    <span>L: <strong className="text-[#006242]">{station.availableL}</strong></span>
+                    <span>L: <strong className="text-[#006242]">{availL}</strong></span>
                 </div>
                 <button
                     disabled={totalAvail === 0}

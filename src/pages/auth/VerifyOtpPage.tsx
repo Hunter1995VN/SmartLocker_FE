@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Mail, ArrowRight, AlertCircle, CheckCircle, ChevronLeft, ArrowLeft } from 'lucide-react';
+import { Mail, ArrowRight, AlertCircle, CheckCircle, ArrowLeft } from 'lucide-react';
 import { tokenStore } from '../../api/client';
 
 type ViewMode = 'login' | 'register' | 'verify-otp' | 'forgot-password';
