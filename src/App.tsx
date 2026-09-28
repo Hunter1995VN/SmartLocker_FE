@@ -78,41 +78,66 @@ const parseQueryAndState = (): PageData => {
     };
 };
 
+const getUserRole = (rawUser: string | null): string => {
+    if (!rawUser) return '';
+    try {
+        const parsed = JSON.parse(rawUser);
+        return (parsed.role || '').toLowerCase();
+    } catch {
+        return '';
+    }
+};
+
 function App() {
     const savedUser = localStorage.getItem('smartlocker_user');
 
     // Xác định trang khởi tạo trực tiếp từ URL trên thanh địa chỉ trình duyệt
     const getInitialPage = (): Page => {
         const pageFromUrl = pathToPage(window.location.pathname);
+        const userRole = getUserRole(savedUser);
+        const isAdminOrStaff = userRole === 'admin' || userRole === 'staff';
+
         if (pageFromUrl !== 'home') {
             if (['dashboard', 'my-bookings'].includes(pageFromUrl) && !savedUser) {
                 return 'login';
             }
+            // Nếu người dùng có quyền Admin hoặc Staff truy cập /dashboard, ưu tiên chuyển về Admin Portal
+            if (pageFromUrl === 'dashboard' && isAdminOrStaff) {
+                return 'admin';
+            }
             // Protected route cho Admin Portal: yêu cầu đăng nhập và role Admin hoặc Staff
             if (pageFromUrl === 'admin') {
                 if (!savedUser) return 'admin-login';
-                try {
-                    const parsed = JSON.parse(savedUser);
-                    const role = (parsed.role || '').toLowerCase();
-                    if (role !== 'admin' && role !== 'staff') {
-                        return 'admin-login';
-                    }
-                } catch {
+                if (!isAdminOrStaff) {
                     return 'admin-login';
                 }
             }
             return pageFromUrl;
         }
-        return savedUser ? 'dashboard' : 'home';
+
+        if (savedUser) {
+            return isAdminOrStaff ? 'admin' : 'dashboard';
+        }
+        return 'home';
     };
 
     const [currentPage, setCurrentPage] = useState<Page>(getInitialPage);
     const [pageData, setPageData] = useState<PageData>(parseQueryAndState);
 
-    // Đồng bộ URL ngay lần đầu nếu truy cập root '/' khi đã đăng nhập
+    // Đồng bộ URL ngay lần đầu nếu truy cập root '/' hoặc '/dashboard' (đối với admin/staff) khi đã đăng nhập
     useEffect(() => {
-        if (window.location.pathname === '/' && savedUser) {
-            window.history.replaceState({ page: 'dashboard' }, '', '/dashboard');
+        if (savedUser) {
+            const userRole = getUserRole(savedUser);
+            const isAdminOrStaff = userRole === 'admin' || userRole === 'staff';
+
+            if (window.location.pathname === '/') {
+                const targetPage = isAdminOrStaff ? 'admin' : 'dashboard';
+                window.history.replaceState({ page: targetPage }, '', `/${targetPage}`);
+                setCurrentPage(targetPage);
+            } else if (window.location.pathname === '/dashboard' && isAdminOrStaff) {
+                window.history.replaceState({ page: 'admin' }, '', '/admin');
+                setCurrentPage('admin');
+            }
         }
     }, [savedUser]);
 
@@ -185,7 +210,15 @@ function App() {
                 <LoginPage onNavigate={(mode, data) => {
                     if (mode === 'dashboard' as Page) navigateTo('dashboard');
                     else navigateTo(mode as Page, data);
-                }} onLoginSuccess={() => navigateTo('dashboard')} />
+                }} onLoginSuccess={() => {
+                    const currentStored = localStorage.getItem('smartlocker_user');
+                    const role = getUserRole(currentStored);
+                    if (role === 'admin' || role === 'staff') {
+                        navigateTo('admin');
+                    } else {
+                        navigateTo('dashboard');
+                    }
+                }} />
             )}
 
             {currentPage === 'register' && (
@@ -207,6 +240,7 @@ function App() {
                 <DashboardPage
                     onLogout={handleLogout}
                     onNavigateToMap={() => navigateTo('map')}
+                    onNavigateToAdmin={() => navigateTo('admin')}
                 />
             )}
 
