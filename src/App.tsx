@@ -10,6 +10,7 @@ import VerifyOtpPage from './pages/auth/VerifyOtpPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import DashboardPage from './pages/DashboardPage';
 import TravelerHomePage from './pages/TravelerHomePage';
+import FindStationPage from './pages/FindStationPage';
 import StationBookingPage from './pages/StationBookingPage';
 import BookingPaymentPage from './pages/BookingPaymentPage';
 import BookingDetailPage from './pages/BookingDetailPage';
@@ -18,7 +19,7 @@ import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminPortalPage from './pages/admin/AdminPortalPage';
 
 /** Các trang có trong hệ thống */
-type Page = 'home' | 'login' | 'register' | 'verify-otp' | 'forgot-password' | 'dashboard' | 'map' | 'station-booking' | 'booking-payment' | 'booking-detail' | 'my-bookings' | 'admin-login' | 'admin';
+type Page = 'home' | 'login' | 'register' | 'verify-otp' | 'forgot-password' | 'dashboard' | 'map' | 'find-station' | 'station-booking' | 'booking-payment' | 'booking-detail' | 'my-bookings' | 'admin-login' | 'admin';
 
 /** Dữ liệu truyền giữa các trang (ví dụ email khi chuyển register → verify-otp) */
 interface PageData {
@@ -49,6 +50,7 @@ const pathToPage = (pathname: string): Page => {
         case 'forgot-password': return 'forgot-password';
         case 'dashboard': return 'dashboard';
         case 'map': return 'map';
+        case 'find-station': return 'find-station';
         case 'station-booking': return 'station-booking';
         case 'booking-payment': return 'booking-payment';
         case 'booking-detail': return 'booking-detail';
@@ -239,7 +241,7 @@ function App() {
             {currentPage === 'dashboard' && (
                 <DashboardPage
                     onLogout={handleLogout}
-                    onNavigateToMap={() => navigateTo('map')}
+                    onNavigateToMap={() => navigateTo('find-station')}
                     onNavigateToAdmin={() => navigateTo('admin')}
                 />
             )}
@@ -294,6 +296,13 @@ function App() {
                 <AdminPortalPage
                     onLogout={handleAdminLogout}
                     onNavigateLogin={() => navigateTo('admin-login')}
+                />
+            )}
+
+            {currentPage === 'find-station' && (
+                <FindStationPage
+                    onLogout={handleLogout}
+                    onNavigateDashboard={() => navigateTo('dashboard')}
                 />
             )}
         </>
