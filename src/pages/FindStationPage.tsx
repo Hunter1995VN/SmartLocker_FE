@@ -123,6 +123,7 @@ export default function FindStationPage({ onLogout, onNavigateDashboard }: Props
 
     // Filter + sort
     const isCurrentlyOpen = (s: Station): boolean => {
+        if (!s.opensAt || !s.closesAt) return true;
         if (s.opensAt === '00:00' && s.closesAt === '23:59') return true;
         const now = new Date();
         const [oh, om] = s.opensAt.split(':').map(Number);
@@ -148,8 +149,8 @@ export default function FindStationPage({ onLogout, onNavigateDashboard }: Props
         })
         .sort((a, b) => {
             if (sortMode === 'nearest') return (a.distanceKm ?? 99) - (b.distanceKm ?? 99);
-            const availA = a.availableS + a.availableM + a.availableL;
-            const availB = b.availableS + b.availableM + b.availableL;
+            const availA = (a.availableS ?? 0) + (a.availableM ?? 0) + (a.availableL ?? 0);
+            const availB = (b.availableS ?? 0) + (b.availableM ?? 0) + (b.availableL ?? 0);
             return availB - availA;
         });
 
@@ -585,7 +586,7 @@ export default function FindStationPage({ onLogout, onNavigateDashboard }: Props
 
 // ─── StationCard ──────────────────────────────────────────────────────────────
 function StationCard({
-    station, isSelected, sizeFilter, isCurrentlyOpen, onClick, onViewDetail, rank
+    station, isSelected, sizeFilter, isCurrentlyOpen, onClick, onViewDetail, rank: _rank
 }: {
     station: Station;
     isSelected: boolean;
@@ -593,10 +594,10 @@ function StationCard({
     isCurrentlyOpen: boolean;
     onClick: () => void;
     onViewDetail: () => void;
-    rank: number;
+    rank?: number;
 }) {
     const isActive = station.status === 'ACTIVE';
-    const totalAvail = station.availableS + station.availableM + station.availableL;
+    const totalAvail = (station.availableS ?? 0) + (station.availableM ?? 0) + (station.availableL ?? 0);
     const { icon: StIcon, color: iconColor } = getStationIcon(station.name);
     const distLabel = station.distanceKm != null
         ? station.distanceKm < 1
@@ -722,7 +723,7 @@ function StationCard({
 // ─── Map InfoWindow ────────────────────────────────────────────────────────────
 function MapInfoWindow({ station }: { station: Station }) {
     const isActive = station.status === 'ACTIVE';
-    const totalAvail = station.availableS + station.availableM + station.availableL;
+    const totalAvail = (station.availableS ?? 0) + (station.availableM ?? 0) + (station.availableL ?? 0);
     const distLabel = station.distanceKm != null
         ? station.distanceKm < 1
             ? `${Math.round(station.distanceKm * 1000)}m`
@@ -743,9 +744,9 @@ function MapInfoWindow({ station }: { station: Station }) {
             {isActive && (
                 <div className="flex gap-1.5 mb-2">
                     {[
-                        { k: 'S', a: station.availableS, t: station.totalS },
-                        { k: 'M', a: station.availableM, t: station.totalM },
-                        { k: 'L', a: station.availableL, t: station.totalL },
+                        { k: 'S', a: station.availableS ?? 0, t: station.totalS ?? 0 },
+                        { k: 'M', a: station.availableM ?? 0, t: station.totalM ?? 0 },
+                        { k: 'L', a: station.availableL ?? 0, t: station.totalL ?? 0 },
                     ].map(({ k, a, t }) => (
                         <span key={k} className={`text-[11px] px-2 py-0.5 rounded-full font-bold ${a > 0 ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-400'}`}>
                             {k}: {a}/{t}
@@ -810,7 +811,7 @@ function MapFallback({
 
             {/* Mini station pins on fallback */}
             <div className="absolute inset-0 pointer-events-none">
-                {stations.slice(0, 6).map((s, i) => {
+                {stations.slice(0, 6).map((s) => {
                     const isSelected = selectedStation?.id === s.id;
                     const posX = 20 + ((s.longitude - 106.66) / 0.08) * 80;
                     const posY = 80 - ((s.latitude - 10.76) / 0.06) * 60;
@@ -830,7 +831,7 @@ function MapFallback({
                                 }`}
                                 style={{ whiteSpace: 'nowrap' }}
                             >
-                                {s.availableS + s.availableM + s.availableL} ô
+                                {(s.availableS ?? 0) + (s.availableM ?? 0) + (s.availableL ?? 0)} ô
                             </div>
                             <div className={`w-1.5 h-1.5 rounded-full mx-auto -mt-0.5 ${s.status === 'ACTIVE' ? 'bg-[#2563eb]' : 'bg-gray-400'}`} />
                         </button>

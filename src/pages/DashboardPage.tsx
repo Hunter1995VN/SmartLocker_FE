@@ -23,6 +23,7 @@ interface AuthUser {
 interface DashboardPageProps {
     onLogout: () => void;
     onNavigateToMap?: () => void;
+    onNavigateToAdmin?: () => void;
 }
 
 // ─── Mock recent bookings (sẽ thay bằng API call sau) ────────────────────────
@@ -98,8 +99,9 @@ function formatDate(): string {
 }
 
 // ─── Main Component ──────────────────────────────────────────────────────────
-export default function DashboardPage({ onLogout, onNavigateToMap }: DashboardPageProps) {
+export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToAdmin }: DashboardPageProps) {
     const user: AuthUser = JSON.parse(localStorage.getItem('smartlocker_user') || '{}');
+    const isAdminOrStaff = (user?.role || '').toLowerCase() === 'admin' || (user?.role || '').toLowerCase() === 'staff';
     const activeBooking: Booking | null = MOCK_ACTIVE_BOOKING;
 
     const [timeLeft, setTimeLeft] = useState('');
@@ -216,6 +218,15 @@ export default function DashboardPage({ onLogout, onNavigateToMap }: DashboardPa
                             <button onClick={onNavigateToMap} className="px-4 py-1.5 text-sm font-semibold rounded-xl text-[#434655] hover:text-[#0b1c30] hover:bg-[#f0f4ff] transition-colors">Tìm trạm</button>
                             <a href="#" className="px-4 py-1.5 text-sm font-semibold rounded-xl text-[#434655] hover:text-[#0b1c30] hover:bg-[#f0f4ff] transition-colors">Lịch sử</a>
                             <a href="#" className="px-4 py-1.5 text-sm font-semibold rounded-xl text-[#434655] hover:text-[#0b1c30] hover:bg-[#f0f4ff] transition-colors">Hỗ trợ</a>
+                            {isAdminOrStaff && (
+                                <button
+                                    onClick={onNavigateToAdmin ? onNavigateToAdmin : () => { window.location.href = '/admin'; }}
+                                    className="ml-2 px-3.5 py-1.5 text-xs font-bold rounded-xl bg-blue-600 text-white hover:bg-blue-700 shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer"
+                                >
+                                    <Shield className="w-3.5 h-3.5" />
+                                    <span>Vào Admin Portal</span>
+                                </button>
+                            )}
                         </nav>
                     </div>
 
@@ -258,6 +269,32 @@ export default function DashboardPage({ onLogout, onNavigateToMap }: DashboardPa
             <main className="w-full pt-16">
                 <div className="w-full px-4 md:px-6 lg:px-8 py-8">
                     <div className="w-full max-w-7xl mx-auto flex flex-col gap-6">
+
+                        {/* ── ADMIN / STAFF CALLOUT BANNER ──────────────── */}
+                        {isAdminOrStaff && (
+                            <div className="w-full bg-blue-600 text-white rounded-2xl p-4 md:p-5 shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div className="flex items-center gap-3.5">
+                                    <div className="w-10 h-10 rounded-xl bg-white/20 border border-white/30 flex items-center justify-center shrink-0">
+                                        <Shield className="w-5 h-5 text-white" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-extrabold text-sm md:text-base">
+                                            Bạn đang đăng nhập bằng tài khoản {user.role || 'Quản trị viên'}
+                                        </h3>
+                                        <p className="text-xs text-blue-100 mt-0.5">
+                                            Để quản lý trạm, giám sát IoT vi điều khiển, cảnh báo sự cố phần cứng và doanh thu, vui lòng mở Operations Dashboard.
+                                        </p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={onNavigateToAdmin ? onNavigateToAdmin : () => { window.location.href = '/admin'; }}
+                                    className="px-5 py-2.5 bg-white text-blue-700 hover:bg-blue-50 font-bold text-xs rounded-xl shadow-xs transition cursor-pointer whitespace-nowrap shrink-0 flex items-center justify-center gap-2"
+                                >
+                                    <span>Mở Admin Portal (Dashboard)</span>
+                                    <ArrowRight className="w-4 h-4" />
+                                </button>
+                            </div>
+                        )}
 
                         {/* ── WELCOME HERO ───────────────────────────────── */}
                         <div className="relative overflow-hidden rounded-2xl bg-white shadow-[0_1px_3px_rgba(15,23,42,0.05)] p-6 md:p-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">

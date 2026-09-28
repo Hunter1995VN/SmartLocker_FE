@@ -71,6 +71,7 @@ function getStationCode(name: string) {
 }
 
 function isCurrentlyOpen(s: Station) {
+    if (!s.opensAt || !s.closesAt) return true;
     if (s.opensAt === '00:00' && s.closesAt === '23:59') return true;
     const now = new Date();
     const [oh, om] = s.opensAt.split(':').map(Number);
@@ -79,12 +80,14 @@ function isCurrentlyOpen(s: Station) {
     return nowMin >= oh * 60 + om && nowMin <= ch * 60 + cm;
 }
 
-function getAvailForSize(station: Station, size: SizeKey) {
-    return size === 'S' ? station.availableS : size === 'M' ? station.availableM : station.availableL;
+function getAvailForSize(station: Station, size: SizeKey): number {
+    const val = size === 'S' ? station.availableS : size === 'M' ? station.availableM : station.availableL;
+    return val ?? 0;
 }
 
-function getTotalForSize(station: Station, size: SizeKey) {
-    return size === 'S' ? station.totalS : size === 'M' ? station.totalM : station.totalL;
+function getTotalForSize(station: Station, size: SizeKey): number {
+    const val = size === 'S' ? station.totalS : size === 'M' ? station.totalM : station.totalL;
+    return val ?? 0;
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
@@ -100,7 +103,6 @@ export default function StationDetailPage({ station, onBack, onLogout, onNavigat
     const cfg = SIZE_CONFIG[selectedSize];
     const totalAmount = cfg.rate * selectedDuration;
     const avail = getAvailForSize(station, selectedSize);
-    const total = getTotalForSize(station, selectedSize);
     const isOpen = isCurrentlyOpen(station);
     const distLabel = station.distanceKm != null
         ? station.distanceKm < 1
