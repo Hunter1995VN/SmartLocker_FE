@@ -24,7 +24,7 @@ interface AdminSidebarProps {
     user: AuthResponse | null;
     openIncidentsCount: number;
     offlineDevicesCount: number;
-    onLogout: () => void;
+    onLogout?: () => void;
     activeMenu?: 'dashboard' | 'stations' | 'users' | 'lockers';
     onSelectMenu?: (menu: 'dashboard' | 'stations' | 'users' | 'lockers') => void;
 }
@@ -104,12 +104,20 @@ export default function AdminSidebar({
                                 </span>
                             </button>
 
-                            <div className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-default">
+                            <button
+                                type="button"
+                                onClick={() => onSelectMenu?.('lockers')}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition cursor-pointer text-left ${
+                                    activeMenu === 'lockers'
+                                        ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-600/30'
+                                        : 'text-slate-600 hover:bg-slate-50'
+                                }`}
+                            >
                                 <span className="flex items-center gap-2.5">
-                                    <Box className="w-4 h-4 text-slate-400" />
+                                    <Box className={`w-4 h-4 ${activeMenu === 'lockers' ? 'text-white' : 'text-slate-400'}`} />
                                     <span>Lockers</span>
                                 </span>
-                            </div>
+                            </button>
 
                             <div className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-default">
                                 <span className="flex items-center gap-2.5">

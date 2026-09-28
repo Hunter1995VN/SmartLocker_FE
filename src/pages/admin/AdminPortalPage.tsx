@@ -29,6 +29,7 @@ import CriticalTriageCard from '../../components/admin/CriticalTriageCard';
 import StationFleetTable from '../../components/admin/StationFleetTable';
 import StationManagementView from '../../components/admin/stations/StationManagementView';
 import InternalUsersManagementView from '../../components/admin/users/InternalUsersManagementView';
+import RealtimeLockerGridView from '../../components/admin/lockers/RealtimeLockerGridView';
 
 interface AdminPortalPageProps {
     onLogout: () => void;
@@ -184,7 +185,9 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
             {/* Right Main Viewport */}
             <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
                 <main className="p-4 sm:p-6 lg:p-7 space-y-5 max-w-7xl w-full mx-auto">
-                    {activeMenu === 'users' ? (
+                    {activeMenu === 'lockers' ? (
+                        <RealtimeLockerGridView />
+                    ) : activeMenu === 'users' ? (
                         <InternalUsersManagementView />
                     ) : activeMenu === 'stations' ? (
                         <StationManagementView />
@@ -253,7 +256,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
 
                 {/* Footer */}
                 <footer className="w-full py-4 text-center text-xs text-slate-400 border-t border-slate-200/80 bg-white mt-auto">
-                    <span>SmartLocker Management System (SLMS) · Internal Users & RBAC Management (AD-FE-05)</span>
+                    <span>SmartLocker Management System (SLMS) · Operations & Fleet Control</span>
                 </footer>
             </div>
         </div>
