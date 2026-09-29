@@ -83,11 +83,23 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
   const duration = booking?.durationHours || bookingData?.duration || 3;
   const amount = booking?.baseAmount || bookingData?.amount || 45000;
   const orderId = booking?.bookingCode || bookingData?.orderCode || bookingId || 'SL-8942A';
-  const isLockerAssigned = Boolean(booking?.lockerCode || bookingData?.bayCode);
+  const rawBayCode = booking?.lockerCode || bookingData?.bayCode;
+  const isLockerAssigned = Boolean(rawBayCode);
   const bayCode = isLockerAssigned
-    ? `Ngăn ${booking?.lockerCode || bookingData?.bayCode}`
-    : `Cấp tại Kiosk (Size ${size})`;
-  const passcode = booking?.accessCode || booking?.passcode || bookingData?.accessCode || 'Chờ cấp tại trạm';
+    ? `Locker ${rawBayCode}`
+    : `Auto-assigned at Kiosk (Size ${size})`;
+
+  // Sinh mã passcode 8 ký tự sắc nét cho Kiosk Touchpad
+  const generatePasscode = (code?: string, id?: string) => {
+    const raw = (code || id || 'SL8942A').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    const seed = raw.length >= 8 ? raw.substring(raw.length - 8) : raw.padEnd(8, '8');
+    return `${seed.substring(0, 4)} ${seed.substring(4, 8)}`;
+  };
+  const rawCode = booking?.accessCode || booking?.passcode || bookingData?.accessCode;
+  const passcode = rawCode 
+    ? (rawCode.length === 8 ? `${rawCode.substring(0, 4)} ${rawCode.substring(4, 8)}` : rawCode) 
+    : generatePasscode(orderId, bookingId);
+
   const status = booking?.status || 'CONFIRMED';
 
   const formatCurrency = (val: number) => new Intl.NumberFormat('vi-VN').format(val);
@@ -99,8 +111,8 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
     const start = new Date(booking.startAt).getTime();
     const end = new Date(booking.endAt).getTime();
     
-    const startedText = new Date(booking.startAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date(booking.startAt).toLocaleDateString('vi-VN');
-    const expiresText = new Date(booking.endAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date(booking.endAt).toLocaleDateString('vi-VN');
+    const startedText = new Date(booking.startAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date(booking.startAt).toLocaleDateString('en-US');
+    const expiresText = new Date(booking.endAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date(booking.endAt).toLocaleDateString('en-US');
     
     if (now >= end) {
       return { remainingText: '0m remaining', progress: 100, startedText, expiresText };
@@ -126,6 +138,50 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
   };
 
   const { remainingText, progress, startedText, expiresText } = calculateTimeInfo();
+
+  // Compartment layout helper
+  const isTargetLocker = (code: string) => isLockerAssigned && Boolean(rawBayCode && (rawBayCode === code || rawBayCode.includes(code)));
+  const isTargetTier = (baySize: string) => !isLockerAssigned && baySize === size;
+
+  const renderCompartment = (code: string, baySize: 'S' | 'M' | 'L') => {
+    const isThisLocker = isTargetLocker(code);
+    const isThisTier = isTargetTier(baySize);
+    const heightClass = baySize === 'S' ? 'h-12' : baySize === 'M' ? 'h-16' : 'h-24';
+
+    if (isThisLocker) {
+      return (
+        <div className={`${heightClass} rounded-lg bg-[#2563eb] text-white border-2 border-primary shadow-md flex flex-col items-center justify-center relative ring-2 ring-primary/30 p-1 text-center`}>
+          <span className="font-bold text-xs truncate max-w-full">{code}</span>
+          <span className="text-[9px] uppercase tracking-wider font-semibold bg-white/20 px-1 rounded truncate">YOUR LOCKER</span>
+          <Lock className="w-3.5 h-3.5 absolute top-1 right-1 text-white/80" />
+        </div>
+      );
+    }
+
+    if (isThisTier) {
+      return (
+        <div className={`${heightClass} rounded-lg bg-blue-50/90 border border-blue-300 text-blue-800 flex flex-col items-center justify-center text-xs font-semibold relative`}>
+          <span>{code}</span>
+          <span className="text-[9px] text-blue-500 font-medium">Size {baySize} Tier</span>
+        </div>
+      );
+    }
+
+    const isOccupied = code === 'M-01' || code === 'L-01' || code === 'S-02';
+    if (isOccupied) {
+      return (
+        <div className={`${heightClass} rounded-lg bg-[#e5eeff] border border-outline-variant/50 flex items-center justify-center text-xs text-[#434655]`}>
+          {code}
+        </div>
+      );
+    }
+
+    return (
+      <div className={`${heightClass} rounded-lg bg-white border border-outline-variant/40 flex items-center justify-center text-xs text-secondary`}>
+        {code}
+      </div>
+    );
+  };
 
   // Token anti-screenshot refresh timer: đếm lùi từ 30s -> 0 -> 30s
   const [tokenSeconds, setTokenSeconds] = useState<number>(28);
@@ -317,8 +373,8 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                   </div>
                   <p className="text-xs text-[#434655]">
                     {isLockerAssigned
-                      ? `Đưa mã QR này vào trước camera quét tại trạm Kiosk hoặc nhập mã mở tủ để mở ô ${bayCode}.`
-                      : `Đưa mã QR này vào trước camera quét của trạm Kiosk hoặc nhập mã mở tủ 8 ký tự bên dưới để trạm tự động cấp ô tủ và mở cửa gửi đồ.`}
+                      ? `Present this QR code to the Kiosk optical scanner or enter the passcode below to release ${bayCode}.`
+                      : `Present this QR code to the Kiosk optical scanner or enter the 8-character passcode below on the touchpad to automatically assign your locker (Size ${size}) and release the door.`}
                   </p>
                 </div>
                 <div className="hidden sm:flex items-center gap-1 text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full text-xs font-semibold">
@@ -497,67 +553,80 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
             <div className="bg-white rounded-2xl border border-outline-variant/40 shadow-sm p-5 space-y-4">
               <div className="flex items-center justify-between border-b border-outline-variant/20 pb-3">
                 <div>
-                  <h3 className="text-base font-bold text-[#0b1c30]">Locker Bank Matrix</h3>
-                  <p className="text-xs text-[#434655]">Cluster Tower B · Layout Schematic</p>
+                  <h3 className="text-base font-bold text-[#0b1c30]">
+                    {isLockerAssigned ? 'Assigned Locker Location' : 'Station Locker Layout'}
+                  </h3>
+                  <p className="text-xs text-[#434655]">
+                    {isLockerAssigned ? `Bay ${rawBayCode} · Cluster Tower B` : `Size ${size} Tier · Assigned at Kiosk Check-in`}
+                  </p>
                 </div>
-                <span className="text-xs px-2.5 py-1 bg-[#e5eeff] rounded-md font-mono text-secondary font-bold">
-                  Slot {bayCode.replace('Bay ', '')}
+                <span className={`text-xs px-2.5 py-1 rounded-md font-mono font-bold ${
+                  isLockerAssigned 
+                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
+                    : 'bg-[#e5eeff] text-secondary'
+                }`}>
+                  {isLockerAssigned ? `Locker ${rawBayCode}` : `Size ${size} Tier`}
                 </span>
               </div>
 
-              {/* Visual Locker Grid Mock */}
+              {!isLockerAssigned && (
+                <div className="p-3 bg-blue-50/80 border border-blue-200/70 rounded-xl flex items-start gap-2.5 text-xs text-blue-900 leading-relaxed">
+                  <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                  <span>
+                    Your physical locker compartment (<strong>Size {size}</strong>) will be assigned dynamically and popped open when you scan your QR Code or enter your PIN at the station kiosk touch screen.
+                  </span>
+                </div>
+              )}
+
+              {/* Visual Locker Grid */}
               <div className="bg-[#eff4ff]/50 p-4 rounded-xl border border-outline-variant/30">
                 <div className="text-xs font-semibold text-secondary mb-3 flex items-center justify-between">
                   <span>Column 01</span>
-                  <span className="text-primary font-bold">Column 02 (Your Bay)</span>
-                  <span>Column 03</span>
+                  <span className={isLockerAssigned && (rawBayCode === 'S-02' || rawBayCode === 'M-02' || rawBayCode === 'L-02') ? 'text-primary font-bold' : ''}>
+                    Column 02 {isLockerAssigned && (rawBayCode === 'S-02' || rawBayCode === 'M-02' || rawBayCode === 'L-02') ? '(Your Bay)' : ''}
+                  </span>
+                  <span>Column 03 (Kiosk)</span>
                 </div>
                 {/* Modular Bay Grid */}
                 <div className="grid grid-cols-3 gap-2.5">
                   {/* Column 1 */}
                   <div className="space-y-2">
-                    <div className="h-12 rounded-lg bg-white border border-outline-variant/40 flex items-center justify-center text-xs text-secondary">
-                      S-01
-                    </div>
-                    <div className="h-16 rounded-lg bg-[#e5eeff] border border-outline-variant/50 flex items-center justify-center text-xs text-[#434655]">
-                      M-01
-                    </div>
-                    <div className="h-24 rounded-lg bg-[#e5eeff] border border-outline-variant/50 flex items-center justify-center text-xs text-[#434655]">
-                      L-01
-                    </div>
+                    {renderCompartment('S-01', 'S')}
+                    {renderCompartment('M-01', 'M')}
+                    {renderCompartment('L-01', 'L')}
                   </div>
-                  {/* Column 2 (Contains User's Bay) */}
+                  {/* Column 2 */}
                   <div className="space-y-2">
-                    <div className="h-12 rounded-lg bg-white border border-outline-variant/40 flex items-center justify-center text-xs text-secondary">
-                      S-02
-                    </div>
-                    {/* Highlighted Active Bay */}
-                    <div className="h-16 rounded-lg bg-[#2563eb] text-white border-2 border-primary shadow-md flex flex-col items-center justify-center relative ring-2 ring-primary/30">
-                      <span className="font-bold text-xs">{bayCode.replace('Bay ', '')}</span>
-                      <span className="text-[9px] uppercase tracking-wider font-semibold bg-white/20 px-1 rounded">YOUR LOCKER</span>
-                      <Lock className="w-3.5 h-3.5 absolute top-1 right-1 text-white/80" />
-                    </div>
-                    <div className="h-24 rounded-lg bg-[#e5eeff] border border-outline-variant/50 flex items-center justify-center text-xs text-[#434655]">
-                      L-02
-                    </div>
+                    {renderCompartment('S-02', 'S')}
+                    {renderCompartment('M-02', 'M')}
+                    {renderCompartment('L-02', 'L')}
                   </div>
                   {/* Column 3 (Screen / Bay Column) */}
                   <div className="space-y-2">
-                    <div className="h-12 rounded-lg bg-slate-800 text-white border border-slate-700 flex items-center justify-center text-[10px] font-bold">
-                      TOUCH SCREEN
+                    <div className="h-12 rounded-lg bg-slate-800 text-white border border-slate-700 flex flex-col items-center justify-center text-[10px] font-bold shadow-xs">
+                      <span>KIOSK</span>
+                      <span className="text-[9px] text-slate-400 font-normal">TOUCH SCREEN</span>
                     </div>
-                    <div className="h-16 rounded-lg bg-[#e5eeff] border border-outline-variant/50 flex items-center justify-center text-xs text-[#434655]">
-                      M-03
-                    </div>
-                    <div className="h-24 rounded-lg bg-[#e5eeff] border border-outline-variant/50 flex items-center justify-center text-xs text-[#434655]">
-                      XL-01
-                    </div>
+                    {renderCompartment('M-03', 'M')}
+                    {renderCompartment('L-03', 'L')}
                   </div>
                 </div>
                 <div className="mt-3 flex items-center justify-center gap-4 text-[11px] text-secondary">
-                  <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-[#2563eb] inline-block"></span> Your Locker</span>
-                  <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-[#e5eeff] inline-block"></span> Occupied</span>
-                  <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm bg-white border border-outline-variant/50 inline-block"></span> Available</span>
+                  {isLockerAssigned ? (
+                    <span className="flex items-center gap-1">
+                      <span className="w-2.5 h-2.5 rounded-sm bg-[#2563eb] inline-block"></span> Your Locker
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1">
+                      <span className="w-2.5 h-2.5 rounded-sm bg-blue-100 border border-blue-400 inline-block"></span> Size {size} Tier
+                    </span>
+                  )}
+                  <span className="flex items-center gap-1">
+                    <span className="w-2.5 h-2.5 rounded-sm bg-[#e5eeff] inline-block"></span> Occupied
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-2.5 h-2.5 rounded-sm bg-white border border-outline-variant/50 inline-block"></span> Available
+                  </span>
                 </div>
               </div>
             </div>
@@ -568,7 +637,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
               <div className="divide-y divide-outline-variant/20 text-xs">
                 <div className="py-2.5 flex justify-between">
                   <span className="text-[#434655]">Check-in Timestamp</span>
-                  <span className="font-mono text-[#0b1c30] font-medium">{booking?.startAt ? new Date(booking.startAt).toLocaleString('vi-VN') : 'N/A'}</span>
+                  <span className="font-mono text-[#0b1c30] font-medium">{booking?.startAt ? new Date(booking.startAt).toLocaleString('en-US') : 'N/A'}</span>
                 </div>
                 <div className="py-2.5 flex justify-between">
                   <span className="text-[#434655]">Baggage Declaration</span>
@@ -585,7 +654,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
               </div>
               <div className="pt-2">
                 <button
-                  onClick={() => alert('Đang tải hóa đơn điện tử VAT...')}
+                  onClick={() => alert('Downloading electronic VAT invoice...')}
                   className="text-xs text-primary font-semibold hover:underline flex items-center gap-1 cursor-pointer"
                 >
                   <FileText className="w-3.5 h-3.5" />
@@ -603,7 +672,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
         onClose={() => setShowExtendModal(false)}
         onSuccess={(addedHours, fee) => {
           setShowExtendModal(false);
-          setExtendSuccessToast(`Gia hạn thành công thêm +${addedHours} giờ (${new Intl.NumberFormat('vi-VN').format(fee)} VND)! Mã mở khóa đã cập nhật.`);
+          setExtendSuccessToast(`Successfully extended +${addedHours} hour(s) (${new Intl.NumberFormat('en-US').format(fee)} VND). Passcode updated.`);
           setTimeout(() => {
             setExtendSuccessToast(null);
           }, 4000);
