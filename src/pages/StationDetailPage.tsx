@@ -42,6 +42,8 @@ interface Props {
     onBack: () => void;
     onLogout: () => void;
     onNavigateDashboard?: () => void;
+    onNavigateHistory?: () => void;
+    onNavigateBooking?: (stationId: string, initialData?: { size?: 'S' | 'M' | 'L'; duration?: number }) => void;
 }
 
 // ─── Station photos (stock images by category) ───────────────────────────────
@@ -91,7 +93,7 @@ function getTotalForSize(station: Station, size: SizeKey): number {
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-export default function StationDetailPage({ station, onBack, onLogout, onNavigateDashboard }: Props) {
+export default function StationDetailPage({ station, onBack, onLogout, onNavigateDashboard, onNavigateHistory, onNavigateBooking }: Props) {
     const user: AuthUser = JSON.parse(localStorage.getItem('smartlocker_user') || '{}');
 
     const [selectedSize, setSelectedSize] = useState<SizeKey>('M');
@@ -113,6 +115,10 @@ export default function StationDetailPage({ station, onBack, onLogout, onNavigat
 
     const handleBooking = () => {
         if (avail === 0) return;
+        if (onNavigateBooking) {
+            onNavigateBooking(station.id, { size: selectedSize, duration: selectedDuration });
+            return;
+        }
         setIsBooking(true);
         setTimeout(() => {
             setIsBooking(false);
@@ -173,7 +179,7 @@ export default function StationDetailPage({ station, onBack, onLogout, onNavigat
                         <nav className="hidden lg:flex items-center gap-1">
                             <button onClick={onNavigateDashboard} className="px-4 py-1.5 text-sm font-semibold rounded-xl text-[#434655] hover:bg-[#f0f4ff] transition-colors">Dashboard</button>
                             <button onClick={onBack} className="px-4 py-1.5 text-sm font-semibold rounded-xl text-[#434655] hover:bg-[#f0f4ff] transition-colors">Tìm trạm</button>
-                            <a href="#" className="px-4 py-1.5 text-sm font-semibold rounded-xl text-[#434655] hover:bg-[#f0f4ff] transition-colors">Lịch sử</a>
+                            <button onClick={onNavigateHistory} className="px-4 py-1.5 text-sm font-semibold rounded-xl text-[#434655] hover:bg-[#f0f4ff] transition-colors cursor-pointer">Lịch sử</button>
                             <a href="#" className="px-4 py-1.5 text-sm font-semibold rounded-xl text-[#434655] hover:bg-[#f0f4ff] transition-colors">Hỗ trợ</a>
                         </nav>
                     </div>

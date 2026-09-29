@@ -303,6 +303,8 @@ function App() {
                 <FindStationPage
                     onLogout={handleLogout}
                     onNavigateDashboard={() => navigateTo('dashboard')}
+                    onNavigateHistory={() => navigateTo('my-bookings')}
+                    onNavigateBooking={(stationId, initialData) => navigateTo('station-booking', { stationId, bookingData: initialData })}
                 />
             )}
         </>
