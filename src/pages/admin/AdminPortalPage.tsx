@@ -30,7 +30,9 @@ import StationFleetTable from '../../components/admin/StationFleetTable';
 import StationManagementView from '../../components/admin/stations/StationManagementView';
 import InternalUsersManagementView from '../../components/admin/users/InternalUsersManagementView';
 import RealtimeLockerGridView from '../../components/admin/lockers/RealtimeLockerGridView';
+import AbandonedPropertyView from '../../components/admin/abandoned/AbandonedPropertyView';
 import EmergencyIncidentListView from '../../components/admin/incidents/EmergencyIncidentListView';
+
 
 interface AdminPortalPageProps {
     onLogout: () => void;
@@ -75,7 +77,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
     const [chartError, setChartError] = useState<string | null>(null);
     const [selectedDays, setSelectedDays] = useState<number>(30);
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-    const [activeMenu, setActiveMenu] = useState<'dashboard' | 'stations' | 'users' | 'lockers' | 'incidents'>('dashboard');
+    const [activeMenu, setActiveMenu] = useState<'dashboard' | 'stations' | 'users' | 'lockers' | 'incidents' | 'abandoned'>('dashboard');
 
     // 4. API Fetch Functions
     const fetchStats = useCallback(async () => {
@@ -186,7 +188,9 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
             {/* Right Main Viewport */}
             <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
                 <main className="p-4 sm:p-6 lg:p-7 space-y-5 max-w-7xl w-full mx-auto">
-                    {activeMenu === 'incidents' ? (
+                    {activeMenu === 'abandoned' ? (
+                        <AbandonedPropertyView userRole={role} />
+                    ) : activeMenu === 'incidents' ? (
                         <EmergencyIncidentListView userRole={role} />
                     ) : activeMenu === 'lockers' ? (
                         <RealtimeLockerGridView />
