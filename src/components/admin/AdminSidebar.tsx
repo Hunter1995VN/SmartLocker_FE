@@ -25,8 +25,8 @@ interface AdminSidebarProps {
     openIncidentsCount: number;
     offlineDevicesCount: number;
     onLogout?: () => void;
-    activeMenu?: 'dashboard' | 'stations' | 'users' | 'lockers' | 'incidents';
-    onSelectMenu?: (menu: 'dashboard' | 'stations' | 'users' | 'lockers' | 'incidents') => void;
+    activeMenu?: 'dashboard' | 'stations' | 'users' | 'lockers' | 'incidents' | 'abandoned';
+    onSelectMenu?: (menu: 'dashboard' | 'stations' | 'users' | 'lockers' | 'incidents' | 'abandoned') => void;
 }
 
 export default function AdminSidebar({
@@ -185,10 +185,18 @@ export default function AdminSidebar({
                                 <CreditCard className="w-4 h-4 text-slate-400" />
                                 <span>Bookings & Pay</span>
                             </div>
-                            <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-default">
-                                <PackageX className="w-4 h-4 text-slate-400" />
+                            <button
+                                type="button"
+                                onClick={() => onSelectMenu?.('abandoned')}
+                                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition cursor-pointer text-left ${
+                                    activeMenu === 'abandoned'
+                                        ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-600/30'
+                                        : 'text-slate-600 hover:bg-slate-50'
+                                }`}
+                            >
+                                <PackageX className={`w-4 h-4 ${activeMenu === 'abandoned' ? 'text-white' : 'text-slate-400'}`} />
                                 <span>Abandoned Cargo</span>
-                            </div>
+                            </button>
                         </div>
                     </div>
 
