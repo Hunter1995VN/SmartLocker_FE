@@ -91,21 +91,21 @@ export const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
             </div>
           </div>
 
-          {/* 3. Refund Policy Calculation Card (Rule BR-T06) */}
+          {/* 3. Refund Policy Calculation Card */}
           <div className="p-4 rounded-xl bg-emerald-50/75 border border-emerald-300 shadow-xs">
             <div className="flex items-center justify-between mb-2">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold uppercase tracking-wider">
                 <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
                 <span>Eligible for 100% Full Refund</span>
               </div>
-              <span className="text-[11px] text-emerald-800 font-bold">Rule BR-T06 Applied</span>
+              <span className="text-[11px] text-emerald-800 font-bold">SmartLocker Policy</span>
             </div>
             <p className="text-xs text-[#0b1c30] leading-relaxed">
               Cancellations requested more than 2 hours prior to scheduled booking start time receive a complete 100% refund ({formatCurrency(paidAmount)} VND) without penalty fees.
             </p>
             <div className="mt-3 pt-2.5 border-t border-emerald-200 flex items-center justify-between text-xs">
-              <span className="text-secondary">Cancellation Timestamp:</span>
-              <span className="text-emerald-700 font-bold">11:30 (2h 30m prior to 14:00 start)</span>
+              <span className="text-secondary">Cancellation Timing:</span>
+              <span className="text-emerald-700 font-bold">&gt; 2 hours prior to booking start</span>
             </div>
           </div>
 

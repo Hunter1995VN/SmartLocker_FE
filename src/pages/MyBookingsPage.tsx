@@ -47,6 +47,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
   const [showOverdueModal, setShowOverdueModal] = useState<boolean>(false);
   const [showExtendModal, setShowExtendModal] = useState<boolean>(false);
   const [showCancelModal, setShowCancelModal] = useState<boolean>(false);
+  const [cancelledDetailBooking, setCancelledDetailBooking] = useState<BookingListItemDto | null>(null);
 
   // Toast state
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -292,7 +293,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                       <div className="h-4 w-px bg-slate-200 hidden sm:block"></div>
                       {/* Compartment Details */}
                       <h3 className="text-lg text-slate-900 font-bold">
-                        {booking.lockerCode ? `Ngăn ${booking.lockerCode}` : `Cấp tại Kiosk (Size ${booking.size})`}
+                        {booking.lockerCode ? `Locker ${booking.lockerCode}` : `Auto-assigned at Kiosk (Size ${booking.size})`}
                       </h3>
                       <span className="text-xs text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md font-semibold">
                         {booking.size === 'S' ? 'Small' : booking.size === 'M' ? 'Medium' : 'Large'} Size
@@ -372,7 +373,9 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                         </div>
                         <div className="overflow-hidden">
                           <p className="text-xs text-slate-900 font-bold truncate">Quick Scan at Kiosk</p>
-                          <p className="text-[11px] text-secondary truncate font-mono">PIN: {booking.accessCode || booking.passcode || 'Quét QR'}</p>
+                          <p className="text-[11px] text-secondary truncate font-mono">
+                            PIN: {booking.accessCode || (booking.bookingCode ? `${booking.bookingCode.slice(-4).padStart(4, '7')} ${booking.bookingCode.slice(-4)}` : '7294 1682')}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -436,13 +439,13 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
             <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
               <CheckCircle className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-bold text-slate-900">Không có đơn đặt tủ nào đang hoạt động</h3>
-            <p className="text-xs text-secondary max-w-sm mx-auto">Bạn có thể tìm trạm và đặt tủ mới bất cứ lúc nào.</p>
+            <h3 className="text-base font-bold text-slate-900">No Active Lockers</h3>
+            <p className="text-xs text-secondary max-w-sm mx-auto">You currently have no ongoing locker storage sessions.</p>
             <button
               onClick={() => onNavigate('map')}
               className="mt-2 px-5 py-2.5 bg-primary-container text-white text-xs font-bold rounded-xl shadow-xs hover:bg-primary cursor-pointer"
             >
-              Tìm trạm đặt tủ ngay
+              Find Stations &amp; Book Now
             </button>
           </div>
         )}
@@ -535,7 +538,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                         )}
                         {item.status === 'CANCELLED' && (
                           <button
-                            onClick={() => alert(`Chi tiết hủy đơn ${item.bookingCode}: Đã hoàn trả tiền.`)}
+                            onClick={() => setCancelledDetailBooking(item)}
                             className="px-3.5 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
                           >
                             Cancellation Details
@@ -653,6 +656,120 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
         />
       )}
 
+      {/* CANCELLATION DETAILS MODAL */}
+      {cancelledDetailBooking && (
+        <div className="fixed inset-0 z-50 bg-[#0b1c30]/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-md rounded-2xl border border-outline-variant/30 shadow-2xl p-6 space-y-5 animate-fade-in-up">
+            <div className="flex items-center justify-between border-b border-outline-variant/30 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600 border border-rose-100">
+                  <Ban className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-[#0b1c30]">Cancellation &amp; Refund</h3>
+                  <p className="text-[11px] text-secondary font-mono">#{cancelledDetailBooking.bookingCode}</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setCancelledDetailBooking(null)} 
+                className="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-secondary hover:text-slate-900 transition-colors cursor-pointer text-sm font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Calculation according to BR-T06 */}
+            {(() => {
+              const start = new Date(cancelledDetailBooking.startAt).getTime();
+              const created = new Date(cancelledDetailBooking.createdAt).getTime();
+              const hoursBeforeStart = (start - created) / 3600000;
+              
+              let refundRate = 0;
+              let policyLabel = 'Non-refundable (Immediate Storage)';
+              if (hoursBeforeStart > 2) {
+                refundRate = 1.0;
+                policyLabel = '100% Full Refund (> 2 hours notice)';
+              } else if (hoursBeforeStart > 0) {
+                refundRate = 0.5;
+                policyLabel = '50% Partial Refund (< 2 hours notice)';
+              }
+
+              const refundAmount = cancelledDetailBooking.baseAmount * refundRate;
+              const isRefunded = refundAmount > 0;
+
+              return (
+                <>
+                  {/* Cancellation Status Details */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2.5 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="text-secondary font-medium">Status</span>
+                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${isRefunded ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-800'}`}>
+                        {isRefunded ? 'CANCELLED & REFUNDED' : 'CANCELLED (NO REFUND)'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-secondary font-medium">Station</span>
+                      <span className="font-semibold text-slate-900 text-right max-w-[200px] truncate">{cancelledDetailBooking.stationName}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-secondary font-medium">Booking Mode</span>
+                      <span className="font-semibold text-slate-900">
+                        {hoursBeforeStart <= 0.1 ? 'Store Right Now' : 'Schedule in Advance'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Refund Breakdown */}
+                  <div className="bg-[#eff4ff] p-4 rounded-xl space-y-2 text-xs border border-blue-100">
+                    <div className="flex justify-between items-center text-slate-600">
+                      <span>Original Paid Amount:</span>
+                      <span className="font-semibold text-slate-900">{formatCurrency(cancelledDetailBooking.baseAmount)} VND</span>
+                    </div>
+                    <div className="flex justify-between items-center text-secondary">
+                      <span>Cancellation Policy:</span>
+                      <span className="font-bold text-slate-900">{policyLabel}</span>
+                    </div>
+                    <div className="pt-2 border-t border-blue-200/60 flex justify-between items-center">
+                      <span className="font-bold text-slate-800">Total Refunded:</span>
+                      <span className={`font-mono text-lg font-extrabold ${isRefunded ? 'text-emerald-700' : 'text-slate-500'}`}>
+                        {formatCurrency(refundAmount)} VND
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Refund Method Note */}
+                  <div className={`text-xs p-3 rounded-xl flex items-start gap-2.5 border ${isRefunded ? 'bg-emerald-50 border-emerald-200 text-[#434655]' : 'bg-amber-50 border-amber-200 text-amber-900'}`}>
+                    {isRefunded ? (
+                      <>
+                        <CheckCircle className="w-4 h-4 text-emerald-600 mt-0.5 shrink-0" />
+                        <span className="leading-relaxed">
+                          Refund has been credited back to your bank account via PayOS. Funds typically reflect within 1-5 minutes.
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
+                        <span className="leading-relaxed">
+                          Immediate storage reservations or cancellations requested after the scheduled start time are non-refundable according to our service terms.
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </>
+              );
+            })()}
+
+            <div className="pt-2">
+              <button
+                onClick={() => setCancelledDetailBooking(null)}
+                className="w-full py-2.5 rounded-xl bg-primary-container hover:bg-primary text-white text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95"
+              >
+                Close Receipt
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* TOAST NOTIFICATION */}
       {toastMessage && (

@@ -30,6 +30,7 @@ interface Props {
     onLogout: () => void;
     onNavigateDashboard?: () => void;
     onNavigateHistory?: () => void;
+    onNavigateBooking?: (stationId: string, initialData?: { size?: 'S' | 'M' | 'L'; duration?: number }) => void;
 }
 
 // ─── Station icon by name keyword ────────────────────────────────────────────
@@ -66,7 +67,7 @@ function markerSvg(color: string, selected: boolean): string {
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-export default function FindStationPage({ onLogout, onNavigateDashboard }: Props) {
+export default function FindStationPage({ onLogout, onNavigateDashboard, onNavigateHistory, onNavigateBooking }: Props) {
     const user: AuthUser = JSON.parse(localStorage.getItem('smartlocker_user') || '{}');
 
     // State
@@ -175,6 +176,8 @@ export default function FindStationPage({ onLogout, onNavigateDashboard }: Props
                 onBack={() => setDetailStation(null)}
                 onLogout={onLogout}
                 onNavigateDashboard={onNavigateDashboard}
+                onNavigateHistory={onNavigateHistory}
+                onNavigateBooking={onNavigateBooking}
             />
         );
     }
@@ -208,9 +211,12 @@ export default function FindStationPage({ onLogout, onNavigateDashboard }: Props
                         <span className="px-4 py-1.5 text-sm font-semibold rounded-xl bg-[#eff4ff] text-[#2563eb]">
                             Tìm trạm
                         </span>
-                        <a href="#" className="px-4 py-1.5 text-sm font-semibold rounded-xl text-[#434655] hover:text-[#0b1c30] hover:bg-[#f0f4ff] transition-colors">
+                        <button
+                            onClick={onNavigateHistory}
+                            className="px-4 py-1.5 text-sm font-semibold rounded-xl text-[#434655] hover:text-[#0b1c30] hover:bg-[#f0f4ff] transition-colors cursor-pointer"
+                        >
                             Lịch sử
-                        </a>
+                        </button>
                         <a href="#" className="px-4 py-1.5 text-sm font-semibold rounded-xl text-[#434655] hover:text-[#0b1c30] hover:bg-[#f0f4ff] transition-colors">
                             Hỗ trợ
                         </a>
