@@ -25,8 +25,8 @@ interface AdminSidebarProps {
     openIncidentsCount: number;
     offlineDevicesCount: number;
     onLogout?: () => void;
-    activeMenu?: 'dashboard' | 'stations' | 'users' | 'lockers';
-    onSelectMenu?: (menu: 'dashboard' | 'stations' | 'users' | 'lockers') => void;
+    activeMenu?: 'dashboard' | 'stations' | 'users' | 'lockers' | 'incidents';
+    onSelectMenu?: (menu: 'dashboard' | 'stations' | 'users' | 'lockers' | 'incidents') => void;
 }
 
 export default function AdminSidebar({
@@ -131,17 +131,29 @@ export default function AdminSidebar({
                                 )}
                             </div>
 
-                            <div className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-default">
+                            <button
+                                type="button"
+                                onClick={() => onSelectMenu?.('incidents')}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition cursor-pointer text-left ${
+                                    activeMenu === 'incidents'
+                                        ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-600/30'
+                                        : 'text-slate-600 hover:bg-slate-50'
+                                }`}
+                            >
                                 <span className="flex items-center gap-2.5">
-                                    <ShieldAlert className="w-4 h-4 text-slate-400" />
+                                    <ShieldAlert className={`w-4 h-4 ${activeMenu === 'incidents' ? 'text-white' : 'text-slate-400'}`} />
                                     <span>Incidents</span>
                                 </span>
                                 {openIncidentsCount > 0 && (
-                                    <span className="px-1.5 py-0.2 rounded-full bg-rose-50 text-rose-600 font-bold text-[10px] border border-rose-200">
+                                    <span className={`px-1.5 py-0.2 rounded-full font-bold text-[10px] border ${
+                                        activeMenu === 'incidents'
+                                            ? 'bg-white/20 text-white border-white/30'
+                                            : 'bg-rose-50 text-rose-600 border-rose-200'
+                                    }`}>
                                         {openIncidentsCount}
                                     </span>
                                 )}
-                            </div>
+                            </button>
                         </div>
                     </div>
 
