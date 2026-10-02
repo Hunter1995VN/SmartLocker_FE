@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
   Lock,
-  Clock,
   MapPin,
-  HelpCircle,
   ShieldCheck,
-  Bell,
   ChevronRight,
   Verified,
   DoorOpen,
@@ -16,7 +13,6 @@ import {
   Info,
   Navigation,
   Headphones,
-  Compass,
   FileText,
   PlusCircle,
   QrCode,
@@ -25,6 +21,7 @@ import {
 import { ExtendBookingModal } from '../components/booking/ExtendBookingModal';
 import { getBookingById, type BookingDto } from '../api/bookingService';
 import { QRCodeSVG } from 'qrcode.react';
+import CustomerHeader from '../components/layout/CustomerHeader';
 
 interface BookingDetailPageProps {
   onNavigate: (page: string, props?: any) => void;
@@ -43,13 +40,6 @@ interface BookingDetailPageProps {
 }
 
 const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, bookingId, bookingData }) => {
-  // Lấy thông tin user đăng nhập nếu có
-  const savedUser = JSON.parse(localStorage.getItem('smartlocker_user') || '{}');
-  const userInitials = savedUser.fullName
-    ? savedUser.fullName.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase()
-    : 'NV';
-  const userName = savedUser.fullName || 'Nguyen Van A';
-
   const [booking, setBooking] = useState<BookingDto | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -214,76 +204,11 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
 
   return (
     <div className="bg-[#f8f9ff] text-[#0b1c30] font-body-md antialiased min-h-screen flex flex-col selection:bg-[#dbe1ff] selection:text-[#004ac6] pb-12">
-      {/* TOP APP BAR */}
-      <header className="bg-white shadow-sm sticky top-0 z-40 border-b border-outline-variant/30">
-        <div className="w-full max-w-7xl mx-auto px-4 md:px-8 flex justify-between items-center h-16">
-          {/* Brand & Primary Destination Links */}
-          <div className="flex items-center gap-6">
-            <button onClick={() => onNavigate('home')} className="flex items-center gap-2.5 transition-all duration-150 active:scale-[0.98]">
-              <div className="w-9 h-9 rounded-xl bg-[#2563EB]/10 flex items-center justify-center p-1.5 border border-[#2563EB]/20">
-                <Lock className="w-5 h-5 text-primary" />
-              </div>
-              <span className="text-lg text-primary tracking-tight font-bold">SmartLocker</span>
-            </button>
-            {/* Desktop Navigation Cluster */}
-            <nav className="hidden md:flex items-center gap-1">
-              <button
-                onClick={() => onNavigate('my-bookings')}
-                className="px-3.5 py-1.5 rounded-lg text-primary font-bold text-sm bg-[#eff4ff] transition-colors duration-150 flex items-center gap-1.5 cursor-pointer"
-              >
-                <Clock className="w-4 h-4 text-primary" />
-                <span>My Bookings</span>
-              </button>
-              <button
-                onClick={() => onNavigate('map')}
-                className="px-3.5 py-1.5 rounded-lg text-[#434655] font-medium text-sm hover:bg-[#eff4ff] transition-colors duration-150 flex items-center gap-1.5 cursor-pointer"
-              >
-                <Compass className="w-4 h-4" />
-                <span>Find Lockers</span>
-              </button>
-              <a
-                href="tel:19001234"
-                className="px-3.5 py-1.5 rounded-lg text-[#434655] font-medium text-sm hover:bg-[#eff4ff] transition-colors duration-150 flex items-center gap-1.5"
-              >
-                <HelpCircle className="w-4 h-4" />
-                <span>Support</span>
-              </a>
-            </nav>
-          </div>
-
-          {/* Trailing Status & User Profile */}
-          <div className="flex items-center gap-3">
-            {/* Telemetry Status Pill */}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-[#eff4ff] rounded-full border border-outline-variant/30">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
-              </span>
-              <span className="text-xs text-[#434655] font-semibold">System Status: Online</span>
-            </div>
-            {/* Help icon action */}
-            <button className="w-9 h-9 flex items-center justify-center rounded-lg text-secondary hover:bg-[#eff4ff] transition-colors" title="Help">
-              <HelpCircle className="w-5 h-5" />
-            </button>
-            {/* Shield Security */}
-            <button className="w-9 h-9 flex items-center justify-center rounded-lg text-secondary hover:bg-[#eff4ff] transition-colors" title="Cryptographic Access Active">
-              <ShieldCheck className="w-5 h-5 text-emerald-600" />
-            </button>
-            {/* Notification Bell */}
-            <button className="relative w-9 h-9 flex items-center justify-center rounded-lg text-secondary hover:bg-[#eff4ff] transition-colors">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full ring-2 ring-white"></span>
-            </button>
-            {/* User Profile Pill */}
-            <div className="flex items-center gap-2 pl-2 border-l border-outline-variant/30">
-              <div className="w-8 h-8 rounded-full bg-[#dce9ff] flex items-center justify-center text-primary font-bold text-xs border border-outline-variant/40">
-                {userInitials}
-              </div>
-              <span className="hidden lg:inline-block text-sm text-[#0b1c30] font-medium">{userName}</span>
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* UNIFIED CUSTOMER HEADER */}
+      <CustomerHeader
+        currentPage="booking-detail"
+        onNavigate={onNavigate}
+      />
 
       {/* MAIN CANVAS */}
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 md:px-8 py-6 space-y-6">
@@ -349,7 +274,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                 <div className="text-[11px] uppercase tracking-wider text-secondary font-bold">Assigned Bay</div>
                 <div className="text-lg text-primary font-bold">{bayCode}</div>
                 <div className="text-xs text-[#434655]">
-                  {size === 'S' ? 'Small Size · 35 × 45 × 50 cm' : size === 'M' ? 'Medium Size · 45 × 60 × 60 cm' : 'Large Size · 60 × 85 × 80 cm'}
+                  {size === 'S' ? 'Small Size · 45 × 45 × 65 cm' : size === 'M' ? 'Medium Size · 65 × 45 × 65 cm' : 'Large Size · 95 × 55 × 65 cm'}
                 </div>
               </div>
             </div>

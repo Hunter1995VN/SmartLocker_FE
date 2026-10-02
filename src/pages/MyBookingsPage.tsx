@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   ShieldCheck,
-  HelpCircle,
-  Bell,
   ChevronRight,
   Plus,
   AlertTriangle,
@@ -22,19 +20,13 @@ import {
 import { ExtendBookingModal } from '../components/booking/ExtendBookingModal';
 import { CancelBookingModal } from '../components/booking/CancelBookingModal';
 import { getMyBookings, extendBooking, cancelBooking, payOverdueFee, type BookingListItemDto } from '../api/bookingService';
+import CustomerHeader from '../components/layout/CustomerHeader';
 
 interface MyBookingsPageProps {
   onNavigate: (page: string, props?: any) => void;
 }
 
 const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
-  // Lấy thông tin user đăng nhập nếu có
-  const savedUser = JSON.parse(localStorage.getItem('smartlocker_user') || '{}');
-  const userInitials = savedUser.fullName
-    ? savedUser.fullName.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase()
-    : 'NV';
-  const userName = savedUser.fullName || 'Nguyen Van A';
-
   const [activeTab, setActiveTab] = useState<'active' | 'history'>('active');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -86,77 +78,11 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
 
   return (
     <div className="bg-[#f8f9ff] text-[#0b1c30] font-body-md antialiased min-h-screen flex flex-col selection:bg-primary-container selection:text-white pb-12">
-      {/* TOP APP BAR */}
-      <header className="bg-white border-b border-outline-variant/30 shadow-sm sticky top-0 z-40">
-        <div className="w-full px-4 md:px-8 flex justify-between items-center h-16 max-w-7xl mx-auto">
-          {/* Brand & Navigation Cluster */}
-          <div className="flex items-center gap-8">
-            <button onClick={() => onNavigate('home')} className="flex items-center gap-2.5 font-bold text-slate-900 tracking-tight cursor-pointer">
-              <div className="w-9 h-9 rounded-xl bg-primary-container text-white flex items-center justify-center shadow-sm">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <span className="font-bold text-slate-900 tracking-tight text-lg">SmartLocker</span>
-            </button>
-            {/* Desktop Navigation Tabs */}
-            <nav className="hidden md:flex items-center gap-1 text-sm font-semibold">
-              <button
-                onClick={() => onNavigate('map')}
-                className="px-3.5 py-1.5 rounded-lg text-secondary hover:bg-[#eff4ff] transition-colors cursor-pointer"
-              >
-                Find Lockers
-              </button>
-              <button
-                onClick={() => setActiveTab('active')}
-                className="px-3.5 py-1.5 rounded-lg text-primary-container font-bold bg-[#eff4ff] flex items-center gap-1.5 cursor-pointer"
-              >
-                <span>My Bookings</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
-              </button>
-              <a
-                href="tel:19001234"
-                className="px-3.5 py-1.5 rounded-lg text-secondary hover:bg-[#eff4ff] transition-colors"
-              >
-                Support
-              </a>
-            </nav>
-          </div>
-
-          {/* Right Utility Actions */}
-          <div className="flex items-center gap-3 md:gap-4">
-            {/* Live System Status */}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-[#eff4ff] rounded-full border border-outline-variant/30">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
-              </span>
-              <span className="text-xs text-secondary font-medium">System Status: Online</span>
-            </div>
-            {/* Currency & Language */}
-            <div className="hidden lg:flex items-center gap-1 text-slate-600 text-xs font-semibold px-2.5 py-1 rounded-lg hover:bg-[#eff4ff] transition-colors cursor-pointer">
-              <span>VND ₫ | EN</span>
-            </div>
-            {/* Help icon */}
-            <button className="p-2 text-secondary hover:bg-[#eff4ff] rounded-full transition-colors" title="Help">
-              <HelpCircle className="w-5 h-5" />
-            </button>
-            {/* Notification Bell */}
-            <button className="relative p-2 text-secondary hover:bg-[#eff4ff] rounded-full transition-colors">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
-            </button>
-            {/* User Profile Pill */}
-            <div className="flex items-center gap-2.5 pl-2 border-l border-outline-variant/30">
-              <div className="w-8 h-8 rounded-full bg-[#dbe1ff] text-primary text-xs flex items-center justify-center font-bold">
-                {userInitials}
-              </div>
-              <div className="hidden sm:block text-left">
-                <p className="text-xs text-[#0b1c30] leading-tight font-semibold">{userName}</p>
-                <p className="text-[11px] text-secondary leading-tight">Verified Traveler</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* UNIFIED CUSTOMER HEADER */}
+      <CustomerHeader
+        currentPage="my-bookings"
+        onNavigate={onNavigate}
+      />
 
       {/* MAIN CANVAS */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 md:px-8 py-6 space-y-6">

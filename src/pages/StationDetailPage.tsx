@@ -11,21 +11,21 @@ import type { Station } from '../api/stationService';
 const SIZE_CONFIG = {
     S: {
         label: 'Cỡ Nhỏ (Size S)', desc: 'Balo, túi xách du lịch cá nhân',
-        dims: '45 × 35 × 25 cm', maxKg: 5, rate: 10_000,
+        dims: '45 × 45 × 65 cm', maxKg: 10, rate: 10_000,
         overage: 5_000, color: 'text-emerald-600', bgSel: 'bg-[#2563eb] text-white',
         bg: 'bg-[#eff4ff]', badgeClass: 'bg-emerald-50 text-emerald-700',
         barColor: 'bg-emerald-500',
     },
     M: {
         label: 'Cỡ Vừa (Size M)', desc: 'Vali cabin xách tay 20 inch',
-        dims: '55 × 40 × 25 cm', maxKg: 15, rate: 15_000,
+        dims: '65 × 45 × 65 cm', maxKg: 20, rate: 15_000,
         overage: 8_000, color: 'text-amber-600', bgSel: 'bg-[#2563eb] text-white',
         bg: 'bg-[#eff4ff]', badgeClass: 'bg-amber-50 text-amber-700',
         barColor: 'bg-amber-500',
     },
     L: {
         label: 'Cỡ Lớn (Size L)', desc: 'Vali ký gửi cỡ lớn 28 inch',
-        dims: '70 × 50 × 30 cm', maxKg: 25, rate: 20_000,
+        dims: '95 × 55 × 65 cm', maxKg: 35, rate: 20_000,
         overage: 12_000, color: 'text-red-500', bgSel: 'bg-[#2563eb] text-white',
         bg: 'bg-[#eff4ff]', badgeClass: 'bg-red-50 text-red-600',
         barColor: 'bg-red-500',

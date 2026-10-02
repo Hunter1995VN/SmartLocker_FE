@@ -1,14 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
-    LogOut, Search, Bell, Lock, MapPin, Navigation, Zap,
+    Search, MapPin, Navigation, Zap,
     Shield, User, Clock, RefreshCw, X, ChevronRight,
     Wifi, Info, ArrowRight, Phone, CheckCircle,
-    Package, ReceiptText, Key,
+    Package, ReceiptText, Key, Lock,
 } from 'lucide-react';
 import { MOCK_STATIONS, MOCK_ACTIVE_BOOKING, getStations } from '../api/stationService';
 import type { Station, Booking } from '../api/stationService';
 import { getMyBookings } from '../api/bookingService';
 import type { BookingListItemDto } from '../api/bookingService';
+import CustomerHeader from '../components/layout/CustomerHeader';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface AuthUser {
@@ -24,6 +25,7 @@ interface DashboardPageProps {
     onLogout: () => void;
     onNavigateToMap?: () => void;
     onNavigateToAdmin?: () => void;
+    onNavigate?: (page: string, data?: any) => void;
 }
 
 // ─── Mock recent bookings (sẽ thay bằng API call sau) ────────────────────────
@@ -99,7 +101,7 @@ function formatDate(): string {
 }
 
 // ─── Main Component ──────────────────────────────────────────────────────────
-export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToAdmin }: DashboardPageProps) {
+export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToAdmin, onNavigate }: DashboardPageProps) {
     const user: AuthUser = JSON.parse(localStorage.getItem('smartlocker_user') || '{}');
     const isAdminOrStaff = (user?.role || '').toLowerCase() === 'admin' || (user?.role || '').toLowerCase() === 'staff';
     const activeBooking: Booking | null = MOCK_ACTIVE_BOOKING;
@@ -202,71 +204,22 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
 
     return (
         <div className="min-h-screen bg-[#f8f9ff] font-sans">
-            {/* ── NAVBAR ─────────────────────────────────────────────────── */}
-            <header className="fixed top-0 left-0 w-full z-50 bg-white border-b border-gray-100 shadow-[0_1px_3px_rgba(15,23,42,0.05)]">
-                <div className="h-16 w-full px-4 md:px-6 lg:px-8 flex items-center justify-between gap-4">
-                    {/* Logo + Nav */}
-                    <div className="flex items-center gap-8">
-                        <a href="#" className="flex items-center gap-2 shrink-0">
-                            <div className="w-9 h-9 rounded-xl bg-[#2563eb] flex items-center justify-center shadow-sm">
-                                <Lock className="w-[18px] h-[18px] text-white" />
-                            </div>
-                            <span className="font-bold text-[18px] leading-6 tracking-tight text-[#0b1c30]">SmartLocker</span>
-                        </a>
-                        <nav className="hidden lg:flex items-center gap-1">
-                            <a href="#" className="px-4 py-1.5 text-sm font-semibold rounded-xl bg-[#eff4ff] text-[#2563eb] transition-colors">Dashboard</a>
-                            <button onClick={onNavigateToMap} className="px-4 py-1.5 text-sm font-semibold rounded-xl text-[#434655] hover:text-[#0b1c30] hover:bg-[#f0f4ff] transition-colors">Tìm trạm</button>
-                            <a href="#" className="px-4 py-1.5 text-sm font-semibold rounded-xl text-[#434655] hover:text-[#0b1c30] hover:bg-[#f0f4ff] transition-colors">Lịch sử</a>
-                            <a href="#" className="px-4 py-1.5 text-sm font-semibold rounded-xl text-[#434655] hover:text-[#0b1c30] hover:bg-[#f0f4ff] transition-colors">Hỗ trợ</a>
-                            {isAdminOrStaff && (
-                                <button
-                                    onClick={onNavigateToAdmin ? onNavigateToAdmin : () => { window.location.href = '/admin'; }}
-                                    className="ml-2 px-3.5 py-1.5 text-xs font-bold rounded-xl bg-blue-600 text-white hover:bg-blue-700 shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer"
-                                >
-                                    <Shield className="w-3.5 h-3.5" />
-                                    <span>Vào Admin Portal</span>
-                                </button>
-                            )}
-                        </nav>
-                    </div>
-
-                    {/* Right side */}
-                    <div className="flex items-center gap-2">
-                        <button className="w-9 h-9 rounded-xl flex items-center justify-center text-[#434655] hover:bg-[#eff4ff] hover:text-[#0b1c30] transition-colors">
-                            <Search className="w-5 h-5" />
-                        </button>
-                        <button className="relative w-9 h-9 rounded-xl flex items-center justify-center text-[#434655] hover:bg-[#eff4ff] hover:text-[#0b1c30] transition-colors">
-                            <Bell className="w-5 h-5" />
-                            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white" />
-                        </button>
-                        <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-xl bg-[#eff4ff] border border-[#c3c6d7] text-[#434655] text-xs font-semibold cursor-pointer hover:bg-[#e5eeff] transition-colors">
-                            <span className="text-[11px]">🌐</span>
-                            <span>VIE / VND</span>
-                            <ChevronRight className="w-3.5 h-3.5 rotate-90" />
-                        </div>
-                        {/* User badge */}
-                        <div className="flex items-center gap-2 pl-2 py-1 pr-3 rounded-xl bg-white border border-[#c3c6d7] hover:bg-[#eff4ff] cursor-pointer transition-colors">
-                            <div className="w-8 h-8 rounded-full bg-[#004ac6] flex items-center justify-center text-white text-sm font-bold shrink-0">
-                                {user.fullName?.charAt(0).toUpperCase() ?? 'U'}
-                            </div>
-                            <div className="hidden md:flex flex-col leading-none">
-                                <span className="text-xs font-semibold text-[#0b1c30]">{user.fullName}</span>
-                                <span className="text-[11px] text-[#434655]">{user.role || 'Traveler'}</span>
-                            </div>
-                            <button
-                                onClick={handleLogout}
-                                className="ml-2 p-1 rounded-lg hover:bg-red-50 text-[#737686] hover:text-red-500 transition-colors"
-                                title="Đăng xuất"
-                            >
-                                <LogOut className="w-3.5 h-3.5" />
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </header>
+            {/* ── UNIFIED CUSTOMER HEADER ── */}
+            <CustomerHeader
+                currentPage="dashboard"
+                onNavigate={(page, data) => {
+                    if (page === 'find-station') {
+                        if (onNavigateToMap) onNavigateToMap();
+                        else if (onNavigate) onNavigate('find-station', data);
+                    } else if (onNavigate) {
+                        onNavigate(page, data);
+                    }
+                }}
+                onLogout={handleLogout}
+            />
 
             {/* ── MAIN CONTENT ───────────────────────────────────────────── */}
-            <main className="w-full pt-16">
+            <main className="w-full">
                 <div className="w-full px-4 md:px-6 lg:px-8 py-8">
                     <div className="w-full max-w-7xl mx-auto flex flex-col gap-6">
 
@@ -425,7 +378,9 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                                             <span>Ngăn: <strong className="font-bold text-[#2563eb]">Tủ {activeBooking.lockerCode}</strong></span>
                                                         </div>
                                                         <span className="text-[#c3c6d7]">|</span>
-                                                        <span className="text-sm text-[#434655]">Size {activeBooking.size} (45×60×60 cm)</span>
+                                                        <span className="text-sm text-[#434655]">
+                                                            Size {activeBooking.size} ({activeBooking.size === 'S' ? '45×45×65' : activeBooking.size === 'M' ? '65×45×65' : '95×55×65'} cm)
+                                                        </span>
                                                     </div>
                                                 </div>
 

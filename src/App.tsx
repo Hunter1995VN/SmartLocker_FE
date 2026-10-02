@@ -243,6 +243,7 @@ function App() {
                     onLogout={handleLogout}
                     onNavigateToMap={() => navigateTo('find-station')}
                     onNavigateToAdmin={() => navigateTo('admin')}
+                    onNavigate={(page, data) => navigateTo(page as Page, data)}
                 />
             )}
 

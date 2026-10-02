@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   Check,
-  ChevronRight,
-  ShieldCheck,
   DoorOpen,
   MapPin,
   Luggage,
@@ -15,7 +13,6 @@ import {
   Copy,
   CheckCircle,
   Lock,
-  Headphones,
   ExternalLink,
   RefreshCw,
   CreditCard,
@@ -24,6 +21,7 @@ import {
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { getBookingById } from '../api/bookingService';
+import CustomerHeader from '../components/layout/CustomerHeader';
 
 interface BookingPaymentPageProps {
   onNavigate: (page: string, props?: any) => void;
@@ -231,65 +229,11 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
 
   return (
     <div className="bg-[#F8FAFC] text-[#0F172A] min-h-screen flex flex-col justify-between selection:bg-blue-100 selection:text-blue-900 pb-12">
-      {/* HEADER APP BAR */}
-      <header className="w-full bg-white sticky top-0 z-40 border-b border-slate-200/80 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          {/* Logo & Breadcrumb */}
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => onNavigate('home')}
-              className="flex items-center gap-2.5 transition-transform active:scale-[0.98]"
-            >
-              <div className="w-10 h-10 rounded-xl bg-blue-600/10 flex items-center justify-center border border-blue-600/20">
-                <Lock className="w-5 h-5 text-blue-600" />
-              </div>
-              <div className="flex flex-col text-left">
-                <span className="text-lg font-extrabold text-blue-600 tracking-tight flex items-center gap-1.5">
-                  SmartLocker
-                  <span className="bg-blue-100 text-blue-700 text-[10px] uppercase font-bold px-1.5 py-0.5 rounded tracking-normal">
-                    Thanh toán
-                  </span>
-                </span>
-              </div>
-            </button>
-            <div className="hidden lg:flex items-center gap-2 pl-4 border-l border-slate-200 text-slate-500 text-sm">
-              <span onClick={() => onNavigate('home')} className="hover:text-blue-600 transition-colors cursor-pointer">
-                Trang chủ
-              </span>
-              <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-              <span onClick={() => onNavigate('map')} className="hover:text-blue-600 transition-colors cursor-pointer">
-                Danh sách trạm
-              </span>
-              <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-              <span
-                onClick={handleBackToStep1}
-                className="hover:text-blue-600 transition-colors cursor-pointer"
-              >
-                {stationName.split('(')[0].trim()}
-              </span>
-              <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-              <span className="text-slate-900 font-semibold">Xác nhận &amp; Thanh toán</span>
-            </div>
-          </div>
-
-          {/* Hotline & Security Badge */}
-          <div className="flex items-center gap-3 sm:gap-5">
-            <a
-              className="hidden sm:flex items-center gap-1.5 text-slate-600 hover:text-blue-600 transition-colors text-sm"
-              href="tel:19001234"
-            >
-              <Headphones className="w-4 h-4 text-blue-600" />
-              <span>
-                Hotline <strong className="text-slate-900">1900 1234</strong>
-              </span>
-            </a>
-            <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full border border-emerald-200 text-xs font-semibold">
-              <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              <span>Bảo mật 100% qua PayOS</span>
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* UNIFIED CUSTOMER HEADER */}
+      <CustomerHeader
+        currentPage="booking-payment"
+        onNavigate={onNavigate}
+      />
 
       {/* MAIN CONTENT */}
       <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 w-full">
@@ -392,10 +336,10 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                       </div>
                       <p className="text-xs text-slate-500 mt-0.5">
                         {size === 'S'
-                          ? 'Kích thước: 35 x 45 x 50 cm'
+                          ? 'Kích thước: 45 x 45 x 65 cm'
                           : size === 'M'
-                          ? 'Kích thước: 45 x 60 x 60 cm'
-                          : 'Kích thước: 60 x 85 x 80 cm'}
+                          ? 'Kích thước: 65 x 45 x 65 cm'
+                          : 'Kích thước: 95 x 55 x 65 cm'}
                       </p>
                     </div>
                   </div>

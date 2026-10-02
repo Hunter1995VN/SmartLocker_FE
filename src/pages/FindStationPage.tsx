@@ -1,14 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
 import {
-    MapPin, Search, Bell, LogOut, Lock, Navigation,
+    MapPin, Search, Navigation,
     X, RefreshCw, ChevronDown, Plane, Train, ShoppingBag,
     Footprints, Clock, Shield, Phone, ArrowRight, Filter,
-    ChevronRight, Zap,
+    ChevronRight,
 } from 'lucide-react';
-import { MOCK_STATIONS, calcDistance } from '../api/stationService';
+import { MOCK_STATIONS, calcDistance, getStations } from '../api/stationService';
 import type { Station } from '../api/stationService';
-import StationDetailPage from './StationDetailPage';
+import CustomerHeader from '../components/layout/CustomerHeader';
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 const GOOGLE_MAPS_API_KEY = (import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string) || '';
@@ -17,14 +17,6 @@ const MAP_CENTER_DEFAULT = { lat: 10.7769, lng: 106.7009 }; // TP.HCM
 // ─── Types ────────────────────────────────────────────────────────────────────
 type SizeFilter = 'ALL' | 'S' | 'M' | 'L';
 type SortMode = 'nearest' | 'available';
-
-interface AuthUser {
-    userId: string;
-    fullName: string;
-    email: string;
-    phone: string;
-    role: string;
-}
 
 interface Props {
     onLogout: () => void;
@@ -68,13 +60,10 @@ function markerSvg(color: string, selected: boolean): string {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function FindStationPage({ onLogout, onNavigateDashboard, onNavigateHistory, onNavigateBooking }: Props) {
-    const user: AuthUser = JSON.parse(localStorage.getItem('smartlocker_user') || '{}');
-
     // State
     const [stations, setStations] = useState<Station[]>(MOCK_STATIONS);
     const [selectedStation, setSelectedStation] = useState<Station | null>(null);
     const [hoveredStation, setHoveredStation] = useState<Station | null>(null);
-    const [detailStation, setDetailStation] = useState<Station | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [sizeFilter, setSizeFilter] = useState<SizeFilter>('ALL');
     const [onlyOpen, setOnlyOpen] = useState(true);
@@ -83,8 +72,8 @@ export default function FindStationPage({ onLogout, onNavigateDashboard, onNavig
     const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
     const [mapCenter, setMapCenter] = useState(MAP_CENTER_DEFAULT);
     const [mapZoom, setMapZoom] = useState(13);
-    const [lastRefresh] = useState<string>('5 giây trước');
-    const [userMenuOpen, setUserMenuOpen] = useState(false);
+    const [lastRefresh, setLastRefresh] = useState<string>('vừa xong');
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const mapRef = useRef<google.maps.Map | null>(null);
 
@@ -98,6 +87,40 @@ export default function FindStationPage({ onLogout, onNavigateDashboard, onNavig
     const onMapLoad = useCallback((map: google.maps.Map) => {
         mapRef.current = map;
     }, []);
+
+    // Fetch stations from backend API with fallback
+    const fetchStationsData = useCallback(async (query?: string) => {
+        setIsLoading(true);
+        try {
+            let data = await getStations(query || undefined);
+            if (userLocation) {
+                data = data
+                    .map(s => ({ ...s, distanceKm: calcDistance(userLocation.lat, userLocation.lng, s.latitude, s.longitude) }))
+                    .sort((a, b) => (a.distanceKm ?? 99) - (b.distanceKm ?? 99));
+            }
+            setStations(data);
+            setLastRefresh('vừa xong');
+        } catch (err) {
+            console.warn('Backend API getStations error, falling back to mock stations:', err);
+            let fallback = [...MOCK_STATIONS];
+            if (userLocation) {
+                fallback = fallback
+                    .map(s => ({ ...s, distanceKm: calcDistance(userLocation.lat, userLocation.lng, s.latitude, s.longitude) }))
+                    .sort((a, b) => (a.distanceKm ?? 99) - (b.distanceKm ?? 99));
+            }
+            setStations(fallback);
+            setLastRefresh('ngoại tuyến');
+        } finally {
+            setIsLoading(false);
+        }
+    }, [userLocation]);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            fetchStationsData(searchQuery);
+        }, 350);
+        return () => clearTimeout(timer);
+    }, [searchQuery, fetchStationsData]);
 
     // GPS: lấy vị trí user
     const fetchUserLocation = useCallback(() => {
@@ -168,114 +191,22 @@ export default function FindStationPage({ onLogout, onNavigateDashboard, onNavig
         onLogout();
     };
 
-    // Show detail page when user clicks booking CTA
-    if (detailStation) {
-        return (
-            <StationDetailPage
-                station={detailStation}
-                onBack={() => setDetailStation(null)}
-                onLogout={onLogout}
-                onNavigateDashboard={onNavigateDashboard}
-                onNavigateHistory={onNavigateHistory}
-                onNavigateBooking={onNavigateBooking}
-            />
-        );
-    }
-
     const activeCount = stations.filter(s => s.status === 'ACTIVE').length;
 
     // ─── Render ───────────────────────────────────────────────────────────────
     return (
         <div className="h-screen w-screen flex flex-col overflow-hidden bg-[#f8f9ff]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
 
-            {/* ══════════════════════ HEADER ══════════════════════ */}
-            <header className="h-16 bg-white border-b border-[#e5eeff] flex items-center px-4 md:px-6 lg:px-8 z-30 shrink-0 shadow-[0_1px_3px_rgba(15,23,42,0.05)]">
-                {/* Logo + Nav */}
-                <div className="flex items-center gap-8 flex-1 min-w-0">
-                    <a href="#" className="flex items-center gap-2.5 shrink-0">
-                        <div className="w-9 h-9 rounded-xl bg-[#2563eb] flex items-center justify-center shadow-sm">
-                            <Lock className="w-[18px] h-[18px] text-white" />
-                        </div>
-                        <span className="font-bold text-[18px] leading-6 tracking-tight text-[#0b1c30] hidden sm:block">
-                            Smart<span className="text-[#2563eb]">Locker</span>
-                        </span>
-                    </a>
-
-                    <nav className="hidden lg:flex items-center gap-1">
-                        <button
-                            onClick={onNavigateDashboard}
-                            className="px-4 py-1.5 text-sm font-semibold rounded-xl text-[#434655] hover:text-[#0b1c30] hover:bg-[#f0f4ff] transition-colors"
-                        >
-                            Dashboard
-                        </button>
-                        <span className="px-4 py-1.5 text-sm font-semibold rounded-xl bg-[#eff4ff] text-[#2563eb]">
-                            Tìm trạm
-                        </span>
-                        <button
-                            onClick={onNavigateHistory}
-                            className="px-4 py-1.5 text-sm font-semibold rounded-xl text-[#434655] hover:text-[#0b1c30] hover:bg-[#f0f4ff] transition-colors cursor-pointer"
-                        >
-                            Lịch sử
-                        </button>
-                        <a href="#" className="px-4 py-1.5 text-sm font-semibold rounded-xl text-[#434655] hover:text-[#0b1c30] hover:bg-[#f0f4ff] transition-colors">
-                            Hỗ trợ
-                        </a>
-                    </nav>
-                </div>
-
-                {/* Right actions */}
-                <div className="flex items-center gap-2 shrink-0">
-                    {/* Search */}
-                    <button className="w-9 h-9 rounded-xl flex items-center justify-center text-[#434655] hover:bg-[#eff4ff] transition-colors">
-                        <Search className="w-5 h-5" />
-                    </button>
-                    {/* Notification */}
-                    <button className="relative w-9 h-9 rounded-xl flex items-center justify-center text-[#434655] hover:bg-[#eff4ff] transition-colors">
-                        <Bell className="w-5 h-5" />
-                        <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white" />
-                    </button>
-                    {/* Language */}
-                    <button className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#c3c6d7] text-[#434655] text-xs font-bold hover:bg-[#eff4ff] transition-colors">
-                        <span className="text-sm">🌐</span>
-                        <span>VIE / VND</span>
-                        <ChevronDown className="w-3 h-3" />
-                    </button>
-                    {/* User */}
-                    <div className="relative">
-                        <button
-                            id="find-station-user-menu"
-                            onClick={() => setUserMenuOpen(v => !v)}
-                            className="flex items-center gap-2 pl-2 py-1 pr-3 rounded-xl bg-white border border-[#c3c6d7] hover:bg-[#eff4ff] cursor-pointer transition-colors"
-                        >
-                            <div className="w-8 h-8 rounded-full bg-[#004ac6] flex items-center justify-center text-white text-sm font-bold shrink-0">
-                                {user.fullName?.charAt(0).toUpperCase() ?? 'U'}
-                            </div>
-                            <div className="hidden md:flex flex-col leading-none text-left">
-                                <span className="text-xs font-semibold text-[#0b1c30]">{user.fullName}</span>
-                                <span className="text-[11px] text-[#434655]">{user.role || 'Traveler'}</span>
-                            </div>
-                            <ChevronDown className="w-3.5 h-3.5 text-[#737686]" />
-                        </button>
-                        {userMenuOpen && (
-                            <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-[#e5eeff] py-1 z-50">
-                                <button
-                                    onClick={() => { setUserMenuOpen(false); onNavigateDashboard?.(); }}
-                                    className="w-full text-left px-4 py-2.5 text-sm text-[#434655] hover:bg-[#eff4ff] flex items-center gap-2"
-                                >
-                                    <Zap className="w-4 h-4 text-[#2563eb]" /> Dashboard
-                                </button>
-                                <hr className="my-1 border-[#f0f4ff]" />
-                                <button
-                                    onClick={() => { setUserMenuOpen(false); handleLogout(); }}
-                                    className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 flex items-center gap-2"
-                                >
-                                    <LogOut className="w-4 h-4" /> Đăng xuất
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </header>
+            {/* ══════════════════════ UNIFIED CUSTOMER HEADER ══════════════════════ */}
+            <CustomerHeader
+                currentPage="find-station"
+                onNavigate={(page) => {
+                    if (page === 'dashboard') onNavigateDashboard?.();
+                    else if (page === 'my-bookings') onNavigateHistory?.();
+                    else if (page === 'find-station') { /* already here */ }
+                }}
+                onLogout={handleLogout}
+            />
 
             {/* ══════════════════════ BREADCRUMB BAR ══════════════════════ */}
             <div className="bg-white border-b border-[#f0f4ff] px-4 md:px-8 py-2.5 flex items-center justify-between shrink-0">
@@ -422,7 +353,8 @@ export default function FindStationPage({ onLogout, onNavigateDashboard, onNavig
                                         sizeFilter={sizeFilter}
                                         isCurrentlyOpen={isCurrentlyOpen(station)}
                                         onClick={() => flyToStation(station)}
-                                        onViewDetail={() => setDetailStation(station)}
+                                        onViewDetail={() => onNavigateBooking ? onNavigateBooking(station.id) : undefined}
+                                        onBook={() => onNavigateBooking ? onNavigateBooking(station.id) : undefined}
                                         rank={idx + 1}
                                     />
                                 ))}
@@ -439,15 +371,15 @@ export default function FindStationPage({ onLogout, onNavigateDashboard, onNavig
                             <span className="text-base">🗺️</span>
                             <span className="font-semibold text-[#0b1c30] text-xs">Bản đồ trực quan Metro &amp; CBD</span>
                             <span className="flex items-center gap-1 text-[#007d55] text-xs font-medium">
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#007d55] animate-pulse" />
-                                Cập nhật {lastRefresh}
+                                <span className={`w-1.5 h-1.5 rounded-full ${isLoading ? 'bg-amber-500 animate-spin' : 'bg-[#007d55] animate-pulse'}`} />
+                                {isLoading ? 'Đang tải...' : `Cập nhật ${lastRefresh}`}
                             </span>
                         </div>
                         <button
-                            onClick={() => setStations([...MOCK_STATIONS])}
-                            className="flex items-center gap-1.5 px-3 py-2 bg-white rounded-xl shadow-[0_2px_8px_rgba(15,23,42,0.08)] border border-[#e5eeff] text-xs font-semibold text-[#434655] hover:bg-[#eff4ff] transition-colors"
+                            onClick={() => fetchStationsData(searchQuery)}
+                            className="flex items-center gap-1.5 px-3 py-2 bg-white rounded-xl shadow-[0_2px_8px_rgba(15,23,42,0.08)] border border-[#e5eeff] text-xs font-semibold text-[#434655] hover:bg-[#eff4ff] transition-colors cursor-pointer"
                         >
-                            <RefreshCw className="w-3.5 h-3.5" /> Làm mới số ô
+                            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-[#2563eb]' : ''}`} /> Làm mới số ô
                         </button>
                     </div>
 
@@ -579,7 +511,11 @@ export default function FindStationPage({ onLogout, onNavigateDashboard, onNavig
                                     onCloseClick={() => setSelectedStation(null)}
                                     options={{ pixelOffset: new google.maps.Size(0, -58) }}
                                 >
-                                    <MapInfoWindow station={selectedStation} />
+                                    <MapInfoWindow
+                                        station={selectedStation}
+                                        onBook={(s) => onNavigateBooking ? onNavigateBooking(s.id) : undefined}
+                                        onViewDetail={(s) => onNavigateBooking ? onNavigateBooking(s.id) : undefined}
+                                    />
                                 </InfoWindow>
                             )}
                         </GoogleMap>
@@ -592,7 +528,7 @@ export default function FindStationPage({ onLogout, onNavigateDashboard, onNavig
 
 // ─── StationCard ──────────────────────────────────────────────────────────────
 function StationCard({
-    station, isSelected, sizeFilter, isCurrentlyOpen, onClick, onViewDetail, rank: _rank
+    station, isSelected, sizeFilter, isCurrentlyOpen, onClick, onViewDetail, onBook, rank: _rank
 }: {
     station: Station;
     isSelected: boolean;
@@ -600,6 +536,7 @@ function StationCard({
     isCurrentlyOpen: boolean;
     onClick: () => void;
     onViewDetail: () => void;
+    onBook?: () => void;
     rank?: number;
 }) {
     const isActive = station.status === 'ACTIVE';
@@ -701,20 +638,33 @@ function StationCard({
                     </div>
                 )}
 
-                {/* CTA button */}
+                {/* CTA buttons */}
                 {isActive && totalAvail > 0 && (
-                    <button
-                        id={`book-station-${station.id}`}
-                        onClick={e => { e.stopPropagation(); onViewDetail(); }}
-                        className={`mt-3 ml-[52px] w-[calc(100%-52px)] flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-95
-                            ${isSelected
-                                ? 'bg-[#2563eb] text-white hover:bg-[#1d4ed8] shadow-sm'
-                                : 'bg-[#eff4ff] text-[#2563eb] hover:bg-[#e5eeff] border border-[#c3c6d7]'
-                            }`}
-                    >
-                        Xem chi tiết &amp; Đặt chỗ
-                        <ArrowRight className="w-4 h-4" />
-                    </button>
+                    <div className="mt-3 ml-[52px] w-[calc(100%-52px)] flex items-center gap-2">
+                        <button
+                            id={`book-station-${station.id}`}
+                            onClick={e => {
+                                e.stopPropagation();
+                                if (onBook) onBook();
+                                else onViewDetail();
+                            }}
+                            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-bold bg-[#2563eb] text-white hover:bg-[#1d4ed8] shadow-sm active:scale-95 transition-all cursor-pointer"
+                        >
+                            Đặt chỗ ngay
+                            <ArrowRight className="w-4 h-4" />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={e => {
+                                e.stopPropagation();
+                                onViewDetail();
+                            }}
+                            className="px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-[#eff4ff] text-[#2563eb] hover:bg-[#e5eeff] border border-[#c3c6d7] transition-all cursor-pointer shrink-0"
+                            title="Xem chi tiết trạm"
+                        >
+                            Chi tiết
+                        </button>
+                    </div>
                 )}
                 {isActive && totalAvail === 0 && (
                     <p className="mt-2 ml-[52px] text-xs text-[#94a3b8] text-center py-1">
@@ -727,7 +677,15 @@ function StationCard({
 }
 
 // ─── Map InfoWindow ────────────────────────────────────────────────────────────
-function MapInfoWindow({ station }: { station: Station }) {
+function MapInfoWindow({
+    station,
+    onBook,
+    onViewDetail
+}: {
+    station: Station;
+    onBook?: (s: Station) => void;
+    onViewDetail?: (s: Station) => void;
+}) {
     const isActive = station.status === 'ACTIVE';
     const totalAvail = (station.availableS ?? 0) + (station.availableM ?? 0) + (station.availableL ?? 0);
     const distLabel = station.distanceKm != null
@@ -780,10 +738,25 @@ function MapInfoWindow({ station }: { station: Station }) {
 
             {/* CTA */}
             {isActive && totalAvail > 0 && (
-                <button className="w-full py-2 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1.5">
-                    Giữ chỗ ngay
-                    <ArrowRight className="w-3.5 h-3.5" />
-                </button>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => {
+                            if (onBook) onBook(station);
+                            else onViewDetail?.(station);
+                        }}
+                        className="flex-1 py-2 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
+                    >
+                        Giữ chỗ ngay
+                        <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                        onClick={() => onViewDetail?.(station)}
+                        className="px-2.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-all cursor-pointer shrink-0"
+                        title="Xem chi tiết trạm"
+                    >
+                        Chi tiết
+                    </button>
+                </div>
             )}
             {isActive && totalAvail === 0 && (
                 <p className="text-xs text-center text-gray-400 py-1">Hết ô trống</p>
