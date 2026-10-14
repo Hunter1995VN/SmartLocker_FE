@@ -87,6 +87,7 @@ export interface BookingDto {
   qrPayload?: string;
   passcode?: string;
   durationHours?: number;
+  holdExpiresAt?: string;
 }
 
 /** Item gọn cho danh sách (GET /api/Bookings/my) */
@@ -101,6 +102,9 @@ export interface BookingListItemDto {
   status: string;
   startAt: string;
   endAt: string;
+  checkedInAt?: string;
+  checkedOutAt?: string;
+  holdExpiresAt?: string;
   baseAmount: number;
   isOverdue: boolean;
   createdAt: string;
@@ -202,5 +206,27 @@ export const payOverdueFee = async (
   id: string
 ): Promise<ApiResponse<CreateBookingResponse>> => {
   const response = await apiClient.post<ApiResponse<CreateBookingResponse>>(`/api/Bookings/${id}/pay-overdue`);
+  return response.data;
+};
+
+/**
+ * Check-in / Mở tủ nhận chỗ tại Kiosk (bắt đầu tính giờ đặt tủ)
+ * POST /api/Bookings/{id}/check-in
+ */
+export const checkInBooking = async (
+  id: string
+): Promise<ApiResponse<BookingDto>> => {
+  const response = await apiClient.post<ApiResponse<BookingDto>>(`/api/Bookings/${id}/check-in`);
+  return response.data;
+};
+
+/**
+ * Check-out / Mở tủ lấy đồ và hoàn tất lưu trữ
+ * POST /api/Bookings/{id}/check-out
+ */
+export const checkOutBooking = async (
+  id: string
+): Promise<ApiResponse<BookingDto>> => {
+  const response = await apiClient.post<ApiResponse<BookingDto>>(`/api/Bookings/${id}/check-out`);
   return response.data;
 };
