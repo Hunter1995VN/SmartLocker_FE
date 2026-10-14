@@ -16,10 +16,14 @@ import {
   FileText,
   PlusCircle,
   QrCode,
-  AlertTriangle
+  AlertTriangle,
+  Clock,
+  Sparkles,
+  CheckCircle2,
+  PackageCheck
 } from 'lucide-react';
 import { ExtendBookingModal } from '../components/booking/ExtendBookingModal';
-import { getBookingById, type BookingDto } from '../api/bookingService';
+import { getBookingById, checkInBooking, checkOutBooking, type BookingDto } from '../api/bookingService';
 import { QRCodeSVG } from 'qrcode.react';
 import CustomerHeader from '../components/layout/CustomerHeader';
 
@@ -94,32 +98,129 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
 
   const formatCurrency = (val: number) => new Intl.NumberFormat('vi-VN').format(val);
 
-  // Time calculations
-  const calculateTimeInfo = () => {
-    if (!booking) return { remainingText: '02h 15m remaining', progress: 35, startedText: '14:00 Today', expiresText: '17:00 Today' };
-    const now = new Date().getTime();
-    const start = new Date(booking.startAt).getTime();
-    const end = new Date(booking.endAt).getTime();
-    
-    const startedText = new Date(booking.startAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date(booking.startAt).toLocaleDateString('en-US');
-    const expiresText = new Date(booking.endAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date(booking.endAt).toLocaleDateString('en-US');
-    
-    if (now >= end) {
-      return { remainingText: '0m remaining', progress: 100, startedText, expiresText };
+  // Realtime tick timer every second so hold & storage countdown update live
+  const [, setClockTick] = useState<number>(0);
+  useEffect(() => {
+    const timer = setInterval(() => setClockTick(t => t + 1), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Check-in and check-out state & actions
+  const [isProcessingAction, setIsProcessingAction] = useState<boolean>(false);
+  const [actionFeedback, setActionFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  const handleKioskCheckIn = async () => {
+    const targetId = booking?.id || bookingId;
+    if (!targetId) return;
+    setIsProcessingAction(true);
+    setActionFeedback(null);
+    try {
+      const res = await checkInBooking(targetId);
+      if (res.success && res.data) {
+        setBooking(res.data);
+        setActionFeedback({
+          type: 'success',
+          message: `Nhận tủ thành công! Ô tủ ${res.data.lockerCode ? `[${res.data.lockerCode}]` : ''} đã được bung mở. Thời gian thuê (${res.data.durationHours || duration}h) bắt đầu tính từ bây giờ.`
+        });
+      } else {
+        setActionFeedback({
+          type: 'error',
+          message: res.message || 'Check-in thất bại. Vui lòng thử lại.'
+        });
+      }
+    } catch (err: any) {
+      setActionFeedback({
+        type: 'error',
+        message: err.response?.data?.message || 'Lỗi kết nối khi nhận tủ.'
+      });
+    } finally {
+      setIsProcessingAction(false);
     }
-    if (now <= start) {
-      return { remainingText: `${duration}h 0m remaining`, progress: 0, startedText, expiresText };
+  };
+
+  const handleKioskCheckOut = async () => {
+    const targetId = booking?.id || bookingId;
+    if (!targetId) return;
+    setIsProcessingAction(true);
+    setActionFeedback(null);
+    try {
+      const res = await checkOutBooking(targetId);
+      if (res.success && res.data) {
+        setBooking(res.data);
+        setActionFeedback({
+          type: 'success',
+          message: 'Trả tủ hoàn tất! Cảm ơn bạn đã sử dụng dịch vụ SmartLocker.'
+        });
+      } else {
+        setActionFeedback({
+          type: 'error',
+          message: res.message || 'Trả tủ thất bại. Vui lòng thử lại.'
+        });
+      }
+    } catch (err: any) {
+      setActionFeedback({
+        type: 'error',
+        message: err.response?.data?.message || 'Lỗi kết nối khi trả tủ.'
+      });
+    } finally {
+      setIsProcessingAction(false);
+    }
+  };
+
+  // Time calculations: 2 Giai đoạn (Hold 30 phút vs Lưu trữ thật)
+  const calculateTimeInfo = () => {
+    const now = new Date().getTime();
+
+    // 1. Giai đoạn HOLD (CONFIRMED - chưa nhận tủ)
+    if (status === 'CONFIRMED') {
+      const confirmedTime = booking?.createdAt ? new Date(booking.createdAt).getTime() : now;
+      const holdExpiresTime = booking?.holdExpiresAt 
+        ? new Date(booking.holdExpiresAt).getTime() 
+        : confirmedTime + 30 * 60 * 1000;
+      
+      const holdTotal = 30 * 60 * 1000;
+      const holdRemaining = Math.max(0, holdExpiresTime - now);
+      const holdElapsed = Math.min(holdTotal, Math.max(0, holdTotal - holdRemaining));
+      const holdProgress = Math.min(100, Math.max(0, (holdElapsed / holdTotal) * 100));
+
+      const minutes = Math.floor(holdRemaining / 60000);
+      const seconds = Math.floor((holdRemaining % 60000) / 1000);
+
+      const holdExpiresText = new Date(holdExpiresTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+      return {
+        isHoldPeriod: true,
+        remainingText: holdRemaining > 0 ? `${minutes}m ${seconds}s remaining` : 'Hold expired',
+        progress: holdProgress,
+        startedText: 'Booking confirmed',
+        expiresText: `Hold until ${holdExpiresText}`,
+        holdMinutes: minutes,
+      };
     }
 
-    const total = end - start;
-    const elapsed = now - start;
-    const remaining = end - now;
-    
+    // 2. Giai đoạn STORED / OTHER (Đã nhận tủ - tính theo CheckedInAt)
+    const startTime = booking?.checkedInAt 
+      ? new Date(booking.checkedInAt).getTime() 
+      : (booking?.startAt ? new Date(booking.startAt).getTime() : now);
+    const endTime = booking?.endAt ? new Date(booking.endAt).getTime() : startTime + duration * 3600000;
+
+    const startedText = new Date(startTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date(startTime).toLocaleDateString('en-US');
+    const expiresText = new Date(endTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date(endTime).toLocaleDateString('en-US');
+
+    if (now >= endTime) {
+      return { isHoldPeriod: false, remainingText: '0m remaining (Overdue)', progress: 100, startedText, expiresText };
+    }
+
+    const total = Math.max(1, endTime - startTime);
+    const elapsed = Math.max(0, now - startTime);
+    const remaining = Math.max(0, endTime - now);
+
     const hours = Math.floor(remaining / 3600000);
     const minutes = Math.floor((remaining % 3600000) / 60000);
     const progress = Math.min(100, Math.max(0, (elapsed / total) * 100));
 
     return { 
+      isHoldPeriod: false,
       remainingText: `${hours}h ${minutes}m remaining`, 
       progress, 
       startedText, 
@@ -127,7 +228,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
     };
   };
 
-  const { remainingText, progress, startedText, expiresText } = calculateTimeInfo();
+  const { isHoldPeriod, remainingText, progress, startedText, expiresText } = calculateTimeInfo();
 
   // Compartment layout helper
   const isTargetLocker = (code: string) => isLockerAssigned && Boolean(rawBayCode && (rawBayCode === code || rawBayCode.includes(code)));
@@ -239,12 +340,30 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2.5">
                 {/* Active Status Chip */}
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#ECFDF5] text-emerald-800 text-xs uppercase tracking-wider font-bold border border-emerald-200">
+                <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs uppercase tracking-wider font-bold border ${
+                  status === 'CONFIRMED' 
+                    ? 'bg-amber-50 text-amber-800 border-amber-300' 
+                    : status === 'STORED'
+                      ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                      : status === 'COMPLETED'
+                        ? 'bg-blue-50 text-blue-800 border-blue-300'
+                        : 'bg-slate-100 text-slate-800 border-slate-300'
+                }`}>
                   <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
+                    <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                      status === 'CONFIRMED' ? 'bg-amber-500' : 'bg-emerald-500'
+                    }`}></span>
+                    <span className={`relative inline-flex rounded-full h-2 w-2 ${
+                      status === 'CONFIRMED' ? 'bg-amber-600' : 'bg-emerald-600'
+                    }`}></span>
                   </span>
-                  <span>{status.replace('_', ' ')}</span>
+                  <span>
+                    {status === 'CONFIRMED' 
+                      ? 'ĐANG GIỮ CHỖ (30M HOLD)' 
+                      : status === 'STORED'
+                        ? 'ĐANG GỬI ĐỒ (STORED)'
+                        : status.replace('_', ' ')}
+                  </span>
                 </div>
                 {/* Booking Reference ID Badge */}
                 <span className="px-2.5 py-0.5 rounded-md bg-[#e5eeff] text-xs text-secondary font-mono font-bold">ID: #{orderId}</span>
@@ -377,30 +496,137 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                 <p className="text-center text-xs text-[#434655]">Tap &quot;Unlock Locker&quot; on the terminal screen, then type this code.</p>
               </div>
 
-              {/* Section C: Rental Time Remaining & Countdown */}
-              <div className="mt-8 bg-[#eff4ff]/70 rounded-xl p-5 border border-outline-variant/30 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Timer className="w-5 h-5 text-primary" />
-                    <span className="text-sm font-bold text-[#0b1c30]">Remaining Duration</span>
+              {/* Action Feedback Toast / Banner */}
+              {actionFeedback && (
+                <div className={`mt-4 p-4 rounded-xl flex items-start gap-3 border shadow-xs animate-in fade-in duration-200 ${
+                  actionFeedback.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-red-50 border-red-200 text-red-900'
+                }`}>
+                  {actionFeedback.type === 'success' ? (
+                    <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                  ) : (
+                    <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+                  )}
+                  <div className="text-xs font-semibold flex-1 leading-relaxed">
+                    {actionFeedback.message}
                   </div>
-                  <span className="text-lg font-bold text-primary">{remainingText}</span>
                 </div>
+              )}
+
+              {/* Section C: 2-Phase Timing Engine (Hold vs Active Rental) */}
+              <div className={`mt-6 rounded-2xl p-5 border space-y-4 transition-all duration-300 ${
+                isHoldPeriod 
+                  ? 'bg-amber-50/70 border-amber-200/80 shadow-xs' 
+                  : status === 'COMPLETED'
+                    ? 'bg-emerald-50/70 border-emerald-200 shadow-xs'
+                    : 'bg-[#eff4ff]/80 border-blue-200/80 shadow-xs'
+              }`}>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    {isHoldPeriod ? (
+                      <Clock className="w-5 h-5 text-amber-600 animate-pulse" />
+                    ) : (
+                      <Timer className="w-5 h-5 text-primary" />
+                    )}
+                    <div>
+                      <span className="text-sm font-bold text-[#0b1c30]">
+                        {isHoldPeriod 
+                          ? 'Thời gian giữ chỗ tủ (30 phút để đến trạm)' 
+                          : status === 'COMPLETED'
+                            ? 'Lượt thuê tủ đã hoàn tất'
+                            : 'Thời gian lưu trữ còn lại'}
+                      </span>
+                      {isHoldPeriod && (
+                        <p className="text-[11px] text-amber-800 font-medium">Giờ thuê thực tế chỉ bắt đầu tính khi bạn mở tủ tại trạm</p>
+                      )}
+                    </div>
+                  </div>
+                  <span className={`text-lg font-bold font-mono ${isHoldPeriod ? 'text-amber-700' : 'text-primary'}`}>
+                    {status === 'COMPLETED' ? '00:00:00' : remainingText}
+                  </span>
+                </div>
+
                 {/* Progress bar */}
                 <div className="space-y-1.5">
-                  <div className="w-full bg-[#d3e4fe] rounded-full h-2.5 overflow-hidden">
-                    <div className="bg-primary h-2.5 rounded-full transition-all duration-500" style={{ width: `${progress}%` }}></div>
+                  <div className="w-full bg-slate-200/80 rounded-full h-2.5 overflow-hidden">
+                    <div 
+                      className={`h-2.5 rounded-full transition-all duration-500 ${
+                        isHoldPeriod 
+                          ? 'bg-amber-500' 
+                          : status === 'COMPLETED' 
+                            ? 'bg-emerald-500' 
+                            : 'bg-primary'
+                      }`} 
+                      style={{ width: `${progress}%` }}
+                    ></div>
                   </div>
-                  <div className="flex justify-between text-xs text-secondary">
-                    <span>Started: {startedText}</span>
-                    <span>Expires: {expiresText}</span>
+                  <div className="flex justify-between text-xs text-secondary font-medium">
+                    <span>{startedText}</span>
+                    <span>{expiresText}</span>
                   </div>
                 </div>
-                {/* Grace Note Callout */}
-                <div className="flex items-start gap-2 pt-2 text-xs text-[#434655] border-t border-outline-variant/20">
-                  <Info className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
-                  <span><strong>Grace period applies</strong>. Overdue fee of 15,000 VND per 30 minutes applies automatically after the grace period expires.</span>
-                </div>
+
+                {/* Explanatory callouts & Live action triggers */}
+                {isHoldPeriod && (
+                  <div className="pt-2 border-t border-amber-200/60 space-y-3">
+                    <div className="flex items-start gap-2 text-xs text-amber-900 leading-relaxed bg-white/70 p-3 rounded-xl border border-amber-200/50">
+                      <Info className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
+                      <span>
+                        Hệ thống đang giữ chỗ ô tủ ({size === 'S' ? 'Size S' : size === 'M' ? 'Size M' : 'Size L'}) cho bạn. 
+                        Thời gian đặt thuê <strong>{duration} tiếng</strong> chỉ được bắt đầu đếm khi bạn có mặt tại trạm và mở tủ.
+                      </span>
+                    </div>
+
+                    {/* Kiosk Check-in trigger */}
+                    <button
+                      onClick={handleKioskCheckIn}
+                      disabled={isProcessingAction}
+                      className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-bold text-xs sm:text-sm shadow-md shadow-blue-500/20 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.99] disabled:opacity-60"
+                    >
+                      {isProcessingAction ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <span>Đang kết nối Kiosk & Cấp tủ...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-4 h-4 text-amber-300" />
+                          <span>Tôi đã tới trạm — Mở tủ & Bắt đầu tính giờ</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
+
+                {status === 'STORED' && (
+                  <div className="pt-2 border-t border-blue-200/60 space-y-3">
+                    <div className="flex items-start gap-2 text-xs text-[#434655] leading-relaxed">
+                      <Info className="w-4 h-4 text-blue-600 mt-0.5 shrink-0" />
+                      <span>
+                        Thời gian thuê đang được tính từ khoảnh khắc bạn check-in lúc {startedText}. 
+                        Gia hạn thêm giờ bất cứ lúc nào trước khi hết hạn.
+                      </span>
+                    </div>
+
+                    {/* Kiosk Check-out trigger */}
+                    <button
+                      onClick={handleKioskCheckOut}
+                      disabled={isProcessingAction}
+                      className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs sm:text-sm shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.99] disabled:opacity-60"
+                    >
+                      {isProcessingAction ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <span>Đang kết nối Kiosk mở tủ...</span>
+                        </>
+                      ) : (
+                        <>
+                          <PackageCheck className="w-4 h-4" />
+                          <span>Mở tủ lấy đồ (Hoàn tất trả tủ)</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Section 4: Offline Availability Guarantee Badge */}

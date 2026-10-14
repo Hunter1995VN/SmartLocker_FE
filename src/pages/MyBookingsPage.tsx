@@ -212,9 +212,17 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                   <div className="flex flex-col md:flex-row md:items-center justify-between pb-5 border-b border-outline-variant/30 gap-3">
                     <div className="flex items-center flex-wrap gap-3">
                       {/* Status Badge */}
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs uppercase font-bold">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        {booking.status.replace('_', ' ')}
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs uppercase font-bold border ${
+                        booking.status === 'CONFIRMED'
+                          ? 'bg-amber-50 border-amber-300 text-amber-800'
+                          : booking.status === 'STORED'
+                            ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
+                            : 'bg-slate-50 border-slate-200 text-slate-700'
+                      }`}>
+                        <span className={`w-2 h-2 rounded-full animate-pulse ${
+                          booking.status === 'CONFIRMED' ? 'bg-amber-500' : 'bg-emerald-500'
+                        }`}></span>
+                        {booking.status === 'CONFIRMED' ? 'ĐANG GIỮ CHỖ (30M HOLD)' : booking.status === 'STORED' ? 'ĐANG GỬI ĐỒ' : booking.status.replace('_', ' ')}
                       </span>
                       <div className="h-4 w-px bg-slate-200 hidden sm:block"></div>
                       {/* Compartment Details */}
@@ -261,23 +269,49 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                     {/* Column 2: Storage Timeline & Remaining Countdown (4 cols) */}
                     <div className="md:col-span-4 space-y-3 md:border-l md:border-r border-outline-variant/30 md:px-5">
                       <div className="flex items-center justify-between">
-                        <p className="text-[11px] uppercase tracking-wider text-secondary font-bold">Session Timeline</p>
-                        <span className="text-xs text-primary-container font-bold bg-blue-50 px-2 py-0.5 rounded">
-                          {booking.isOverdue ? 'OVERDUE' : 'ACTIVE'}
+                        <p className="text-[11px] uppercase tracking-wider text-secondary font-bold">
+                          {booking.status === 'CONFIRMED' ? 'Hold Reservation' : 'Session Timeline'}
+                        </p>
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded ${
+                          booking.status === 'CONFIRMED'
+                            ? 'text-amber-800 bg-amber-100'
+                            : booking.isOverdue 
+                              ? 'text-rose-700 bg-rose-50' 
+                              : 'text-primary-container bg-blue-50'
+                        }`}>
+                          {booking.status === 'CONFIRMED' ? '30M HOLD WINDOW' : (booking.isOverdue ? 'OVERDUE' : 'ACTIVE')}
                         </span>
                       </div>
                       <div>
-                        <p className="text-sm text-slate-900 font-semibold">{new Date(booking.startAt).toLocaleString('vi-VN')} – {new Date(booking.endAt).toLocaleString('vi-VN')}</p>
-                        <p className="text-xs text-secondary">{booking.durationHours} Hours Scheduled</p>
+                        {booking.status === 'CONFIRMED' ? (
+                          <p className="text-xs text-amber-900 font-medium leading-relaxed bg-amber-50/80 p-2 rounded-lg border border-amber-200">
+                            Đang giữ chỗ tủ. Thời gian thuê <strong>{booking.durationHours || 1}h</strong> chỉ bắt đầu tính khi bạn quét QR mở tủ tại trạm.
+                          </p>
+                        ) : (
+                          <>
+                            <p className="text-sm text-slate-900 font-semibold">
+                              {new Date(booking.checkedInAt || booking.startAt).toLocaleString('vi-VN')} – {new Date(booking.endAt).toLocaleString('vi-VN')}
+                            </p>
+                            <p className="text-xs text-secondary">{booking.durationHours} Hours Storage</p>
+                          </>
+                        )}
                       </div>
                       {/* Visual Progress Bar */}
                       <div className="space-y-1.5">
                         <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                          <div className={`h-full rounded-full transition-all duration-500 ${booking.isOverdue ? 'bg-rose-500' : 'bg-primary-container'}`} style={{ width: `${progress}%` }}></div>
+                          <div className={`h-full rounded-full transition-all duration-500 ${
+                            booking.status === 'CONFIRMED'
+                              ? 'bg-amber-500'
+                              : booking.isOverdue 
+                                ? 'bg-rose-500' 
+                                : 'bg-primary-container'
+                          }`} style={{ width: `${progress}%` }}></div>
                         </div>
                         <div className="flex justify-between text-xs text-slate-500">
-                          <span>Start: {new Date(booking.startAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</span>
-                          <span className="text-amber-700 font-semibold">End: {new Date(booking.endAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</span>
+                          <span>{booking.status === 'CONFIRMED' ? 'Start: Đã xác nhận' : `Bắt đầu: ${new Date(booking.checkedInAt || booking.startAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`}</span>
+                          <span className={booking.status === 'CONFIRMED' ? 'text-amber-700 font-semibold' : 'text-blue-700 font-semibold'}>
+                            {booking.status === 'CONFIRMED' ? '30m Giữ chỗ' : `Hết hạn: ${new Date(booking.endAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`}
+                          </span>
                         </div>
                       </div>
                     </div>

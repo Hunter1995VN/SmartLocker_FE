@@ -574,37 +574,40 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
               </div>
 
               {/* Visual Storage Schedule Timeline Banner */}
-              <div className="mt-6 bg-slate-50 border border-slate-200 rounded-xl p-4 sm:p-5">
+              <div className="mt-6 bg-blue-50/50 border border-blue-200/80 rounded-xl p-4 sm:p-5 space-y-3.5">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 rounded-full bg-emerald-500 shrink-0"></div>
+                    <div className="w-3.5 h-3.5 rounded-full bg-amber-500 shrink-0 ring-4 ring-amber-100"></div>
                     <div>
-                      <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Start Deposit</p>
+                      <p className="text-[11px] font-bold text-amber-800 uppercase tracking-wider">Free Hold Window</p>
                       <p className="text-sm font-extrabold text-[#0F172A]">
-                        {bookingMode === 'NOW' ? `Right Now (${formatTimeStr(startDateObj)})` : `${dropOffTime} (${displayStorageDate})`}
+                        30 Minutes to Arrive
                       </p>
                     </div>
                   </div>
 
-                  <div className="hidden sm:flex items-center gap-2 text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100 shrink-0">
-                    <Timer className="w-3.5 h-3.5" />
+                  <div className="flex items-center gap-2 text-xs font-bold text-blue-700 bg-white px-3.5 py-1.5 rounded-full border border-blue-200 shadow-xs shrink-0">
+                    <Timer className="w-3.5 h-3.5 text-blue-600" />
                     <span>Duration: {selectedDuration} {selectedDuration === 1 ? 'Hour' : 'Hours'}</span>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 rounded-full bg-rose-500 shrink-0"></div>
+                    <div className="w-3.5 h-3.5 rounded-full bg-emerald-500 shrink-0 ring-4 ring-emerald-100"></div>
                     <div>
-                      <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Pick-up Deadline</p>
+                      <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Storage Count</p>
                       <p className="text-sm font-extrabold text-[#0F172A]">
-                        {pickUpDisplay}
+                        Starts at Kiosk Check-in
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-3 pt-3 border-t border-slate-200/60 flex items-start text-xs text-slate-500">
-                  <Info className="w-3.5 h-3.5 mr-1.5 mt-0.5 shrink-0 text-blue-600" />
-                  <span>You can pick up your luggage anytime before the deadline. If needed, extension is available 24/7 on this app.</span>
+                <div className="pt-3 border-t border-blue-200/60 flex items-start text-xs text-blue-900 leading-relaxed bg-white/80 p-3 rounded-xl border border-blue-100">
+                  <Info className="w-4 h-4 mr-2 mt-0.5 shrink-0 text-blue-600" />
+                  <span>
+                    <strong>Chính sách giữ tủ mới:</strong> Bạn có 30 phút giữ tủ miễn phí sau khi thanh toán để di chuyển đến trạm. 
+                    Thời gian thuê <strong>{selectedDuration} tiếng</strong> chỉ chính thức bắt đầu đếm ngược từ lúc bạn quét mã QR/nhập PIN mở tủ tại trạm.
+                  </span>
                 </div>
               </div>
             </section>
