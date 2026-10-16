@@ -7,13 +7,14 @@ import {
   QrCode,
   Copy,
   Lock,
-  Check
+  Check,
+  Loader2
 } from 'lucide-react';
 
 interface ExtendBookingModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (addedHours: number, amount: number) => void;
+  onSuccess: (addedHours: number, amount: number) => Promise<void> | void;
   lockerCode?: string;
   stationName?: string;
   currentEndTime?: string;
@@ -29,8 +30,19 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
 }) => {
   const [selectedHours, setSelectedHours] = useState<number>(3);
   const [copied, setCopied] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   if (!isOpen) return null;
+
+  const handleConfirm = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      await onSuccess(selectedHours, currentPrice);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const getPrice = (hours: number) => {
     switch (hours) {
@@ -276,16 +288,31 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
         <div className="px-6 py-4 bg-[#eff4ff]/60 border-t border-outline-variant/30 flex items-center justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-5 py-2.5 rounded-xl border border-outline-variant bg-white text-[#0b1c30] text-xs font-semibold hover:bg-[#eff4ff] transition-colors cursor-pointer"
+            disabled={isSubmitting}
+            className="px-5 py-2.5 rounded-xl border border-outline-variant bg-white text-[#0b1c30] text-xs font-semibold hover:bg-[#eff4ff] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancel
           </button>
           <button
-            onClick={() => onSuccess(selectedHours, currentPrice)}
-            className="px-6 py-2.5 rounded-xl bg-primary-container text-white text-xs font-bold hover:bg-blue-700 shadow-sm transition-all active:scale-[0.98] flex items-center gap-2 cursor-pointer"
+            onClick={handleConfirm}
+            disabled={isSubmitting}
+            className={`px-6 py-2.5 rounded-xl bg-primary-container text-white text-xs font-bold shadow-sm transition-all flex items-center gap-2 ${
+              isSubmitting
+                ? 'opacity-70 cursor-not-allowed'
+                : 'hover:bg-blue-700 active:scale-[0.98] cursor-pointer'
+            }`}
           >
-            <Lock className="w-4 h-4" />
-            <span>Confirm &amp; Pay Extension ({formatCurrency(currentPrice)} VND)</span>
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Đang xử lý giao dịch...</span>
+              </>
+            ) : (
+              <>
+                <Lock className="w-4 h-4" />
+                <span>Confirm &amp; Pay Extension ({formatCurrency(currentPrice)} VND)</span>
+              </>
+            )}
           </button>
         </div>
       </div>

@@ -23,7 +23,7 @@ import {
   PackageCheck
 } from 'lucide-react';
 import { ExtendBookingModal } from '../components/booking/ExtendBookingModal';
-import { getBookingById, checkInBooking, checkOutBooking, type BookingDto } from '../api/bookingService';
+import { getBookingById, checkInBooking, checkOutBooking, extendBooking, type BookingDto } from '../api/bookingService';
 import { QRCodeSVG } from 'qrcode.react';
 import CustomerHeader from '../components/layout/CustomerHeader';
 
@@ -821,13 +821,30 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
       <ExtendBookingModal
         isOpen={showExtendModal}
         onClose={() => setShowExtendModal(false)}
-        onSuccess={(addedHours, fee) => {
-          setShowExtendModal(false);
-          setExtendSuccessToast(`Successfully extended +${addedHours} hour(s) (${new Intl.NumberFormat('en-US').format(fee)} VND). Passcode updated.`);
-          setTimeout(() => {
-            setExtendSuccessToast(null);
-          }, 4000);
-          // Optional: we can reload the booking details here if needed, but typically window will redirect to payment
+        onSuccess={async (addedHours, _fee) => {
+          if (!bookingId) {
+            setShowExtendModal(false);
+            return;
+          }
+          try {
+            const currentEnd = booking?.endAt ? new Date(booking.endAt) : new Date();
+            const newEndAt = new Date(currentEnd.getTime() + addedHours * 3600000).toISOString();
+            const res = await extendBooking(bookingId, { newEndAt });
+            if (res.success && res.data?.paymentUrl) {
+              window.open(res.data.paymentUrl, '_blank');
+              setExtendSuccessToast(`Đang chuyển hướng thanh toán gia hạn +${addedHours} giờ...`);
+            } else {
+              setExtendSuccessToast(res.message || 'Gia hạn thành công.');
+            }
+            setShowExtendModal(false);
+            const refreshRes = await getBookingById(bookingId);
+            if (refreshRes.success && refreshRes.data) setBooking(refreshRes.data);
+            setTimeout(() => {
+              setExtendSuccessToast(null);
+            }, 4000);
+          } catch (error) {
+            setExtendSuccessToast('Có lỗi xảy ra khi gia hạn đơn hàng.');
+          }
         }}
         lockerCode={bayCode}
         stationName={stationName}
