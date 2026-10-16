@@ -8,8 +8,9 @@ import type { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axio
  */
 
 // Cho dev: backend chạy trên cổng 5000 (mặc định của ASP.NET Core)
-// Frontend ở port 5173/5174 → Gọi qua proxy hoặc URL trực tiếp
-const API_BASE_URL = (import.meta.env.VITE_API_URL as string) || 'http://localhost:5000';
+// Cho prod (Vercel): tự động trỏ đến Backend MonsterASP
+const API_BASE_URL = (import.meta.env.VITE_API_URL as string) ||
+    (import.meta.env.PROD ? 'https://smartlocker-api.runasp.net' : 'http://localhost:5000');
 
 const apiClient: AxiosInstance = axios.create({
     baseURL: API_BASE_URL,
