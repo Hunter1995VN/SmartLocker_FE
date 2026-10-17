@@ -38,6 +38,7 @@ export interface CreateBookingResponse {
   accountNumber?: string;
   accountName?: string;
   bin?: string;
+  orderCode?: number;
 }
 
 export interface PaymentDto {
@@ -228,5 +229,16 @@ export const checkOutBooking = async (
   id: string
 ): Promise<ApiResponse<BookingDto>> => {
   const response = await apiClient.post<ApiResponse<BookingDto>>(`/api/Bookings/${id}/check-out`);
+  return response.data;
+};
+
+/**
+ * Chủ động đối soát & kích hoạt thanh toán từ PayOS
+ * POST /api/payments/sync/{orderCode}
+ */
+export const syncPayment = async (
+  orderCode: number | string
+): Promise<ApiResponse<any>> => {
+  const response = await apiClient.post<ApiResponse<any>>(`/api/payments/sync/${orderCode}`);
   return response.data;
 };

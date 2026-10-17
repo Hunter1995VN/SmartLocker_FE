@@ -1110,6 +1110,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                               accountNumber: res.data.accountNumber,
                               accountName: res.data.accountName,
                               bin: res.data.bin,
+                              orderCode: res.data.orderCode,
                             }
                           });
                         } else {

@@ -20,7 +20,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
-import { getBookingById } from '../api/bookingService';
+import { getBookingById, syncPayment } from '../api/bookingService';
 import CustomerHeader from '../components/layout/CustomerHeader';
 
 interface BookingPaymentPageProps {
@@ -39,6 +39,7 @@ interface BookingPaymentPageProps {
     paymentUrl?: string;
     bookingId?: string;
     bookingCode?: string;
+    orderCode?: number;
     paymentExpiresAt?: string;
     qrCode?: string;
     accountNumber?: string;
@@ -187,6 +188,11 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
     return () => clearInterval(interval);
   }, [bookingData?.bookingId]);
 
+  // Lấy orderCode dạng số từ bookingData hoặc URL param nếu có
+  const searchParams = new URLSearchParams(window.location.search);
+  const urlOrderCode = searchParams.get('orderCode');
+  const payosNumericOrderCode = bookingData?.orderCode || (urlOrderCode ? Number(urlOrderCode) : undefined);
+
   // Hàm kiểm tra thanh toán ngay khi người dùng bấm nút
   const handleCheckPaymentNow = async () => {
     if (!bookingData?.bookingId) {
@@ -195,6 +201,16 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
     }
     setIsCheckingStatus(true);
     try {
+      // 1. Nếu có orderCode số, chủ động gọi syncPayment đối soát với PayOS
+      if (payosNumericOrderCode) {
+        try {
+          await syncPayment(payosNumericOrderCode);
+        } catch (syncErr) {
+          console.warn('Sync payment warning:', syncErr);
+        }
+      }
+
+      // 2. Lấy thông tin đơn hàng (Backend cũng tự động đối soát với PayOS nếu đang PENDING)
       const res = await getBookingById(bookingData.bookingId);
       if (res.success && res.data) {
         if (res.data.status === 'CONFIRMED' || res.data.status === 'STORED' || res.data.status === 'CHECKED_IN') {
@@ -215,6 +231,16 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
       setIsCheckingStatus(false);
     }
   };
+
+  // Tự động kiểm tra ngay khi mở trang nếu phát hiện redirect từ PayOS thành công
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    const status = params.get('status');
+    if (code === '00' || status === 'PAID') {
+      handleCheckPaymentNow();
+    }
+  }, [bookingData?.bookingId]);
 
   const handleOpenPayOS = () => {
     if (bookingData?.paymentUrl) {
