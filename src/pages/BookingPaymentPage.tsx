@@ -20,7 +20,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
-import { getBookingById } from '../api/bookingService';
+import { getBookingById, syncPayment } from '../api/bookingService';
 import CustomerHeader from '../components/layout/CustomerHeader';
 
 interface BookingPaymentPageProps {
@@ -39,6 +39,7 @@ interface BookingPaymentPageProps {
     paymentUrl?: string;
     bookingId?: string;
     bookingCode?: string;
+    orderCode?: number;
     paymentExpiresAt?: string;
     qrCode?: string;
     accountNumber?: string;
@@ -187,6 +188,11 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
     return () => clearInterval(interval);
   }, [bookingData?.bookingId]);
 
+  // Lấy orderCode dạng số từ bookingData hoặc URL param nếu có
+  const searchParams = new URLSearchParams(window.location.search);
+  const urlOrderCode = searchParams.get('orderCode');
+  const payosNumericOrderCode = bookingData?.orderCode || (urlOrderCode ? Number(urlOrderCode) : undefined);
+
   // Hàm kiểm tra thanh toán ngay khi người dùng bấm nút
   const handleCheckPaymentNow = async () => {
     if (!bookingData?.bookingId) {
@@ -195,6 +201,16 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
     }
     setIsCheckingStatus(true);
     try {
+      // 1. Nếu có orderCode số, chủ động gọi syncPayment đối soát với PayOS
+      if (payosNumericOrderCode) {
+        try {
+          await syncPayment(payosNumericOrderCode);
+        } catch (syncErr) {
+          console.warn('Sync payment warning:', syncErr);
+        }
+      }
+
+      // 2. Lấy thông tin đơn hàng (Backend cũng tự động đối soát với PayOS nếu đang PENDING)
       const res = await getBookingById(bookingData.bookingId);
       if (res.success && res.data) {
         if (res.data.status === 'CONFIRMED' || res.data.status === 'STORED' || res.data.status === 'CHECKED_IN') {
@@ -215,6 +231,16 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
       setIsCheckingStatus(false);
     }
   };
+
+  // Tự động kiểm tra ngay khi mở trang nếu phát hiện redirect từ PayOS thành công
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    const status = params.get('status');
+    if (code === '00' || status === 'PAID') {
+      handleCheckPaymentNow();
+    }
+  }, [bookingData?.bookingId]);
 
   const handleOpenPayOS = () => {
     if (bookingData?.paymentUrl) {
@@ -405,7 +431,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                 <div className="bg-blue-50/80 border border-blue-200 rounded-xl p-3 flex items-start gap-2.5">
                   <Info className="text-blue-600 w-4 h-4 mt-0.5 shrink-0" />
                   <p className="text-xs text-blue-900 leading-relaxed">
-                    Sau khi chuyển khoản thành công, hệ thống sẽ tự động gán vị trí ô tủ (ví dụ: <strong>M-04</strong>) và cấp mã PIN mở tủ ngay trên màn hình.
+                    Sau khi thanh toán thành công, hệ thống sẽ <strong>giữ chỗ tủ cho bạn trong 30 phút</strong> để bạn di chuyển đến trạm. Thời gian thuê <strong>{duration} giờ</strong> chỉ bắt đầu tính từ lúc bạn mở tủ tại trạm.
                   </p>
                 </div>
               </div>
@@ -684,11 +710,10 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                   {successData?.accessCode || '729 416'}
                 </span>
               </div>
-              {!successData?.lockerCode && (
-                <p className="text-[11px] text-blue-800/80 pt-1 border-t border-blue-200/60 leading-relaxed">
-                  ℹ️ Trạm Kiosk sẽ tự động gán ô tủ và bật mở cửa khi bạn quét mã check-in tại trạm.
-                </p>
-              )}
+              <div className="pt-2 border-t border-blue-200/60 space-y-1 text-[11px] text-blue-900 leading-relaxed">
+                <p>⏱️ <strong>Giữ chỗ 30 phút:</strong> Bạn có 30 phút để đến trạm nhận tủ.</p>
+                <p>🔒 <strong>Tính giờ:</strong> Thời gian thuê <strong>{duration} tiếng</strong> chỉ bắt đầu đếm khi bạn quét mã QR/nhập PIN mở tủ tại trạm.</p>
+              </div>
             </div>
 
             <p className="text-xs text-slate-500 mb-5">
