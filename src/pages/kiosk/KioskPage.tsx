@@ -64,6 +64,13 @@ export default function KioskPage() {
   const [activeDoorState, setActiveDoorState] = useState<string>('OPEN');
   const [overdueFee, setOverdueFee] = useState<number>(0);
 
+  const activeLockerIdRef = useRef<string>('');
+  const activeLockerCodeRef = useRef<string>('');
+  useEffect(() => {
+    activeLockerIdRef.current = activeLockerId;
+    activeLockerCodeRef.current = activeLockerCode;
+  }, [activeLockerId, activeLockerCode]);
+
   // Status & error
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -106,8 +113,10 @@ export default function KioskPage() {
       if (list.length > 0) {
         setAllStations(list);
         if (!stationId || !list.some(s => s.id === stationId)) {
-          setStationId(list[0].id);
-          localStorage.setItem('kiosk_station_id', list[0].id);
+          const iotStation = list.find(s => s.id === '22222222-2222-2222-2222-222222222222' || s.name.toLowerCase().includes('bến thành'));
+          const selected = iotStation ? iotStation.id : list[0].id;
+          setStationId(selected);
+          localStorage.setItem('kiosk_station_id', selected);
         }
       }
     }).catch((err) => {
@@ -129,7 +138,9 @@ export default function KioskPage() {
     kioskSignalR.connect(
       stationId,
       (event) => {
-        if (event.lockerId === activeLockerId || event.lockerCode === activeLockerCode) {
+        const curId = activeLockerIdRef.current || activeLockerId;
+        const curCode = activeLockerCodeRef.current || activeLockerCode;
+        if ((curId && event.lockerId === curId) || (curCode && event.lockerCode === curCode)) {
           setActiveDoorState(event.doorState);
           if (event.doorState === 'CLOSED') {
             if (soundEnabled) sounds.playUnlockSuccess();
@@ -140,7 +151,9 @@ export default function KioskPage() {
         }
       },
       (event) => {
-        if (event.lockerId === activeLockerId || event.lockerCode === activeLockerCode) {
+        const curId = activeLockerIdRef.current || activeLockerId;
+        const curCode = activeLockerCodeRef.current || activeLockerCode;
+        if ((curId && event.lockerId === curId) || (curCode && event.lockerCode === curCode)) {
           setActiveDoorState('OPEN');
           if (soundEnabled) sounds.playUnlockSuccess();
         }
@@ -401,10 +414,25 @@ export default function KioskPage() {
           
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-black tracking-tight uppercase">
-                {stationStatus?.stationName || allStations.find(s => s.id === stationId)?.name || 'SMARTLOCKER TERMINAL'}
-              </span>
-              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <select
+                value={stationId}
+                onChange={(e) => {
+                  const newId = e.target.value;
+                  setStationId(newId);
+                  localStorage.setItem('kiosk_station_id', newId);
+                }}
+                className={`text-sm font-black tracking-tight uppercase bg-transparent border-0 outline-none cursor-pointer max-w-[240px] md:max-w-[320px] truncate ${
+                  outdoorMode ? 'text-slate-900' : 'text-slate-100'
+                }`}
+                title="Nhấn để chọn trạm phục vụ"
+              >
+                {allStations.map((st) => (
+                  <option key={st.id} value={st.id} className="text-slate-900 bg-white">
+                    {st.name}
+                  </option>
+                ))}
+              </select>
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Trạng thái kết nối sẵn sàng"></span>
             </div>
             
             <div className="text-xs text-slate-500 dark:text-slate-400">

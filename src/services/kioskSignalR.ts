@@ -5,12 +5,17 @@ const API_BASE_URL = (import.meta.env.VITE_API_URL as string) || 'http://localho
 class KioskSignalRService {
   private connection: signalR.HubConnection | null = null;
   private currentStationId: string | null = null;
+  private onDoorChangedCallback: ((event: { stationId: string; lockerId: string; lockerCode: string; doorState: string; occurredAt: string }) => void) | null = null;
+  private onUnlockedCallback: ((event: { stationId: string; lockerId: string; lockerCode: string; timestamp: string }) => void) | null = null;
 
   async connect(
     stationId: string,
     onDoorChanged: (event: { stationId: string; lockerId: string; lockerCode: string; doorState: string; occurredAt: string }) => void,
     onUnlocked: (event: { stationId: string; lockerId: string; lockerCode: string; timestamp: string }) => void
   ) {
+    this.onDoorChangedCallback = onDoorChanged;
+    this.onUnlockedCallback = onUnlocked;
+
     if (this.connection && this.currentStationId === stationId) {
       return;
     }
@@ -30,8 +35,12 @@ class KioskSignalRService {
       .configureLogging(signalR.LogLevel.Warning)
       .build();
 
-    this.connection.on('DoorStatusChanged', onDoorChanged);
-    this.connection.on('LockerUnlocked', onUnlocked);
+    this.connection.on('DoorStatusChanged', (event) => {
+      this.onDoorChangedCallback?.(event);
+    });
+    this.connection.on('LockerUnlocked', (event) => {
+      this.onUnlockedCallback?.(event);
+    });
 
     try {
       await this.connection.start();
