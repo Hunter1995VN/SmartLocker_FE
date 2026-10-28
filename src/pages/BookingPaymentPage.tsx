@@ -183,7 +183,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
       } catch (error) {
         console.error('Polling payment error:', error);
       }
-    }, 5000);
+    }, 1500);
 
     return () => clearInterval(interval);
   }, [bookingData?.bookingId]);
