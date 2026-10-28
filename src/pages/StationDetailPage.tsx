@@ -388,7 +388,7 @@ export default function StationDetailPage({ station, onBack, onLogout, onNavigat
                                                 <div className="mt-4 flex flex-col gap-1.5">
                                                     <div className="flex items-baseline justify-between">
                                                         <span className={`text-4xl font-bold ${c.color}`}>
-                                                            {a}
+                                                            {Math.min(t ?? 0, a ?? 0)}
                                                             <span className="text-sm text-[#737686] font-normal ml-1">/ {t} trống</span>
                                                         </span>
                                                         <span className="text-base font-bold text-[#2563eb]">

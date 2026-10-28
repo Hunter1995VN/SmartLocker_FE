@@ -627,7 +627,7 @@ function StationCard({
                                         {isFilteredSize ? `${label} (đã chọn)` : isEmpty ? `${label}: Hết ô` : label}
                                     </span>
                                     <span className={`text-lg font-bold leading-tight mt-0.5 ${isFilteredSize ? 'text-white' : isEmpty ? 'text-red-400' : 'text-[#0b1c30]'}`}>
-                                        {avail}
+                                        {Math.min(total ?? 0, avail ?? 0)}
                                     </span>
                                     <span className={`text-[10px] ${isFilteredSize ? 'text-white/70' : 'text-[#94a3b8]'}`}>
                                         / {total} trống
