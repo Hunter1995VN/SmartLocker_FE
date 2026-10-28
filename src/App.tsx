@@ -17,9 +17,10 @@ import BookingDetailPage from './pages/BookingDetailPage';
 import MyBookingsPage from './pages/MyBookingsPage';
 import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminPortalPage from './pages/admin/AdminPortalPage';
+import KioskPage from './pages/kiosk/KioskPage';
 
 /** Các trang có trong hệ thống */
-type Page = 'home' | 'login' | 'register' | 'verify-otp' | 'forgot-password' | 'dashboard' | 'map' | 'find-station' | 'station-booking' | 'booking-payment' | 'booking-detail' | 'my-bookings' | 'admin-login' | 'admin';
+type Page = 'home' | 'login' | 'register' | 'verify-otp' | 'forgot-password' | 'dashboard' | 'map' | 'find-station' | 'station-booking' | 'booking-payment' | 'booking-detail' | 'my-bookings' | 'admin-login' | 'admin' | 'kiosk';
 
 /** Dữ liệu truyền giữa các trang (ví dụ email khi chuyển register → verify-otp) */
 interface PageData {
@@ -55,6 +56,7 @@ const pathToPage = (pathname: string): Page => {
         case 'booking-payment': return 'booking-payment';
         case 'booking-detail': return 'booking-detail';
         case 'my-bookings': return 'my-bookings';
+        case 'kiosk': return 'kiosk';
         default: return 'home';
     }
 };
@@ -307,6 +309,10 @@ function App() {
                     onNavigateHistory={() => navigateTo('my-bookings')}
                     onNavigateBooking={(stationId, initialData) => navigateTo('station-booking', { stationId, bookingData: initialData })}
                 />
+            )}
+
+            {currentPage === 'kiosk' && (
+                <KioskPage />
             )}
         </>
     );

@@ -27,6 +27,7 @@ export default function RealtimeLockerGridView() {
     const [stations, setStations] = useState<StationAdminDetailDto[]>([]);
     const [selectedStationId, setSelectedStationId] = useState<string>('');
     const [isLoadingStations, setIsLoadingStations] = useState<boolean>(true);
+    const [stationError, setStationError] = useState<string | null>(null);
 
     // 2. Lockers State for Selected Station
     const [lockers, setLockers] = useState<LockerGridItemDto[]>([]);
@@ -57,6 +58,8 @@ export default function RealtimeLockerGridView() {
 
     // 7. Load Stations
     const loadStations = useCallback(async () => {
+        setIsLoadingStations(true);
+        setStationError(null);
         try {
             const res = await adminStationService.getStations();
             if (res.success && res.data && res.data.length > 0) {
@@ -64,9 +67,15 @@ export default function RealtimeLockerGridView() {
                 setSelectedStationId((prev) => (prev ? prev : res.data[0].id));
             } else {
                 setStations([]);
+                setSelectedStationId('');
+                setIsLoadingLockers(false);
+                setStationError(res.success ? 'Chưa có trạm tủ để hiển thị.' : (res.message || 'Không thể tải danh sách trạm.'));
             }
         } catch {
             setStations([]);
+            setSelectedStationId('');
+            setIsLoadingLockers(false);
+            setStationError('Không tải được danh sách trạm. Kiểm tra kết nối BE và quyền truy cập tài khoản, rồi thử lại.');
             showToast('Không thể kết nối danh sách trạm tủ', 'error');
         } finally {
             setIsLoadingStations(false);
@@ -148,7 +157,7 @@ export default function RealtimeLockerGridView() {
 
     // Manual Refresh
     const handleManualRefresh = () => {
-        if (!selectedStationId) return;
+        if (!selectedStationId) { void loadStations(); return; }
         setIsRefreshing(true);
         void fetchLockers(selectedStationId);
     };
@@ -302,6 +311,7 @@ export default function RealtimeLockerGridView() {
                                 disabled={isLoadingStations || stations.length === 0}
                                 className="text-xs font-bold text-slate-900 bg-transparent focus:outline-none cursor-pointer max-w-[210px] truncate"
                             >
+                                {stations.length === 0 && <option value="">{isLoadingStations ? 'Đang tải trạm...' : 'Chưa có trạm'}</option>}
                                 {stations.map((st) => (
                                     <option key={st.id} value={st.id}>
                                         {st.name} ({st.id.slice(0, 6).toUpperCase()})
@@ -348,6 +358,14 @@ export default function RealtimeLockerGridView() {
                     </button>
                 </div>
             </div>
+
+            {stationError && (
+                <div role="alert" className="p-4 rounded-2xl border border-rose-200 bg-rose-50 text-sm text-rose-700">
+                    {stationError}
+                    <button type="button" onClick={() => void loadStations()} disabled={isLoadingStations}
+                        className="ml-3 font-bold underline disabled:opacity-50">Thử lại</button>
+                </div>
+            )}
 
             {/* Status Summary & Legend Cards Row (4 cards) */}
             <LockerStatusSummaryCards
