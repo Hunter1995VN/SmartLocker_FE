@@ -220,7 +220,7 @@ export default function KioskPage() {
         );
 
         scanner.render(
-          (decodedText) => {
+          (decodedText: string) => {
             if (soundEnabled) sounds.playScanChime();
             scanner?.clear().catch(console.error);
             handleProcessCredential('QR', decodedText);

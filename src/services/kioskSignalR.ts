@@ -35,10 +35,10 @@ class KioskSignalRService {
       .configureLogging(signalR.LogLevel.Warning)
       .build();
 
-    this.connection.on('DoorStatusChanged', (event) => {
+    this.connection.on('DoorStatusChanged', (event: any) => {
       this.onDoorChangedCallback?.(event);
     });
-    this.connection.on('LockerUnlocked', (event) => {
+    this.connection.on('LockerUnlocked', (event: any) => {
       this.onUnlockedCallback?.(event);
     });
 
