@@ -223,15 +223,15 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
 
   // Real availability counts
   const totalS = currentStation.totalS || 10;
-  const availS = currentStation.availableS ?? currentStation.totalS ?? 10;
+  const availS = Math.min(totalS, currentStation.availableS ?? currentStation.totalS ?? 10);
   const isSAvailable = availS > 0;
 
   const totalM = currentStation.totalM || 8;
-  const availM = currentStation.availableM ?? currentStation.totalM ?? 8;
+  const availM = Math.min(totalM, currentStation.availableM ?? currentStation.totalM ?? 8);
   const isMAvailable = availM > 0;
 
   const totalL = currentStation.totalL || 4;
-  const availL = currentStation.availableL ?? currentStation.totalL ?? 4;
+  const availL = Math.min(totalL, currentStation.availableL ?? currentStation.totalL ?? 4);
   const isLAvailable = availL > 0;
 
   // Generate locker slot arrays based on real station total counts
