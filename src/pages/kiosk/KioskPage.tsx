@@ -24,8 +24,8 @@ type OperationMode = 'CHECK_IN' | 'CHECK_OUT';
 type AuthMethod = 'QR' | 'ACCESS_CODE';
 
 const FALLBACK_STATIONS = [
-  { id: '11111111-1111-1111-1111-111111111111', name: 'SmartLocker Sân Bay Tân Sơn Nhất', address: 'Nhà ga quốc nội T1, Tân Bình, TP.HCM' },
   { id: '22222222-2222-2222-2222-222222222222', name: 'SmartLocker Bến Thành', address: 'Quảng trường Quách Thị Trang, Q.1, TP.HCM' },
+  { id: '11111111-1111-1111-1111-111111111111', name: 'SmartLocker Sân Bay Tân Sơn Nhất', address: 'Nhà ga quốc nội T1, Tân Bình, TP.HCM' },
   { id: '33333333-3333-3333-3333-333333333333', name: 'SmartLocker Phố Đi Bộ Nguyễn Huệ', address: '89 Nguyễn Huệ, Q.1, TP.HCM' },
 ];
 
