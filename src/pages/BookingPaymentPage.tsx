@@ -173,7 +173,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
             clearInterval(interval);
             setSuccessData({
               lockerCode: res.data.lockerCode || null,
-              accessCode: res.data.passcode || (res.data.lockerCode ? `LK-${res.data.lockerCode}` : '729 416')
+              accessCode: res.data.accessCode || res.data.passcode || ''
             });
             setShowSuccessModal(true);
           } else if (res.data.status !== 'PENDING_PAYMENT') {
@@ -216,11 +216,17 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
         if (res.data.status === 'CONFIRMED' || res.data.status === 'STORED' || res.data.status === 'CHECKED_IN') {
           setSuccessData({
             lockerCode: res.data.lockerCode || null,
-            accessCode: res.data.passcode || (res.data.lockerCode ? `LK-${res.data.lockerCode}` : '729 416')
+            accessCode: res.data.accessCode || res.data.passcode || ''
           });
           setShowSuccessModal(true);
+        } else if (res.data.status === 'NO_SHOW') {
+          showToast('Đơn đã bị huỷ do quá hạn đến nhận tủ (No Show). Vui lòng kiểm tra Lịch sử đơn.');
+        } else if (res.data.status === 'CANCELLED') {
+          showToast('Đơn đặt tủ đã bị huỷ.');
+        } else if (res.data.status === 'EXPIRED') {
+          showToast('Đơn đặt tủ đã hết hạn sử dụng.');
         } else {
-          showToast('Chưa nhận được giao dịch. Vui lòng thanh toán qua VietQR.');
+          showToast('Chưa nhận được giao dịch hoặc đang xử lý. Vui lòng thử lại sau vài giây.');
         }
       } else {
         showToast('Chưa ghi nhận thanh toán. Vui lòng thử lại sau vài giây.');
@@ -707,7 +713,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
               <div className="flex justify-between items-center">
                 <span className="text-xs text-slate-500">Mã PIN mở tủ một lần:</span>
                 <span className="font-mono text-xl font-extrabold text-slate-900 tracking-wider">
-                  {successData?.accessCode || '729 416'}
+                  {successData?.accessCode ? (successData.accessCode.replace(/\s+/g, '').length === 6 ? `${successData.accessCode.replace(/\s+/g, '').slice(0, 3)} ${successData.accessCode.replace(/\s+/g, '').slice(3)}` : successData.accessCode) : 'Chưa cấp'}
                 </span>
               </div>
               <div className="pt-2 border-t border-blue-200/60 space-y-1 text-[11px] text-blue-900 leading-relaxed">

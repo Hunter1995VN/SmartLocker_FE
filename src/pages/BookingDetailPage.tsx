@@ -83,16 +83,24 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
     ? `Locker ${rawBayCode}`
     : `Auto-assigned at Kiosk (Size ${size})`;
 
-  // Sinh mã passcode 8 ký tự sắc nét cho Kiosk Touchpad
-  const generatePasscode = (code?: string, id?: string) => {
-    const raw = (code || id || 'SL8942A').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-    const seed = raw.length >= 8 ? raw.substring(raw.length - 8) : raw.padEnd(8, '8');
-    return `${seed.substring(0, 4)} ${seed.substring(4, 8)}`;
+    // Chuẩn hóa mã PIN 6 số cho Kiosk Touchpad
+  const getDisplayPin = () => {
+    if (booking?.status === 'PENDING_PAYMENT') {
+      return 'Chờ thanh toán';
+    }
+    const raw = booking?.accessCode || booking?.passcode || bookingData?.accessCode;
+    if (raw) {
+      const clean = raw.replace(/\s+/g, '');
+      if (clean.length === 6) {
+        return `${clean.substring(0, 3)} ${clean.substring(3, 6)}`;
+      }
+      return clean;
+    }
+    if (booking?.status === 'NO_SHOW') return 'Hết hạn nhận';
+    if (booking?.status === 'CANCELLED') return 'Đã hủy';
+    return 'Chưa cấp';
   };
-  const rawCode = booking?.accessCode || booking?.passcode || bookingData?.accessCode;
-  const passcode = rawCode 
-    ? (rawCode.length === 8 ? `${rawCode.substring(0, 4)} ${rawCode.substring(4, 8)}` : rawCode) 
-    : generatePasscode(orderId, bookingId);
+  const passcode = getDisplayPin();
 
   const status = booking?.status || 'CONFIRMED';
 
@@ -418,7 +426,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                   <p className="text-xs text-[#434655]">
                     {isLockerAssigned
                       ? `Present this QR code to the Kiosk optical scanner or enter the passcode below to release ${bayCode}.`
-                      : `Present this QR code to the Kiosk optical scanner or enter the 8-character passcode below on the touchpad to automatically assign your locker (Size ${size}) and release the door.`}
+                      : `Present this QR code to the Kiosk optical scanner or enter the 6-digit passcode below on the touchpad to automatically assign your locker (Size ${size}) and release the door.`}
                   </p>
                 </div>
                 <div className="hidden sm:flex items-center gap-1 text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full text-xs font-semibold">
@@ -460,11 +468,11 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                 </div>
               </div>
 
-              {/* Section B: 8-Character Backup Access Passcode */}
+              {/* Section B: 6-Digit Backup Access PIN Passcode */}
               <div className="mt-6 pt-6 border-t border-outline-variant/30 space-y-3">
                 <div className="text-center">
                   <span className="text-[11px] text-secondary tracking-wider uppercase font-bold">
-                    OR ENTER 8-CHARACTER CODE ON TOUCHPAD
+                    HOẶC NHẬP MÃ PIN 6 SỐ TẠI BÀN PHÍM KIOSK
                   </span>
                 </div>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3">

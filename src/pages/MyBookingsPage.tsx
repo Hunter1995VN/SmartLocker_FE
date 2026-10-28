@@ -58,7 +58,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
       if (res.success && res.data?.items) {
         const items = res.data.items;
         setActiveBookings(items.filter(i => ['CONFIRMED', 'STORED', 'PENDING_PAYMENT'].includes(i.status)));
-        setHistoryBookings(items.filter(i => ['COMPLETED', 'CANCELLED'].includes(i.status)));
+        setHistoryBookings(items.filter(i => ['COMPLETED', 'CANCELLED', 'NO_SHOW', 'EXPIRED'].includes(i.status)));
       }
     } catch (error) {
       console.error('Failed to fetch bookings', error);
@@ -334,7 +334,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                         <div className="overflow-hidden">
                           <p className="text-xs text-slate-900 font-bold truncate">Quick Scan at Kiosk</p>
                           <p className="text-[11px] text-secondary truncate font-mono">
-                            PIN: {booking.accessCode || (booking.bookingCode ? `${booking.bookingCode.slice(-4).padStart(4, '7')} ${booking.bookingCode.slice(-4)}` : '7294 1682')}
+                            PIN: {booking.status === 'PENDING_PAYMENT' ? 'Chờ thanh toán' : (booking.accessCode ? (booking.accessCode.replace(/\s+/g, '').length === 6 ? `${booking.accessCode.replace(/\s+/g, '').slice(0, 3)} ${booking.accessCode.replace(/\s+/g, '').slice(3)}` : booking.accessCode) : 'Chưa cấp')}
                           </p>
                         </div>
                       </div>
