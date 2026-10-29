@@ -5,6 +5,7 @@ import type { KioskStationStatus } from '../../api/kioskService';
 import { kioskSignalR } from '../../services/kioskSignalR';
 import { sounds } from '../../utils/soundEffects';
 import WalkInBooking from '../../components/kiosk/WalkInBooking';
+import { kioskText, kioskLocales } from '../../utils/kioskMessages';
 import Locker3DCanvas from '../../components/kiosk/Locker3DCanvas';
 import { 
   SmartLockerLogo3D, 
@@ -38,6 +39,7 @@ export default function KioskPage() {
   const [accessCode, setAccessCode] = useState<string>('');
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [lang, setLang] = useState<KioskLanguage>('VI');
+  const x = kioskText(lang);
 
   // Outdoor Sunlight Anti-Glare Mode (default true for outdoor tablet kiosk)
   const [outdoorMode, setOutdoorMode] = useState<boolean>(() => {
@@ -95,7 +97,7 @@ export default function KioskPage() {
       if (disposed) { value.getTracks().forEach(track => track.stop()); return; }
       stream = value;
       if (videoRef.current) videoRef.current.srcObject = value;
-    }).catch(() => setErrorMessage('Không truy cập được camera. Vui lòng liên hệ nhân viên.'));
+    }).catch(() => setErrorMessage(x('cameraError')));
     return () => { disposed = true; stream?.getTracks().forEach(track => track.stop()); };
   }, [showSensorModal]);
 
@@ -110,12 +112,12 @@ export default function KioskPage() {
   useEffect(() => {
     const updateClock = () => {
       const now = new Date();
-      setCurrentTime(now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+      setCurrentTime(now.toLocaleTimeString(kioskLocales[lang], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
     };
     updateClock();
     const interval = setInterval(updateClock, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [lang]);
 
   // Fetch stations on mount
   useEffect(() => {
@@ -281,6 +283,9 @@ export default function KioskPage() {
 
   // Return to Welcome (Language Select) after completing transaction
   const handleReturnToWelcome = () => {
+    sessionTokenRef.current = undefined;
+    credentialRef.current = { credentialType: 'QR', payload: '' };
+    operationStartedRef.current = 0;
     observedOpenRef.current = false;
     activeLockerIdRef.current = '';
     activeLockerCodeRef.current = '';
@@ -329,7 +334,7 @@ export default function KioskPage() {
           setActiveDoorState(res.data.doorState || 'UNKNOWN');
           setStep('LOCKER_ACTIVE');
         } else {
-          setErrorMessage(res.message || 'Mã không hợp lệ hoặc đơn chưa sẵn sàng.');
+          setErrorMessage(res.message || x('authError'));
           if (soundEnabled) sounds.playWarningAlert();
         }
       } else {
@@ -357,15 +362,15 @@ export default function KioskPage() {
             setStep('LOCKER_ACTIVE');
           }
         } else {
-          setErrorMessage(res.message || 'Mã không hợp lệ.');
+          setErrorMessage(res.message || x('authError'));
           if (soundEnabled) sounds.playWarningAlert();
         }
       }
     } catch (err: any) {
       if (err.code === 'ERR_NETWORK' || !err.response) {
-        setErrorMessage('Không thể kết nối trạm. Vui lòng thử lại hoặc liên hệ nhân viên.');
+        setErrorMessage(x('networkError'));
       } else {
-        setErrorMessage(err.response?.data?.message || 'Lỗi xử lý xác thực.');
+        setErrorMessage(err.response?.data?.message || x('authError'));
       }
       if (soundEnabled) sounds.playWarningAlert();
     } finally {
@@ -410,10 +415,10 @@ export default function KioskPage() {
         setShowSensorModal(false);
         setStep('REVIEW_PENDING');
       } else {
-        setErrorMessage(res.message || 'Xác nhận thất bại.');
+        setErrorMessage(res.message || x('submitError'));
       }
     } catch (err: any) {
-      setErrorMessage(err.response?.data?.message || 'Lỗi xác nhận.');
+      setErrorMessage(err.response?.data?.message || x('submitError'));
     } finally {
       setLoading(false);
     }
@@ -451,7 +456,7 @@ export default function KioskPage() {
                 className={`text-sm font-black tracking-tight uppercase bg-transparent border-0 outline-none cursor-pointer max-w-[240px] md:max-w-[320px] truncate ${
                   outdoorMode ? 'text-slate-900' : 'text-slate-100'
                 }`}
-                title="Nhấn để chọn trạm phục vụ"
+                title={x('selectStation')}
               >
                 {allStations.map((st) => (
                   <option key={st.id} value={st.id} className="text-slate-900 bg-white">
@@ -459,11 +464,11 @@ export default function KioskPage() {
                   </option>
                 ))}
               </select>
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Trạng thái kết nối sẵn sàng"></span>
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title={x('status')}></span>
             </div>
             
             <div className="text-xs text-slate-500 dark:text-slate-400">
-              {stationStatus?.stationAddress || allStations.find(s => s.id === stationId)?.address || 'Khu vực tự phục vụ 24/7'}
+              {stationStatus?.stationAddress || allStations.find(s => s.id === stationId)?.address || x('support')}
             </div>
           </div>
         </div>
@@ -479,18 +484,18 @@ export default function KioskPage() {
         <div className="flex items-center gap-2">
           
           {/* Language Switch Button (Returns to Welcome / Change Language) */}
-          <button
-            onClick={() => setStep('WELCOME')}
+          <select
+            value={lang}
+            onChange={event => { setLang(event.target.value as KioskLanguage); setErrorMessage(''); }}
             className={`px-3 py-1.5 rounded-lg border text-xs font-bold transition-all flex items-center gap-1.5 ${
               outdoorMode
                 ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800'
                 : 'bg-slate-900 hover:bg-slate-800 border-slate-700 text-slate-200'
             }`}
-            title="Đổi ngôn ngữ"
+            title={t.changeLanguage}
           >
-            <span>{SUPPORTED_LANGUAGES.find(l => l.code === lang)?.flag || '🌐'}</span>
-            <span>{SUPPORTED_LANGUAGES.find(l => l.code === lang)?.name || 'Language'}</span>
-          </button>
+            {SUPPORTED_LANGUAGES.map(item => <option key={item.code} value={item.code}>{item.flag} {item.nativeName}</option>)}
+          </select>
 
           {/* Sunlight Contrast Mode Toggle */}
           <button
@@ -500,17 +505,17 @@ export default function KioskPage() {
                 ? 'bg-amber-100/70 hover:bg-amber-100 border-amber-300 text-amber-900'
                 : 'bg-slate-900 hover:bg-slate-800 border-slate-700 text-slate-300'
             }`}
-            title="Chuyển chế độ ngoài trời / ban đêm"
+            title={x('day')}
           >
             {outdoorMode ? (
               <>
                 <SunlightDayIcon className="w-4 h-4 text-amber-600" />
-                <span className="hidden sm:inline">Chống chói</span>
+                <span className="hidden sm:inline">{x('day')}</span>
               </>
             ) : (
               <>
                 <NightMoonIcon className="w-4 h-4 text-sky-400" />
-                <span className="hidden sm:inline">Ban đêm</span>
+                <span className="hidden sm:inline">{x('night')}</span>
               </>
             )}
           </button>
@@ -523,7 +528,7 @@ export default function KioskPage() {
                 ? 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
                 : 'bg-slate-900 hover:bg-slate-800 border-slate-700 text-slate-400'
             }`}
-            title="Bật/Tắt âm thanh"
+            title={x('sound')}
           >
             {soundEnabled ? '🔊' : '🔇'}
           </button>
@@ -537,7 +542,7 @@ export default function KioskPage() {
                 : 'bg-sky-950/40 hover:bg-sky-900/60 border-sky-800 text-sky-300'
             }`}
           >
-            Trợ giúp
+            {x('help')}
           </button>
 
         </div>
@@ -559,8 +564,8 @@ export default function KioskPage() {
         {/* =========================================================================
             STATE 0: WELCOME & LANGUAGE SELECTION (BẮT BUỘC CHỌN NGÔN NGỮ ĐẦU TIÊN)
            ========================================================================= */}
-        {(step === 'WELCOME' || step === 'IDLE') && <button className="mb-4 rounded-xl bg-blue-700 text-white px-8 py-4 font-bold" onClick={() => { setOpMode('CHECK_IN'); setStep('WALK_IN'); }}>Đặt tủ ngay / Book a locker</button>}
-        {step === 'WALK_IN' && <WalkInBooking stationId={stationId} onCancel={handleReturnToWelcome} onReady={pin => { void handleProcessCredential('ACCESS_CODE', pin); }} />}
+        {(step === 'WELCOME' || step === 'IDLE') && <button className="mb-4 rounded-xl bg-blue-700 text-white px-8 py-4 font-bold" onClick={() => { setOpMode('CHECK_IN'); setStep('WALK_IN'); }}>{x('book')}</button>}
+        {step === 'WALK_IN' && <WalkInBooking lang={lang} stationId={stationId} onCancel={handleReturnToWelcome} onReady={pin => { void handleProcessCredential('ACCESS_CODE', pin); }} />}
         {step === 'WELCOME' && (
           <div className="w-full max-w-3xl my-auto text-center space-y-6 animate-fade-in">
             
@@ -569,10 +574,10 @@ export default function KioskPage() {
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 bg-white/60 dark:bg-slate-900/60 shadow-sm">
                 <span>{stationStatus?.stationName || 'SMARTLOCKER AIRPORT HUB'}</span>
                 <span>•</span>
-                <span className="text-emerald-600 dark:text-emerald-400 font-bold">24/7 TỰ PHỤC VỤ</span>
+                <span className="text-emerald-600 dark:text-emerald-400 font-bold">{t.allDayOpen}</span>
               </div>
               <h1 className="text-3xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
-                Chào Mừng Quý Khách
+                {t.welcomeTitle}
               </h1>
               <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
                 Welcome • 환영합니다 • 欢迎 • ようこそ
@@ -584,7 +589,7 @@ export default function KioskPage() {
               outdoorMode ? 'bg-white border-slate-200' : 'bg-[#131b28] border-slate-800'
             }`}>
               <div className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">
-                Vui lòng chạm để chọn ngôn ngữ • Please select language
+                {t.selectLanguagePrompt}
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
@@ -612,34 +617,6 @@ export default function KioskPage() {
               </div>
             </div>
 
-            {/* Quick Demonstration Toolbar */}
-            <div className="flex items-center justify-center gap-2 pt-2 text-xs font-mono text-slate-500 dark:text-slate-400">
-              <span>⚡ Mã test nhanh:</span>
-              <button
-                onClick={() => {
-                  setLang('VI');
-                  setOpMode('CHECK_IN');
-                  setStep('AUTH');
-                  setAuthMethod('ACCESS_CODE');
-                  setAccessCode('888888');
-                }}
-                className="px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-700 hover:border-sky-500 text-xs font-bold"
-              >
-                1. Gửi (888888)
-              </button>
-              <button
-                onClick={() => {
-                  setLang('VI');
-                  setOpMode('CHECK_OUT');
-                  setStep('AUTH');
-                  setAuthMethod('ACCESS_CODE');
-                  setAccessCode('999999');
-                }}
-                className="px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-700 hover:border-emerald-500 text-xs font-bold"
-              >
-                2. Lấy (999999)
-              </button>
-            </div>
 
           </div>
         )}
@@ -661,12 +638,10 @@ export default function KioskPage() {
                   </span>
                 </div>
                 <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 dark:text-white uppercase leading-tight">
-                  {lang === 'VI' ? 'CHỌN THAO TÁC ĐỂ BẮT ĐẦU' : 'SELECT ACTION TO BEGIN'}
+                  {x('chooseAction')}
                 </h2>
                 <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 mt-1">
-                  {lang === 'VI' 
-                    ? 'Chạm vào Gửi Đồ hoặc Lấy Đồ bên dưới để thực hiện giao dịch' 
-                    : 'Tap Deposit or Retrieve below to start your transaction'}
+                  {x('chooseHint')}
                 </p>
               </div>
 
@@ -692,7 +667,7 @@ export default function KioskPage() {
                       <CheckInIcon3D className="w-14 h-14" />
                     </div>
                     <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-sky-500/10 text-sky-700 dark:text-sky-400 border border-sky-300/40">
-                      GỬI MỚI
+                      {t.depositAction}
                     </span>
                   </div>
 
@@ -706,12 +681,12 @@ export default function KioskPage() {
                   </div>
 
                   <div className="pt-2 flex items-center justify-between border-t border-slate-200 dark:border-slate-800/80 w-full text-xs font-bold text-sky-600 dark:text-sky-400">
-                    <span>{lang === 'VI' ? 'Chạm bất kỳ đâu để gửi đồ' : 'Tap anywhere to deposit'}</span>
+                    <span>{x('depositTap')}</span>
                     <span className="text-base group-hover:translate-x-1 transition-transform">→</span>
                   </div>
                 </button>
 
-                {/* 2. LẤY HÀNH LÝ / RETRIEVE - Full card is touch button */}
+                {/* 2. {t.retrieveAction} / RETRIEVE - Full card is touch button */}
                 <button
                   onClick={() => {
                     if (soundEnabled) sounds.playKeypadTap();
@@ -730,7 +705,7 @@ export default function KioskPage() {
                       <CheckOutIcon3D className="w-14 h-14" />
                     </div>
                     <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-300/40">
-                      LẤY ĐỒ
+                      {t.retrieveAction}
                     </span>
                   </div>
 
@@ -744,58 +719,13 @@ export default function KioskPage() {
                   </div>
 
                   <div className="pt-2 flex items-center justify-between border-t border-slate-200 dark:border-slate-800/80 w-full text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                    <span>{lang === 'VI' ? 'Chạm bất kỳ đâu để lấy đồ' : 'Tap anywhere to retrieve'}</span>
+                    <span>{x('retrieveTap')}</span>
                     <span className="text-base group-hover:translate-x-1 transition-transform">→</span>
                   </div>
                 </button>
 
               </div>
 
-              {/* Bottom Quick Presets & Status */}
-              <div className={`p-3 rounded-2xl border flex items-center justify-between text-xs ${
-                outdoorMode ? 'bg-white border-slate-200 text-slate-600' : 'bg-slate-900/60 border-slate-800 text-slate-400'
-              }`}>
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-slate-900 dark:text-white">Mã test nhanh:</span>
-                  <button
-                    onClick={() => {
-                      setOpMode('CHECK_IN');
-                      setStep('AUTH');
-                      setAuthMethod('ACCESS_CODE');
-                      setAccessCode('888888');
-                    }}
-                    className="px-2 py-0.5 rounded border border-slate-300 dark:border-slate-700 text-xs font-bold hover:text-sky-600"
-                  >
-                    1. Gửi (888888)
-                  </button>
-                  <button
-                    onClick={() => {
-                      setOpMode('CHECK_OUT');
-                      setStep('AUTH');
-                      setAuthMethod('ACCESS_CODE');
-                      setAccessCode('999999');
-                    }}
-                    className="px-2 py-0.5 rounded border border-slate-300 dark:border-slate-700 text-xs font-bold hover:text-emerald-600"
-                  >
-                    2. Lấy (999999)
-                  </button>
-                  <button
-                    onClick={() => {
-                      setOpMode('CHECK_OUT');
-                      setStep('AUTH');
-                      setAuthMethod('ACCESS_CODE');
-                      setAccessCode('777777');
-                    }}
-                    className="px-2 py-0.5 rounded border border-slate-300 dark:border-slate-700 text-xs font-bold hover:text-amber-500"
-                  >
-                    3. Quá hạn (777777)
-                  </button>
-                </div>
-
-                <div className="text-slate-500 text-xs font-mono">
-                  S-01 • M-02 • L-03
-                </div>
-              </div>
 
             </div>
 
@@ -951,7 +881,7 @@ export default function KioskPage() {
                           : (outdoorMode ? 'bg-white border border-slate-300 text-slate-900 shadow-sm' : 'bg-slate-900 border border-slate-800 text-white shadow-sm')
                       }`}
                     >
-                      {key === 'CLEAR' ? 'CLR' : key === 'BACK' ? '⌫' : key}
+                      {key === 'CLEAR' ? x('clear') : key === 'BACK' ? '⌫' : key}
                     </button>
                   ))}
                 </div>
@@ -1000,13 +930,13 @@ export default function KioskPage() {
             <div className="md:col-span-6 space-y-4">
               
               <div className="flex justify-between items-center text-xs font-mono border-b pb-2 border-slate-200 dark:border-slate-800">
-                <span>ĐƠN: {activeBookingCode}</span>
-                <span className="font-bold">CỠ: {activeLockerSize || 'S'}</span>
+                <span>{x('order')}: {activeBookingCode}</span>
+                <span className="font-bold">{x('size')}: {activeLockerSize || 'S'}</span>
               </div>
 
               <div>
                 <span className="text-xs text-slate-500 uppercase tracking-wider block">
-                  Vị trí ngăn tủ của bạn
+                  {t.doorOpenedTitle}
                 </span>
                 <span className="text-4xl md:text-5xl font-black font-mono text-sky-600 dark:text-sky-400">
                   {activeLockerCode || 'S-01'}
@@ -1025,9 +955,9 @@ export default function KioskPage() {
               {/* Timer & Exception */}
               <div className="flex justify-between items-center text-xs pt-1">
                 <span className="text-slate-500">
-                  Thời gian mở: <strong className="text-slate-900 dark:text-white font-mono">{doorTimerSeconds}s</strong>
+                  {x('elapsed')}: <strong className="text-slate-900 dark:text-white font-mono">{doorTimerSeconds}s</strong>
                 </span>
-                {doorTimerSeconds >= 30 && activeDoorState === 'OPEN' && (
+                {doorTimerSeconds >= 30 && activeDoorState === 'OPEN' && opMode === 'CHECK_OUT' && (
                   <button
                     onClick={() => setShowSensorModal(true)}
                     className="text-amber-600 dark:text-amber-400 underline font-bold"
@@ -1043,7 +973,7 @@ export default function KioskPage() {
                   outdoorMode ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-slate-700 hover:bg-slate-600 text-white'
                 }`}
               >
-                CẦN NHÂN VIÊN HỖ TRỢ
+                {x('staff')}
               </button>
 
             </div>
@@ -1066,9 +996,9 @@ export default function KioskPage() {
             <div className={`p-4 rounded-xl border ${
               outdoorMode ? 'bg-amber-50 border-amber-200' : 'bg-slate-900 border-slate-800'
             }`}>
-              <span className="text-xs text-slate-500 block mb-1">PHỤ PHÍ PHÁT SINH</span>
+              <span className="text-xs text-slate-500 block mb-1">{x('fee')}</span>
               <span className="text-3xl font-black text-amber-600 dark:text-amber-400 font-mono">
-                {overdueFee.toLocaleString('vi-VN')} đ
+                {overdueFee.toLocaleString(kioskLocales[lang])} đ
               </span>
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400">
@@ -1086,7 +1016,7 @@ export default function KioskPage() {
         {/* =========================================================================
             STATE 5: SUCCESS (AUTO RESETS TO WELCOME / LANGUAGE SELECT SCREEN)
            ========================================================================= */}
-        {step === 'REVIEW_PENDING' && <section className="p-10 bg-white rounded-2xl text-center"><h2 className="text-2xl font-bold">Đang chờ nhân viên duyệt</h2><p className="my-4">Ảnh đã được gửi. Đơn chỉ hoàn tất sau khi nhân viên xác nhận.</p><button onClick={handleReturnToWelcome}>Về màn hình chào</button></section>}
+        {step === 'REVIEW_PENDING' && <section className="p-10 bg-white rounded-2xl text-center"><h2 className="text-2xl font-bold">{x('pending')}</h2><p className="my-4">{x('pendingHint')}</p><button onClick={handleReturnToWelcome}>{x('home')}</button></section>}
         {step === 'SUCCESS' && (
           <div className={`w-full max-w-md border-2 rounded-3xl p-8 text-center space-y-5 my-auto animate-fade-in shadow-xl ${
             outdoorMode
@@ -1140,10 +1070,10 @@ export default function KioskPage() {
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
           <div className="bg-[#141b27] border border-amber-500 rounded-2xl p-6 max-w-sm w-full text-center space-y-4 text-white">
             <span className="text-xs font-bold text-amber-400 uppercase">
-              XÁC NHẬN ĐÓNG CỬA THỦ CÔNG
+              {x('sensorTitle')}
             </span>
             <p className="text-xs text-slate-300 leading-relaxed">
-              Cảm biến ô tủ <strong>{activeLockerCode}</strong> chưa nhận tín hiệu. Nếu bạn đã đẩy chặt cửa, vui lòng bấm xác nhận.
+              {x('sensorHint')} <strong>{activeLockerCode}</strong>
             </p>
             <video ref={videoRef} autoPlay playsInline muted className="hidden"></video>
             <div className="flex gap-2">
@@ -1151,14 +1081,14 @@ export default function KioskPage() {
                 onClick={() => setShowSensorModal(false)}
                 className="flex-1 py-2.5 rounded-lg bg-slate-800 text-xs font-bold"
               >
-                Hủy
+                {t.cancel}
               </button>
               <button
                 onClick={handleManualConfirm}
                 disabled={loading}
                 className="flex-1 py-2.5 rounded-lg bg-amber-500 text-slate-950 text-xs font-bold"
               >
-                {loading ? 'Đang xác nhận...' : 'Đã đóng cửa'}
+                {loading ? x('sending') : x('sendPhoto')}
               </button>
             </div>
           </div>
@@ -1170,18 +1100,18 @@ export default function KioskPage() {
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
           <div className="bg-[#141b27] border border-slate-700 rounded-2xl p-6 max-w-sm w-full text-center space-y-3 text-white">
             <span className="text-sm font-bold text-sky-400 uppercase">
-              HỖ TRỢ TRẠM 24/7
+              {x('support')}
             </span>
             <div className="p-3 bg-slate-900 rounded-xl text-left text-xs space-y-1.5 text-slate-300">
-              <div>Hotline khẩn cấp: <strong className="text-sky-400 font-mono">1900 6868</strong></div>
-              <div>Trạm: <strong className="text-white">{stationStatus?.stationName || 'Tân Sơn Nhất Airport'}</strong></div>
-              <div className="text-[11px] text-slate-400">Nhân viên trạm luôn trực hỗ trợ khách hàng 24/24.</div>
+              <div>{x('hotline')}: <strong className="text-sky-400 font-mono">1900 6868</strong></div>
+              <div>{x('station')}: <strong className="text-white">{stationStatus?.stationName || 'Tân Sơn Nhất Airport'}</strong></div>
+              <div className="text-[11px] text-slate-400">{x('supportHint')}</div>
             </div>
             <button
               onClick={() => setShowHelpModal(false)}
               className="w-full py-2.5 bg-sky-600 rounded-lg text-xs font-bold text-white uppercase"
             >
-              Đóng
+              {t.close}
             </button>
           </div>
         </div>
@@ -1195,8 +1125,8 @@ export default function KioskPage() {
           ? 'bg-white border-slate-200 text-slate-500'
           : 'bg-[#101622] border-slate-800/80 text-slate-500'
       }`}>
-        <span>SmartLocker Transit OS v3.3 • Sân Bay Tân Sơn Nhất</span>
-        <span>Hỗ trợ: 1900 6868</span>
+        <span>SmartLocker</span>
+        <span>{x('hotline')}: 1900 6868</span>
       </footer>
 
     </div>

@@ -1,3 +1,4 @@
+import { kioskText } from '../../utils/kioskMessages';
 import { useState, useEffect } from 'react';
 import { sounds } from '../../utils/soundEffects';
 import type { KioskLanguage } from '../../utils/kioskI18n';
@@ -113,6 +114,7 @@ export default function Locker3DCanvas({
   outdoorMode = false,
   lang = 'VI',
 }: Locker3DCanvasProps) {
+  const x = kioskText(lang);
   const [selectedSize, setSelectedSize] = useState<'S' | 'M' | 'L' | null>(null);
 
   // Sync with backend active locker if unlocked
@@ -165,14 +167,14 @@ export default function Locker3DCanvas({
                     : 'bg-slate-800/90 hover:bg-slate-700 text-slate-300 border-slate-700'
                 }`}
               >
-                {SIZE_SPECS[sz].name[lang]} {isSel ? '• Mở' : ''}
+                {SIZE_SPECS[sz].name[lang]} {isSel ? '• ' + x('open') : ''}
               </button>
             );
           })}
         </div>
 
         <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400">
-          Chạm cánh tủ 3D để mở
+          {x('previewHint')}
         </span>
       </div>
 
@@ -243,8 +245,8 @@ export default function Locker3DCanvas({
                   </div>
                   <div className="text-left font-mono">
                     <div className="text-xs font-black text-emerald-400 flex items-center gap-1.5">
-                      <span>KHOANG CỠ S</span>
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-sans font-bold">MỞ</span>
+                      <span>{x('size')} S</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-sans font-bold">{x('open')}</span>
                     </div>
                     <div className="text-[11px] text-slate-300 font-sans font-bold mt-0.5">
                       67 Lít • Balo laptop 15.6"
@@ -255,7 +257,7 @@ export default function Locker3DCanvas({
                 {/* Right: Price & Solenoid status */}
                 <div className="text-right pr-3 z-10 font-mono">
                   <div className="text-xs font-black text-emerald-400">10.000 đ/h</div>
-                  <div className="text-[10px] text-slate-400">Chốt điện an toàn</div>
+                  <div className="text-[10px] text-slate-400">{x('secure')}</div>
                 </div>
               </div>
 
@@ -330,8 +332,8 @@ export default function Locker3DCanvas({
                   </div>
                   <div className="text-left font-mono">
                     <div className="text-xs font-black text-sky-400 flex items-center gap-1.5">
-                      <span>KHOANG CỠ M</span>
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 font-sans font-bold">MỞ</span>
+                      <span>{x('size')} M</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 font-sans font-bold">{x('open')}</span>
                     </div>
                     <div className="text-[11px] text-slate-300 font-sans font-bold mt-0.5">
                       120 Lít • Vali cabin 20 inch
@@ -341,7 +343,7 @@ export default function Locker3DCanvas({
 
                 <div className="text-right pr-3 z-10 font-mono">
                   <div className="text-xs font-black text-sky-400">15.000 đ/h</div>
-                  <div className="text-[10px] text-slate-400">Đệm chống trầy xước</div>
+                  <div className="text-[10px] text-slate-400">{x('padding')}</div>
                 </div>
               </div>
 
@@ -412,8 +414,8 @@ export default function Locker3DCanvas({
                   </div>
                   <div className="text-left font-mono">
                     <div className="text-xs font-black text-amber-400 flex items-center gap-1.5">
-                      <span>KHOANG CỠ L</span>
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-sans font-bold">MỞ</span>
+                      <span>{x('size')} L</span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-sans font-bold">{x('open')}</span>
                     </div>
                     <div className="text-[11px] text-slate-300 font-sans font-bold mt-0.5">
                       248 Lít • Vali 28-32" • Gậy golf
@@ -423,7 +425,7 @@ export default function Locker3DCanvas({
 
                 <div className="text-right pr-3 z-10 font-mono">
                   <div className="text-xs font-black text-amber-400">25.000 đ/h</div>
-                  <div className="text-[10px] text-slate-400">Trợ lực giảm chấn</div>
+                  <div className="text-[10px] text-slate-400">{x('damping')}</div>
                 </div>
               </div>
 
@@ -538,7 +540,7 @@ export default function Locker3DCanvas({
                     </h4>
                     <span className="text-xs text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1">
                       <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-                      Cửa 3D đang mở • Khoang sẵn sàng
+                      {x('previewOpen')}
                     </span>
                   </div>
                 </div>
@@ -563,7 +565,7 @@ export default function Locker3DCanvas({
                 <div className={`p-2 rounded-xl border ${
                   outdoorMode ? 'bg-slate-50 border-slate-300' : 'bg-slate-900/80 border-slate-700'
                 }`}>
-                  <div className="text-[10px] font-bold text-slate-600 dark:text-slate-400">Kích thước</div>
+                  <div className="text-[10px] font-bold text-slate-600 dark:text-slate-400">{x('dimensions')}</div>
                   <div className="font-black font-mono text-xs text-slate-950 dark:text-white mt-0.5">
                     {SIZE_SPECS[selectedSize].dimensions}
                   </div>
@@ -572,7 +574,7 @@ export default function Locker3DCanvas({
                 <div className={`p-2 rounded-xl border ${
                   outdoorMode ? 'bg-slate-50 border-slate-300' : 'bg-slate-900/80 border-slate-700'
                 }`}>
-                  <div className="text-[10px] font-bold text-slate-600 dark:text-slate-400">Dung tích / Tải</div>
+                  <div className="text-[10px] font-bold text-slate-600 dark:text-slate-400">{x('capacity')}</div>
                   <div className="font-black font-mono text-xs text-slate-950 dark:text-white mt-0.5">
                     {SIZE_SPECS[selectedSize].volume} • {SIZE_SPECS[selectedSize].maxWeight}
                   </div>
@@ -581,7 +583,7 @@ export default function Locker3DCanvas({
                 <div className={`p-2 rounded-xl border ${
                   outdoorMode ? 'bg-emerald-50 border-emerald-300' : 'bg-emerald-950/60 border-emerald-600'
                 }`}>
-                  <div className="text-[10px] font-bold text-emerald-800 dark:text-emerald-300">Đơn giá</div>
+                  <div className="text-[10px] font-bold text-emerald-800 dark:text-emerald-300">{x('price')}</div>
                   <div className="font-black font-mono text-xs text-emerald-700 dark:text-emerald-300 mt-0.5">
                     {SIZE_SPECS[selectedSize].priceHour}
                   </div>
@@ -609,7 +611,7 @@ export default function Locker3DCanvas({
         <div className={`py-1.5 px-3 border-t text-center text-xs font-bold shrink-0 transition-colors ${
           outdoorMode ? 'bg-white border-slate-300 text-slate-700' : 'bg-[#141d2f] border-slate-800 text-slate-400'
         }`}>
-          💡 Chạm vào cánh tủ S, M hoặc L để mở cửa 3D và xem thông tin khoang
+          {x('previewHint')}
         </div>
       )}
 
