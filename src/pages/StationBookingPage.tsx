@@ -469,9 +469,9 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                 <div className="hidden sm:flex flex-col items-end">
                   <div className="flex items-center text-amber-500 font-medium bg-amber-50 px-2 py-1 rounded text-sm mb-1">
                     <Star className="w-4 h-4 mr-1 fill-current" />
-                    4.9
+                    {currentStation.ratingCount ? currentStation.ratingAverage?.toFixed(1) : 'Chưa có đánh giá'}
                   </div>
-                  <span className="text-xs text-slate-500">2.4k bookings</span>
+                  <span className="text-xs text-slate-500">{currentStation.ratingCount ?? 0} lượt đánh giá</span>
                 </div>
               </div>
 
