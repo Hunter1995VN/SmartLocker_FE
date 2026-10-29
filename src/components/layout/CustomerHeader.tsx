@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
     Lock, LayoutDashboard, Compass, Clock, Headphones,
-    ChevronDown, LogOut
+    ChevronDown, LogOut, User, DollarSign
 } from 'lucide-react';
 
 export interface CustomerHeaderProps {
-    currentPage?: 'dashboard' | 'find-station' | 'my-bookings' | 'station-booking' | 'booking-payment' | 'booking-detail';
+    currentPage?: 'dashboard' | 'find-station' | 'my-bookings' | 'station-booking' | 'booking-payment' | 'booking-detail' | 'profile';
     onNavigate: (page: string, data?: any) => void;
     onLogout?: () => void;
 }
@@ -56,10 +56,11 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
         }
     };
 
-    const isTabActive = (tab: 'dashboard' | 'find-station' | 'my-bookings') => {
+    const isTabActive = (tab: 'dashboard' | 'find-station' | 'my-bookings' | 'profile') => {
         if (tab === 'dashboard') return currentPage === 'dashboard';
         if (tab === 'find-station') return currentPage === 'find-station' || currentPage === 'station-booking';
         if (tab === 'my-bookings') return currentPage === 'my-bookings' || currentPage === 'booking-payment' || currentPage === 'booking-detail';
+        if (tab === 'profile') return currentPage === 'profile';
         return false;
     };
 
@@ -190,6 +191,22 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                                 >
                                     <Clock className="w-4 h-4 text-[#2563eb]" />
                                     <span>Lịch sử đơn đặt</span>
+                                </button>
+
+                                <button
+                                    onClick={() => { setUserMenuOpen(false); onNavigate('profile', { tab: 'info' }); }}
+                                    className="w-full text-left px-4 py-2.5 text-xs font-medium text-[#434655] hover:bg-[#eff4ff] hover:text-[#2563eb] flex items-center gap-2.5 transition-colors cursor-pointer"
+                                >
+                                    <User className="w-4 h-4 text-[#2563eb]" />
+                                    <span>Thông tin cá nhân</span>
+                                </button>
+
+                                <button
+                                    onClick={() => { setUserMenuOpen(false); onNavigate('profile', { tab: 'debt' }); }}
+                                    className="w-full text-left px-4 py-2.5 text-xs font-medium text-[#434655] hover:bg-[#eff4ff] hover:text-[#2563eb] flex items-center gap-2.5 transition-colors cursor-pointer"
+                                >
+                                    <DollarSign className="w-4 h-4 text-[#2563eb]" />
+                                    <span>Tra cứu dư nợ quá hạn</span>
                                 </button>
 
                                 <hr className="my-1 border-[#f0f4ff]" />
