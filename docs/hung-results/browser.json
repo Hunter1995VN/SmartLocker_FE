@@ -1,0 +1,21 @@
+{
+  "level": "Production React components, mocked API; no real payment or hardware",
+  "results": [
+    {
+      "name": "T23 five languages preserve active screen and translate Walk-in",
+      "status": "PASS"
+    },
+    {
+      "name": "T09 expired QR refreshes without reloading page",
+      "status": "PASS"
+    },
+    {
+      "name": "T21 submitted review cannot be submitted twice",
+      "status": "PASS"
+    },
+    {
+      "name": "T16 delegate PIN comes from server and supports leading zero",
+      "status": "PASS"
+    }
+  ]
+}
