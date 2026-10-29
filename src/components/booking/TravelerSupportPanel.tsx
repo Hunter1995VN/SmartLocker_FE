@@ -13,11 +13,6 @@ export default function TravelerSupportPanel({ booking }: { booking: BookingDto 
   const [contact, setContact] = useState('');
   const [pin, setPin] = useState('');
   const [minutes, setMinutes] = useState(60);
-  const [stars, setStars] = useState(5);
-  const [criteria, setCriteria] = useState<string[]>([]);
-  const [comment, setComment] = useState('');
-  const [description, setDescription] = useState('');
-  const [photo, setPhoto] = useState<string>();
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
   const base = `/api/bookings/${booking.id}/support`;
