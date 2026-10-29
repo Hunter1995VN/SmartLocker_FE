@@ -38,6 +38,7 @@ import RealtimeLockerGridView from '../../components/admin/lockers/RealtimeLocke
 import AbandonedPropertyView from '../../components/admin/abandoned/AbandonedPropertyView';
 import EmergencyIncidentListView from '../../components/admin/incidents/EmergencyIncidentListView';
 import FinancialReconciliationView from '../../components/admin/finance/FinancialReconciliationView';
+import ManualRefundManagementView from '../../components/admin/refunds/ManualRefundManagementView';
 import AuditLogView from '../../components/admin/audit/AuditLogView';
 
 interface AdminPortalPageProps {
@@ -216,7 +217,15 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                             onNavigateAudit={() => setActiveMenu('audit')}
                         />
                     ) : activeMenu === 'reconciliation' ? (
-                        <FinancialReconciliationView />
+                        <FinancialReconciliationView
+                            onNavigateManualRefunds={() => setActiveMenu('refunds')}
+                        />
+                    ) : activeMenu === 'refunds' ? (
+                        <ManualRefundManagementView
+                            userRole={role}
+                            onNavigateReconciliation={() => setActiveMenu('reconciliation')}
+                            onNavigateAudit={() => setActiveMenu('audit')}
+                        />
                     ) : activeMenu === 'audit' ? (
                         <AuditLogView />
                     ) : (
