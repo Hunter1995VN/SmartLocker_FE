@@ -7,6 +7,7 @@ export interface KioskCheckInRequest {
 }
 
 export interface KioskCheckInResponse {
+  sessionToken?: string;
   bookingId: string;
   bookingCode: string;
   lockerId: string;
@@ -23,6 +24,7 @@ export interface KioskCheckOutRequest {
 }
 
 export interface KioskCheckOutResponse {
+  sessionToken?: string;
   bookingId: string;
   bookingCode: string;
   lockerId?: string;
@@ -36,6 +38,9 @@ export interface KioskCheckOutResponse {
 }
 
 export interface KioskManualConfirmRequest {
+  sessionToken?: string;
+  credentialType: 'QR' | 'ACCESS_CODE';
+  payload: string;
   stationId: string;
   bookingId: string;
   lockerId: string;
