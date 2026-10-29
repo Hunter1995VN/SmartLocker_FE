@@ -101,7 +101,13 @@ const FALLBACK_ITEMS: PaymentReconciliationItemDto[] = [
     },
 ];
 
-export default function FinancialReconciliationView() {
+interface FinancialReconciliationViewProps {
+    onNavigateManualRefunds?: () => void;
+}
+
+export default function FinancialReconciliationView({
+    onNavigateManualRefunds,
+}: FinancialReconciliationViewProps = {}) {
     const [dashboard, setDashboard] = useState<ReconciliationDashboardDto | null>(null);
     const [items, setItems] = useState<PaymentReconciliationItemDto[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -250,6 +256,16 @@ export default function FinancialReconciliationView() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+                    {onNavigateManualRefunds && (
+                        <button
+                            type="button"
+                            onClick={onNavigateManualRefunds}
+                            className="px-3.5 py-2 rounded-xl border border-purple-200 bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
+                        >
+                            <RotateCcw className="w-4 h-4" />
+                            <span>Phê duyệt Hoàn tiền Ngoại lệ</span>
+                        </button>
+                    )}
                     <button
                         type="button"
                         onClick={handleExportCsv}
