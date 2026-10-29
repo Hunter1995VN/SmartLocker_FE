@@ -1,0 +1,32 @@
+{
+  "checkedAt": "2026-10-29T14:58:22.478Z",
+  "uc": "T17",
+  "level": "Dev-based merge candidate; real production forms/API/SQL, explicitly authorized TEST illustration; no mocked requests",
+  "checks": [
+    {
+      "name": "Resumed same owned TEST report; original production upload/OPEN duplicate evidence retained in uc-t17-attempt1.json",
+      "status": "PASS"
+    },
+    {
+      "name": "Staff permission and premature handover rejected; OPEN duplicate verified during original form upload",
+      "status": "PASS"
+    },
+    {
+      "name": "Production staff queue displays and decodes the persisted JPEG",
+      "status": "PASS"
+    },
+    {
+      "name": "FOUND persists, repeated staff save is idempotent, owner receives/reads notification and cannot duplicate while awaiting handover",
+      "status": "PASS"
+    },
+    {
+      "name": "Staff handover completes as RETURNED, owner reads final response, terminal report cannot be reopened",
+      "status": "PASS"
+    },
+    {
+      "name": "Original booking/review unchanged; no browser exceptions or API 5xx in production UI flow",
+      "status": "PASS"
+    }
+  ],
+  "disposition": "TEST report RETURNED; two owner notifications marked READ; no real missing item or physical handover claimed"
+}
