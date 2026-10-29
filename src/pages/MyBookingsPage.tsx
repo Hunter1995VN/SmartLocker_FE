@@ -88,7 +88,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
       if (res.success && res.data?.items) {
         const items = res.data.items;
         setActiveBookings(items.filter(i => ['CONFIRMED', 'STORED', 'PENDING_PAYMENT'].includes(i.status)));
-        setHistoryBookings(items.filter(i => ['COMPLETED', 'CANCELLED', 'NO_SHOW', 'EXPIRED'].includes(i.status)));
+        setHistoryBookings(items.filter(i => ['COMPLETED', 'COMPLETED_MANUAL', 'CANCELLED', 'NO_SHOW', 'EXPIRED'].includes(i.status)));
       }
     } catch (error) {
       console.error('Failed to fetch bookings', error);
@@ -486,16 +486,16 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                   <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                     <div className="flex items-start gap-4">
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${
-                        item.status === 'COMPLETED'
+                        ['COMPLETED', 'COMPLETED_MANUAL'].includes(item.status)
                           ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
                           : 'bg-slate-100 text-slate-500 border-slate-200'
                       }`}>
-                        {item.status === 'COMPLETED' ? <LockOpen className="w-5 h-5" /> : <Ban className="w-5 h-5" />}
+                        {['COMPLETED', 'COMPLETED_MANUAL'].includes(item.status) ? <LockOpen className="w-5 h-5" /> : <Ban className="w-5 h-5" />}
                       </div>
                       <div className="space-y-1">
                         <div className="flex items-center gap-2.5 flex-wrap">
                           <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                            item.status === 'COMPLETED'
+                            ['COMPLETED', 'COMPLETED_MANUAL'].includes(item.status)
                               ? 'bg-emerald-100 text-emerald-800'
                               : 'bg-slate-200 text-slate-700'
                           }`}>
@@ -519,7 +519,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
-                        {item.status === 'COMPLETED' && (
+                        {['COMPLETED', 'COMPLETED_MANUAL'].includes(item.status) && (
                           <>
                             <button
                               onClick={() => showToast(`Đang tải hóa đơn VAT cho đơn ${item.bookingCode}...`)}
