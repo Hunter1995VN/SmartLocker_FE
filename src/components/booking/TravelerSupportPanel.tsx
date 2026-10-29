@@ -46,6 +46,16 @@ export default function TravelerSupportPanel({ booking }: { booking: BookingDto 
       {pin && <p className="text-xl font-mono">PIN người nhận: {pin}</p>}
       {data?.delegations.filter(d => !d.usedAt && !d.revokedAt).map(d => <div key={d.id} className="flex gap-3"><span>{d.contact}</span><button type="button" disabled={busy} onClick={() => void run(async () => { await apiClient.delete(`${base}/delegations/${d.id}`); setPin(''); setMessage('Đã thu hồi mã.'); })}>Thu hồi</button></div>)}
     </form>}
+    {booking.status === 'COMPLETED' && !data?.review && <form className="space-y-3" onSubmit={e => {
+      e.preventDefault(); void run(async () => { await apiClient.post(`${base}/review`, { stars, comment, criteria }); setMessage('Cảm ơn bạn đã đánh giá.'); });
+    }}>
+      <h3 className="font-semibold">Đánh giá trạm</h3>
+      <label>Số sao <select className="border p-2 rounded" value={stars} onChange={e => setStars(Number(e.target.value))}>{[1,2,3,4,5].map(n => <option key={n} value={n}>{n} sao</option>)}</select></label>
+      <div className="flex gap-4">{[['CLEAN','Tủ sạch sẽ'],['FAST','Mở khóa nhanh'],['EASY_TO_FIND','Dễ tìm trạm']].map(([key,label]) => <label key={key}><input type="checkbox" checked={criteria.includes(key)} onChange={e => setCriteria(old => e.target.checked ? [...old,key] : old.filter(x => x !== key))} /> {label}</label>)}</div>
+      <label className="block">Góp ý<textarea className="block border w-full p-2 rounded" maxLength={1000} value={comment} onChange={e => setComment(e.target.value)} /></label>
+      <button disabled={busy} className="bg-blue-700 text-white p-2 rounded">Gửi đánh giá</button>
+    </form>}
+    {data?.review && <p>Đánh giá đã gửi: {data.review.stars}/5 · {data.review.comment}</p>}
     {booking.status === 'COMPLETED' && <form className="space-y-3" onSubmit={e => {
       e.preventDefault(); void run(async () => { await apiClient.post(`${base}/lost-items`, { description, photo }); setMessage('Đã gửi yêu cầu tìm đồ. Theo dõi phản hồi bên dưới.'); });
     }}>
