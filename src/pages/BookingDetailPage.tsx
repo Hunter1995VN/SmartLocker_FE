@@ -1,4 +1,5 @@
-﻿import React, { useState, useEffect } from 'react';
+import TravelerSupportPanel from '../components/booking/TravelerSupportPanel';
+import React, { useState, useEffect } from 'react';
 import {
   Lock,
   MapPin,
@@ -932,6 +933,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
       />
 
       {/* EXTEND BOOKING MODAL (UC-T07) */}
+      {booking && <TravelerSupportPanel booking={booking} />}
       <ExtendBookingModal
         isOpen={showExtendModal}
         onClose={() => setShowExtendModal(false)}
