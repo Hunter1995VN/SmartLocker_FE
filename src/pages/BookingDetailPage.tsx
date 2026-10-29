@@ -73,6 +73,32 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
     return () => { mounted = false; };
   }, [bookingId]);
 
+  // Refresh expired online tickets while this page stays open. Serialize retries.
+  useEffect(() => {
+    if (!bookingId || !booking || !['CONFIRMED', 'STORED'].includes(booking.status)) return;
+    let disposed = false;
+    let pending = false;
+    const refresh = async () => {
+      if (pending || disposed) return;
+      try {
+        if (booking.qrPayload) {
+          const expiry = String(JSON.parse(atob(booking.qrPayload)).expiresAt);
+          const expiresAt = Date.parse(/Z|[+-]\d\d:\d\d$/.test(expiry) ? expiry : `${expiry}Z`);
+          if (expiresAt > Date.now()) return;
+        }
+      } catch { /* Fetch a valid ticket when the current payload cannot be read. */ }
+      pending = true;
+      try {
+        const response = await getBookingById(bookingId);
+        if (!disposed && response.success && response.data) setBooking(response.data);
+      } catch { /* Keep the expired QR hidden and retry on the next tick. */ }
+      finally { pending = false; }
+    };
+    const timer = window.setInterval(() => { void refresh(); }, 3000);
+    void refresh();
+    return () => { disposed = true; window.clearInterval(timer); };
+  }, [bookingId, booking]);
+
   // Fallback to props or mock while loading, or if API fails
   const stationName = booking?.stationName || bookingData?.stationName || 'Da Nang Airport Station - Terminal 1';
   const stationAddress = booking?.stationAddress || bookingData?.stationAddress || 'Arrival Hall Gate A2, Ground Floor (Kiosk Tower B)';
