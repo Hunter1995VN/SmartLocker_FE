@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
     Lock, LayoutDashboard, Compass, Clock, Headphones,
-    ChevronDown, LogOut, Bell
+    ChevronDown, LogOut, Bell, User, DollarSign
 } from 'lucide-react';
 import NotificationPreferencesModal from '../customer/NotificationPreferencesModal';
 
 export interface CustomerHeaderProps {
-    currentPage?: 'dashboard' | 'find-station' | 'my-bookings' | 'station-booking' | 'booking-payment' | 'booking-detail';
+    currentPage?: 'dashboard' | 'find-station' | 'my-bookings' | 'station-booking' | 'booking-payment' | 'booking-detail' | 'profile';
     onNavigate: (page: string, data?: any) => void;
     onLogout?: () => void;
 }
@@ -58,10 +58,11 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
         }
     };
 
-    const isTabActive = (tab: 'dashboard' | 'find-station' | 'my-bookings') => {
+    const isTabActive = (tab: 'dashboard' | 'find-station' | 'my-bookings' | 'profile') => {
         if (tab === 'dashboard') return currentPage === 'dashboard';
         if (tab === 'find-station') return currentPage === 'find-station' || currentPage === 'station-booking';
         if (tab === 'my-bookings') return currentPage === 'my-bookings' || currentPage === 'booking-payment' || currentPage === 'booking-detail';
+        if (tab === 'profile') return currentPage === 'profile';
         return false;
     };
 
@@ -132,8 +133,8 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                         </nav>
                     </div>
 
-                    {/* 2. Trailing System Status, Notification Settings & User Profile */}
-                    <div className="flex items-center gap-2.5">
+                    {/* 2. Trailing System Status & User Profile */}
+                    <div className="flex items-center gap-3">
                         {/* Live System Status Pill */}
                         <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-[#eff4ff] rounded-full border border-[#dce9ff]">
                             <span className="relative flex h-2 w-2">
@@ -142,16 +143,6 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                             </span>
                             <span className="text-xs text-[#0b1c30] font-semibold">IoT Trực tuyến</span>
                         </div>
-
-                        {/* UC-T22 Quick Button: Notification Channel Preferences */}
-                        <button
-                            type="button"
-                            onClick={() => setNotifPrefsOpen(true)}
-                            className="p-2 rounded-xl border border-[#e5eeff] bg-[#f8faff] hover:bg-[#eff4ff] text-[#2563eb] transition cursor-pointer"
-                            title="Thiết lập tùy chọn kênh nhận thông báo (SMS, Email, WebPush - UC-T22)"
-                        >
-                            <Bell className="w-4 h-4" />
-                        </button>
 
                         {/* User Dropdown */}
                         <div className="relative" ref={dropdownRef}>
@@ -203,6 +194,22 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                                     >
                                         <Clock className="w-4 h-4 text-[#2563eb]" />
                                         <span>Lịch sử đơn đặt</span>
+                                    </button>
+
+                                    <button
+                                        onClick={() => { setUserMenuOpen(false); onNavigate('profile', { tab: 'info' }); }}
+                                        className="w-full text-left px-4 py-2.5 text-xs font-medium text-[#434655] hover:bg-[#eff4ff] hover:text-[#2563eb] flex items-center gap-2.5 transition-colors cursor-pointer"
+                                    >
+                                        <User className="w-4 h-4 text-[#2563eb]" />
+                                        <span>Thông tin cá nhân</span>
+                                    </button>
+
+                                    <button
+                                        onClick={() => { setUserMenuOpen(false); onNavigate('profile', { tab: 'debt' }); }}
+                                        className="w-full text-left px-4 py-2.5 text-xs font-medium text-[#434655] hover:bg-[#eff4ff] hover:text-[#2563eb] flex items-center gap-2.5 transition-colors cursor-pointer"
+                                    >
+                                        <DollarSign className="w-4 h-4 text-[#2563eb]" />
+                                        <span>Tra cứu dư nợ quá hạn</span>
                                     </button>
 
                                     <button
