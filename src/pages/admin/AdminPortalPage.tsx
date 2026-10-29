@@ -1,3 +1,4 @@
+import LostItemQueue from '../../components/admin/incidents/LostItemQueue';
 import StationRatingSummary from '../../components/admin/incidents/StationRatingSummary';
 /**
  * AD-FE-02: UC-A02 — View Operations Dashboard
@@ -199,7 +200,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                     {activeMenu === 'abandoned' ? (
                         <AbandonedPropertyView userRole={role} />
                     ) : activeMenu === 'incidents' ? (
-                        <><StationRatingSummary /><EmergencyIncidentListView userRole={role} /></>
+                        <><LostItemQueue /><StationRatingSummary /><EmergencyIncidentListView userRole={role} /></>
                     ) : activeMenu === 'lockers' ? (
                         <RealtimeLockerGridView />
                     ) : activeMenu === 'rbac' ? (

@@ -30,6 +30,7 @@ import { offlineTicketStore } from '../utils/offlineTicketStore';
 import { QRCodeSVG } from 'qrcode.react';
 import CustomerHeader from '../components/layout/CustomerHeader';
 import StationReviewPanel from '../components/booking/StationReviewPanel';
+import LostItemPanel from '../components/booking/LostItemPanel';
 
 interface BookingDetailPageProps {
   onNavigate: (page: string, props?: any) => void;
@@ -886,6 +887,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
           </div>
         </div>
         {booking && <StationReviewPanel bookingId={booking.id} status={booking.status} />}
+        {booking && <LostItemPanel bookingId={booking.id} status={booking.status} checkedOutAt={booking.checkedOutAt} />}
       </main>
 
       {/* OFFLINE TICKET PASS MODAL */}
