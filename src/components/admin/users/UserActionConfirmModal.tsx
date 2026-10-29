@@ -43,6 +43,7 @@ export default function UserActionConfirmModal({
 
     const targetRoleCfg = targetRole ? getRoleConfig(targetRole) : null;
     const currentRoleCfg = getRoleConfig(user.role);
+    const isTraveler = user.role === 'TRAVELER';
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
@@ -67,12 +68,12 @@ export default function UserActionConfirmModal({
                         )}
                         <div>
                             <h3 className="text-sm font-bold text-slate-900">
-                                {actionType === 'LOCK' && 'Khóa tài khoản nhân viên?'}
-                                {actionType === 'ACTIVATE' && 'Kích hoạt tài khoản nhân viên?'}
+                                {actionType === 'LOCK' && (isTraveler ? 'Khóa tài khoản khách hàng?' : 'Khóa tài khoản nhân sự?')}
+                                {actionType === 'ACTIVATE' && (isTraveler ? 'Kích hoạt tài khoản khách hàng?' : 'Kích hoạt tài khoản nhân sự?')}
                                 {actionType === 'CHANGE_ROLE' && 'Xác nhận thay đổi vai trò?'}
                             </h3>
                             <p className="text-xs text-slate-500">
-                                Nhân sự: <strong className="text-slate-800">{user.fullName || user.email}</strong>
+                                {isTraveler ? 'Khách hàng: ' : 'Nhân sự: '}<strong className="text-slate-800">{user.fullName || user.email}</strong>
                             </p>
                         </div>
                     </div>
@@ -93,17 +94,21 @@ export default function UserActionConfirmModal({
                         <div className="p-3 bg-rose-50 border border-rose-200/80 rounded-xl text-rose-800 space-y-1">
                             <p className="font-bold flex items-center gap-1.5">
                                 <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
-                                Cảnh báo bảo mật:
+                                {isTraveler ? 'Cảnh báo khóa tài khoản khách hàng:' : 'Cảnh báo bảo mật:'}
                             </p>
                             <p className="text-rose-700">
-                                Tài khoản này sẽ ngay lập tức bị thu hồi quyền truy cập Admin Portal và ứng dụng Mobile.
+                                {isTraveler
+                                    ? 'Tài khoản khách hàng này sẽ bị tạm khóa (SUSPENDED), không thể đăng nhập hoặc đặt ô tủ mới cho đến khi được mở khóa.'
+                                    : 'Tài khoản này sẽ ngay lập tức bị thu hồi quyền truy cập Admin Portal và các chức năng vận hành trạm.'}
                             </p>
                         </div>
                     )}
 
                     {actionType === 'ACTIVATE' && (
                         <p className="text-slate-600">
-                            Tài khoản sẽ được chuyển sang trạng thái <strong>ACTIVE</strong> và nhân sự có thể đăng nhập thực hiện các thao tác vận hành trạm.
+                            {isTraveler
+                                ? 'Tài khoản sẽ được chuyển sang trạng thái ACTIVE và khách hàng có thể tiếp tục đăng nhập, sử dụng dịch vụ bình thường.'
+                                : 'Tài khoản sẽ được chuyển sang trạng thái ACTIVE và nhân sự có thể đăng nhập thực hiện các thao tác vận hành trạm.'}
                         </p>
                     )}
 
@@ -130,7 +135,11 @@ export default function UserActionConfirmModal({
                                 id="lock-reason-input"
                                 value={reason}
                                 onChange={(e) => setReason(e.target.value)}
-                                placeholder="Nhập lý do tạm khóa (vd: Vi phạm quy trình vận hành trạm, nghi vấn lộ bảo mật...)"
+                                placeholder={
+                                    isTraveler
+                                        ? 'Nhập lý do tạm khóa (vd: Nợ cước quá hạn chưa thanh toán, vi phạm điều khoản dịch vụ, nghi vấn gian lận...)'
+                                        : 'Nhập lý do tạm khóa (vd: Vi phạm quy trình vận hành trạm, nghi vấn lộ bảo mật...)'
+                                }
                                 rows={3}
                                 className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 text-xs"
                             />
