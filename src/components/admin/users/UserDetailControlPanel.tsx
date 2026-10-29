@@ -44,6 +44,7 @@ interface UserDetailControlPanelProps {
         autoSuspended: boolean,
         message: string
     ) => void;
+    onNavigateRbac?: () => void;
 }
 
 export default function UserDetailControlPanel({
@@ -55,6 +56,7 @@ export default function UserDetailControlPanel({
     onSaveRole,
     isUpdatingRole,
     onDebtUpdated,
+    onNavigateRbac,
 }: UserDetailControlPanelProps) {
     const currentRole = ((user?.role || 'STAFF').toUpperCase() as UserRole) || 'STAFF';
     const [selectedRole, setSelectedRole] = useState<UserRole>(currentRole);
@@ -477,10 +479,14 @@ export default function UserDetailControlPanel({
                         <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                             Phân quyền vai trò (RBAC)
                         </span>
-                        <span className="text-[11px] font-semibold text-blue-600 flex items-center gap-1 cursor-pointer">
+                        <button
+                            type="button"
+                            onClick={onNavigateRbac}
+                            className="text-[11px] font-semibold text-blue-600 hover:underline flex items-center gap-1 cursor-pointer"
+                        >
                             <span>Chi tiết RBAC</span>
                             <ExternalLink className="w-3 h-3" />
-                        </span>
+                        </button>
                     </div>
 
                     <div>
