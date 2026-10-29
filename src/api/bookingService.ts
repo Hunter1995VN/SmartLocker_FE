@@ -17,6 +17,7 @@ export interface CreateBookingRequest {
   size: 'S' | 'M' | 'L';
   startAt: string;   // ISO 8601 datetime
   endAt: string;     // ISO 8601 datetime
+  voucherCode?: string;
 }
 
 export interface ExtendBookingRequest {
@@ -32,6 +33,9 @@ export interface CancelBookingRequest {
 export interface CreateBookingResponse {
   bookingId: string;
   bookingCode: string;
+  originalAmount?: number;
+  discountAmount?: number;
+  appliedVoucherCode?: string;
   amount: number;
   paymentUrl: string;
   paymentExpiresAt: string;
