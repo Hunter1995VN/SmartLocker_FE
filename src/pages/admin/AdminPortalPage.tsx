@@ -1,3 +1,4 @@
+import LostItemQueue from '../../components/admin/incidents/LostItemQueue';
 import ManualConfirmQueue from '../../components/admin/incidents/ManualConfirmQueue';
 /**
  * AD-FE-02: UC-A02 — View Operations Dashboard
@@ -195,7 +196,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                     {activeMenu === 'abandoned' ? (
                         <AbandonedPropertyView userRole={role} />
                     ) : activeMenu === 'incidents' ? (
-                        <><ManualConfirmQueue /><EmergencyIncidentListView userRole={role} /></>
+                        <><LostItemQueue /><ManualConfirmQueue /><EmergencyIncidentListView userRole={role} /></>
                     ) : activeMenu === 'lockers' ? (
                         <RealtimeLockerGridView />
                     ) : activeMenu === 'users' ? (
