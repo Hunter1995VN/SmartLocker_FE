@@ -11,6 +11,7 @@ import {
     ShieldAlert,
     DollarSign,
     Users,
+    UserCog,
     CreditCard,
     PackageX,
     FileText,
@@ -23,6 +24,7 @@ import type { AuthResponse } from '../../api/authService';
 export type AdminMenuKey =
     | 'dashboard'
     | 'stations'
+    | 'rbac'
     | 'users'
     | 'lockers'
     | 'incidents'
@@ -184,6 +186,30 @@ export default function AdminSidebar({
                             >
                                 <DollarSign className="w-4 h-4 text-slate-400" />
                                 <span>Pricing & Penalty (UC-A04)</span>
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => onSelectMenu?.('rbac')}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition cursor-pointer text-left ${
+                                    activeMenu === 'rbac'
+                                        ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-600/30'
+                                        : 'text-slate-600 hover:bg-slate-50'
+                                }`}
+                            >
+                                <span className="flex items-center gap-2.5">
+                                    <UserCog className={`w-4 h-4 ${activeMenu === 'rbac' ? 'text-white' : 'text-purple-500'}`} />
+                                    <span>Staff & RBAC (UC-A05)</span>
+                                </span>
+                                <span
+                                    className={`px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase ${
+                                        activeMenu === 'rbac'
+                                            ? 'bg-white/20 text-white'
+                                            : 'bg-purple-50 text-purple-700 border border-purple-200/80'
+                                    }`}
+                                >
+                                    RBAC
+                                </span>
                             </button>
 
                             <button
