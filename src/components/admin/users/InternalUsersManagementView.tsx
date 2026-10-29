@@ -35,7 +35,13 @@ interface NotificationState {
 
 type QuickViewTab = 'ALL_ACCOUNTS' | 'TRAVELERS' | 'DEBTORS' | 'INTERNAL_STAFF';
 
-export default function InternalUsersManagementView() {
+interface InternalUsersManagementViewProps {
+    onNavigateRbac?: () => void;
+}
+
+export default function InternalUsersManagementView({
+    onNavigateRbac,
+}: InternalUsersManagementViewProps = {}) {
     // 1. Current Logged-in User & Authorization check
     const currentAdminUser = useMemo(() => {
         try {
@@ -529,6 +535,16 @@ export default function InternalUsersManagementView() {
 
                     {/* Action buttons on header */}
                     <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+                        {onNavigateRbac && (
+                            <button
+                                type="button"
+                                onClick={onNavigateRbac}
+                                className="inline-flex items-center gap-2 px-4 py-2.5 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs font-bold rounded-xl transition cursor-pointer"
+                            >
+                                <Shield className="w-4 h-4" />
+                                <span>Phân quyền Nhân sự & RBAC (UC-A05)</span>
+                            </button>
+                        )}
                         {isAdmin && (
                             <>
                                 <button
@@ -754,6 +770,7 @@ export default function InternalUsersManagementView() {
                         onSaveRole={handleSaveRoleFromPanel}
                         isUpdatingRole={isUpdatingRole}
                         onDebtUpdated={handleDebtUpdated}
+                        onNavigateRbac={onNavigateRbac}
                     />
                 </div>
             </div>

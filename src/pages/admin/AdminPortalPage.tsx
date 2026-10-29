@@ -7,7 +7,8 @@
  * - Ma trận Lưới Ô Tủ & Mở khóa khẩn cấp (UC-S02, UC-S05)
  * - Trung tâm Sự cố & Cứu hộ mở khóa từ xa (UC-S04, UC-S05)
  * - Quản lý Tài sản bỏ quên 72h, Duyệt 4 mắt & Bàn giao đồ thất lạc (UC-S10, UC-S11, UC-A07)
- * - Quản lý Khách hàng, Nhân sự & Chặn nợ xấu (UC-A05, UC-A06)
+ * - Quản lý Tài khoản Nội bộ & Phân quyền Vai trò Admin / Staff RBAC (UC-A05)
+ * - Quản lý Khách hàng & Kiểm soát Nợ xấu (UC-A06)
  * - Đối soát tài chính định kỳ PayOS & CSDL (UC-A12)
  * - Tra cứu Nhật ký Truy vết An ninh toàn hệ thống Audit Logs (UC-A08)
  */
@@ -31,6 +32,7 @@ import CriticalTriageCard from '../../components/admin/CriticalTriageCard';
 import StationFleetTable from '../../components/admin/StationFleetTable';
 import StationManagementView from '../../components/admin/stations/StationManagementView';
 import InternalUsersManagementView from '../../components/admin/users/InternalUsersManagementView';
+import InternalRbacManagementView from '../../components/admin/rbac/InternalRbacManagementView';
 import RealtimeLockerGridView from '../../components/admin/lockers/RealtimeLockerGridView';
 import AbandonedPropertyView from '../../components/admin/abandoned/AbandonedPropertyView';
 import EmergencyIncidentListView from '../../components/admin/incidents/EmergencyIncidentListView';
@@ -197,8 +199,15 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                         <EmergencyIncidentListView userRole={role} />
                     ) : activeMenu === 'lockers' ? (
                         <RealtimeLockerGridView />
+                    ) : activeMenu === 'rbac' ? (
+                        <InternalRbacManagementView
+                            onNavigateAudit={() => setActiveMenu('audit')}
+                            onNavigateDebtUsers={() => setActiveMenu('users')}
+                        />
                     ) : activeMenu === 'users' ? (
-                        <InternalUsersManagementView />
+                        <InternalUsersManagementView
+                            onNavigateRbac={() => setActiveMenu('rbac')}
+                        />
                     ) : activeMenu === 'stations' ? (
                         <StationManagementView />
                     ) : activeMenu === 'reconciliation' ? (
