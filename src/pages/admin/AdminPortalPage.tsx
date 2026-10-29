@@ -31,6 +31,7 @@ import IoTTelemetryCard from '../../components/admin/IoTTelemetryCard';
 import CriticalTriageCard from '../../components/admin/CriticalTriageCard';
 import StationFleetTable from '../../components/admin/StationFleetTable';
 import StationManagementView from '../../components/admin/stations/StationManagementView';
+import PromotionVoucherManagementView from '../../components/admin/promotions/PromotionVoucherManagementView';
 import InternalUsersManagementView from '../../components/admin/users/InternalUsersManagementView';
 import InternalRbacManagementView from '../../components/admin/rbac/InternalRbacManagementView';
 import RealtimeLockerGridView from '../../components/admin/lockers/RealtimeLockerGridView';
@@ -210,6 +211,10 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                         />
                     ) : activeMenu === 'stations' ? (
                         <StationManagementView />
+                    ) : activeMenu === 'promotions' ? (
+                        <PromotionVoucherManagementView
+                            onNavigateAudit={() => setActiveMenu('audit')}
+                        />
                     ) : activeMenu === 'reconciliation' ? (
                         <FinancialReconciliationView />
                     ) : activeMenu === 'audit' ? (

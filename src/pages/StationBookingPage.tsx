@@ -21,10 +21,16 @@ import {
   Timer,
   Lock,
   BadgeCheck,
-  Sparkles
+  Sparkles,
+  Ticket,
+  X
 } from 'lucide-react';
 import { MOCK_STATIONS, getStationById, type StationDetail } from '../api/stationService';
 import { createBooking } from '../api/bookingService';
+import adminPromotionService, {
+  type AvailableVoucherItemDto,
+  type VoucherValidationResultDto
+} from '../api/adminPromotionService';
 import CustomerHeader from '../components/layout/CustomerHeader';
 
 interface StationBookingPageProps {
@@ -215,6 +221,116 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
   };
 
   const currentPrice = getPrice(selectedSize, selectedDuration);
+
+  // Promotion / Voucher States
+  const [availableVouchers, setAvailableVouchers] = useState<AvailableVoucherItemDto[]>([]);
+  const [voucherInput, setVoucherInput] = useState<string>('');
+  const [appliedVoucher, setAppliedVoucher] = useState<VoucherValidationResultDto | null>(null);
+  const [isApplyingVoucher, setIsApplyingVoucher] = useState<boolean>(false);
+  const [voucherFeedback, setVoucherFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  const handleApplyVoucherCode = async (rawCode?: string) => {
+    const codeToCheck = (rawCode ?? voucherInput).trim().toUpperCase();
+    if (!codeToCheck || currentPrice <= 0) return;
+    setIsApplyingVoucher(true);
+    setVoucherFeedback(null);
+    try {
+      const res = await adminPromotionService.validateVoucher({
+        code: codeToCheck,
+        orderAmount: currentPrice,
+        stationId: currentStation.id,
+        size: selectedSize || undefined
+      });
+      if (res.success && res.data && res.data.isValid) {
+        setAppliedVoucher(res.data);
+        setVoucherInput(res.data.code);
+        setVoucherFeedback({
+          type: 'success',
+          text: `Đã áp dụng mã ${res.data.code}: tiết kiệm ${res.data.discountAmount.toLocaleString('en-US')} VND`
+        });
+      } else {
+        setAppliedVoucher(null);
+        setVoucherFeedback({
+          type: 'error',
+          text: res.data?.message || res.message || 'Mã giảm giá không đủ điều kiện áp dụng.'
+        });
+      }
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { message?: string; data?: { message?: string } } } };
+      setAppliedVoucher(null);
+      setVoucherFeedback({
+        type: 'error',
+        text:
+          axiosErr.response?.data?.data?.message ||
+          axiosErr.response?.data?.message ||
+          'Mã Voucher không hợp lệ hoặc đã hết ngân sách khuyến mại.'
+      });
+    } finally {
+      setIsApplyingVoucher(false);
+    }
+  };
+
+  const handleClearVoucher = () => {
+    setAppliedVoucher(null);
+    setVoucherInput('');
+    setVoucherFeedback(null);
+  };
+
+  // Fetch available vouchers & re-validate applied voucher when price/size/station changes
+  useEffect(() => {
+    let active = true;
+    const syncVouchers = async () => {
+      if (currentPrice <= 0) {
+        setAvailableVouchers([]);
+        setAppliedVoucher(null);
+        return;
+      }
+      try {
+        const availRes = await adminPromotionService.getAvailableVouchers({
+          stationId: currentStation.id,
+          size: selectedSize || undefined,
+          orderAmount: currentPrice
+        });
+        if (active && availRes.success && availRes.data) {
+          setAvailableVouchers(availRes.data);
+        }
+      } catch {
+        // Non-blocking if promotions endpoint is unreachable
+      }
+
+      if (appliedVoucher?.code) {
+        try {
+          const valRes = await adminPromotionService.validateVoucher({
+            code: appliedVoucher.code,
+            orderAmount: currentPrice,
+            stationId: currentStation.id,
+            size: selectedSize || undefined
+          });
+          if (!active) return;
+          if (valRes.success && valRes.data && valRes.data.isValid) {
+            setAppliedVoucher(valRes.data);
+          } else {
+            setAppliedVoucher(null);
+            setVoucherFeedback({
+              type: 'error',
+              text: valRes.data?.message || 'Mã giảm giá đã tự động gỡ do thay đổi giá trị đơn thuê.'
+            });
+          }
+        } catch {
+          if (active) setAppliedVoucher(null);
+        }
+      }
+    };
+    void syncVouchers();
+    return () => {
+      active = false;
+    };
+  }, [currentStation.id, selectedSize, currentPrice]);
+
+  const discountAmount = appliedVoucher?.isValid ? appliedVoucher.discountAmount : 0;
+  const finalPayableAmount = appliedVoucher?.isValid
+    ? appliedVoucher.finalPayableAmount
+    : currentPrice;
 
   // Format currency
   const formatCurrency = (amount: number) => {
@@ -1057,10 +1173,119 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                     <p className="font-semibold text-emerald-600">Included</p>
                   </div>
 
-                  <div className="bg-slate-50 p-4 rounded-xl mt-5 border border-slate-200/80">
+                  {/* Promo Code & Voucher Selection */}
+                  <div className="pt-3 border-t border-slate-100 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-[#0F172A] flex items-center gap-1.5">
+                        <Ticket className="w-3.5 h-3.5 text-emerald-600" />
+                        Promo Code / Voucher
+                      </span>
+                      {availableVouchers.filter(v => v.isEligibleNow).length > 0 && (
+                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                          {availableVouchers.filter(v => v.isEligibleNow).length} mã khả dụng
+                        </span>
+                      )}
+                    </div>
+
+                    {appliedVoucher ? (
+                      <div className="flex items-center justify-between bg-emerald-50/90 border border-emerald-200 rounded-xl px-3 py-2">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-mono text-xs font-extrabold text-emerald-800 bg-white px-2 py-0.5 rounded border border-emerald-200">
+                              {appliedVoucher.code}
+                            </span>
+                            <span className="text-xs font-bold text-emerald-700">
+                              -{formatCurrency(appliedVoucher.discountAmount)}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-emerald-700 truncate mt-0.5">{appliedVoucher.title}</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleClearVoucher}
+                          className="p-1 rounded-lg text-emerald-700 hover:bg-emerald-100 cursor-pointer shrink-0"
+                          title="Gỡ mã giảm giá"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex gap-1.5">
+                        <input
+                          type="text"
+                          value={voucherInput}
+                          onChange={(e) => setVoucherInput(e.target.value.toUpperCase())}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              void handleApplyVoucherCode();
+                            }
+                          }}
+                          placeholder="Nhập mã (VD: DANANG20)"
+                          className="flex-1 px-3 py-2 rounded-xl border border-slate-200 text-xs font-mono font-bold uppercase focus:border-blue-500 focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          disabled={!voucherInput.trim() || isApplyingVoucher}
+                          onClick={() => void handleApplyVoucherCode()}
+                          className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:bg-slate-200 disabled:text-slate-400 text-white text-xs font-bold transition cursor-pointer"
+                        >
+                          {isApplyingVoucher ? '...' : 'Áp dụng'}
+                        </button>
+                      </div>
+                    )}
+
+                    {voucherFeedback && (
+                      <p className={`text-[11px] font-medium ${voucherFeedback.type === 'success' ? 'text-emerald-700' : 'text-rose-600'}`}>
+                        {voucherFeedback.text}
+                      </p>
+                    )}
+
+                    {availableVouchers.length > 0 && !appliedVoucher && (
+                      <div className="flex flex-wrap gap-1.5 pt-0.5">
+                        {availableVouchers.slice(0, 4).map((v) => (
+                          <button
+                            key={v.id}
+                            type="button"
+                            disabled={!v.isEligibleNow || isApplyingVoucher}
+                            onClick={() => void handleApplyVoucherCode(v.code)}
+                            title={v.isEligibleNow ? v.title : (v.ineligibleReason || v.title)}
+                            className={`px-2.5 py-1 rounded-lg border text-[11px] font-bold flex items-center gap-1 transition ${
+                              v.isEligibleNow
+                                ? 'bg-blue-50/70 hover:bg-blue-100 text-blue-700 border-blue-200 cursor-pointer'
+                                : 'bg-slate-50 text-slate-400 border-slate-200 cursor-not-allowed opacity-75'
+                            }`}
+                          >
+                            <span className="font-mono">{v.code}</span>
+                            {v.isEligibleNow ? (
+                              <span className="text-emerald-600">(-{(v.estimatedDiscount / 1000).toFixed(0)}K)</span>
+                            ) : (
+                              <span className="text-[10px] font-normal">
+                                (Đơn từ {(v.minOrderAmount / 1000).toFixed(0)}K)
+                              </span>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="bg-slate-50 p-4 rounded-xl mt-5 border border-slate-200/80 space-y-1.5">
+                    {discountAmount > 0 && (
+                      <>
+                        <div className="flex justify-between items-center text-xs text-slate-500">
+                          <span>Subtotal</span>
+                          <span className="line-through">{formatCurrency(currentPrice)}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-xs font-bold text-emerald-600">
+                          <span>Voucher ({appliedVoucher?.code})</span>
+                          <span>-{formatCurrency(discountAmount)}</span>
+                        </div>
+                      </>
+                    )}
                     <div className="flex justify-between items-end mb-1">
                       <p className="text-sm font-bold text-[#0F172A]">Total Amount</p>
-                      <p className="text-2xl font-extrabold text-blue-600">{formatCurrency(currentPrice)}</p>
+                      <p className="text-2xl font-extrabold text-blue-600">{formatCurrency(finalPayableAmount)}</p>
                     </div>
                     <p className="text-[11px] text-slate-400 text-right">Includes VAT & station facility services</p>
                   </div>
@@ -1086,7 +1311,8 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                           stationId: currentStation.id,
                           size: selectedSize,
                           startAt: start.toISOString(),
-                          endAt: end.toISOString()
+                          endAt: end.toISOString(),
+                          voucherCode: appliedVoucher?.code || undefined
                         });
                         
                         if (res.success && res.data) {
@@ -1101,7 +1327,10 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                               dropOffDate: dropOffDate,
                               dropOffTime: dropOffTime,
                               storageDate: bookingMode === 'NOW' ? 'Right Now' : displayStorageDate,
-                              amount: res.data.amount || currentPrice,
+                              amount: res.data.amount || finalPayableAmount,
+                              originalAmount: res.data.originalAmount ?? currentPrice,
+                              discountAmount: res.data.discountAmount ?? discountAmount,
+                              appliedVoucherCode: res.data.appliedVoucherCode ?? appliedVoucher?.code,
                               paymentUrl: res.data.paymentUrl,
                               bookingId: res.data.bookingId,
                               bookingCode: res.data.bookingCode,
