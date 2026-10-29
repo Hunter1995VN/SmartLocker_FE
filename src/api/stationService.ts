@@ -4,6 +4,8 @@ import apiClient from './client';
 
 /** Trạm tủ (danh sách — StationListItemDto) */
 export interface Station {
+    ratingAverage?: number | null;
+    ratingCount?: number;
     id: string;
     name: string;
     address: string;

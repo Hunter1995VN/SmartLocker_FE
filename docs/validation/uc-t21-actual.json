@@ -1,0 +1,37 @@
+{
+  "checkedAt": "2026-10-29T14:40:24.370Z",
+  "uc": "T21",
+  "level": "Dev-based merge candidate; actual API, SQL and production React components; no HTTP mocks",
+  "checks": [
+    {
+      "name": "Actual duplicate, validation, checkout and owner/role guards",
+      "status": "PASS"
+    },
+    {
+      "name": "Actual public/staff aggregates agree with persisted review",
+      "status": "PASS",
+      "count": 1,
+      "average": 3
+    },
+    {
+      "name": "Production booking detail shows stored review and prevents duplicate form",
+      "status": "PASS"
+    },
+    {
+      "name": "Manually completed booking remains accessible in production history",
+      "status": "PASS"
+    },
+    {
+      "name": "Production station page replaces fixed rating with actual aggregate",
+      "status": "PASS"
+    },
+    {
+      "name": "Staff production summary uses actual station scores",
+      "status": "PASS"
+    },
+    {
+      "name": "Existing TEST review unchanged throughout merge-candidate verification",
+      "status": "PASS"
+    }
+  ]
+}

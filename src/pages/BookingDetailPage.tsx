@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Lock,
   MapPin,
@@ -29,6 +29,7 @@ import { getBookingById, checkInBooking, checkOutBooking, extendBooking, getOffl
 import { offlineTicketStore } from '../utils/offlineTicketStore';
 import { QRCodeSVG } from 'qrcode.react';
 import CustomerHeader from '../components/layout/CustomerHeader';
+import StationReviewPanel from '../components/booking/StationReviewPanel';
 
 interface BookingDetailPageProps {
   onNavigate: (page: string, props?: any) => void;
@@ -401,7 +402,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                     ? 'bg-amber-50 text-amber-800 border-amber-300' 
                     : status === 'STORED'
                       ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                      : status === 'COMPLETED'
+                      : ['COMPLETED', 'COMPLETED_MANUAL'].includes(status)
                         ? 'bg-blue-50 text-blue-800 border-blue-300'
                         : 'bg-slate-100 text-slate-800 border-slate-300'
                 }`}>
@@ -572,7 +573,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
               <div className={`mt-6 rounded-2xl p-5 border space-y-4 transition-all duration-300 ${
                 isHoldPeriod 
                   ? 'bg-amber-50/70 border-amber-200/80 shadow-xs' 
-                  : status === 'COMPLETED'
+                  : ['COMPLETED', 'COMPLETED_MANUAL'].includes(status)
                     ? 'bg-emerald-50/70 border-emerald-200 shadow-xs'
                     : 'bg-[#eff4ff]/80 border-blue-200/80 shadow-xs'
               }`}>
@@ -587,7 +588,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                       <span className="text-sm font-bold text-[#0b1c30]">
                         {isHoldPeriod 
                           ? 'Thời gian giữ chỗ tủ (30 phút để đến trạm)' 
-                          : status === 'COMPLETED'
+                          : ['COMPLETED', 'COMPLETED_MANUAL'].includes(status)
                             ? 'Lượt thuê tủ đã hoàn tất'
                             : 'Thời gian lưu trữ còn lại'}
                       </span>
@@ -597,7 +598,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                     </div>
                   </div>
                   <span className={`text-lg font-bold font-mono ${isHoldPeriod ? 'text-amber-700' : 'text-primary'}`}>
-                    {status === 'COMPLETED' ? '00:00:00' : remainingText}
+                    {['COMPLETED', 'COMPLETED_MANUAL'].includes(status) ? '00:00:00' : remainingText}
                   </span>
                 </div>
 
@@ -608,7 +609,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                       className={`h-2.5 rounded-full transition-all duration-500 ${
                         isHoldPeriod 
                           ? 'bg-amber-500' 
-                          : status === 'COMPLETED' 
+                          : ['COMPLETED', 'COMPLETED_MANUAL'].includes(status)
                             ? 'bg-emerald-500' 
                             : 'bg-primary'
                       }`} 
@@ -884,6 +885,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
             </div>
           </div>
         </div>
+        {booking && <StationReviewPanel bookingId={booking.id} status={booking.status} />}
       </main>
 
       {/* OFFLINE TICKET PASS MODAL */}

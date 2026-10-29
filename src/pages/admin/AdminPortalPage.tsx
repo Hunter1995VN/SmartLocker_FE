@@ -1,3 +1,4 @@
+import StationRatingSummary from '../../components/admin/incidents/StationRatingSummary';
 /**
  * AD-FE-02: UC-A02 — View Operations Dashboard
  * Màn hình Operations Dashboard chính cho Admin Portal (Admin & Staff)
@@ -198,7 +199,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                     {activeMenu === 'abandoned' ? (
                         <AbandonedPropertyView userRole={role} />
                     ) : activeMenu === 'incidents' ? (
-                        <EmergencyIncidentListView userRole={role} />
+                        <><StationRatingSummary /><EmergencyIncidentListView userRole={role} /></>
                     ) : activeMenu === 'lockers' ? (
                         <RealtimeLockerGridView />
                     ) : activeMenu === 'rbac' ? (
