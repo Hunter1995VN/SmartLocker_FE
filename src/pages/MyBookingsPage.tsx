@@ -15,11 +15,14 @@ import {
   SlidersHorizontal,
   LockOpen,
   Ban,
-  CheckCircle
+  CheckCircle,
+  WifiOff
 } from 'lucide-react';
 import { ExtendBookingModal } from '../components/booking/ExtendBookingModal';
 import { CancelBookingModal } from '../components/booking/CancelBookingModal';
-import { getMyBookings, extendBooking, cancelBooking, payOverdueFee, type BookingListItemDto } from '../api/bookingService';
+import { OfflineTicketModal } from '../components/booking/OfflineTicketModal';
+import { getMyBookings, extendBooking, cancelBooking, payOverdueFee, getOfflineTicket, type BookingListItemDto, type OfflineTicketDto } from '../api/bookingService';
+import { offlineTicketStore } from '../utils/offlineTicketStore';
 import CustomerHeader from '../components/layout/CustomerHeader';
 
 interface MyBookingsPageProps {
@@ -40,6 +43,33 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
   const [showExtendModal, setShowExtendModal] = useState<boolean>(false);
   const [showCancelModal, setShowCancelModal] = useState<boolean>(false);
   const [cancelledDetailBooking, setCancelledDetailBooking] = useState<BookingListItemDto | null>(null);
+
+  // Offline Ticket Modal state
+  const [isOfflineModalOpen, setIsOfflineModalOpen] = useState<boolean>(false);
+  const [offlineTicket, setOfflineTicket] = useState<OfflineTicketDto | null>(null);
+  const [isLoadingOfflineTicket, setIsLoadingOfflineTicket] = useState<boolean>(false);
+
+  const handleOpenOfflineModal = async (bookingId: string) => {
+    setIsOfflineModalOpen(true);
+    const cached = offlineTicketStore.getTicket(bookingId);
+    if (cached) {
+      setOfflineTicket(cached);
+    } else {
+      setOfflineTicket(null);
+    }
+
+    setIsLoadingOfflineTicket(true);
+    try {
+      const res = await getOfflineTicket(bookingId);
+      if (res.success && res.data) {
+        setOfflineTicket(res.data);
+      }
+    } catch (err) {
+      console.warn('Lá»—i táº£i vÃ© ngoáº¡i tuyáº¿n:', err);
+    } finally {
+      setIsLoadingOfflineTicket(false);
+    }
+  };
 
   // Toast state
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -352,6 +382,15 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                         <QrCode className="w-4 h-4" />
                         <span>View Digital Key (QR Code)</span>
                       </button>
+                      {/* Offline Ticket Modal Trigger */}
+                      <button
+                        onClick={() => handleOpenOfflineModal(booking.id)}
+                        className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-blue-50 hover:bg-blue-100/80 border border-blue-200 text-blue-900 text-sm font-semibold rounded-xl transition-all cursor-pointer active:scale-95"
+                        title="Má»Ÿ vÃ© ngoáº¡i tuyáº¿n (ká»ƒ cáº£ khi máº¥t sÃ³ng 4G/Wifi)"
+                      >
+                        <WifiOff className="w-4 h-4 text-blue-700" />
+                        <span>VÃ© Offline</span>
+                      </button>
                       {/* Outline Action: Extend Time */}
                       <button
                         onClick={() => {
@@ -566,6 +605,14 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
           </div>
         </div>
       )}
+
+      {/* OFFLINE TICKET PASS MODAL */}
+      <OfflineTicketModal
+        isOpen={isOfflineModalOpen}
+        onClose={() => setIsOfflineModalOpen(false)}
+        ticket={offlineTicket}
+        isLoading={isLoadingOfflineTicket}
+      />
 
       {/* EXTEND BOOKING MODAL (UC-T07) */}
       {selectedBooking && (
