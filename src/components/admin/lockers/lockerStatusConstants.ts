@@ -9,7 +9,7 @@
 import { CheckCircle2, Lock, Wrench, ShieldOff } from 'lucide-react';
 import type { ElementType } from 'react';
 
-export type LockerBusinessStatus = 'AVAILABLE' | 'OCCUPIED' | 'MAINTENANCE' | 'DISABLED';
+export type LockerBusinessStatus = 'AVAILABLE' | 'RESERVED' | 'OCCUPIED' | 'MAINTENANCE' | 'DISABLED';
 
 export interface LockerStatusMeta {
     status: LockerBusinessStatus;
@@ -40,6 +40,12 @@ export const LOCKER_STATUS_CONFIG: Record<LockerBusinessStatus, LockerStatusMeta
         cardHoverBorder: 'hover:border-emerald-400',
         icon: CheckCircle2,
         description: 'Tủ đang trống, sẵn sàng cho khách hàng đặt và sử dụng',
+    },
+    RESERVED: {
+        status: 'RESERVED', label: 'Đã giữ chỗ', sublabel: 'RESERVED (GIỮ CHỖ)',
+        badgeBg: 'bg-amber-50', badgeText: 'text-amber-700', badgeBorder: 'border-amber-200',
+        dotColor: 'bg-amber-500', cardBorder: 'border-amber-200', cardBg: 'bg-amber-50/40',
+        cardHoverBorder: 'hover:border-amber-400', icon: Lock, description: 'Đã dành cho khách, chưa gửi đồ',
     },
     OCCUPIED: {
         status: 'OCCUPIED',
@@ -91,8 +97,9 @@ export const LOCKER_STATUS_CONFIG: Record<LockerBusinessStatus, LockerStatusMeta
 export function normalizeLockerStatus(rawStatus?: string): LockerBusinessStatus {
     const s = (rawStatus || '').toUpperCase();
     if (s === 'AVAILABLE') return 'AVAILABLE';
-    if (s === 'OCCUPIED' || s === 'RESERVED') return 'OCCUPIED';
+    if (s === 'RESERVED') return 'RESERVED';
+    if (s === 'OCCUPIED') return 'OCCUPIED';
     if (s === 'MAINTENANCE') return 'MAINTENANCE';
     if (s === 'DISABLED' || s === 'BLOCKED') return 'DISABLED';
-    return 'AVAILABLE';
+    return 'DISABLED';
 }

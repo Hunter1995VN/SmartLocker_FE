@@ -31,6 +31,7 @@ import StationManagementView from '../../components/admin/stations/StationManage
 import InternalUsersManagementView from '../../components/admin/users/InternalUsersManagementView';
 import RealtimeLockerGridView from '../../components/admin/lockers/RealtimeLockerGridView';
 import AbandonedPropertyView from '../../components/admin/abandoned/AbandonedPropertyView';
+import ManualConfirmQueue from '../../components/admin/incidents/ManualConfirmQueue';
 import EmergencyIncidentListView from '../../components/admin/incidents/EmergencyIncidentListView';
 
 
@@ -191,7 +192,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                     {activeMenu === 'abandoned' ? (
                         <AbandonedPropertyView userRole={role} />
                     ) : activeMenu === 'incidents' ? (
-                        <EmergencyIncidentListView userRole={role} />
+                        <><ManualConfirmQueue /><EmergencyIncidentListView userRole={role} /></>
                     ) : activeMenu === 'lockers' ? (
                         <RealtimeLockerGridView />
                     ) : activeMenu === 'users' ? (

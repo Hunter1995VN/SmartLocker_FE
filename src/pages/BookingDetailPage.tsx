@@ -25,6 +25,7 @@ import {
 import { ExtendBookingModal } from '../components/booking/ExtendBookingModal';
 import { getBookingById, checkInBooking, checkOutBooking, extendBooking, type BookingDto } from '../api/bookingService';
 import { QRCodeSVG } from 'qrcode.react';
+import TravelerSupportPanel from '../components/booking/TravelerSupportPanel';
 import CustomerHeader from '../components/layout/CustomerHeader';
 
 interface BookingDetailPageProps {
@@ -54,7 +55,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
         setIsLoading(false);
         return;
       }
-      setIsLoading(true);
+      if (!booking) setIsLoading(true);
       try {
         const response = await getBookingById(bookingId);
         if (mounted && response.success && response.data) {
@@ -66,8 +67,9 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
         if (mounted) setIsLoading(false);
       }
     };
-    fetchBooking();
-    return () => { mounted = false; };
+    void fetchBooking();
+    const refresh = window.setInterval(fetchBooking, 5000);
+    return () => { mounted = false; window.clearInterval(refresh); };
   }, [bookingId]);
 
   // Fallback to props or mock while loading, or if API fails
@@ -83,7 +85,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
     ? `Locker ${rawBayCode}`
     : `Auto-assigned at Kiosk (Size ${size})`;
 
-    // Chuẩn hóa mã PIN 6 số cho Kiosk Touchpad
+    // PIN hiển thị đúng mã được cấp bởi máy chủ.
   const getDisplayPin = () => {
     if (booking?.status === 'PENDING_PAYMENT') {
       return 'Chờ thanh toán';
@@ -282,14 +284,15 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
     );
   };
 
-  // Token anti-screenshot refresh timer: đếm lùi từ 30s -> 0 -> 30s
-  const [tokenSeconds, setTokenSeconds] = useState<number>(28);
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTokenSeconds(prev => (prev <= 1 ? 30 : prev - 1));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
+  // The server rotates the actual token; the countdown uses its expiry.
+  let tokenSeconds = 0;
+  if (booking?.qrPayload) {
+    try {
+      const ticket = JSON.parse(atob(booking.qrPayload));
+      const expiry = String(ticket.expiresAt);
+      tokenSeconds = Math.max(0, Math.ceil((Date.parse(/Z|[+-]\d\d:\d\d$/.test(expiry) ? expiry : `${expiry}Z`) - Date.now()) / 1000));
+    } catch { /* An unreadable ticket must not be displayed. */ }
+  }
 
   // Copy passcode state
   const [copied, setCopied] = useState<boolean>(false);
@@ -441,17 +444,9 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                   <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-primary/30 to-blue-400/30 blur-md opacity-75 group-hover:opacity-100 transition duration-500"></div>
                   {/* QR Frame */}
                   <div className="relative p-5 bg-white rounded-2xl border-2 border-primary/20 shadow-md flex items-center justify-center">
-                    <QRCodeSVG
-                      value={booking?.qrPayload || JSON.stringify({
-                        bookingId: booking?.id || bookingId,
-                        bookingCode: orderId,
-                        stationId: booking?.stationId,
-                        accessCode: passcode
-                      })}
-                      size={210}
-                      level="H"
-                      includeMargin={false}
-                    />
+                    {booking?.qrPayload && tokenSeconds > 0 && ['CONFIRMED', 'STORED'].includes(booking.status) ? (
+                      <QRCodeSVG value={booking.qrPayload} size={210} level="H" includeMargin={false} />
+                    ) : <p className="p-8 text-sm">Vé chưa sẵn sàng hoặc đã hết hạn. Đang cập nhật…</p>}
                   </div>
                 </div>
 
@@ -464,7 +459,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                 {/* Real-time Refresh Pulse Indicator */}
                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#eff4ff] rounded-full text-xs font-medium text-secondary">
                   <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                  <span>Token refreshes in <strong className="text-[#0b1c30]">{tokenSeconds}s</strong> (Anti-screenshot security)</span>
+                  <span>Token refreshes in <strong className="text-[#0b1c30]">{tokenSeconds}s</strong> </span>
                 </div>
               </div>
 
@@ -823,6 +818,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
             </div>
           </div>
         </div>
+        {booking && <TravelerSupportPanel booking={booking} />}
       </main>
 
       {/* EXTEND BOOKING MODAL (UC-T07) */}

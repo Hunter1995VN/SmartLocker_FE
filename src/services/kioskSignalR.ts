@@ -1,8 +1,9 @@
+import apiClient from '../api/client';
 import * as signalR from '@microsoft/signalr';
 
-const API_BASE_URL = (import.meta.env.VITE_API_URL as string) || 'http://localhost:5000';
+const API_BASE_URL = apiClient.defaults.baseURL;
 
-class KioskSignalRService {
+export class KioskSignalRService {
   private connection: signalR.HubConnection | null = null;
   private currentStationId: string | null = null;
   private onDoorChangedCallback: ((event: { stationId: string; lockerId: string; lockerCode: string; doorState: string; occurredAt: string }) => void) | null = null;
@@ -34,6 +35,10 @@ class KioskSignalRService {
       .withAutomaticReconnect([0, 2000, 5000, 10000])
       .configureLogging(signalR.LogLevel.Warning)
       .build();
+
+    this.connection.onreconnected(async () => {
+      if (this.currentStationId) await this.connection?.invoke('JoinStation', this.currentStationId);
+    });
 
     this.connection.on('DoorStatusChanged', (event: any) => {
       this.onDoorChangedCallback?.(event);

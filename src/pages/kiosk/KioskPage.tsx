@@ -4,6 +4,7 @@ import { kioskApi } from '../../api/kioskService';
 import type { KioskStationStatus } from '../../api/kioskService';
 import { kioskSignalR } from '../../services/kioskSignalR';
 import { sounds } from '../../utils/soundEffects';
+import WalkInBooking from '../../components/kiosk/WalkInBooking';
 import Locker3DCanvas from '../../components/kiosk/Locker3DCanvas';
 import { 
   SmartLockerLogo3D, 
@@ -19,7 +20,7 @@ import {
   type KioskLanguage 
 } from '../../utils/kioskI18n';
 
-type KioskStep = 'WELCOME' | 'IDLE' | 'AUTH' | 'LOCKER_ACTIVE' | 'OVERDUE' | 'SUCCESS';
+type KioskStep = 'WELCOME' | 'IDLE' | 'AUTH' | 'LOCKER_ACTIVE' | 'OVERDUE' | 'SUCCESS' | 'REVIEW_PENDING' | 'WALK_IN';
 type OperationMode = 'CHECK_IN' | 'CHECK_OUT';
 type AuthMethod = 'QR' | 'ACCESS_CODE';
 
@@ -64,6 +65,11 @@ export default function KioskPage() {
   const [activeDoorState, setActiveDoorState] = useState<string>('OPEN');
   const [overdueFee, setOverdueFee] = useState<number>(0);
 
+  const sessionTokenRef = useRef<string | undefined>(undefined);
+  const credentialRef = useRef<{ credentialType: 'QR' | 'ACCESS_CODE'; payload: string }>({ credentialType: 'QR', payload: '' });
+  const observedOpenRef = useRef(false);
+  const submittingRef = useRef(false);
+  const operationStartedRef = useRef(0);
   const activeLockerIdRef = useRef<string>('');
   const activeLockerCodeRef = useRef<string>('');
   useEffect(() => {
@@ -80,6 +86,18 @@ export default function KioskPage() {
   const [showHelpModal, setShowHelpModal] = useState<boolean>(false);
   const [doorTimerSeconds, setDoorTimerSeconds] = useState<number>(0);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    if (!showSensorModal) return;
+    let disposed = false;
+    let stream: MediaStream | undefined;
+    navigator.mediaDevices.getUserMedia({ video: true }).then(value => {
+      if (disposed) { value.getTracks().forEach(track => track.stop()); return; }
+      stream = value;
+      if (videoRef.current) videoRef.current.srcObject = value;
+    }).catch(() => setErrorMessage('Không truy cập được camera. Vui lòng liên hệ nhân viên.'));
+    return () => { disposed = true; stream?.getTracks().forEach(track => track.stop()); };
+  }, [showSensorModal]);
 
   // Success auto-return countdown timer
   const [successCountdown, setSuccessCountdown] = useState<number>(6);
@@ -142,7 +160,9 @@ export default function KioskPage() {
         const curCode = activeLockerCodeRef.current || activeLockerCode;
         if ((curId && event.lockerId === curId) || (curCode && event.lockerCode === curCode)) {
           setActiveDoorState(event.doorState);
-          if (event.doorState === 'CLOSED') {
+          if (Date.parse(event.occurredAt) < operationStartedRef.current) return;
+          if (event.doorState === 'OPEN') observedOpenRef.current = true;
+          if (event.doorState === 'CLOSED' && observedOpenRef.current) {
             if (soundEnabled) sounds.playUnlockSuccess();
             setStep('SUCCESS');
           } else {
@@ -150,14 +170,7 @@ export default function KioskPage() {
           }
         }
       },
-      (event) => {
-        const curId = activeLockerIdRef.current || activeLockerId;
-        const curCode = activeLockerCodeRef.current || activeLockerCode;
-        if ((curId && event.lockerId === curId) || (curCode && event.lockerCode === curCode)) {
-          setActiveDoorState('OPEN');
-          if (soundEnabled) sounds.playUnlockSuccess();
-        }
-      }
+      () => { /* Command acknowledgement is not proof that the door opened. */ }
     );
 
     return () => {
@@ -268,6 +281,10 @@ export default function KioskPage() {
 
   // Return to Welcome (Language Select) after completing transaction
   const handleReturnToWelcome = () => {
+    observedOpenRef.current = false;
+    activeLockerIdRef.current = '';
+    activeLockerCodeRef.current = '';
+    setLang('VI');
     setStep('WELCOME');
     setAccessCode('');
     setErrorMessage('');
@@ -280,6 +297,11 @@ export default function KioskPage() {
 
   // Process QR or PIN
   const handleProcessCredential = async (type: 'QR' | 'ACCESS_CODE', rawValue: string) => {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+    observedOpenRef.current = false;
+    operationStartedRef.current = Date.now();
+    credentialRef.current = { credentialType: type, payload: rawValue };
     const targetStationId = stationId || allStations[0]?.id || FALLBACK_STATIONS[0].id;
     if (!stationId) {
       setStationId(targetStationId);
@@ -298,12 +320,13 @@ export default function KioskPage() {
 
         if (res.success && res.data) {
           if (soundEnabled) sounds.playUnlockSuccess();
+          sessionTokenRef.current = res.data.sessionToken;
           setActiveBookingId(res.data.bookingId);
           setActiveBookingCode(res.data.bookingCode);
           setActiveLockerId(res.data.lockerId);
           setActiveLockerCode(res.data.lockerCode);
           setActiveLockerSize(res.data.lockerSize);
-          setActiveDoorState(res.data.doorState || 'OPEN');
+          setActiveDoorState(res.data.doorState || 'UNKNOWN');
           setStep('LOCKER_ACTIVE');
         } else {
           setErrorMessage(res.message || 'Mã không hợp lệ hoặc đơn chưa sẵn sàng.');
@@ -324,12 +347,13 @@ export default function KioskPage() {
             if (soundEnabled) sounds.playWarningAlert();
           } else {
             if (soundEnabled) sounds.playUnlockSuccess();
-            setActiveBookingId(res.data.bookingId || '');
+            sessionTokenRef.current = res.data.sessionToken;
+          setActiveBookingId(res.data.bookingId || '');
             setActiveBookingCode(res.data.bookingCode || '');
             setActiveLockerId(res.data.lockerId || '');
             setActiveLockerCode(res.data.lockerCode || '');
             setActiveLockerSize(res.data.lockerSize || '');
-            setActiveDoorState(res.data.doorState || 'OPEN');
+            setActiveDoorState(res.data.doorState || 'UNKNOWN');
             setStep('LOCKER_ACTIVE');
           }
         } else {
@@ -339,12 +363,13 @@ export default function KioskPage() {
       }
     } catch (err: any) {
       if (err.code === 'ERR_NETWORK' || !err.response) {
-        setErrorMessage('Không thể kết nối đến máy chủ Backend (http://localhost:5000). Vui lòng đảm bảo Backend API đã chạy.');
+        setErrorMessage('Không thể kết nối trạm. Vui lòng thử lại hoặc liên hệ nhân viên.');
       } else {
         setErrorMessage(err.response?.data?.message || 'Lỗi xử lý xác thực.');
       }
       if (soundEnabled) sounds.playWarningAlert();
     } finally {
+      submittingRef.current = false;
       setLoading(false);
     }
   };
@@ -376,12 +401,14 @@ export default function KioskPage() {
         bookingId: activeBookingId,
         lockerId: activeLockerId,
         photoBase64,
+        ...credentialRef.current,
+        sessionToken: sessionTokenRef.current,
         notes: 'Xác nhận thủ công trên Kiosk khi cảm biến cửa chưa ghi nhận.',
       });
 
       if (res.success) {
         setShowSensorModal(false);
-        setStep('SUCCESS');
+        setStep('REVIEW_PENDING');
       } else {
         setErrorMessage(res.message || 'Xác nhận thất bại.');
       }
@@ -532,6 +559,8 @@ export default function KioskPage() {
         {/* =========================================================================
             STATE 0: WELCOME & LANGUAGE SELECTION (BẮT BUỘC CHỌN NGÔN NGỮ ĐẦU TIÊN)
            ========================================================================= */}
+        {(step === 'WELCOME' || step === 'IDLE') && <button className="mb-4 rounded-xl bg-blue-700 text-white px-8 py-4 font-bold" onClick={() => { setOpMode('CHECK_IN'); setStep('WALK_IN'); }}>Đặt tủ ngay / Book a locker</button>}
+        {step === 'WALK_IN' && <WalkInBooking stationId={stationId} onCancel={handleReturnToWelcome} onReady={pin => { void handleProcessCredential('ACCESS_CODE', pin); }} />}
         {step === 'WELCOME' && (
           <div className="w-full max-w-3xl my-auto text-center space-y-6 animate-fade-in">
             
@@ -576,9 +605,7 @@ export default function KioskPage() {
                       <div className="text-sm font-black text-slate-900 dark:text-white">
                         {item.nativeName}
                       </div>
-                      <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                        {item.name}
-                      </div>
+        
                     </div>
                   </button>
                 ))}
@@ -943,33 +970,6 @@ export default function KioskPage() {
               </div>
             )}
 
-            {/* Quick Test Presets inside Auth */}
-            <div className="pt-3 mt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[11px]">
-              <span className="text-slate-500">Mã kiểm tra:</span>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAccessCode('888888');
-                    handleProcessCredential('ACCESS_CODE', '888888');
-                  }}
-                  className="px-2 py-1 rounded bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-300/40 font-mono font-bold"
-                >
-                  Check-In 888888
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAccessCode('999999');
-                    handleProcessCredential('ACCESS_CODE', '999999');
-                  }}
-                  className="px-2 py-1 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-300/40 font-mono font-bold"
-                >
-                  Check-Out 999999
-                </button>
-              </div>
-            </div>
-
           </div>
         )}
 
@@ -1038,12 +1038,12 @@ export default function KioskPage() {
               </div>
 
               <button
-                onClick={() => setStep('SUCCESS')}
+                onClick={() => setShowHelpModal(true)}
                 className={`w-full py-3 rounded-xl text-xs font-bold uppercase transition-colors ${
                   outdoorMode ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-slate-700 hover:bg-slate-600 text-white'
                 }`}
               >
-                ĐÃ ĐÓNG CỬA TỦ • HOÀN TẤT
+                CẦN NHÂN VIÊN HỖ TRỢ
               </button>
 
             </div>
@@ -1086,6 +1086,7 @@ export default function KioskPage() {
         {/* =========================================================================
             STATE 5: SUCCESS (AUTO RESETS TO WELCOME / LANGUAGE SELECT SCREEN)
            ========================================================================= */}
+        {step === 'REVIEW_PENDING' && <section className="p-10 bg-white rounded-2xl text-center"><h2 className="text-2xl font-bold">Đang chờ nhân viên duyệt</h2><p className="my-4">Ảnh đã được gửi. Đơn chỉ hoàn tất sau khi nhân viên xác nhận.</p><button onClick={handleReturnToWelcome}>Về màn hình chào</button></section>}
         {step === 'SUCCESS' && (
           <div className={`w-full max-w-md border-2 rounded-3xl p-8 text-center space-y-5 my-auto animate-fade-in shadow-xl ${
             outdoorMode

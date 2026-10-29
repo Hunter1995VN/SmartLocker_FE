@@ -11,6 +11,7 @@ import type { LockerBusinessStatus } from './lockerStatusConstants';
 
 interface LockerStatusSummaryCardsProps {
     total: number;
+    reservedCount: number;
     availableCount: number;
     occupiedCount: number;
     maintenanceCount: number;
@@ -22,6 +23,7 @@ interface LockerStatusSummaryCardsProps {
 
 export default function LockerStatusSummaryCards({
     total,
+    reservedCount,
     availableCount,
     occupiedCount,
     maintenanceCount,
@@ -43,6 +45,8 @@ export default function LockerStatusSummaryCards({
         borderColor: string;
         icon: typeof CheckCircle2;
     }[] = [
+        { key: 'RESERVED', title: 'RESERVED (GIỮ CHỖ)', count: reservedCount, pct: calcPct(reservedCount),
+          dotBg: 'bg-amber-500', badgeBg: 'bg-amber-50', textColor: 'text-amber-700', borderColor: 'border-amber-200', icon: Lock },
         {
             key: 'AVAILABLE',
             title: 'AVAILABLE (SẴN SÀNG)',

@@ -8,6 +8,7 @@ interface LockerFilterBarProps {
     sizeFilter: string;
     onSizeFilterChange: (size: string) => void;
     total: number;
+    reservedCount: number;
     availableCount: number;
     occupiedCount: number;
     maintenanceCount: number;
@@ -20,6 +21,7 @@ export default function LockerFilterBar({
     sizeFilter,
     onSizeFilterChange,
     total,
+    reservedCount,
     availableCount,
     occupiedCount,
     maintenanceCount,
@@ -33,6 +35,7 @@ export default function LockerFilterBar({
                     Bộ lọc:
                 </span>
 
+                <button type="button" onClick={() => onStatusFilterChange('RESERVED')} className="px-3 py-1.5 rounded-xl bg-amber-50 text-amber-800 border border-amber-200">Giữ chỗ ({reservedCount})</button>
                 <button
                     type="button"
                     onClick={() => onStatusFilterChange('all')}
