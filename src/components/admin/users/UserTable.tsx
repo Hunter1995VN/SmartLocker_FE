@@ -1,11 +1,13 @@
 /**
- * AD-FE-05: UC-A06 — Manage Internal Users
- * Bảng danh sách tài khoản Staff & quản trị viên, hiển thị thông tin thực tế từ API.
+ * AD-FE-05: UC-A05 & UC-A06 — Manage Customers, Internal Users & Overdue Debt Control
+ * Bảng danh sách tài khoản Khách hàng, Staff & Quản trị viên, hiển thị cột Dư nợ quá hạn (UC-A06).
  */
 import {
     Shield,
     UserCheck,
     AlertCircle,
+    AlertTriangle,
+    CheckCircle2,
     Lock,
     Unlock,
     Eye,
@@ -103,9 +105,9 @@ export default function UserTable({
                     <Users className="w-7 h-7" />
                 </div>
                 <div>
-                    <h3 className="text-sm font-bold text-slate-800">Không tìm thấy tài khoản nhân viên phù hợp</h3>
+                    <h3 className="text-sm font-bold text-slate-800">Không tìm thấy tài khoản phù hợp</h3>
                     <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-                        Không có nhân sự nào khớp với điều kiện tìm kiếm hoặc bộ lọc trạng thái hiện tại.
+                        Không có khách hàng hoặc nhân sự nào khớp với điều kiện tìm kiếm hoặc bộ lọc hiện tại.
                     </p>
                 </div>
                 <button
@@ -125,8 +127,9 @@ export default function UserTable({
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr className="bg-slate-50/70 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
-                            <th className="py-3 px-4">Nhân viên / Định danh</th>
-                            <th className="py-3 px-4">Vai trò & Phân quyền</th>
+                            <th className="py-3 px-4">Người dùng / Định danh</th>
+                            <th className="py-3 px-4">Vai trò</th>
+                            <th className="py-3 px-4">Dư nợ quá hạn (UC-A06)</th>
                             <th className="py-3 px-4">Trạng thái</th>
                             <th className="py-3 px-4">Ngày tạo</th>
                             <th className="py-3 px-4 text-right">Thao tác</th>
@@ -139,6 +142,8 @@ export default function UserTable({
                             const statusCfg = getStatusConfig(user.status);
                             const isActive = (user.status || '').toUpperCase() === 'ACTIVE';
                             const isSuspended = (user.status || '').toUpperCase() === 'SUSPENDED';
+                            const debtAmount = Math.max(0, Number(user.overdueDebt || 0));
+                            const hasDebt = debtAmount > 0;
 
                             return (
                                 <tr
@@ -147,6 +152,8 @@ export default function UserTable({
                                     className={`transition-colors cursor-pointer group ${
                                         isSelected
                                             ? 'bg-blue-50/80 hover:bg-blue-50'
+                                            : hasDebt
+                                            ? 'bg-rose-50/25 hover:bg-rose-50/50'
                                             : 'hover:bg-slate-50/80'
                                     }`}
                                 >
@@ -195,7 +202,29 @@ export default function UserTable({
                                         </span>
                                     </td>
 
-                                    {/* Column 3: Status Badge */}
+                                    {/* Column 3: Overdue Debt (UC-A06) */}
+                                    <td className="py-3.5 px-4 whitespace-nowrap">
+                                        {hasDebt ? (
+                                            <div className="flex flex-col items-start gap-0.5">
+                                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-extrabold bg-rose-100 text-rose-700 border border-rose-200 font-mono">
+                                                    <AlertTriangle className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+                                                    <span>{debtAmount.toLocaleString('vi-VN')} đ — NỢ XẤU</span>
+                                                </span>
+                                                {!isSuspended && (
+                                                    <span className="text-[10px] font-bold text-rose-600 pl-1">
+                                                        Chưa khóa tài khoản
+                                                    </span>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+                                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                                                <span>0 đ (Không nợ)</span>
+                                            </span>
+                                        )}
+                                    </td>
+
+                                    {/* Column 4: Status Badge */}
                                     <td className="py-3.5 px-4 whitespace-nowrap">
                                         <span
                                             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border ${statusCfg.badgeClass}`}
@@ -205,19 +234,19 @@ export default function UserTable({
                                         </span>
                                     </td>
 
-                                    {/* Column 4: Created At */}
+                                    {/* Column 5: Created At */}
                                     <td className="py-3.5 px-4 whitespace-nowrap text-slate-500 font-mono text-[11px]">
                                         {formatDate(user.createdAt)}
                                     </td>
 
-                                    {/* Column 5: Actions */}
+                                    {/* Column 6: Actions */}
                                     <td className="py-3.5 px-4 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                                         <div className="flex items-center justify-end gap-1.5">
                                             <button
                                                 type="button"
                                                 onClick={() => onSelectUser(user)}
                                                 className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition cursor-pointer"
-                                                title="Xem chi tiết & Quản lý"
+                                                title="Xem chi tiết & Kiểm soát nợ xấu"
                                             >
                                                 <Eye className="w-4 h-4" />
                                             </button>
@@ -228,8 +257,12 @@ export default function UserTable({
                                                         <button
                                                             type="button"
                                                             onClick={() => onTriggerLock(user)}
-                                                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer"
-                                                            title="Tạm khóa tài khoản"
+                                                            className={`p-1.5 rounded-lg transition cursor-pointer ${
+                                                                hasDebt
+                                                                    ? 'text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200'
+                                                                    : 'text-slate-400 hover:text-rose-600 hover:bg-rose-50'
+                                                            }`}
+                                                            title={hasDebt ? 'Chặn tài khoản nợ xấu' : 'Tạm khóa tài khoản'}
                                                         >
                                                             <Lock className="w-4 h-4" />
                                                         </button>
@@ -268,10 +301,10 @@ export default function UserTable({
             {/* Table Footer: Summary count */}
             <div className="p-3 bg-slate-50/60 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
                 <span>
-                    Hiển thị <strong className="text-slate-800">{users.length}</strong> nhân sự
+                    Hiển thị <strong className="text-slate-800">{users.length}</strong> tài khoản
                 </span>
                 <span className="text-[11px] text-slate-400">
-                    Bấm vào dòng để xem chi tiết và quản trị quyền
+                    Bấm vào dòng để xem hồ sơ chi tiết, kiểm soát nợ xấu (UC-A06) và phân quyền
                 </span>
             </div>
         </div>

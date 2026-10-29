@@ -1,14 +1,15 @@
 /**
  * AD-FE-02: UC-A02 — View Operations Dashboard
  * Màn hình Operations Dashboard chính cho Admin Portal (Admin & Staff)
- * Giao diện bám sát theo thiết kế mockup SmartLocker Operations Control.
- * Tích hợp đầy đủ dữ liệu từ Backend API:
- * - KpiSummaryRow: Stations, Operational, Ready Lockers, Occupied, Reserved, Offline, Incidents, Revenue
- * - LockerCompartmentAllocation: Thanh phân bổ ngăn tủ đa màu sắc
- * - RevenueChart: Biểu đồ doanh thu tương tác SVG
- * - IoTTelemetryCard: Chỉ số đo đạc vi điều khiển ESP32, Uptime, MQTT Broker
- * - CriticalTriageCard: Cảnh báo sự cố phần cứng, lỗi kẹt chốt tủ
- * - StationFleetTable: Chi tiết danh sách trạm, dung lượng ô tủ và trạng thái kết nối
+ * Tích hợp đầy đủ các phân hệ Quản trị & Vận hành:
+ * - Dashboard tổng quan
+ * - Quản lý Trạm & Chính sách Giá / Phạt quá hạn / Hoàn tiền hủy đơn (UC-A03, UC-A04)
+ * - Ma trận Lưới Ô Tủ & Mở khóa khẩn cấp (UC-S02, UC-S05)
+ * - Trung tâm Sự cố & Cứu hộ mở khóa từ xa (UC-S04, UC-S05)
+ * - Quản lý Tài sản bỏ quên 72h, Duyệt 4 mắt & Bàn giao đồ thất lạc (UC-S10, UC-S11, UC-A07)
+ * - Quản lý Khách hàng, Nhân sự & Chặn nợ xấu (UC-A05, UC-A06)
+ * - Đối soát tài chính định kỳ PayOS & CSDL (UC-A12)
+ * - Tra cứu Nhật ký Truy vết An ninh toàn hệ thống Audit Logs (UC-A08)
  */
 import { useState, useEffect, useCallback } from 'react';
 import type { AuthResponse } from '../../api/authService';
@@ -20,6 +21,7 @@ import type {
     IncidentDto,
 } from '../../api/adminDashboardService';
 import AdminSidebar from '../../components/admin/AdminSidebar';
+import type { AdminMenuKey } from '../../components/admin/AdminSidebar';
 import DashboardHeader from '../../components/admin/DashboardHeader';
 import KpiSummaryRow from '../../components/admin/KpiSummaryRow';
 import LockerCompartmentAllocation from '../../components/admin/LockerCompartmentAllocation';
@@ -32,7 +34,8 @@ import InternalUsersManagementView from '../../components/admin/users/InternalUs
 import RealtimeLockerGridView from '../../components/admin/lockers/RealtimeLockerGridView';
 import AbandonedPropertyView from '../../components/admin/abandoned/AbandonedPropertyView';
 import EmergencyIncidentListView from '../../components/admin/incidents/EmergencyIncidentListView';
-
+import FinancialReconciliationView from '../../components/admin/finance/FinancialReconciliationView';
+import AuditLogView from '../../components/admin/audit/AuditLogView';
 
 interface AdminPortalPageProps {
     onLogout: () => void;
@@ -77,7 +80,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
     const [chartError, setChartError] = useState<string | null>(null);
     const [selectedDays, setSelectedDays] = useState<number>(30);
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-    const [activeMenu, setActiveMenu] = useState<'dashboard' | 'stations' | 'users' | 'lockers' | 'incidents' | 'abandoned'>('dashboard');
+    const [activeMenu, setActiveMenu] = useState<AdminMenuKey>('dashboard');
 
     // 4. API Fetch Functions
     const fetchStats = useCallback(async () => {
@@ -198,6 +201,10 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                         <InternalUsersManagementView />
                     ) : activeMenu === 'stations' ? (
                         <StationManagementView />
+                    ) : activeMenu === 'reconciliation' ? (
+                        <FinancialReconciliationView />
+                    ) : activeMenu === 'audit' ? (
+                        <AuditLogView />
                     ) : (
                         <>
                             {/* Top Header & Telemetry Controls */}

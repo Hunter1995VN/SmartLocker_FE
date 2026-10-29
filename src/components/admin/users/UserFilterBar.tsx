@@ -1,8 +1,8 @@
 /**
- * AD-FE-05: UC-A06 — Manage Internal Users
- * Thanh bộ lọc trạng thái dạng tabs, tìm kiếm họ tên/email/phone và dropdown vai trò.
+ * AD-FE-05: UC-A05 & UC-A06 — Manage Customers, Internal Users & Overdue Debt Control
+ * Thanh bộ lọc trạng thái dạng tabs, tìm kiếm họ tên/email/phone, lọc vai trò và lọc tình trạng dư nợ.
  */
-import { Search, Filter, RotateCw, Plus, Download } from 'lucide-react';
+import { Search, Filter, RotateCw, Plus, Download, AlertOctagon } from 'lucide-react';
 
 interface UserFilterBarProps {
     searchQuery: string;
@@ -11,6 +11,8 @@ interface UserFilterBarProps {
     onStatusFilterChange: (status: string) => void;
     roleFilter: string; // 'ALL' | 'ADMIN' | 'STAFF' | 'TRAVELER'
     onRoleFilterChange: (role: string) => void;
+    debtFilter?: string; // 'ALL' | 'HAS_DEBT' | 'NO_DEBT'
+    onDebtFilterChange?: (debtFilter: string) => void;
     totalCount: number;
     activeCount: number;
     suspendedCount: number;
@@ -29,6 +31,8 @@ export default function UserFilterBar({
     onStatusFilterChange,
     roleFilter,
     onRoleFilterChange,
+    debtFilter = 'ALL',
+    onDebtFilterChange,
     totalCount,
     activeCount,
     suspendedCount,
@@ -40,9 +44,9 @@ export default function UserFilterBar({
     isAdmin,
 }: UserFilterBarProps) {
     const tabs: Array<{ id: string; label: string; count: number }> = [
-        { id: 'ALL', label: 'Tất cả', count: totalCount },
+        { id: 'ALL', label: 'Tất cả trạng thái', count: totalCount },
         { id: 'ACTIVE', label: 'Đang hoạt động', count: activeCount },
-        { id: 'SUSPENDED', label: 'Bị tạm khóa', count: suspendedCount },
+        { id: 'SUSPENDED', label: 'Đã khóa / Chặn', count: suspendedCount },
         { id: 'PENDING_VERIFICATION', label: 'Chờ xác nhận', count: pendingCount },
     ];
 
@@ -105,7 +109,7 @@ export default function UserFilterBar({
                 </div>
             </div>
 
-            {/* Bottom row: Search input, Role dropdown & Refresh */}
+            {/* Bottom row: Search input, Role dropdown, Debt filter & Refresh */}
             <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
                 {/* Search Input */}
                 <div className="relative flex-1">
@@ -114,7 +118,7 @@ export default function UserFilterBar({
                         type="text"
                         value={searchQuery}
                         onChange={(e) => onSearchChange(e.target.value)}
-                        placeholder="Tìm kiếm nhân sự theo Tên, Email, Số điện thoại..."
+                        placeholder="Tìm kiếm khách hàng hoặc nhân sự theo Tên, Email, Số điện thoại..."
                         className="w-full pl-10 pr-4 py-2 text-xs bg-slate-50/80 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition text-slate-800 placeholder-slate-400"
                     />
                     {searchQuery && (
@@ -128,8 +132,27 @@ export default function UserFilterBar({
                     )}
                 </div>
 
-                {/* Filter Dropdown & Refresh */}
-                <div className="flex items-center gap-2.5">
+                {/* Filter Dropdowns & Refresh */}
+                <div className="flex flex-wrap items-center gap-2.5">
+                    {onDebtFilterChange && (
+                        <div className="flex items-center gap-1.5">
+                            <label htmlFor="debt-filter-select" className="text-xs font-semibold text-slate-500 whitespace-nowrap flex items-center gap-1">
+                                <AlertOctagon className="w-3.5 h-3.5 text-rose-500" />
+                                <span>Dư nợ:</span>
+                            </label>
+                            <select
+                                id="debt-filter-select"
+                                value={debtFilter}
+                                onChange={(e) => onDebtFilterChange(e.target.value)}
+                                className="px-3 py-2 text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 text-slate-700 cursor-pointer"
+                            >
+                                <option value="ALL">Tất cả dư nợ</option>
+                                <option value="HAS_DEBT">Có nợ xấu (&gt; 0 đ)</option>
+                                <option value="NO_DEBT">Không nợ (0 đ)</option>
+                            </select>
+                        </div>
+                    )}
+
                     <div className="flex items-center gap-2">
                         <label htmlFor="role-filter-select" className="text-xs font-semibold text-slate-500 whitespace-nowrap flex items-center gap-1">
                             <Filter className="w-3.5 h-3.5 text-slate-400" />
@@ -142,9 +165,9 @@ export default function UserFilterBar({
                             className="px-3 py-2 text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 text-slate-700 cursor-pointer"
                         >
                             <option value="ALL">Tất cả vai trò</option>
+                            <option value="TRAVELER">Khách hàng (Traveler)</option>
                             <option value="STAFF">Vận hành (Staff)</option>
                             <option value="ADMIN">Quản trị viên (Admin)</option>
-                            <option value="TRAVELER">Khách hàng (Traveler)</option>
                         </select>
                     </div>
 
