@@ -4,7 +4,7 @@ import { kioskApi } from '../../api/kioskService';
 import type { KioskStationStatus } from '../../api/kioskService';
 import { kioskSignalR } from '../../services/kioskSignalR';
 import { sounds } from '../../utils/soundEffects';
-
+import WalkInBooking from '../../components/kiosk/WalkInBooking';
 import Locker3DCanvas from '../../components/kiosk/Locker3DCanvas';
 import { 
   SmartLockerLogo3D, 
@@ -559,6 +559,8 @@ export default function KioskPage() {
         {/* =========================================================================
             STATE 0: WELCOME & LANGUAGE SELECTION (BẮT BUỘC CHỌN NGÔN NGỮ ĐẦU TIÊN)
            ========================================================================= */}
+        {(step === 'WELCOME' || step === 'IDLE') && <button className="mb-4 rounded-xl bg-blue-700 text-white px-8 py-4 font-bold" onClick={() => { setOpMode('CHECK_IN'); setStep('WALK_IN'); }}>Đặt tủ ngay / Book a locker</button>}
+        {step === 'WALK_IN' && <WalkInBooking stationId={stationId} onCancel={handleReturnToWelcome} onReady={pin => { void handleProcessCredential('ACCESS_CODE', pin); }} />}
         {step === 'WELCOME' && (
           <div className="w-full max-w-3xl my-auto text-center space-y-6 animate-fade-in">
             
