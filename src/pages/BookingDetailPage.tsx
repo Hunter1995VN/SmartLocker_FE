@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import {
   Lock,
   MapPin,
@@ -20,10 +20,13 @@ import {
   Clock,
   Sparkles,
   CheckCircle2,
-  PackageCheck
+  PackageCheck,
+  WifiOff
 } from 'lucide-react';
 import { ExtendBookingModal } from '../components/booking/ExtendBookingModal';
-import { getBookingById, checkInBooking, checkOutBooking, extendBooking, type BookingDto } from '../api/bookingService';
+import { OfflineTicketModal } from '../components/booking/OfflineTicketModal';
+import { getBookingById, checkInBooking, checkOutBooking, extendBooking, getOfflineTicket, type BookingDto, type OfflineTicketDto } from '../api/bookingService';
+import { offlineTicketStore } from '../utils/offlineTicketStore';
 import { QRCodeSVG } from 'qrcode.react';
 import CustomerHeader from '../components/layout/CustomerHeader';
 
@@ -112,6 +115,51 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
     const timer = setInterval(() => setClockTick(t => t + 1), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  // Offline Ticket Modal state
+  const [isOfflineModalOpen, setIsOfflineModalOpen] = useState<boolean>(false);
+  const [offlineTicket, setOfflineTicket] = useState<OfflineTicketDto | null>(null);
+  const [isLoadingOfflineTicket, setIsLoadingOfflineTicket] = useState<boolean>(false);
+
+  useEffect(() => {
+    const targetId = booking?.id || bookingId;
+    if (!targetId) return;
+
+    const cached = offlineTicketStore.getTicket(targetId);
+    if (cached) {
+      setOfflineTicket(cached);
+    }
+
+    getOfflineTicket(targetId)
+      .then(res => {
+        if (res.success && res.data) {
+          setOfflineTicket(res.data);
+        }
+      })
+      .catch(err => {
+        console.warn('Offline ticket sync fallback:', err);
+      });
+  }, [booking?.id, bookingId]);
+
+  const handleOpenOfflineTicket = async () => {
+    setIsOfflineModalOpen(true);
+    const targetId = booking?.id || bookingId;
+    if (!targetId) return;
+
+    if (!offlineTicket) {
+      setIsLoadingOfflineTicket(true);
+      try {
+        const res = await getOfflineTicket(targetId);
+        if (res.success && res.data) {
+          setOfflineTicket(res.data);
+        }
+      } catch (err) {
+        console.warn('Lá»—i táº£i vÃ© ngoáº¡i tuyáº¿n:', err);
+      } finally {
+        setIsLoadingOfflineTicket(false);
+      }
+    }
+  };
 
   // Check-in and check-out state & actions
   const [isProcessingAction, setIsProcessingAction] = useState<boolean>(false);
@@ -442,7 +490,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                   {/* QR Frame */}
                   <div className="relative p-5 bg-white rounded-2xl border-2 border-primary/20 shadow-md flex items-center justify-center">
                     <QRCodeSVG
-                      value={booking?.qrPayload || JSON.stringify({
+                      value={offlineTicket?.qrData || booking?.offlineHmacToken || booking?.qrPayload || JSON.stringify({
                         bookingId: booking?.id || bookingId,
                         bookingCode: orderId,
                         stationId: booking?.stationId,
@@ -638,16 +686,29 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
               </div>
 
               {/* Section 4: Offline Availability Guarantee Badge */}
-              <div className="mt-6 p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-3.5">
-                <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
-                  <ShieldCheck className="w-5 h-5" />
+              <div className="mt-6 p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5">
+                <div className="flex items-start gap-3.5">
+                  <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+                    <ShieldCheck className="w-5 h-5" />
+                  </div>
+                  <div className="space-y-0.5">
+                    <div className="text-sm font-semibold text-[#0b1c30] flex items-center gap-1.5">
+                      <span>Offline Ready Guarantee</span>
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">HMAC JWS</span>
+                    </div>
+                    <p className="text-xs text-[#434655] leading-relaxed">
+                      VÃ© vÃ  chá»¯ kÃ½ máº­t mÃ£ Ä‘Ã£ Ä‘Æ°á»£c lÆ°u trong bá»™ nhá»› mÃ¡y. Báº¡n cÃ³ thá»ƒ má»Ÿ khÃ³a ngay cáº£ khi máº¥t káº¿t ná»‘i máº¡ng.
+                    </p>
+                  </div>
                 </div>
-                <div className="space-y-0.5">
-                  <div className="text-sm font-semibold text-[#0b1c30]">Offline Ready Guarantee</div>
-                  <p className="text-xs text-[#434655] leading-relaxed">
-                    This digital key and cryptographic token are securely cached in your browser storage. You can unlock your locker even without 4G/5G or Wi-Fi connectivity at the terminal.
-                  </p>
-                </div>
+
+                <button
+                  onClick={handleOpenOfflineTicket}
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-300 text-xs font-bold text-slate-800 flex items-center justify-center gap-2 shadow-xs transition-all active:scale-95 cursor-pointer shrink-0"
+                >
+                  <WifiOff className="w-4 h-4 text-primary" />
+                  <span>Xem vÃ© ngoáº¡i tuyáº¿n</span>
+                </button>
               </div>
 
               {/* Section 5: Quick Action Hub */}
@@ -824,6 +885,14 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
           </div>
         </div>
       </main>
+
+      {/* OFFLINE TICKET PASS MODAL */}
+      <OfflineTicketModal
+        isOpen={isOfflineModalOpen}
+        onClose={() => setIsOfflineModalOpen(false)}
+        ticket={offlineTicket}
+        isLoading={isLoadingOfflineTicket}
+      />
 
       {/* EXTEND BOOKING MODAL (UC-T07) */}
       <ExtendBookingModal

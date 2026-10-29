@@ -1,4 +1,5 @@
 import apiClient from './client';
+import { offlineTicketStore } from '../utils/offlineTicketStore';
 
 // ─── Common Response Wrapper ─────────────────────────────────────────────────
 
@@ -57,6 +58,27 @@ export interface PaymentDto {
   createdAt: string;
 }
 
+/** DTO vé mở khóa ngoại tuyến có chữ ký mật mã HMAC-SHA256 (JWS RFC 7515) */
+export interface OfflineTicketDto {
+  bookingId: string;
+  bookingCode: string;
+  stationId: string;
+  stationName: string;
+  stationAddress: string;
+  lockerId?: string | null;
+  lockerCode?: string | null;
+  lockerSize: string;
+  accessPin: string;
+  offlineHmacToken: string;
+  qrData: string;
+  startAt: string;
+  endAt: string;
+  validUntil: string;
+  isOfflineReady: boolean;
+  securityAlgorithm: string;
+  instructions: string;
+}
+
 /** Chi tiết đầy đủ 1 booking (GET /api/Bookings/{id}) */
 export interface BookingDto {
   id: string;
@@ -86,6 +108,9 @@ export interface BookingDto {
   canCancel: boolean;
   accessCode?: string;
   qrPayload?: string;
+  offlineHmacToken?: string;
+  offlineExpiresAt?: string;
+  isOfflineReady?: boolean;
   passcode?: string;
   durationHours?: number;
   holdExpiresAt?: string;
@@ -99,6 +124,8 @@ export interface BookingListItemDto {
   stationAddress?: string;
   lockerCode?: string;
   accessCode?: string;
+  offlineHmacToken?: string;
+  isOfflineReady?: boolean;
   size: string;
   status: string;
   startAt: string;
@@ -121,19 +148,23 @@ export interface BookingListResponse {
   page: number;
   pageSize: number;
   totalPages: number;
-  hasPreviousPage: boolean;
-  hasNextPage: boolean;
 }
 
-// ─── Backward compatibility alias ────────────────────────────────────────────
-// Một số page cũ import BookingDetailDto — alias sang BookingDto mới
-export type BookingDetailDto = BookingDto;
+export interface CancelBookingResponse {
+  bookingId: string;
+  status: string;
+  refundAmount?: number;
+  refundPolicyRate?: number;
+  cancellationReason?: string;
+  refundStatus?: string;
+  cancelledAt: string;
+}
 
-// ─── API Functions ───────────────────────────────────────────────────────────
+// ─── API Functions ────────────────────────────────────────────────────────────
 
 /**
- * Tạo lượt đặt tủ mới.
- * POST /api/Bookings (JWT required)
+ * Tạo booking mới và nhận link thanh toán PayOS.
+ * POST /api/Bookings
  */
 export const createBooking = async (
   data: CreateBookingRequest
@@ -143,26 +174,7 @@ export const createBooking = async (
 };
 
 /**
- * Lấy danh sách đơn đặt của user đang đăng nhập (phân trang & lọc status).
- * GET /api/Bookings/my?status=...&page=...&pageSize=...
- */
-export const getMyBookings = async (
-  status?: string,
-  page?: number,
-  pageSize?: number
-): Promise<ApiResponse<BookingListResponse>> => {
-  const params = new URLSearchParams();
-  if (status) params.append('status', status);
-  if (page !== undefined) params.append('page', page.toString());
-  if (pageSize !== undefined) params.append('pageSize', pageSize.toString());
-
-  const queryString = params.toString() ? `?${params.toString()}` : '';
-  const response = await apiClient.get<ApiResponse<BookingListResponse>>(`/api/Bookings/my${queryString}`);
-  return response.data;
-};
-
-/**
- * Lấy chi tiết đơn đặt theo ID.
+ * Lấy chi tiết booking theo ID.
  * GET /api/Bookings/{id}
  */
 export const getBookingById = async (
@@ -173,9 +185,59 @@ export const getBookingById = async (
 };
 
 /**
+ * Lấy vé mở khóa ngoại tuyến có chữ ký HMAC-SHA256 (JWS RFC 7515).
+ * Tự động đồng bộ vào local cache (offlineTicketStore) để mở tủ khi mất kết nối mạng.
+ * GET /api/Bookings/{id}/offline-ticket
+ */
+export const getOfflineTicket = async (
+  bookingId: string
+): Promise<ApiResponse<OfflineTicketDto>> => {
+  try {
+    const response = await apiClient.get<ApiResponse<OfflineTicketDto>>(`/api/Bookings/${bookingId}/offline-ticket`);
+    if (response.data && response.data.success && response.data.data) {
+      offlineTicketStore.saveTicket({
+        ...response.data.data,
+        cachedAt: new Date().toISOString()
+      });
+    }
+    return response.data;
+  } catch (err: any) {
+    const cached = offlineTicketStore.getTicket(bookingId);
+    if (cached) {
+      return {
+        success: true,
+        message: 'Đã tải vé mở khóa ngoại tuyến từ bộ nhớ máy (Offline Cache).',
+        data: {
+          ...cached,
+          isOfflineReady: true
+        }
+      };
+    }
+    throw err;
+  }
+};
+
+/**
+ * Lấy danh sách booking của user hiện tại (My Bookings).
+ * GET /api/Bookings/my
+ */
+export const getMyBookings = async (
+  status?: string,
+  page: number = 1,
+  pageSize: number = 20
+): Promise<ApiResponse<BookingListResponse>> => {
+  const params: Record<string, any> = { page, pageSize };
+  if (status && status !== 'ALL') {
+    params.status = status;
+  }
+  const response = await apiClient.get<ApiResponse<BookingListResponse>>('/api/Bookings/my', { params });
+  return response.data;
+};
+
+/**
  * Gia hạn thời gian thuê tủ.
  * POST /api/Bookings/{id}/extend
- * Backend sẽ tạo link PayOS mới để thanh toán phí gia hạn.
+ * Backend tạo link PayOS mới cho khoản phụ phí gia hạn.
  */
 export const extendBooking = async (
   id: string,
@@ -186,15 +248,14 @@ export const extendBooking = async (
 };
 
 /**
- * Hủy đơn đặt tủ.
+ * Hủy booking và kích hoạt hoàn tiền (nếu đủ điều kiện theo chính sách).
  * POST /api/Bookings/{id}/cancel
- * Backend tính toán hoàn tiền theo chính sách hủy.
  */
 export const cancelBooking = async (
   id: string,
-  data: CancelBookingRequest
-): Promise<ApiResponse<BookingDto>> => {
-  const response = await apiClient.post<ApiResponse<BookingDto>>(`/api/Bookings/${id}/cancel`, data);
+  data?: CancelBookingRequest
+): Promise<ApiResponse<CancelBookingResponse>> => {
+  const response = await apiClient.post<ApiResponse<CancelBookingResponse>>(`/api/Bookings/${id}/cancel`, data ?? {});
   return response.data;
 };
 
