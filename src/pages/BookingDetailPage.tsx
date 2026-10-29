@@ -86,7 +86,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
     ? `Locker ${rawBayCode}`
     : `Auto-assigned at Kiosk (Size ${size})`;
 
-    // Chuẩn hóa mã PIN 6 số cho Kiosk Touchpad
+    // UC-T09: Chuẩn hóa mã PIN mở tủ 8 chữ số cho Kiosk Touchpad (có hỗ trợ 6 số cũ)
   const getDisplayPin = () => {
     if (booking?.status === 'PENDING_PAYMENT') {
       return 'Chờ thanh toán';
@@ -94,6 +94,9 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
     const raw = booking?.accessCode || booking?.passcode || bookingData?.accessCode;
     if (raw) {
       const clean = raw.replace(/\s+/g, '');
+      if (clean.length === 8) {
+        return `${clean.substring(0, 4)} ${clean.substring(4, 8)}`;
+      }
       if (clean.length === 6) {
         return `${clean.substring(0, 3)} ${clean.substring(3, 6)}`;
       }
@@ -330,14 +333,17 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
     );
   };
 
-  // Token anti-screenshot refresh timer: đếm lùi từ 30s -> 0 -> 30s
-  const [tokenSeconds, setTokenSeconds] = useState<number>(28);
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTokenSeconds(prev => (prev <= 1 ? 30 : prev - 1));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
+  // UC-T09: Dynamic QR token expiry countdown (xoay vòng mã mỗi 60s)
+  let tokenSeconds = 0;
+  if (booking?.qrPayload) {
+    try {
+      const ticket = JSON.parse(atob(booking.qrPayload));
+      const expiry = String(ticket.expiresAt);
+      tokenSeconds = Math.max(0, Math.ceil((Date.parse(/Z|[+-]\d\d:\d\d$/.test(expiry) ? expiry : `${expiry}Z`) - Date.now()) / 1000));
+    } catch {
+      // In case qrPayload is unreadable or plain string
+    }
+  }
 
   // Copy passcode state
   const [copied, setCopied] = useState<boolean>(false);
@@ -474,7 +480,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                   <p className="text-xs text-[#434655]">
                     {isLockerAssigned
                       ? `Present this QR code to the Kiosk optical scanner or enter the passcode below to release ${bayCode}.`
-                      : `Present this QR code to the Kiosk optical scanner or enter the 6-digit passcode below on the touchpad to automatically assign your locker (Size ${size}) and release the door.`}
+                      : `Present this QR code to the Kiosk optical scanner or enter the 8-digit passcode below on the touchpad to automatically assign your locker (Size ${size}) and release the door.`}
                   </p>
                 </div>
                 <div className="hidden sm:flex items-center gap-1 text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full text-xs font-semibold">
@@ -489,17 +495,22 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                   <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-primary/30 to-blue-400/30 blur-md opacity-75 group-hover:opacity-100 transition duration-500"></div>
                   {/* QR Frame */}
                   <div className="relative p-5 bg-white rounded-2xl border-2 border-primary/20 shadow-md flex items-center justify-center">
-                    <QRCodeSVG
-                      value={offlineTicket?.qrData || booking?.offlineHmacToken || booking?.qrPayload || JSON.stringify({
-                        bookingId: booking?.id || bookingId,
-                        bookingCode: orderId,
-                        stationId: booking?.stationId,
-                        accessCode: passcode
-                      })}
-                      size={210}
-                      level="H"
-                      includeMargin={false}
-                    />
+                    {(booking?.qrPayload && tokenSeconds > 0 && ['CONFIRMED', 'STORED'].includes(booking.status)) || offlineTicket?.qrData || booking?.offlineHmacToken ? (
+                      <QRCodeSVG
+                        value={booking?.qrPayload || offlineTicket?.qrData || booking?.offlineHmacToken || ''}
+                        size={210}
+                        level="H"
+                        includeMargin={false}
+                      />
+                    ) : booking?.status === 'PENDING_PAYMENT' ? (
+                      <div className="p-8 text-center text-xs text-amber-700 font-medium">
+                        Đang chờ thanh toán để kích hoạt vé mở tủ
+                      </div>
+                    ) : (
+                      <div className="p-8 text-center text-xs text-slate-500 font-medium">
+                        Vé chưa sẵn sàng hoặc đang xoay mã bảo mật…
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -516,11 +527,11 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                 </div>
               </div>
 
-              {/* Section B: 6-Digit Backup Access PIN Passcode */}
+              {/* Section B: 8-Digit Backup Access PIN Passcode */}
               <div className="mt-6 pt-6 border-t border-outline-variant/30 space-y-3">
                 <div className="text-center">
                   <span className="text-[11px] text-secondary tracking-wider uppercase font-bold">
-                    HOẶC NHẬP MÃ PIN 6 SỐ TẠI BÀN PHÍM KIOSK
+                    HOẶC NHẬP MÃ PIN 8 SỐ TẠI BÀN PHÍM KIOSK
                   </span>
                 </div>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
