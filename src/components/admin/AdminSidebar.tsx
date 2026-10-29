@@ -20,13 +20,23 @@ import {
 } from 'lucide-react';
 import type { AuthResponse } from '../../api/authService';
 
+export type AdminMenuKey =
+    | 'dashboard'
+    | 'stations'
+    | 'users'
+    | 'lockers'
+    | 'incidents'
+    | 'abandoned'
+    | 'reconciliation'
+    | 'audit';
+
 interface AdminSidebarProps {
     user: AuthResponse | null;
     openIncidentsCount: number;
     offlineDevicesCount: number;
     onLogout?: () => void;
-    activeMenu?: 'dashboard' | 'stations' | 'users' | 'lockers' | 'incidents' | 'abandoned';
-    onSelectMenu?: (menu: 'dashboard' | 'stations' | 'users' | 'lockers' | 'incidents' | 'abandoned') => void;
+    activeMenu?: AdminMenuKey;
+    onSelectMenu?: (menu: AdminMenuKey) => void;
 }
 
 export default function AdminSidebar({
@@ -100,7 +110,7 @@ export default function AdminSidebar({
                             >
                                 <span className="flex items-center gap-2.5">
                                     <Layers className={`w-4 h-4 ${activeMenu === 'stations' ? 'text-white' : 'text-slate-400'}`} />
-                                    <span>Stations</span>
+                                    <span>Stations & Pricing</span>
                                 </span>
                             </button>
 
@@ -115,11 +125,15 @@ export default function AdminSidebar({
                             >
                                 <span className="flex items-center gap-2.5">
                                     <Box className={`w-4 h-4 ${activeMenu === 'lockers' ? 'text-white' : 'text-slate-400'}`} />
-                                    <span>Lockers</span>
+                                    <span>Lockers Grid</span>
                                 </span>
                             </button>
 
-                            <div className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-default">
+                            <button
+                                type="button"
+                                onClick={() => onSelectMenu?.('lockers')}
+                                className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-pointer text-left"
+                            >
                                 <span className="flex items-center gap-2.5">
                                     <Cpu className="w-4 h-4 text-slate-400" />
                                     <span>IoT Devices</span>
@@ -129,7 +143,7 @@ export default function AdminSidebar({
                                 ) : (
                                     <span className="w-2 h-2 rounded-full bg-emerald-500" title="IoT online" />
                                 )}
-                            </div>
+                            </button>
 
                             <button
                                 type="button"
@@ -142,7 +156,7 @@ export default function AdminSidebar({
                             >
                                 <span className="flex items-center gap-2.5">
                                     <ShieldAlert className={`w-4 h-4 ${activeMenu === 'incidents' ? 'text-white' : 'text-slate-400'}`} />
-                                    <span>Incidents</span>
+                                    <span>Incidents (UC-S04/S05)</span>
                                 </span>
                                 {openIncidentsCount > 0 && (
                                     <span className={`px-1.5 py-0.2 rounded-full font-bold text-[10px] border ${
@@ -163,10 +177,15 @@ export default function AdminSidebar({
                             Management
                         </p>
                         <div className="space-y-0.5 text-slate-600">
-                            <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-default">
+                            <button
+                                type="button"
+                                onClick={() => onSelectMenu?.('stations')}
+                                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-pointer text-left"
+                            >
                                 <DollarSign className="w-4 h-4 text-slate-400" />
-                                <span>Pricing Policies</span>
-                            </div>
+                                <span>Pricing & Penalty (UC-A04)</span>
+                            </button>
+
                             <button
                                 type="button"
                                 onClick={() => onSelectMenu?.('users')}
@@ -178,13 +197,23 @@ export default function AdminSidebar({
                             >
                                 <span className="flex items-center gap-2.5">
                                     <Users className={`w-4 h-4 ${activeMenu === 'users' ? 'text-white' : 'text-slate-400'}`} />
-                                    <span>Accounts</span>
+                                    <span>Accounts & Debt (UC-A06)</span>
                                 </span>
                             </button>
-                            <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-default">
-                                <CreditCard className="w-4 h-4 text-slate-400" />
-                                <span>Bookings & Pay</span>
-                            </div>
+
+                            <button
+                                type="button"
+                                onClick={() => onSelectMenu?.('reconciliation')}
+                                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition cursor-pointer text-left ${
+                                    activeMenu === 'reconciliation'
+                                        ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-600/30'
+                                        : 'text-slate-600 hover:bg-slate-50'
+                                }`}
+                            >
+                                <CreditCard className={`w-4 h-4 ${activeMenu === 'reconciliation' ? 'text-white' : 'text-slate-400'}`} />
+                                <span>PayOS Reconciliation (UC-A12)</span>
+                            </button>
+
                             <button
                                 type="button"
                                 onClick={() => onSelectMenu?.('abandoned')}
@@ -195,7 +224,7 @@ export default function AdminSidebar({
                                 }`}
                             >
                                 <PackageX className={`w-4 h-4 ${activeMenu === 'abandoned' ? 'text-white' : 'text-slate-400'}`} />
-                                <span>Abandoned Cargo</span>
+                                <span>Abandoned 72h (UC-S10/A07)</span>
                             </button>
                         </div>
                     </div>
@@ -206,14 +235,27 @@ export default function AdminSidebar({
                             Security & Logs
                         </p>
                         <div className="space-y-0.5 text-slate-600">
-                            <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-default">
-                                <FileText className="w-4 h-4 text-slate-400" />
-                                <span>Audit Log</span>
-                            </div>
-                            <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-default">
+                            <button
+                                type="button"
+                                onClick={() => onSelectMenu?.('audit')}
+                                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition cursor-pointer text-left ${
+                                    activeMenu === 'audit'
+                                        ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-600/30'
+                                        : 'text-slate-600 hover:bg-slate-50'
+                                }`}
+                            >
+                                <FileText className={`w-4 h-4 ${activeMenu === 'audit' ? 'text-white' : 'text-slate-400'}`} />
+                                <span>Audit Logs (UC-A08)</span>
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => onSelectMenu?.('reconciliation')}
+                                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-pointer text-left"
+                            >
                                 <BarChart3 className="w-4 h-4 text-slate-400" />
-                                <span>Reports</span>
-                            </div>
+                                <span>Financial Reports</span>
+                            </button>
                         </div>
                     </div>
                 </nav>
