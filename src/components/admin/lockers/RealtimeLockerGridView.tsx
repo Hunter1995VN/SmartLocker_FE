@@ -20,6 +20,7 @@ import LockerFilterBar from './LockerFilterBar';
 import LockerBayGrid from './LockerBayGrid';
 import LockerDetailControlPanel from './LockerDetailControlPanel';
 import LockerStatusConfirmModal from './LockerStatusConfirmModal';
+import { KioskSignalRService } from '../../../services/kioskSignalR';
 import { normalizeLockerStatus } from './lockerStatusConstants';
 
 export default function RealtimeLockerGridView() {
@@ -155,6 +156,14 @@ export default function RealtimeLockerGridView() {
         };
     }, [selectedStationId, pollingInterval, fetchLockers]);
 
+    useEffect(() => {
+        if (!selectedStationId) return;
+        const realtime = new KioskSignalRService();
+        const refresh = () => { void fetchLockers(selectedStationId, true); };
+        void realtime.connect(selectedStationId, refresh, refresh);
+        return () => { void realtime.disconnect(); };
+    }, [selectedStationId, fetchLockers]);
+
     // Manual Refresh
     const handleManualRefresh = () => {
         if (!selectedStationId) { void loadStations(); return; }
@@ -173,7 +182,8 @@ export default function RealtimeLockerGridView() {
     }, [lockers, selectedLockerId]);
 
     // Calculate Status Counts
-    const { availableCount, occupiedCount, maintenanceCount, disabledCount } = useMemo(() => {
+    const { availableCount, occupiedCount, reservedCount, maintenanceCount, disabledCount } = useMemo(() => {
+        let res = 0;
         let avail = 0;
         let occ = 0;
         let maint = 0;
@@ -181,13 +191,15 @@ export default function RealtimeLockerGridView() {
 
         lockers.forEach((l) => {
             const st = normalizeLockerStatus(l.businessStatus);
-            if (st === 'AVAILABLE') avail++;
+            if (st === 'RESERVED') res++;
+            else if (st === 'AVAILABLE') avail++;
             else if (st === 'OCCUPIED') occ++;
             else if (st === 'MAINTENANCE') maint++;
             else dis++;
         });
 
         return {
+            reservedCount: res,
             availableCount: avail,
             occupiedCount: occ,
             maintenanceCount: maint,
@@ -370,6 +382,7 @@ export default function RealtimeLockerGridView() {
             {/* Status Summary & Legend Cards Row (4 cards) */}
             <LockerStatusSummaryCards
                 total={lockers.length}
+                reservedCount={reservedCount}
                 availableCount={availableCount}
                 occupiedCount={occupiedCount}
                 maintenanceCount={maintenanceCount}
@@ -386,6 +399,7 @@ export default function RealtimeLockerGridView() {
                 sizeFilter={sizeFilter}
                 onSizeFilterChange={setSizeFilter}
                 total={lockers.length}
+                reservedCount={reservedCount}
                 availableCount={availableCount}
                 occupiedCount={occupiedCount}
                 maintenanceCount={maintenanceCount}
