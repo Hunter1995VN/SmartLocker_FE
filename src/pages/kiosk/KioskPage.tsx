@@ -1075,7 +1075,7 @@ export default function KioskPage() {
             <p className="text-xs text-slate-300 leading-relaxed">
               {x('sensorHint')} <strong>{activeLockerCode}</strong>
             </p>
-            <video ref={videoRef} autoPlay playsInline muted className="hidden"></video>
+            <video ref={videoRef} autoPlay playsInline muted className="w-full rounded-lg"></video>
             <div className="flex gap-2">
               <button
                 onClick={() => setShowSensorModal(false)}

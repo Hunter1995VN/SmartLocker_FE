@@ -375,7 +375,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
   // Copy passcode state
   const [copied, setCopied] = useState<boolean>(false);
   const handleCopyCode = () => {
-    navigator.clipboard.writeText(passcode);
+    navigator.clipboard.writeText(passcode.replace(/\s+/g, ''));
     setCopied(true);
     setTimeout(() => setCopied(false), 2200);
   };
