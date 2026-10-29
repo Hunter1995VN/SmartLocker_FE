@@ -46,5 +46,19 @@ export default function TravelerSupportPanel({ booking }: { booking: BookingDto 
       {pin && <p className="text-xl font-mono">PIN người nhận: {pin}</p>}
       {data?.delegations.filter(d => !d.usedAt && !d.revokedAt).map(d => <div key={d.id} className="flex gap-3"><span>{d.contact}</span><button type="button" disabled={busy} onClick={() => void run(async () => { await apiClient.delete(`${base}/delegations/${d.id}`); setPin(''); setMessage('Đã thu hồi mã.'); })}>Thu hồi</button></div>)}
     </form>}
+    {booking.status === 'COMPLETED' && <form className="space-y-3" onSubmit={e => {
+      e.preventDefault(); void run(async () => { await apiClient.post(`${base}/lost-items`, { description, photo }); setMessage('Đã gửi yêu cầu tìm đồ. Theo dõi phản hồi bên dưới.'); });
+    }}>
+      <h3 className="font-semibold">Báo quên đồ (trong 7 ngày sau khi lấy đồ)</h3>
+      <label className="block">Mô tả đồ vật<textarea required maxLength={2000} className="block border w-full p-2 rounded" value={description} onChange={e => setDescription(e.target.value)} /></label>
+      <label className="block">Ảnh minh họa JPEG (tối đa 500 KB)<input type="file" accept="image/jpeg" onChange={e => {
+        const file = e.target.files?.[0]; setPhoto(undefined);
+        if (!file) return;
+        if (file.type !== 'image/jpeg' || file.size > 500000) { setMessage('Chọn ảnh JPEG tối đa 500 KB.'); return; }
+        const reader = new FileReader(); reader.onload = () => setPhoto(String(reader.result)); reader.readAsDataURL(file);
+      }} /></label>
+      <button disabled={busy} className="bg-blue-700 text-white p-2 rounded">Gửi báo quên đồ</button>
+    </form>}
+    {data?.lostReports.map(r => <article key={r.id} className="border rounded p-3"><p>{r.description}</p><p>Trạng thái: {r.status}</p>{r.staffResponse && <p>Nhân viên: {r.staffResponse}</p>}</article>)}
   </section>;
 }
