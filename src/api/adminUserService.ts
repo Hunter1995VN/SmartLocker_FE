@@ -1,13 +1,15 @@
 /**
- * AD-FE-05: UC-A06 — Manage Internal Users
+ * AD-FE-05: UC-A05 & UC-A06 — Manage Internal Users, Customers & Overdue Debt Control
  * API Service kết nối với Backend ASP.NET Core:
  * AdminUsersController (/api/admin/users)
  * 
  * Endpoints thực tế từ Backend:
- * - GET   /api/admin/users                     : Lấy danh sách users (filter: search, role, status, page, pageSize)
+ * - GET   /api/admin/users                     : Lấy danh sách users (filter: search, role, status, hasDebt, page, pageSize)
  * - POST  /api/admin/users/staff               : Tạo tài khoản Staff mới
  * - PATCH /api/admin/users/{userId}/status     : Kích hoạt / Tạm khóa tài khoản
  * - PATCH /api/admin/users/{userId}/role       : Thay đổi phân quyền (Role)
+ * - PATCH /api/admin/users/{userId}/debt       : Cập nhật dư nợ quá hạn & tự động chặn nợ xấu (UC-A06)
+ * - POST  /api/admin/users/block-debtors       : Chặn hàng loạt tất cả tài khoản đang có nợ xấu (UC-A06)
  */
 import apiClient from './client';
 
@@ -32,6 +34,7 @@ export interface GetUsersParams {
     search?: string;
     role?: string;
     status?: string;
+    hasDebt?: boolean;
     page?: number;
     pageSize?: number;
 }
@@ -53,6 +56,12 @@ export interface UpdateUserRoleRequest {
     role: UserRole;
 }
 
+export interface UpdateUserDebtRequest {
+    overdueDebt: number;
+    reason?: string;
+    autoSuspendIfDebt?: boolean;
+}
+
 export interface ApiResponse<T> {
     success: boolean;
     message: string;
@@ -64,7 +73,7 @@ export interface ApiResponse<T> {
 
 export const adminUserService = {
     /**
-     * Lấy danh sách tài khoản nội bộ (có hỗ trợ search, lọc theo role, status, phân trang)
+     * Lấy danh sách tài khoản (hỗ trợ search, lọc theo role, status, hasDebt, phân trang)
      * GET /api/admin/users
      */
     async getUsers(params: GetUsersParams = {}): Promise<ApiResponse<UserAdminListItemDto[]>> {
@@ -72,6 +81,7 @@ export const adminUserService = {
         if (params.search?.trim()) query.set('search', params.search.trim());
         if (params.role?.trim()) query.set('role', params.role.trim());
         if (params.status?.trim()) query.set('status', params.status.trim());
+        if (params.hasDebt !== undefined) query.set('hasDebt', String(params.hasDebt));
         if (params.page && params.page > 0) query.set('page', params.page.toString());
         if (params.pageSize && params.pageSize > 0) query.set('pageSize', params.pageSize.toString());
 
@@ -104,6 +114,26 @@ export const adminUserService = {
      */
     async updateUserRole(userId: string, request: UpdateUserRoleRequest): Promise<ApiResponse<boolean>> {
         const response = await apiClient.patch<ApiResponse<boolean>>(`/api/admin/users/${userId}/role`, request);
+        return response.data;
+    },
+
+    /**
+     * UC-A06: Cập nhật dư nợ quá hạn của khách hàng & tùy chọn tự động chặn nếu có nợ xấu
+     * PATCH /api/admin/users/{userId}/debt
+     */
+    async updateUserDebt(userId: string, body: UpdateUserDebtRequest): Promise<ApiResponse<boolean>> {
+        const response = await apiClient.patch<ApiResponse<boolean>>(`/api/admin/users/${userId}/debt`, body);
+        return response.data;
+    },
+
+    /**
+     * UC-A06: Chặn hàng loạt tất cả tài khoản đang có dư nợ quá hạn (overdueDebt > 0)
+     * POST /api/admin/users/block-debtors
+     */
+    async blockAllDebtors(reason?: string): Promise<ApiResponse<number | boolean>> {
+        const response = await apiClient.post<ApiResponse<number | boolean>>('/api/admin/users/block-debtors', {
+            reason: reason || 'Chặn hàng loạt tài khoản khách hàng có nợ xấu quá hạn (UC-A06)',
+        });
         return response.data;
     },
 };

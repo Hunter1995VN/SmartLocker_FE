@@ -1,13 +1,14 @@
 /**
- * AD-FE-07: UC-A09, S-03 — Staff Inspection Form (Mắt 1)
+ * AD-FE-07: UC-S10 (UC-A09, S-03) — Staff Inspection Form (Mắt 1)
  *
- * Staff lập biên bản kiểm kê tài sản bỏ quên:
- *  - Hiển thị read-only Case Information (từ booking/locker context hoặc manual entry)
+ * Staff lập biên bản niêm phong đồ quá hạn 72h (Kèm ảnh/video kiểm kê):
+ *  - Hỗ trợ chọn nhanh từ danh sách đơn đặt quá hạn 72h (getOverdueCandidates) hoặc nhập thủ công
  *  - Hỗ trợ thêm nhiều item (Danh mục, Mô tả, Số lượng, Tình trạng, Ghi chú)
  *  - Cho phép Add, Edit, Remove item trước khi submit
+ *  - Đính kèm Ảnh / Video Kiểm Kê Hiện Trường (UC-S10)
  *  - Mã tem niêm phong vật lý (Seal Barcode)
  *  - Tải trọng cân thực địa tại trạm (kg)
- *  - Submit → POST /api/admin/abandoned-properties
+ *  - Submit → POST /api/admin/abandoned-properties (kèm photoUrls)
  *  - Sau khi submit thành công → status PENDING_APPROVAL, callback onSubmitted()
  *
  * Security:
@@ -15,7 +16,7 @@
  *  - Staff không có nút Approve hay Reject trong form này.
  *  - Không tự đổi status UI khi API thất bại.
  */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Package,
     X,
@@ -28,10 +29,13 @@ import {
     Trash2,
     Edit2,
     Shield,
+    Camera,
+    Video,
 } from 'lucide-react';
 import abandonedPropertyService, {
     type CreateAbandonedPropertyRequest,
     type AbandonedPropertyRecordDto,
+    type OverdueBookingCandidateDto,
 } from '../../../api/abandonedPropertyService';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -60,6 +64,12 @@ export const ITEM_CONDITIONS = [
     'Cũ / Có vết trầy xước',
     'Hư hỏng / Rách',
     'Cần bảo quản đặc biệt',
+];
+
+const SAMPLE_KIOSK_EVIDENCE_URLS = [
+    'https://storage.smartlocker.vn/evidence/uc-s10-locker-bay-overview.jpg',
+    'https://storage.smartlocker.vn/evidence/uc-s10-seal-3m-barcode.jpg',
+    'https://storage.smartlocker.vn/evidence/uc-s10-kiosk-inspection-clip.mp4',
 ];
 
 interface InspectionFormProps {
@@ -95,13 +105,64 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
         bookingId: prefill?.bookingId ?? '',
         lockerId: prefill?.lockerId ?? '',
         stationId: prefill?.stationId ?? '',
-        overdueHours: prefill?.overdueHours ? String(prefill.overdueHours) : '48',
+        overdueHours: prefill?.overdueHours ? String(prefill.overdueHours) : '72',
         sealCode: `SL-SEAL-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
         measuredWeight: '6.85',
         safetyVerified: true,
         generalCondition: 'Balo còn nguyên vẹn, dây kéo bình thường, không có dấu hiệu cạy phá.',
         notes: '',
     });
+
+    // Overdue booking candidates from Backend (UC-S10)
+    const [candidates, setCandidates] = useState<OverdueBookingCandidateDto[]>([]);
+    const [selectedCandidateId, setSelectedCandidateId] = useState<string>('');
+    const [candidateHint, setCandidateHint] = useState<{
+        bookingCode?: string;
+        lockerCode?: string;
+        stationName?: string;
+        customerName?: string | null;
+    }>({
+        bookingCode: prefill?.bookingCode,
+        lockerCode: prefill?.lockerCode,
+        stationName: prefill?.stationName,
+    });
+
+    useEffect(() => {
+        let mounted = true;
+        abandonedPropertyService
+            .getOverdueCandidates()
+            .then((res) => {
+                if (mounted && res.success && Array.isArray(res.data)) {
+                    setCandidates(res.data);
+                }
+            })
+            .catch(() => {
+                // Keep manual / prefill fallback if endpoint is unavailable
+            });
+        return () => {
+            mounted = false;
+        };
+    }, []);
+
+    const handleSelectCandidate = (bookingId: string) => {
+        setSelectedCandidateId(bookingId);
+        const found = candidates.find((c) => c.bookingId === bookingId);
+        if (found) {
+            setFields((prev) => ({
+                ...prev,
+                bookingId: found.bookingId,
+                lockerId: found.lockerId,
+                stationId: found.stationId,
+                overdueHours: String(Math.max(72, found.overdueHours || 72)),
+            }));
+            setCandidateHint({
+                bookingCode: found.bookingCode,
+                lockerCode: found.lockerCode,
+                stationName: found.stationName,
+                customerName: found.customerName,
+            });
+        }
+    };
 
     const [items, setItems] = useState<InventoryItem[]>([
         {
@@ -122,6 +183,13 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
         },
     ]);
 
+    // Evidence Photo / Video URLs (UC-S10)
+    const [photoUrls, setPhotoUrls] = useState<string[]>([
+        SAMPLE_KIOSK_EVIDENCE_URLS[0],
+        SAMPLE_KIOSK_EVIDENCE_URLS[1],
+    ]);
+    const [newPhotoUrl, setNewPhotoUrl] = useState<string>('');
+
     // Editing item modal/row state
     const [editingItemId, setEditingItemId] = useState<string | null>(null);
     const [itemInput, setItemInput] = useState<Omit<InventoryItem, 'id'>>({
@@ -137,7 +205,29 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
     const [phase, setPhase] = useState<SubmitPhase>('idle');
     const [apiError, setApiError] = useState<string | null>(null);
 
-    const hasPrefill = !!(prefill?.bookingId && prefill?.lockerId && prefill?.stationId);
+    const hasPrefill = !!(prefill?.bookingId && prefill?.lockerId && prefill?.stationId && !selectedCandidateId);
+
+    // ── Evidence Photo/Video handlers (UC-S10) ─────────────────────────────────
+
+    const handleAddPhotoUrl = () => {
+        const trimmed = newPhotoUrl.trim();
+        if (!trimmed) return;
+        if (!photoUrls.includes(trimmed)) {
+            setPhotoUrls((prev) => [...prev, trimmed]);
+        }
+        setNewPhotoUrl('');
+    };
+
+    const handleCaptureKioskSample = () => {
+        const nextSample =
+            SAMPLE_KIOSK_EVIDENCE_URLS.find((u) => !photoUrls.includes(u)) ??
+            `https://storage.smartlocker.vn/evidence/kiosk-cam-${Date.now().toString().slice(-4)}.jpg`;
+        setPhotoUrls((prev) => [...prev, nextSample]);
+    };
+
+    const handleRemovePhotoUrl = (url: string) => {
+        setPhotoUrls((prev) => prev.filter((u) => u !== url));
+    };
 
     // ── Item management ────────────────────────────────────────────────────────
 
@@ -152,17 +242,14 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
         }
 
         if (editingItemId) {
-            // Update existing
             setItems((prev) =>
                 prev.map((it) => (it.id === editingItemId ? { ...itemInput, id: editingItemId } : it))
             );
             setEditingItemId(null);
         } else {
-            // Add new
             setItems((prev) => [...prev, { ...itemInput, id: `item-${Date.now()}` }]);
         }
 
-        // Reset input
         setItemInput({
             category: ITEM_CATEGORIES[0],
             description: '',
@@ -239,13 +326,16 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
 
     const serializeItemDescription = (): string => {
         const lines: string[] = [];
-        lines.push(`[BIÊN BẢN KIỂM KÊ HIỆN TRƯỜNG]`);
+        lines.push(`[BIÊN BẢN KIỂM KÊ HIỆN TRƯỜNG QUÁ HẠN 72H - UC-S10]`);
         lines.push(`Mã tem niêm phong: ${fields.sealCode.trim()}`);
         if (fields.measuredWeight) {
             lines.push(`Tải trọng thực địa: ${fields.measuredWeight.trim()} kg`);
         }
         lines.push(`Tình trạng tổng quan: ${fields.generalCondition.trim() || 'Bình thường'}`);
-        lines.push(`Cam kết an toàn: ${fields.safetyVerified ? 'Đã kiểm tra sơ bộ không có chất cấm/dễ cháy nổ' : 'Chưa kiểm tra'}`);
+        lines.push(
+            `Cam kết an toàn: ${fields.safetyVerified ? 'Đã kiểm tra sơ bộ không có chất cấm/dễ cháy nổ' : 'Chưa kiểm tra'}`
+        );
+        lines.push(`Bằng chứng đính kèm: ${photoUrls.length} tệp ảnh/video hiện trường`);
         lines.push(`\nDanh mục ${items.length} tài sản kiểm kê:`);
 
         items.forEach((it, idx) => {
@@ -269,6 +359,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
             stationId: fields.stationId.trim(),
             overdueHours: Number(fields.overdueHours),
             itemDescription: fullDescription,
+            photoUrls: photoUrls.length > 0 ? photoUrls : null,
             notes: fields.notes.trim() || null,
         };
 
@@ -293,7 +384,8 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
             <ConfirmDialog
                 fields={fields}
                 items={items}
-                prefill={prefill}
+                photoUrls={photoUrls}
+                prefill={candidateHint}
                 isSubmitting={phase === 'submitting'}
                 onConfirm={handleConfirmSubmit}
                 onCancel={handleCancelConfirm}
@@ -312,14 +404,14 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                     <div>
                         <div className="flex items-center gap-2">
                             <h2 className="text-base font-black text-slate-900 tracking-tight">
-                                Lập Biên Bản Kiểm Kê Hiện Trường
+                                Lập Biên Bản Niêm Phong Đồ Quá Hạn 72h
                             </h2>
                             <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-300">
-                                Mắt 1 (Staff)
+                                UC-S10 · Mắt 1 (Staff)
                             </span>
                         </div>
                         <p className="text-xs text-slate-600 mt-0.5">
-                            UC-A09, S-03 · Kiểm kê đồ bỏ quên quá hạn theo nguyên tắc 4 mắt
+                            UC-S10, S-03 · Kiểm kê &amp; niêm phong đồ bỏ quên quá hạn 72h (Kèm ảnh/video hiện trường)
                         </p>
                     </div>
                 </div>
@@ -344,9 +436,31 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                     </div>
                 )}
 
-                {/* Section: Context & Locker Information */}
+                {/* Section 1: Context & Locker Information */}
                 <section>
-                    <SectionTitle icon={MapPin} title="1. Thông tin vị trí & Đơn đặt tủ" />
+                    <SectionTitle icon={MapPin} title="1. Thông tin vị trí & Đơn đặt tủ quá hạn 72h" />
+
+                    {candidates.length > 0 && (
+                        <div className="mt-3 p-3 rounded-xl bg-amber-50/70 border border-amber-200/80">
+                            <label className="block text-[11px] font-bold text-amber-900 mb-1">
+                                Chọn nhanh Đơn đặt tủ quá hạn 72h chờ lập biên bản (UC-S10):
+                            </label>
+                            <select
+                                value={selectedCandidateId}
+                                onChange={(e) => handleSelectCandidate(e.target.value)}
+                                className="w-full px-3 py-1.5 text-xs rounded-lg border border-amber-300 bg-white font-semibold text-slate-800 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                            >
+                                <option value="">-- Hoặc sử dụng thông tin điền sẵn bên dưới --</option>
+                                {candidates.map((c) => (
+                                    <option key={c.bookingId} value={c.bookingId}>
+                                        Ô {c.lockerCode} · Đơn #{c.bookingCode} · {c.stationName} ({c.overdueHours}h quá hạn
+                                        {c.customerName ? ` - KH: ${c.customerName}` : ''})
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
                         <FormField
                             label="Booking ID *"
@@ -354,7 +468,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                             onChange={(val) => setFields((p) => ({ ...p, bookingId: val }))}
                             error={errors.bookingId}
                             readOnly={hasPrefill}
-                            hint={prefill?.bookingCode ? `#${prefill.bookingCode}` : undefined}
+                            hint={candidateHint.bookingCode ? `#${candidateHint.bookingCode}` : undefined}
                             mono
                         />
                         <FormField
@@ -363,7 +477,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                             onChange={(val) => setFields((p) => ({ ...p, lockerId: val }))}
                             error={errors.lockerId}
                             readOnly={hasPrefill}
-                            hint={prefill?.lockerCode ? `Tủ: ${prefill.lockerCode}` : undefined}
+                            hint={candidateHint.lockerCode ? `Tủ: ${candidateHint.lockerCode}` : undefined}
                             mono
                         />
                         <FormField
@@ -372,18 +486,18 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                             onChange={(val) => setFields((p) => ({ ...p, stationId: val }))}
                             error={errors.stationId}
                             readOnly={hasPrefill}
-                            hint={prefill?.stationName ? prefill.stationName : undefined}
+                            hint={candidateHint.stationName ? candidateHint.stationName : undefined}
                             mono
                         />
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
                         <FormField
-                            label="Số giờ quá hạn *"
+                            label="Số giờ quá hạn (≥ 72h) *"
                             type="number"
                             value={fields.overdueHours}
                             onChange={(val) => setFields((p) => ({ ...p, overdueHours: val }))}
                             error={errors.overdueHours}
-                            hint="Tính từ thời điểm hết hạn thuê"
+                            hint="Ngưỡng niêm phong chuẩn: 72h"
                         />
                         <FormField
                             label="Mã tem niêm phong vật lý *"
@@ -403,7 +517,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                     </div>
                 </section>
 
-                {/* Section: Item List Management */}
+                {/* Section 2: Item List Management */}
                 <section>
                     <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                         <div className="flex items-center gap-2">
@@ -584,9 +698,74 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                     </div>
                 </section>
 
-                {/* Section: Inspection notes & Safety confirmation */}
+                {/* Section 3: Đính kèm Ảnh / Video Kiểm Kê Hiện Trường (UC-S10) */}
                 <section className="space-y-3">
-                    <SectionTitle icon={Shield} title="3. Xác nhận an toàn & Ghi chú hiện trường" />
+                    <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
+                        <div className="flex items-center gap-2">
+                            <Camera className="w-4 h-4 text-blue-600" />
+                            <p className="text-xs font-bold text-slate-700">
+                                3. Đính kèm Ảnh / Video Kiểm Kê Hiện Trường (UC-S10)
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={handleCaptureKioskSample}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 text-[11px] font-bold hover:bg-blue-100 transition cursor-pointer"
+                        >
+                            <Video className="w-3.5 h-3.5" />
+                            Chụp ảnh mẫu từ Camera Kiosk
+                        </button>
+                    </div>
+
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            value={newPhotoUrl}
+                            onChange={(e) => setNewPhotoUrl(e.target.value)}
+                            placeholder="Nhập URL ảnh/video bằng chứng hiện trường (https://...)"
+                            className="flex-1 px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        />
+                        <button
+                            type="button"
+                            onClick={handleAddPhotoUrl}
+                            className="px-3 py-1.5 rounded-lg bg-slate-800 text-white text-xs font-bold hover:bg-slate-700 transition cursor-pointer shrink-0"
+                        >
+                            Thêm bằng chứng
+                        </button>
+                    </div>
+
+                    {photoUrls.length > 0 && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {photoUrls.map((url, idx) => (
+                                <div
+                                    key={`${url}-${idx}`}
+                                    className="flex items-center justify-between gap-2 p-2 rounded-lg bg-slate-50 border border-slate-200 text-[11px]"
+                                >
+                                    <div className="flex items-center gap-2 min-w-0">
+                                        <span className="px-1.5 py-0.5 rounded bg-slate-800 text-white font-mono text-[10px] shrink-0">
+                                            #{idx + 1}
+                                        </span>
+                                        <span className="truncate font-mono text-slate-700" title={url}>
+                                            {url.split('/').pop() || url}
+                                        </span>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleRemovePhotoUrl(url)}
+                                        className="text-slate-400 hover:text-rose-600 p-1 cursor-pointer shrink-0"
+                                        title="Xóa tệp này"
+                                    >
+                                        <X className="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </section>
+
+                {/* Section 4: Inspection notes & Safety confirmation */}
+                <section className="space-y-3">
+                    <SectionTitle icon={Shield} title="4. Xác nhận an toàn & Ghi chú hiện trường" />
 
                     <label className="flex items-start gap-2.5 p-3 rounded-xl bg-emerald-50/80 border border-emerald-200/80 cursor-pointer">
                         <input
@@ -618,7 +797,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                 <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-blue-50 border border-blue-200/80 text-xs text-blue-900">
                     <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-blue-600" />
                     <div>
-                        <p className="font-bold">Tuân thủ nguyên tắc 4 mắt (Four-Eyes Principle)</p>
+                        <p className="font-bold">Tuân thủ nguyên tắc 4 mắt (Four-Eyes Principle - UC-S10 &amp; UC-A07)</p>
                         <p className="mt-0.5 text-blue-800">
                             Biên bản sau khi tạo sẽ chuyển sang trạng thái <strong>CHỜ ADMIN DUYỆT (PENDING_APPROVAL)</strong>. Bạn sẽ không có quyền tự phê duyệt hồ sơ này.
                         </p>
@@ -641,7 +820,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                     className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-500/25 transition cursor-pointer"
                 >
                     <Send className="w-3.5 h-3.5" />
-                    Kiểm tra & Gửi biên bản (Mắt 1)
+                    Kiểm tra &amp; Gửi biên bản 72h (Mắt 1)
                 </button>
             </div>
         </div>
@@ -714,6 +893,7 @@ function FormField({
 function ConfirmDialog({
     fields,
     items,
+    photoUrls,
     prefill,
     isSubmitting,
     onConfirm,
@@ -721,7 +901,13 @@ function ConfirmDialog({
 }: {
     fields: FormFields;
     items: InventoryItem[];
-    prefill?: InspectionFormProps['prefill'];
+    photoUrls: string[];
+    prefill?: {
+        bookingCode?: string;
+        lockerCode?: string;
+        stationName?: string;
+        customerName?: string | null;
+    };
     isSubmitting: boolean;
     onConfirm: () => void;
     onCancel: () => void;
@@ -736,10 +922,10 @@ function ConfirmDialog({
                 <div className="px-6 pt-5 pb-4 border-b border-slate-100 flex items-start justify-between">
                     <div>
                         <h3 className="text-base font-black text-slate-900">
-                            Xác nhận gửi biên bản kiểm kê?
+                            Xác nhận gửi biên bản niêm phong 72h (UC-S10)?
                         </h3>
                         <p className="text-xs text-slate-500 mt-0.5">
-                            Sau khi gửi, biên bản sẽ chuyển sang trạng thái PENDING_APPROVAL chờ Admin phê duyệt.
+                            Sau khi gửi, biên bản sẽ chuyển sang trạng thái PENDING_APPROVAL chờ Admin phê duyệt (UC-A07).
                         </p>
                     </div>
                     {!isSubmitting && (
@@ -761,11 +947,17 @@ function ConfirmDialog({
                         </div>
                         <div className="flex justify-between">
                             <span className="text-slate-500">Trạm / Tủ:</span>
-                            <span className="font-semibold text-slate-800">{prefill?.stationName || fields.stationId} · {prefill?.lockerCode || fields.lockerId}</span>
+                            <span className="font-semibold text-slate-800">
+                                {prefill?.stationName || fields.stationId} · {prefill?.lockerCode || fields.lockerId}
+                            </span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-slate-500">Thời gian quá hạn:</span>
                             <span className="font-bold text-amber-700">{fields.overdueHours} giờ</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-slate-500">Bằng chứng ảnh/video:</span>
+                            <span className="font-bold text-blue-700">{photoUrls.length} tệp đính kèm</span>
                         </div>
                         {fields.measuredWeight && (
                             <div className="flex justify-between">

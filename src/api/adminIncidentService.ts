@@ -1,10 +1,13 @@
 /**
- * AD-FE-06: UC-T14 → A08, S-02 — Emergency Locker Access Support
+ * AD-FE-06: UC-T14 → A08, S-02, UC-S04, UC-S05 — Emergency Locker Access & Incident Management
  * API service cho phân hệ Emergency Incident & Remote Unlock.
  *
  * Endpoints:
- *  GET  /api/admin/incidents                          — Danh sách sự cố
- *  POST /api/admin/incidents/{incidentId}/remote-unlock — Mở tủ từ xa theo sự cố
+ *  GET   /api/admin/incidents                                  — Danh sách sự cố
+ *  POST  /api/admin/incidents                                  — Tạo phiếu sự cố mới (UC-S04)
+ *  PATCH /api/admin/incidents/{incidentId}/status              — Cập nhật trạng thái xử lý sự cố (UC-S04)
+ *  POST  /api/admin/incidents/{incidentId}/remote-unlock       — Mở tủ từ xa theo sự cố (UC-S05)
+ *  POST  /api/admin/incidents/lockers/{lockerId}/remote-unlock — Mở tủ khẩn cấp trực tiếp theo ô tủ (UC-S05)
  */
 import apiClient from './client';
 
@@ -42,7 +45,23 @@ export interface IncidentDetailDto {
     createdAt: string;
 }
 
-/** Request body khi gọi Remote Unlock */
+/** Request body khi tạo phiếu sự cố mới (UC-S04) */
+export interface CreateIncidentRequest {
+    lockerId: string;
+    stationId: string;
+    bookingId?: string | null;
+    type: string;
+    severity: string;
+    description: string;
+}
+
+/** Request body khi cập nhật trạng thái xử lý sự cố (UC-S04) */
+export interface UpdateIncidentStatusRequest {
+    status: 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CANCELLED';
+    resolutionNote?: string;
+}
+
+/** Request body khi gọi Remote Unlock (UC-S05) */
 export interface RemoteUnlockRequest {
     reason: string;
 }
@@ -75,7 +94,36 @@ export const adminIncidentService = {
     },
 
     /**
-     * Gửi lệnh mở khóa tủ từ xa theo sự cố.
+     * Tiếp nhận / tạo phiếu báo cáo sự cố mới (UC-S04).
+     * POST /api/admin/incidents
+     */
+    async createIncident(
+        body: CreateIncidentRequest
+    ): Promise<ApiResponse<IncidentDetailDto>> {
+        const res = await apiClient.post<ApiResponse<IncidentDetailDto>>(
+            '/api/admin/incidents',
+            body
+        );
+        return res.data;
+    },
+
+    /**
+     * Cập nhật tiến độ xử lý & đóng sự cố (UC-S04).
+     * PATCH /api/admin/incidents/{incidentId}/status
+     */
+    async updateIncidentStatus(
+        incidentId: string,
+        body: UpdateIncidentStatusRequest
+    ): Promise<ApiResponse<IncidentDetailDto>> {
+        const res = await apiClient.patch<ApiResponse<IncidentDetailDto>>(
+            `/api/admin/incidents/${incidentId}/status`,
+            body
+        );
+        return res.data;
+    },
+
+    /**
+     * Gửi lệnh mở khóa tủ từ xa theo sự cố (UC-S05).
      * POST /api/admin/incidents/{incidentId}/remote-unlock
      * Body: { reason: string }
      *
@@ -88,6 +136,22 @@ export const adminIncidentService = {
     ): Promise<ApiResponse<boolean>> {
         const res = await apiClient.post<ApiResponse<boolean>>(
             `/api/admin/incidents/${incidentId}/remote-unlock`,
+            body
+        );
+        return res.data;
+    },
+
+    /**
+     * Mở khóa khẩn cấp trực tiếp từ xa theo mã ô tủ (UC-S05).
+     * POST /api/admin/incidents/lockers/{lockerId}/remote-unlock
+     * Body: { reason: string }
+     */
+    async directRemoteUnlockLocker(
+        lockerId: string,
+        body: RemoteUnlockRequest
+    ): Promise<ApiResponse<boolean>> {
+        const res = await apiClient.post<ApiResponse<boolean>>(
+            `/api/admin/incidents/lockers/${lockerId}/remote-unlock`,
             body
         );
         return res.data;
