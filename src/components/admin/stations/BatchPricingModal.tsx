@@ -85,7 +85,7 @@ export default function BatchPricingModal({
             }
 
             setFeedback(
-                `Đã áp dụng bảng giá & chính sách hoàn tiền (UC-A04) thành công cho ${targetStations.length} trạm!`
+                `Đã áp dụng bảng giá & chính sách hoàn tiền thành công cho ${targetStations.length} trạm!`
             );
             setTimeout(() => {
                 onSuccess();
@@ -108,7 +108,7 @@ export default function BatchPricingModal({
                         </div>
                         <div>
                             <h3 className="text-base font-extrabold text-slate-900 tracking-tight">
-                                Áp Dụng Bảng Giá & Hoàn Tiền Hàng Loạt (UC-A04)
+                                Áp Dụng Bảng Giá & Hoàn Tiền Hàng Loạt
                             </h3>
                             <p className="text-[11px] text-slate-400">
                                 Cập nhật đồng bộ giá thuê, phí quá hạn và tỷ lệ hoàn tiền hủy đơn
@@ -180,7 +180,7 @@ export default function BatchPricingModal({
                     <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
                         <div className="flex items-center gap-1.5 text-xs font-extrabold text-slate-800 uppercase tracking-wider">
                             <RotateCcw className="w-3.5 h-3.5 text-blue-600" />
-                            <span>Chính sách Phạt quá hạn & Hoàn tiền hủy đơn (UC-A04)</span>
+                            <span>Chính sách Phạt quá hạn & Hoàn tiền hủy đơn</span>
                         </div>
 
                         <div className="grid grid-cols-2 gap-3">

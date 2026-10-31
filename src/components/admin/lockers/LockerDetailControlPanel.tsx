@@ -138,7 +138,7 @@ export default function LockerDetailControlPanel({
                     type: 'success',
                     message:
                         res.message ||
-                        `Đã phát lệnh MQTT mở khẩn cấp ngăn ${locker.lockerCode} và lưu vết Audit Log (UC-S05).`,
+                        `Đã phát lệnh MQTT mở khẩn cấp ngăn ${locker.lockerCode} và lưu vết Audit Log .`,
                 });
                 setShowEmergencyForm(false);
                 setEmergencyReason('');
@@ -558,7 +558,7 @@ export default function LockerDetailControlPanel({
                             <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                             <div>
                                 <p className="font-bold text-rose-900 text-[11px]">
-                                    Mở khóa cưỡng bức từ xa (Emergency Latch — UC-S05)
+                                    Mở khóa cưỡng bức từ xa (Emergency Latch)
                                 </p>
                                 <p className="text-[10px] text-rose-700/80">
                                     Phát lệnh MQTT mở chốt khẩn cấp trực tiếp cho ngăn {locker.lockerCode} (Bắt buộc nhập lý do Audit).
@@ -599,7 +599,7 @@ export default function LockerDetailControlPanel({
                         <div className="pt-2 border-t border-rose-200/80 space-y-2.5">
                             <div className="flex items-center justify-between">
                                 <label className="text-[11px] font-bold text-rose-900">
-                                    Lý do Audit mở khóa khẩn cấp (UC-S05) <span className="text-rose-600">*</span>
+                                    Lý do an ninh mở khóa khẩn cấp <span className="text-rose-600">*</span>
                                 </label>
                                 <span
                                     className={`text-[10px] font-mono font-bold ${

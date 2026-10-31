@@ -180,7 +180,7 @@ export default function StationManagementView() {
                             Station Network & Compartment Configuration
                         </h1>
                         <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold tracking-wider uppercase border border-slate-200">
-                            UC-A03 · UC-A04
+                            QUẢN LÝ TRẠM & BẢNG GIÁ
                         </span>
                     </div>
                     <p className="text-xs text-slate-500 mt-1 max-w-2xl">

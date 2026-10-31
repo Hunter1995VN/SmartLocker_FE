@@ -5,7 +5,7 @@
  *  - Hỗ trợ chọn nhanh từ danh sách đơn đặt quá hạn 72h (getOverdueCandidates) hoặc nhập thủ công
  *  - Hỗ trợ thêm nhiều item (Danh mục, Mô tả, Số lượng, Tình trạng, Ghi chú)
  *  - Cho phép Add, Edit, Remove item trước khi submit
- *  - Đính kèm Ảnh / Video Kiểm Kê Hiện Trường (UC-S10)
+ *  - Đính kèm Ảnh / Video Kiểm Kê Hiện Trường
  *  - Mã tem niêm phong vật lý (Seal Barcode)
  *  - Tải trọng cân thực địa tại trạm (kg)
  *  - Submit → POST /api/admin/abandoned-properties (kèm photoUrls)
@@ -326,7 +326,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
 
     const serializeItemDescription = (): string => {
         const lines: string[] = [];
-        lines.push(`[BIÊN BẢN KIỂM KÊ HIỆN TRƯỜNG QUÁ HẠN 72H - UC-S10]`);
+        lines.push(`[BIÊN BẢN KIỂM KÊ HIỆN TRƯỜNG QUÁ HẠN 72H]`);
         lines.push(`Mã tem niêm phong: ${fields.sealCode.trim()}`);
         if (fields.measuredWeight) {
             lines.push(`Tải trọng thực địa: ${fields.measuredWeight.trim()} kg`);
@@ -407,11 +407,11 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                                 Lập Biên Bản Niêm Phong Đồ Quá Hạn 72h
                             </h2>
                             <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-300">
-                                UC-S10 · Mắt 1 (Staff)
+                                Mắt 1 (Nhân viên hiện trường)
                             </span>
                         </div>
                         <p className="text-xs text-slate-600 mt-0.5">
-                            UC-S10, S-03 · Kiểm kê &amp; niêm phong đồ bỏ quên quá hạn 72h (Kèm ảnh/video hiện trường)
+                            Kiểm kê &amp; niêm phong đồ bỏ quên quá hạn 72h (Kèm ảnh/video hiện trường)
                         </p>
                     </div>
                 </div>
@@ -443,7 +443,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                     {candidates.length > 0 && (
                         <div className="mt-3 p-3 rounded-xl bg-amber-50/70 border border-amber-200/80">
                             <label className="block text-[11px] font-bold text-amber-900 mb-1">
-                                Chọn nhanh Đơn đặt tủ quá hạn 72h chờ lập biên bản (UC-S10):
+                                Chọn nhanh Đơn đặt tủ quá hạn 72h chờ lập biên bản:
                             </label>
                             <select
                                 value={selectedCandidateId}
@@ -698,13 +698,13 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                     </div>
                 </section>
 
-                {/* Section 3: Đính kèm Ảnh / Video Kiểm Kê Hiện Trường (UC-S10) */}
+                {/* Section 3: Đính kèm Ảnh / Video Kiểm Kê Hiện Trường */}
                 <section className="space-y-3">
                     <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
                         <div className="flex items-center gap-2">
                             <Camera className="w-4 h-4 text-blue-600" />
                             <p className="text-xs font-bold text-slate-700">
-                                3. Đính kèm Ảnh / Video Kiểm Kê Hiện Trường (UC-S10)
+                                3. Đính kèm Ảnh / Video Kiểm Kê Hiện Trường
                             </p>
                         </div>
                         <button
@@ -797,7 +797,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                 <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-blue-50 border border-blue-200/80 text-xs text-blue-900">
                     <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-blue-600" />
                     <div>
-                        <p className="font-bold">Tuân thủ nguyên tắc 4 mắt (Four-Eyes Principle - UC-S10 &amp; UC-A07)</p>
+                        <p className="font-bold">Tuân thủ nguyên tắc 4 mắt (Four-Eyes Principle)</p>
                         <p className="mt-0.5 text-blue-800">
                             Biên bản sau khi tạo sẽ chuyển sang trạng thái <strong>CHỜ ADMIN DUYỆT (PENDING_APPROVAL)</strong>. Bạn sẽ không có quyền tự phê duyệt hồ sơ này.
                         </p>
@@ -922,10 +922,10 @@ function ConfirmDialog({
                 <div className="px-6 pt-5 pb-4 border-b border-slate-100 flex items-start justify-between">
                     <div>
                         <h3 className="text-base font-black text-slate-900">
-                            Xác nhận gửi biên bản niêm phong 72h (UC-S10)?
+                            Xác nhận gửi biên bản niêm phong 72h?
                         </h3>
                         <p className="text-xs text-slate-500 mt-0.5">
-                            Sau khi gửi, biên bản sẽ chuyển sang trạng thái PENDING_APPROVAL chờ Admin phê duyệt (UC-A07).
+                            Sau khi gửi, biên bản sẽ chuyển sang trạng thái PENDING_APPROVAL chờ Admin phê duyệt.
                         </p>
                     </div>
                     {!isSubmitting && (

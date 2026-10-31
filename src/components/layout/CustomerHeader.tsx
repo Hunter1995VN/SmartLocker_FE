@@ -208,7 +208,7 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                                         className="w-full text-left px-4 py-2.5 text-xs font-medium text-[#434655] hover:bg-[#eff4ff] hover:text-[#2563eb] flex items-center gap-2.5 transition-colors cursor-pointer"
                                     >
                                         <Bell className="w-4 h-4 text-[#2563eb]" />
-                                        <span>Kênh nhận thông báo (UC-T22)</span>
+                                        <span>Kênh nhận thông báo</span>
                                     </button>
 
                                     <hr className="my-1 border-[#f0f4ff]" />

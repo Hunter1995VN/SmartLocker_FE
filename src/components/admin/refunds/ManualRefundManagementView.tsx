@@ -299,7 +299,7 @@ export default function ManualRefundManagementView({
                                 Phê Duyệt Lệnh Hoàn Tiền Thủ Công (Trường Hợp Ngoại Lệ)
                             </h1>
                             <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full bg-purple-50 text-purple-700 border border-purple-200">
-                                UC-A11 · Exception Refund Control
+                                DUYỆT HOÀN TIỀN NGOẠI LỆ
                             </span>
                         </div>
                         <p className="text-xs text-slate-500 mt-1">
@@ -829,7 +829,7 @@ export default function ManualRefundManagementView({
                                 </p>
                             </div>
                             <div className="p-3 rounded-xl bg-blue-50/70 border border-blue-200 text-blue-950">
-                                <p className="font-bold">3. Đồng bộ Sổ cái Đối soát PayOS (UC-A12)</p>
+                                <p className="font-bold">3. Đồng bộ Sổ cái Đối soát PayOS</p>
                                 <p className="mt-0.5 text-[11px]">
                                     Ngay khi xác nhận giải ngân, hệ thống tự động sinh dòng bút toán{' '}
                                     <code className="font-mono">Kind = REFUND, Status = REFUNDED</code> vào bảng{' '}

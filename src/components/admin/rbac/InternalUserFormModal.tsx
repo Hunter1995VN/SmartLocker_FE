@@ -185,7 +185,7 @@ export default function InternalUserFormModal({
                         <div>
                             <h3 className="text-sm font-extrabold text-slate-900">
                                 {mode === 'CREATE'
-                                    ? 'Tạo Tài Khoản Nhân Sự Nội Bộ Mới (UC-A05)'
+                                    ? 'Tạo Tài Khoản Nhân Sự Nội Bộ Mới'
                                     : 'Cập Nhật Hồ Sơ & Vai Trò Nhân Sự Nội Bộ'}
                             </h3>
                             <p className="text-[11px] text-slate-500">

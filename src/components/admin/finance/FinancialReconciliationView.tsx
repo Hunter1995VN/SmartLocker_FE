@@ -246,7 +246,7 @@ export default function FinancialReconciliationView({
                                 Đối Soát Tài Chính Định Kỳ PayOS & Cơ Sở Dữ Liệu
                             </h1>
                             <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-                                UC-A12 · PayOS Napas247 Reconciliation
+                                ĐỐI SOÁT PAYOS NAPAS247
                             </span>
                         </div>
                         <p className="text-xs text-slate-500 mt-1">
@@ -356,7 +356,7 @@ export default function FinancialReconciliationView({
                         {refundTotal.toLocaleString('vi-VN')} đ
                     </p>
                     <p className="text-[11px] text-slate-500 mt-1">
-                        Áp dụng theo chính sách hoàn tiền UC-A04
+                        Áp dụng theo chính sách hoàn tiền trạm
                     </p>
                 </div>
 

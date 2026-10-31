@@ -201,7 +201,7 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
     const handleApprove = async () => {
         if (!activeRecord) return;
         if (!isAdmin) {
-            setApprovalErrorMsg('Chỉ tài khoản Quản trị viên (Admin) mới có thẩm quyền phê duyệt 4-Eyes (UC-A07).');
+            setApprovalErrorMsg('Chỉ tài khoản Quản trị viên (Admin) mới có thẩm quyền phê duyệt kép (Four-Eyes).');
             return;
         }
         if (!isChecklistComplete) {
@@ -221,7 +221,7 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
 
             if (res.success) {
                 setApprovalSuccessMsg(
-                    `Đã phê duyệt thành công biên bản ${activeRecord.recordCode} (UC-A07)! Lệnh mở khóa Solenoid ô ${activeRecord.lockerCode} đã được phát trong 45 giây.`
+                    `Đã phê duyệt thành công biên bản ${activeRecord.recordCode} ! Lệnh mở khóa Solenoid ô ${activeRecord.lockerCode} đã được phát trong 45 giây.`
                 );
                 setRecords((prev) =>
                     prev.map((r) =>
@@ -338,7 +338,7 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                 collectOverdueDebt: handoverCollectDebt,
                 notes:
                     handoverNotes.trim() ||
-                    `[UC-S11 BÀN GIAO KHÁCH] Người nhận: ${handoverReceiverName.trim()} (CCCD: ${handoverReceiverIdNumber.trim()})`,
+                    `[BÀN GIAO KHÁCH] Người nhận: ${handoverReceiverName.trim()} (CCCD: ${handoverReceiverIdNumber.trim()})`,
             });
 
             if (res.success) {
@@ -356,7 +356,7 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                     )
                 );
                 setApprovalSuccessMsg(
-                    `[UC-S11 Hoàn Tất] Đã bàn giao lại tài sản biên bản ${activeRecord.recordCode} cho khách hàng ${handoverReceiverName.trim()} (CCCD: ${handoverReceiverIdNumber.trim()})${
+                    `[BÀN GIAO HOÀN TẤT] Đã bàn giao lại tài sản biên bản ${activeRecord.recordCode} cho khách hàng ${handoverReceiverName.trim()} (CCCD: ${handoverReceiverIdNumber.trim()})${
                         handoverCollectDebt ? ' và xóa nợ quá hạn thành công!' : '!'
                     }`
                 );
@@ -381,7 +381,7 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                 )
             );
             setApprovalSuccessMsg(
-                `[UC-S11 Hoàn Tất] Đã bàn giao lại tài sản biên bản ${activeRecord.recordCode} cho khách hàng ${handoverReceiverName.trim()} (CCCD: ${handoverReceiverIdNumber.trim()})${
+                `[BÀN GIAO HOÀN TẤT] Đã bàn giao lại tài sản biên bản ${activeRecord.recordCode} cho khách hàng ${handoverReceiverName.trim()} (CCCD: ${handoverReceiverIdNumber.trim()})${
                     handoverCollectDebt ? ' và xóa nợ quá hạn thành công!' : '!'
                 }`
             );
@@ -420,7 +420,7 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                     )
                 );
                 setApprovalSuccessMsg(
-                    `[UC-A07 Hoàn Tất] Đã xuất kho / thanh lý biên bản ${activeRecord.recordCode} và giải phóng ô tủ ${activeRecord.lockerCode} về trạng thái AVAILABLE!`
+                    `[THANH LÝ HOÀN TẤT] Đã xuất kho / thanh lý biên bản ${activeRecord.recordCode} và giải phóng ô tủ ${activeRecord.lockerCode} về trạng thái AVAILABLE!`
                 );
                 void fetchRecords(false);
             } else {
@@ -440,7 +440,7 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                 )
             );
             setApprovalSuccessMsg(
-                `[UC-A07 Hoàn Tất] Đã xuất kho / thanh lý biên bản ${activeRecord.recordCode} và giải phóng ô tủ ${activeRecord.lockerCode} về trạng thái AVAILABLE!`
+                `[THANH LÝ HOÀN TẤT] Đã xuất kho / thanh lý biên bản ${activeRecord.recordCode} và giải phóng ô tủ ${activeRecord.lockerCode} về trạng thái AVAILABLE!`
             );
         } finally {
             setIsSubmittingResolve(false);
@@ -474,7 +474,7 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                     <span className="hover:text-slate-800 cursor-pointer">Vận hành trạm</span>
                     <span>/</span>
                     <span className="font-bold text-slate-900">
-                        Xử lý đồ bỏ quên quá hạn 72h (UC-S10 · UC-S11 · UC-A07)
+                        Xử lý đồ bỏ quên quá hạn 72h
                     </span>
                 </div>
 
@@ -507,9 +507,9 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                                 Xử Lý Đồ Bỏ Quên Quá Hạn 72h &amp; Kiểm Kê An Toàn (Nguyên Tắc 4 Mắt)
                             </h1>
                             <p className="text-xs text-slate-500 mt-0.5 max-w-3xl leading-relaxed">
-                                Quy trình lập biên bản niêm phong đồ quá hạn 72h kèm ảnh/video (UC-S10), phê duyệt kép
-                                thanh lý theo quy tắc 4 mắt (UC-A07) và thực hiện thủ tục bàn giao lại đồ thất lạc khi
-                                khách đến nhận diện (UC-S11).
+                                Quy trình lập biên bản niêm phong đồ quá hạn 72h kèm ảnh/video, phê duyệt kép
+                                thanh lý theo quy tắc 4 mắt và thực hiện thủ tục bàn giao lại đồ thất lạc khi
+                                khách đến nhận diện.
                             </p>
                         </div>
                     </div>
@@ -540,7 +540,7 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-500/25 transition cursor-pointer"
                         >
                             <Plus className="w-4 h-4" />
-                            Lập biên bản 72h (UC-S10)
+                            Lập biên bản 72h
                         </button>
                     )}
                     <button
@@ -567,8 +567,8 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                     </p>
                     <p className="mt-1 text-slate-600">
                         Thao tác mở ô tủ chứa đồ quá hạn 72h bắt buộc phải có sự xác nhận đồng thời của{' '}
-                        <strong>Nhân viên hiện trường (Staff - UC-S10)</strong> và{' '}
-                        <strong>Quản trị viên hệ thống (Admin - UC-A07)</strong>. Toàn bộ hình ảnh/video hiện trường, mã
+                        <strong>Nhân viên hiện trường (Staff)</strong> và{' '}
+                        <strong>Quản trị viên hệ thống (Admin)</strong>. Toàn bộ hình ảnh/video hiện trường, mã
                         tem niêm phong vật lý và dữ liệu trọng lượng tải trọng Loadcell IoT đều được băm SHA-256 lưu trữ
                         vĩnh viễn trên sổ cái hệ thống.
                     </p>
@@ -626,7 +626,7 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
 
                 <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-xs">
                     <div className="flex items-center justify-between text-slate-500 text-xs font-semibold">
-                        <span>TỶ LỆ BÀN GIAO LẠI KHÁCH (UC-S11)</span>
+                        <span>TỶ LỆ BÀN GIAO LẠI KHÁCH</span>
                         <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                     </div>
                     <div className="mt-2 flex items-baseline gap-1.5">
@@ -647,12 +647,12 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                         { key: 'ALL', label: 'Tất cả quá hạn 72h', count: records.length },
                         {
                             key: 'WAITING_INSPECTION',
-                            label: 'Chờ lập BB (UC-S10)',
+                            label: 'Chờ lập biên bản',
                             count: records.filter((r) => (r.status || '').toUpperCase() === 'REPORTED').length,
                         },
                         {
                             key: 'PENDING_APPROVAL',
-                            label: 'Chờ Admin duyệt (UC-A07)',
+                            label: 'Chờ Admin duyệt',
                             count: pendingCount,
                             highlight: true,
                         },
@@ -774,7 +774,7 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                     <Package className="w-10 h-10 mx-auto text-slate-300 mb-2" />
                     <p className="font-bold text-sm text-slate-700">Không tìm thấy biên bản phù hợp</p>
                     <p className="text-xs text-slate-400 mt-1">
-                        Hãy thử đổi bộ lọc hoặc bấm &quot;Lập biên bản 72h (UC-S10)&quot; để ghi nhận đồ bỏ quên.
+                        Hãy thử đổi bộ lọc hoặc bấm &quot;Lập biên bản 72h&quot; để ghi nhận đồ bỏ quên.
                     </p>
                 </div>
             ) : (
@@ -801,12 +801,12 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                                             </span>
                                             {activeRecord.status.toUpperCase() === 'RETURNED' && (
                                                 <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                                    ĐÃ BÀN GIAO LẠI KHÁCH (UC-S11)
+                                                    ĐÃ BÀN GIAO LẠI KHÁCH
                                                 </span>
                                             )}
                                             {activeRecord.status.toUpperCase() === 'DISPOSED' && (
                                                 <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-slate-200 text-slate-800 border border-slate-300">
-                                                    ĐÃ THANH LÝ / XUẤT KHO (UC-A07)
+                                                    ĐÃ THANH LÝ / XUẤT KHO
                                                 </span>
                                             )}
                                         </div>
@@ -928,7 +928,7 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                                     </span>
                                     <div>
                                         <h3 className="text-sm font-black text-slate-900">
-                                            Biên Bản Kiểm Kê &amp; Niêm Phong 72h (UC-S10)
+                                            Biên Bản Kiểm Kê &amp; Niêm Phong 72h
                                         </h3>
                                         <p className="text-[11px] text-slate-500">
                                             Lập bởi Kỹ thuật viên hiện trường · Bước 1/2 của quy trình 4-Eyes
@@ -1043,7 +1043,7 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                                 <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                                     <Camera className="w-3.5 h-3.5 text-blue-600" />
                                     <span>
-                                        Tệp hình ảnh / video kiểm kê hiện trường UC-S10 (
+                                        Tệp hình ảnh / video kiểm kê hiện trường (
                                         {activeRecord.photos && activeRecord.photos.length > 0
                                             ? `${activeRecord.photos.length} tệp đính kèm`
                                             : '03 ảnh đã đồng bộ Cloud Storage'}
@@ -1059,7 +1059,7 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                                             >
                                                 <div className="flex items-center justify-between">
                                                     <span className="px-1.5 py-0.5 bg-blue-600/80 rounded text-[9px] font-mono">
-                                                        UC-S10 #{idx + 1}
+                                                        Ảnh hiện trường #{idx + 1}
                                                     </span>
                                                     <span className="text-[9px] text-emerald-400 font-mono">VERIFIED</span>
                                                 </div>
@@ -1112,7 +1112,7 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                                     </span>
                                     <div>
                                         <h3 className="text-sm font-black text-slate-900">
-                                            Phê Duyệt Kép Của Quản Trị Viên (UC-A07)
+                                            Phê Duyệt Kép Của Quản Trị Viên (Four-Eyes)
                                         </h3>
                                         <p className="text-[11px] text-slate-500">
                                             Four-Eyes Sign-Off · Thẩm định biên bản quá hạn 72h
@@ -1129,9 +1129,9 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                                     }`}
                                 >
                                     {activeRecord.status.toUpperCase() === 'RETURNED'
-                                        ? 'ĐÃ TRẢ KHÁCH (UC-S11)'
+                                        ? 'ĐÃ TRẢ KHÁCH'
                                         : activeRecord.status.toUpperCase() === 'DISPOSED'
-                                        ? 'ĐÃ THANH LÝ (UC-A07)'
+                                        ? 'ĐÃ THANH LÝ'
                                         : activeRecord.status.toUpperCase() === 'APPROVED'
                                         ? 'ĐÃ PHÊ DUYỆT'
                                         : 'CHỜ ADMIN DUYỆT (STEP 2/2)'}
@@ -1275,7 +1275,7 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                                         />
                                         <div>
                                             <p className="font-bold text-slate-900">
-                                                Bàn giao trả lại cho Chủ sở hữu / Khách hàng (UC-S11)
+                                                Bàn giao trả lại cho Chủ sở hữu / Khách hàng
                                             </p>
                                             <p className="text-[11px] text-slate-500 mt-0.5">
                                                 Áp dụng khi khách hàng đã liên hệ xác minh danh tính và đến trạm/kho nhận lại đồ.
@@ -1295,7 +1295,7 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                                         />
                                         <div>
                                             <p className="font-bold text-slate-900">
-                                                Chuyển diện thanh lý / tiêu hủy tài sản quá hạn (UC-A07)
+                                                Chuyển diện thanh lý / tiêu hủy tài sản quá hạn
                                             </p>
                                             <p className="text-[11px] text-slate-500 mt-0.5">
                                                 Phê duyệt thanh lý tài sản bỏ quên sau 72h theo biên bản thẩm định 4 mắt.
@@ -1410,7 +1410,7 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                             {/* UC-S11 & UC-A07: Post-Inspection Handover & Liquidation Actions */}
                             <div className="pt-3 border-t border-slate-100 space-y-2.5">
                                 <p className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
-                                    Thủ tục Bàn giao lại cho Khách (UC-S11) &amp; Hoàn tất Thanh lý (UC-A07):
+                                    Thủ tục Bàn giao lại cho Khách &amp; Hoàn tất Thanh lý:
                                 </p>
                                 <div className="grid grid-cols-1 gap-2">
                                     <button
@@ -1424,7 +1424,7 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                                         className="w-full py-2.5 px-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-400 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-xs transition cursor-pointer disabled:cursor-not-allowed"
                                     >
                                         <UserCheck className="w-4 h-4" />
-                                        <span>Thủ Tục Bàn Giao Lại Đồ Cho Khách (UC-S11)</span>
+                                        <span>Thủ Tục Bàn Giao Lại Đồ Cho Khách</span>
                                     </button>
 
                                     {activeRecord.status.toUpperCase() === 'APPROVED' && (
@@ -1435,7 +1435,7 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                                             className="w-full py-2.5 px-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-xs transition cursor-pointer"
                                         >
                                             <Archive className="w-4 h-4" />
-                                            <span>Hoàn Tất Xuất Kho / Thanh Lý Tài Sản (UC-A07)</span>
+                                            <span>Hoàn Tất Xuất Kho / Thanh Lý Tài Sản</span>
                                         </button>
                                     )}
                                 </div>
@@ -1460,7 +1460,7 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                                             14:20:15 UTC+7 · IoT Watchdog | <span className="text-blue-600 font-bold">EVENT_EMIT</span>
                                         </p>
                                         <p className="text-slate-800 font-semibold mt-0.5">
-                                            Cảnh báo Ô {activeRecord.lockerCode} quá hạn 72h tự động kích hoạt UC-S10. Phân bổ ca trực KTV.
+                                            Cảnh báo Ô {activeRecord.lockerCode} quá hạn 72h tự động thông báo KTV đến lập biên bản kiểm kê.
                                         </p>
                                     </div>
                                 </div>
@@ -1495,7 +1495,7 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                                     <span className="w-2 h-2 rounded-full bg-purple-600 mt-1 shrink-0 animate-ping" />
                                     <div>
                                         <p className="font-mono text-purple-700 text-[10px] font-bold">
-                                            (QUY TẮC 4 MẮT - UC-A07) | CUSTODY_VERIFICATION
+                                            (QUY TẮC 4 MẮT) | CUSTODY_VERIFICATION
                                         </p>
                                         <p className="text-purple-900 font-semibold mt-0.5">
                                             Admin thẩm tra checklist. Sẵn sàng phát lệnh S-03 Solenoid Pulse khi ký duyệt.
@@ -1549,7 +1549,7 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                             setRecords((prev) => [newRec, ...prev]);
                             setSelectedRecordId(newRec.id);
                             setApprovalSuccessMsg(
-                                `Đã tạo biên bản niêm phong 72h ${newRec.recordCode} thành công (UC-S10 - Mắt 1)! Biên bản đang chờ Admin phê duyệt (UC-A07).`
+                                `Đã tạo biên bản niêm phong 72h ${newRec.recordCode} thành công thành công! Biên bản đang chờ Quản trị viên phê duyệt.`
                             );
                         }}
                         onCancel={() => setShowCreateModal(false)}
@@ -1568,7 +1568,7 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                                 </span>
                                 <div>
                                     <h3 className="text-base font-black text-slate-900">
-                                        Thủ Tục Bàn Giao Lại Đồ Thất Lạc (UC-S11)
+                                        Thủ Tục Bàn Giao Lại Đồ Thất Lạc
                                     </h3>
                                     <p className="text-xs text-slate-500">
                                         Biên bản <strong className="font-mono">{activeRecord.recordCode}</strong> · Ô tủ{' '}
@@ -1686,7 +1686,7 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                                 <span>
                                     {isSubmittingResolve
                                         ? 'Đang lưu biên bản bàn giao...'
-                                        : 'Xác nhận bàn giao & Trả đồ (UC-S11)'}
+                                        : 'Xác nhận bàn giao & Trả đồ'}
                                 </span>
                             </button>
                         </div>
@@ -1700,7 +1700,7 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                     <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-slate-200 space-y-4">
                         <div className="flex items-start justify-between">
                             <h3 className="text-base font-black text-slate-900">
-                                Từ chối biên bản kiểm kê (UC-A07)
+                                Từ chối biên bản kiểm kê
                             </h3>
                             <button
                                 type="button"
@@ -1771,13 +1771,13 @@ export default function AbandonedPropertyView({ userRole }: AbandonedPropertyVie
                                 <strong>1. Căn cứ Bộ luật Dân sự 2015:</strong> Điều 230 quy định về việc xác lập quyền sở hữu đối với tài sản do người khác bỏ quên, đánh rơi.
                             </p>
                             <p>
-                                <strong>2. Thời hạn lưu giữ trạm (72 giờ - UC-S10):</strong> Tối đa 72 giờ kể từ thời điểm hết hạn thuê. Sau 72 giờ không có phản hồi, hệ thống chuyển sang quy trình lập biên bản niêm phong kèm ảnh/video chuyển về Kho trung tâm.
+                                <strong>2. Thời hạn lưu giữ trạm (72 giờ):</strong> Tối đa 72 giờ kể từ thời điểm hết hạn thuê. Sau 72 giờ không có phản hồi, hệ thống chuyển sang quy trình lập biên bản niêm phong kèm ảnh/video chuyển về Kho trung tâm.
                             </p>
                             <p>
-                                <strong>3. Nguyên tắc 4 Mắt (UC-A07):</strong> Mọi thao tác tiếp cận và phê duyệt thanh lý tài sản quá hạn 72h phải có sự chứng kiến và ký số của ít nhất 02 nhân sự (01 Nhân viên hiện trường lập biên bản và 01 Quản trị viên phê duyệt).
+                                <strong>3. Nguyên tắc 4 Mắt kép (Four-Eyes):</strong> Mọi thao tác tiếp cận và phê duyệt thanh lý tài sản quá hạn 72h phải có sự chứng kiến và ký số của ít nhất 02 nhân sự (01 Nhân viên hiện trường lập biên bản và 01 Quản trị viên phê duyệt).
                             </p>
                             <p>
-                                <strong>4. Thủ tục nhận diện &amp; bàn giao lại (UC-S11):</strong> Khi khách hàng đến nhận lại đồ thất lạc, nhân viên đối chiếu CCCD/Passport, thu phí phạt quá hạn (nếu có) và lập biên bản bàn giao có chữ ký xác nhận.
+                                <strong>4. Thủ tục nhận diện &amp; bàn giao lại :</strong> Khi khách hàng đến nhận lại đồ thất lạc, nhân viên đối chiếu CCCD/Passport, thu phí phạt quá hạn (nếu có) và lập biên bản bàn giao có chữ ký xác nhận.
                             </p>
                         </div>
 

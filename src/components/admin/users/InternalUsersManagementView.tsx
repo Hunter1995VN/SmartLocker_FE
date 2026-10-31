@@ -1,39 +1,29 @@
 /**
- * AD-FE-05: UC-A05 & UC-A06 — Manage Customers, Internal Users & Overdue Debt Control
- * Container View hoàn chỉnh cho chức năng Quản lý danh sách khách hàng, Chặn tài khoản có nợ xấu (UC-A06)
- * và Quản lý tài khoản nhân viên nội bộ & Phân quyền (UC-A05).
+ * AD-FE-05: Quản lý khách hàng & Kiểm soát dư nợ
+ * Giao diện quản lý danh sách khách hàng thuê tủ (Traveler), theo dõi dư nợ quá hạn & chặn tài khoản vi phạm.
  */
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
     CheckCircle2,
     AlertCircle,
-    AlertOctagon,
     ShieldAlert,
-    Users,
-    UserCheck,
-    Shield,
     X,
-    Plus,
 } from 'lucide-react';
 import adminUserService from '../../../api/adminUserService';
 import type {
     UserAdminListItemDto,
     UserRole,
-    CreateStaffRequest,
 } from '../../../api/adminUserService';
 import UserKpiSummaryCards from './UserKpiSummaryCards';
 import UserFilterBar from './UserFilterBar';
 import UserTable from './UserTable';
 import UserDetailControlPanel from './UserDetailControlPanel';
 import UserActionConfirmModal, { type ActionType } from './UserActionConfirmModal';
-import CreateStaffModal from './CreateStaffModal';
 
 interface NotificationState {
     type: 'success' | 'error';
     message: string;
 }
-
-type QuickViewTab = 'ALL_ACCOUNTS' | 'TRAVELERS' | 'DEBTORS' | 'INTERNAL_STAFF';
 
 interface InternalUsersManagementViewProps {
     onNavigateRbac?: () => void;
@@ -63,7 +53,6 @@ export default function InternalUsersManagementView({
     const [fetchError, setFetchError] = useState<string | null>(null);
 
     // 3. Filter States
-    const [quickViewTab, setQuickViewTab] = useState<QuickViewTab>('ALL_ACCOUNTS');
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState<string>('ALL'); // 'ALL' | 'ACTIVE' | 'SUSPENDED' | 'PENDING_VERIFICATION'
     const [roleFilter, setRoleFilter] = useState<string>('ALL'); // 'ALL' | 'STAFF' | 'ADMIN' | 'TRAVELER'
@@ -78,9 +67,6 @@ export default function InternalUsersManagementView({
     const [confirmTargetUser, setConfirmTargetUser] = useState<UserAdminListItemDto | null>(null);
     const [confirmTargetRole, setConfirmTargetRole] = useState<UserRole | undefined>(undefined);
     const [isProcessingAction, setIsProcessingAction] = useState(false);
-
-    const [createModalOpen, setCreateModalOpen] = useState(false);
-    const [isCreatingStaff, setIsCreatingStaff] = useState(false);
     const [isUpdatingRole, setIsUpdatingRole] = useState(false);
     const [isBlockingDebtors, setIsBlockingDebtors] = useState(false);
 
@@ -105,9 +91,9 @@ export default function InternalUsersManagementView({
             if (res.success && res.data) {
                 setUsers(res.data);
                 setSelectedUser((prev) => {
-                    if (!prev) return res.data && res.data.length > 0 ? res.data[0] : null;
+                    if (!prev) return null;
                     const found = res.data?.find((u) => u.id === prev.id);
-                    return found || (res.data && res.data.length > 0 ? res.data[0] : null);
+                    return found || null;
                 });
             } else {
                 setFetchError(res.message || 'Không thể tải danh sách tài khoản');
@@ -127,211 +113,167 @@ export default function InternalUsersManagementView({
         loadUsers();
     }, [loadUsers]);
 
-    // Sync Quick View Tab selection with role/debt filters
-    const handleSelectQuickViewTab = (tab: QuickViewTab) => {
-        setQuickViewTab(tab);
-        if (tab === 'ALL_ACCOUNTS') {
-            setRoleFilter('ALL');
-            setDebtFilter('ALL');
-        } else if (tab === 'TRAVELERS') {
-            setRoleFilter('TRAVELER');
-            setDebtFilter('ALL');
-        } else if (tab === 'DEBTORS') {
-            setRoleFilter('ALL');
-            setDebtFilter('HAS_DEBT');
-        } else if (tab === 'INTERNAL_STAFF') {
-            setRoleFilter('ALL');
-            setDebtFilter('ALL');
-        }
-    };
-
     // 7. Filter & Search Logic
     const filteredUsers = useMemo(() => {
         return users.filter((u) => {
-            const uRole = (u.role || '').toUpperCase();
-            const uStatus = (u.status || '').toUpperCase();
-            const uDebt = Math.max(0, Number(u.overdueDebt || 0));
+            // Search match (name, email, phone)
+            const query = searchQuery.trim().toLowerCase();
+            const matchSearch =
+                !query ||
+                (u.fullName && u.fullName.toLowerCase().includes(query)) ||
+                (u.email && u.email.toLowerCase().includes(query)) ||
+                (u.phone && u.phone.toLowerCase().includes(query));
 
-            // Quick View Tab filter
-            if (quickViewTab === 'TRAVELERS' && uRole !== 'TRAVELER') {
-                return false;
-            }
-            if (quickViewTab === 'DEBTORS' && uDebt <= 0) {
-                return false;
-            }
-            if (quickViewTab === 'INTERNAL_STAFF' && uRole !== 'ADMIN' && uRole !== 'STAFF') {
-                return false;
-            }
+            // Status filter
+            const matchStatus =
+                statusFilter === 'ALL' ||
+                (u.status || '').toUpperCase() === statusFilter.toUpperCase();
 
-            // Filter by status tab
-            if (statusFilter !== 'ALL' && uStatus !== statusFilter) {
-                return false;
-            }
+            // Role filter
+            const matchRole =
+                roleFilter === 'ALL' ||
+                (u.role || '').toUpperCase() === roleFilter.toUpperCase();
 
-            // Filter by role dropdown
-            if (roleFilter !== 'ALL' && uRole !== roleFilter) {
-                return false;
-            }
+            // Debt filter
+            const debt = Number(u.overdueDebt || 0);
+            const matchDebt =
+                debtFilter === 'ALL' ||
+                (debtFilter === 'HAS_DEBT' && debt > 0) ||
+                (debtFilter === 'NO_DEBT' && debt <= 0);
 
-            // Filter by debt dropdown
-            if (debtFilter === 'HAS_DEBT' && uDebt <= 0) {
-                return false;
-            }
-            if (debtFilter === 'NO_DEBT' && uDebt > 0) {
-                return false;
-            }
-
-            // Filter by search query (fullName, email, phone)
-            if (searchQuery.trim()) {
-                const q = searchQuery.toLowerCase().trim();
-                const name = (u.fullName || '').toLowerCase();
-                const email = (u.email || '').toLowerCase();
-                const phone = (u.phone || '').toLowerCase();
-                if (!name.includes(q) && !email.includes(q) && !phone.includes(q)) {
-                    return false;
-                }
-            }
-
-            return true;
+            return matchSearch && matchStatus && matchRole && matchDebt;
         });
-    }, [users, quickViewTab, statusFilter, roleFilter, debtFilter, searchQuery]);
+    }, [users, searchQuery, statusFilter, roleFilter, debtFilter]);
 
-    // Counters for Quick View Tabs & Filter Bar
+    // Counters for Quick Tab Badges
     const counters = useMemo(() => {
         const total = users.length;
         const active = users.filter((u) => (u.status || '').toUpperCase() === 'ACTIVE').length;
         const suspended = users.filter((u) => (u.status || '').toUpperCase() === 'SUSPENDED').length;
         const pending = users.filter((u) => (u.status || '').toUpperCase() === 'PENDING_VERIFICATION').length;
-        const travelers = users.filter((u) => (u.role || '').toUpperCase() === 'TRAVELER').length;
-        const internalStaff = users.filter((u) => {
-            const r = (u.role || '').toUpperCase();
-            return r === 'ADMIN' || r === 'STAFF';
-        }).length;
         const debtors = users.filter((u) => Number(u.overdueDebt || 0) > 0);
         const debtorCount = debtors.length;
-        const unblockedDebtorsCount = debtors.filter(
-            (u) => (u.status || '').toUpperCase() !== 'SUSPENDED'
-        ).length;
-        const totalDebtAmount = debtors.reduce(
-            (sum, u) => sum + Math.max(0, Number(u.overdueDebt || 0)),
-            0
-        );
+        const totalOverdueDebt = debtors.reduce((sum, u) => sum + Math.max(0, Number(u.overdueDebt || 0)), 0);
+
         return {
             total,
             active,
             suspended,
             pending,
-            travelers,
-            internalStaff,
             debtorCount,
-            unblockedDebtorsCount,
-            totalDebtAmount,
+            totalOverdueDebt,
         };
     }, [users]);
 
-    // 8. UC-A06: Block All Debtors Handler
-    const handleBlockAllDebtors = async () => {
-        if (!isAdmin) return;
-        setIsBlockingDebtors(true);
-        try {
-            const res = await adminUserService.blockAllDebtors(
-                'Chặn hàng loạt tài khoản khách hàng có nợ xấu quá hạn (UC-A06)'
-            );
-            // Update local state immediately + refresh from server
-            setUsers((prev) =>
-                prev.map((u) =>
-                    Number(u.overdueDebt || 0) > 0 ? { ...u, status: 'SUSPENDED' } : u
-                )
-            );
-            setSelectedUser((prev) =>
-                prev && Number(prev.overdueDebt || 0) > 0
-                    ? { ...prev, status: 'SUSPENDED' }
-                    : prev
-            );
-            setNotification({
-                type: 'success',
-                message:
-                    res.message ||
-                    `Đã chặn thành công tất cả (${counters.debtorCount}) tài khoản có nợ xấu quá hạn (UC-A06)!`,
-            });
-            await loadUsers(true);
-        } catch {
-            // Fallback local state update if endpoint is unavailable
-            const affectedCount = users.filter((u) => Number(u.overdueDebt || 0) > 0).length;
-            setUsers((prev) =>
-                prev.map((u) =>
-                    Number(u.overdueDebt || 0) > 0 ? { ...u, status: 'SUSPENDED' } : u
-                )
-            );
-            setSelectedUser((prev) =>
-                prev && Number(prev.overdueDebt || 0) > 0
-                    ? { ...prev, status: 'SUSPENDED' }
-                    : prev
-            );
-            setNotification({
-                type: 'success',
-                message:
-                    affectedCount > 0
-                        ? `Đã chuyển trạng thái tạm khóa (SUSPENDED) cho ${affectedCount} tài khoản đang có nợ xấu (UC-A06).`
-                        : 'Hiện không có tài khoản nào phát sinh dư nợ quá hạn cần chặn.',
-            });
-        } finally {
-            setIsBlockingDebtors(false);
-        }
-    };
-
-    // UC-A06: Callback when single user's debt is updated in Detail Panel
-    const handleDebtUpdated = useCallback(
-        (userId: string, newDebt: number, autoSuspended: boolean, message: string) => {
-            setUsers((prev) =>
-                prev.map((u) => {
-                    if (u.id !== userId) return u;
-                    return {
-                        ...u,
-                        overdueDebt: newDebt,
-                        status: autoSuspended && newDebt > 0 ? 'SUSPENDED' : u.status,
-                    };
-                })
-            );
-            setSelectedUser((prev) => {
-                if (!prev || prev.id !== userId) return prev;
-                return {
-                    ...prev,
-                    overdueDebt: newDebt,
-                    status: autoSuspended && newDebt > 0 ? 'SUSPENDED' : prev.status,
-                };
-            });
-            setNotification({
-                type: 'success',
-                message,
-            });
-            void loadUsers(true);
-        },
-        [loadUsers]
-    );
-
-    // 9. Handlers for User Actions (Lock, Activate, Change Role)
+    // 8. Action Handlers
     const handleTriggerLock = (user: UserAdminListItemDto) => {
         setConfirmTargetUser(user);
         setConfirmActionType('LOCK');
-        setConfirmTargetRole(undefined);
         setConfirmModalOpen(true);
     };
 
     const handleTriggerActivate = (user: UserAdminListItemDto) => {
         setConfirmTargetUser(user);
         setConfirmActionType('ACTIVATE');
-        setConfirmTargetRole(undefined);
         setConfirmModalOpen(true);
     };
 
     const handleTriggerChangeRole = (user: UserAdminListItemDto) => {
-        const currentRole = (user.role || '').toUpperCase();
-        const nextRole: UserRole = currentRole === 'ADMIN' ? 'STAFF' : 'ADMIN';
         setConfirmTargetUser(user);
         setConfirmActionType('CHANGE_ROLE');
+        const nextRole: UserRole =
+            (user.role || '').toUpperCase() === 'TRAVELER'
+                ? 'STAFF'
+                : (user.role || '').toUpperCase() === 'STAFF'
+                ? 'ADMIN'
+                : 'STAFF';
         setConfirmTargetRole(nextRole);
         setConfirmModalOpen(true);
+    };
+
+    // Chặn tất cả khách hàng nợ xấu
+    const handleBlockAllDebtors = async () => {
+        if (!isAdmin) return;
+        const debtorsToBlock = users.filter(
+            (u) => Number(u.overdueDebt || 0) > 0 && (u.status || '').toUpperCase() !== 'SUSPENDED'
+        );
+
+        if (debtorsToBlock.length === 0) {
+            setNotification({
+                type: 'success',
+                message: 'Hiện không có tài khoản nợ quá hạn nào chưa bị khóa.',
+            });
+            return;
+        }
+
+        const confirmMsg = `Bạn có chắc chắn muốn chặn ${debtorsToBlock.length} tài khoản khách hàng đang có nợ quá hạn?`;
+        if (!window.confirm(confirmMsg)) return;
+
+        setIsBlockingDebtors(true);
+        let successCount = 0;
+        let failCount = 0;
+
+        for (const debtor of debtorsToBlock) {
+            try {
+                const res = await adminUserService.updateUserStatus(debtor.id, {
+                    status: 'SUSPENDED',
+                    reason: `Tự động chặn do có nợ quá hạn ${Number(debtor.overdueDebt).toLocaleString('vi-VN')} đ`,
+                });
+                if (res.success) {
+                    successCount++;
+                } else {
+                    failCount++;
+                }
+            } catch {
+                failCount++;
+            }
+        }
+
+        setIsBlockingDebtors(false);
+        await loadUsers(true);
+
+        if (failCount === 0) {
+            setNotification({
+                type: 'success',
+                message: `Đã chặn thành công ${successCount} tài khoản nợ quá hạn!`,
+            });
+        } else {
+            setNotification({
+                type: 'error',
+                message: `Đã chặn ${successCount} tài khoản. Có ${failCount} tài khoản thất bại.`,
+            });
+        }
+    };
+
+    const handleDebtUpdated = (
+        userId: string,
+        newDebt: number,
+        autoSuspended: boolean,
+        message: string
+    ) => {
+        setUsers((prev) =>
+            prev.map((u) => {
+                if (u.id === userId) {
+                    return {
+                        ...u,
+                        overdueDebt: newDebt,
+                        status: autoSuspended ? 'SUSPENDED' : u.status,
+                    };
+                }
+                return u;
+            })
+        );
+        setSelectedUser((prev) => {
+            if (prev && prev.id === userId) {
+                return {
+                    ...prev,
+                    overdueDebt: newDebt,
+                    status: autoSuspended ? 'SUSPENDED' : prev.status,
+                };
+            }
+            return prev;
+        });
+        setNotification({ type: 'success', message });
     };
 
     const handleExecuteConfirmAction = async (reason?: string) => {
@@ -342,7 +284,7 @@ export default function InternalUsersManagementView({
             if (confirmActionType === 'LOCK') {
                 const res = await adminUserService.updateUserStatus(confirmTargetUser.id, {
                     status: 'SUSPENDED',
-                    reason: reason || 'Quản trị viên tạm khóa / chặn tài khoản',
+                    reason: reason || 'Quản trị viên tạm khóa tài khoản',
                 });
                 if (res.success) {
                     setNotification({
@@ -380,13 +322,13 @@ export default function InternalUsersManagementView({
                 if (res.success) {
                     setNotification({
                         type: 'success',
-                        message: `Đã cập nhật phân quyền tài khoản thành ${confirmTargetRole} thành công.`,
+                        message: `Đã cập nhật vai trò tài khoản thành ${confirmTargetRole} thành công.`,
                     });
                     await loadUsers(true);
                 } else {
                     setNotification({
                         type: 'error',
-                        message: res.message || 'Cập nhật phân quyền thất bại.',
+                        message: res.message || 'Cập nhật vai trò thất bại.',
                     });
                 }
             }
@@ -402,7 +344,6 @@ export default function InternalUsersManagementView({
         }
     };
 
-    // Save Role directly from Detail Panel
     const handleSaveRoleFromPanel = async (userId: string, newRole: UserRole) => {
         setIsUpdatingRole(true);
         try {
@@ -410,59 +351,27 @@ export default function InternalUsersManagementView({
             if (res.success) {
                 setNotification({
                     type: 'success',
-                    message: `Đã cập nhật phân quyền tài khoản thành ${newRole} thành công.`,
+                    message: `Đã cập nhật vai trò tài khoản thành ${newRole} thành công.`,
                 });
                 await loadUsers(true);
             } else {
                 setNotification({
                     type: 'error',
-                    message: res.message || 'Cập nhật phân quyền thất bại.',
+                    message: res.message || 'Cập nhật vai trò thất bại.',
                 });
             }
         } catch (err: unknown) {
             const axiosErr = err as { response?: { data?: { message?: string } } };
             setNotification({
                 type: 'error',
-                message: axiosErr.response?.data?.message || 'Có lỗi xảy ra khi cập nhật phân quyền.',
+                message: axiosErr.response?.data?.message || 'Có lỗi xảy ra khi cập nhật vai trò.',
             });
         } finally {
             setIsUpdatingRole(false);
         }
     };
 
-    // Create Staff Handler
-    const handleCreateStaffSubmit = async (request: CreateStaffRequest): Promise<boolean> => {
-        setIsCreatingStaff(true);
-        try {
-            const res = await adminUserService.createStaff(request);
-            if (res.success && res.data) {
-                setNotification({
-                    type: 'success',
-                    message: `Đã tạo tài khoản nhân viên ${res.data.fullName} (${res.data.email}) thành công!`,
-                });
-                await loadUsers(true);
-                setSelectedUser(res.data);
-                return true;
-            } else {
-                setNotification({
-                    type: 'error',
-                    message: res.message || 'Tạo tài khoản nhân viên thất bại.',
-                });
-                return false;
-            }
-        } catch (err: unknown) {
-            const axiosErr = err as { response?: { data?: { message?: string } } };
-            setNotification({
-                type: 'error',
-                message: axiosErr.response?.data?.message || 'Có lỗi xảy ra khi tạo tài khoản nhân viên.',
-            });
-            return false;
-        } finally {
-            setIsCreatingStaff(false);
-        }
-    };
-
-    // Export CSV Handler
+    // Export CSV
     const handleExportCsv = () => {
         if (filteredUsers.length === 0) {
             setNotification({
@@ -493,187 +402,71 @@ export default function InternalUsersManagementView({
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', `SmartLocker_Users_DebtReport_${new Date().toISOString().slice(0, 10)}.csv`);
+        link.setAttribute('download', `SmartLocker_KhachHang_${new Date().toISOString().slice(0, 10)}.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
 
         setNotification({
             type: 'success',
-            message: `Đã xuất danh sách ${filteredUsers.length} tài khoản ra file CSV!`,
+            message: `Đã xuất danh sách ${filteredUsers.length} khách hàng ra file CSV!`,
         });
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4">
             {/* Top Breadcrumb & Page Header */}
             <div>
-                <nav className="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-2">
+                <nav className="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1.5">
                     <span>Quản trị</span>
                     <span>/</span>
                     <span>Quản trị hệ thống</span>
                     <span>/</span>
                     <span className="text-blue-600 font-bold">
-                        Quản lý khách hàng, nhân sự & nợ xấu (UC-A05 & UC-A06)
+                        Quản lý khách hàng
                     </span>
                 </nav>
 
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
                         <div className="flex items-center gap-2.5 flex-wrap">
-                            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-                                Quản Lý Khách Hàng, Nhân Sự & Kiểm Soát Nợ Xấu (UC-A05 & UC-A06)
+                            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+                                Quản Lý Khách Hàng
                             </h1>
-                            <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-purple-100 text-purple-700 border border-purple-200">
-                                RBAC & DEBT CONTROL
+                            <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-700 border border-emerald-200">
+                                KHÁCH HÀNG & DƯ NỢ
                             </span>
                         </div>
-                        <p className="text-xs text-slate-500 mt-1 max-w-3xl">
-                            Quản lý danh sách khách hàng thuê tủ (Traveler), theo dõi dư nợ quá hạn & chặn tài khoản có nợ xấu (UC-A06), đồng thời phân quyền nhân sự vận hành nội bộ (UC-A05).
+                        <p className="text-xs text-slate-500 mt-0.5">
+                            Theo dõi danh sách khách hàng thuê tủ, kiểm soát trạng thái hoạt động và xử lý dư nợ cước quá hạn.
                         </p>
                     </div>
 
-                    {/* Action buttons on header */}
-                    <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-                        {onNavigateRbac && (
+                    {/* Action button on header */}
+                    {isAdmin && (
+                        <div className="flex items-center gap-2 shrink-0">
                             <button
                                 type="button"
-                                onClick={onNavigateRbac}
-                                className="inline-flex items-center gap-2 px-4 py-2.5 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs font-bold rounded-xl transition cursor-pointer"
+                                onClick={handleBlockAllDebtors}
+                                disabled={isBlockingDebtors || counters.debtorCount === 0}
+                                className="inline-flex items-center gap-2 px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition cursor-pointer shadow-xs shadow-rose-600/20 disabled:opacity-50"
                             >
-                                <Shield className="w-4 h-4" />
-                                <span>Phân quyền Nhân sự & RBAC (UC-A05)</span>
+                                <ShieldAlert className="w-4 h-4" />
+                                <span>
+                                    {isBlockingDebtors
+                                        ? 'Đang chặn...'
+                                        : `Chặn tài khoản nợ cước${counters.debtorCount > 0 ? ` (${counters.debtorCount})` : ''}`}
+                                </span>
                             </button>
-                        )}
-                        {isAdmin && (
-                            <>
-                                <button
-                                    type="button"
-                                    onClick={handleBlockAllDebtors}
-                                    disabled={isBlockingDebtors}
-                                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition cursor-pointer shadow-xs shadow-rose-600/20 disabled:opacity-50"
-                                >
-                                    <ShieldAlert className="w-4 h-4" />
-                                    <span>
-                                        {isBlockingDebtors
-                                            ? 'Đang chặn tài khoản nợ xấu...'
-                                            : `Chặn tất cả tài khoản nợ xấu (UC-A06)${
-                                                  counters.debtorCount > 0 ? ` (${counters.debtorCount})` : ''
-                                              }`}
-                                    </span>
-                                </button>
-
-                                <button
-                                    type="button"
-                                    onClick={() => setCreateModalOpen(true)}
-                                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition cursor-pointer shadow-xs shadow-blue-600/20"
-                                >
-                                    <Plus className="w-4 h-4" />
-                                    <span>Tạo tài khoản Staff</span>
-                                </button>
-                            </>
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </div>
-            </div>
-
-            {/* Quick View Tab Bar / Filter Pills (UC-A05 & UC-A06) */}
-            <div className="bg-white rounded-2xl p-2 border border-slate-200/80 shadow-xs flex flex-wrap items-center gap-2">
-                <button
-                    type="button"
-                    onClick={() => handleSelectQuickViewTab('ALL_ACCOUNTS')}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer inline-flex items-center gap-2 ${
-                        quickViewTab === 'ALL_ACCOUNTS'
-                            ? 'bg-slate-900 text-white shadow-xs'
-                            : 'text-slate-600 hover:bg-slate-100'
-                    }`}
-                >
-                    <Users className="w-3.5 h-3.5" />
-                    <span>Tất cả tài khoản</span>
-                    <span
-                        className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
-                            quickViewTab === 'ALL_ACCOUNTS'
-                                ? 'bg-white/20 text-white'
-                                : 'bg-slate-100 text-slate-600'
-                        }`}
-                    >
-                        {counters.total}
-                    </span>
-                </button>
-
-                <button
-                    type="button"
-                    onClick={() => handleSelectQuickViewTab('TRAVELERS')}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer inline-flex items-center gap-2 ${
-                        quickViewTab === 'TRAVELERS'
-                            ? 'bg-emerald-600 text-white shadow-xs'
-                            : 'text-slate-600 hover:bg-slate-100'
-                    }`}
-                >
-                    <UserCheck className="w-3.5 h-3.5" />
-                    <span>Khách hàng (Traveler)</span>
-                    <span
-                        className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
-                            quickViewTab === 'TRAVELERS'
-                                ? 'bg-white/20 text-white'
-                                : 'bg-emerald-50 text-emerald-700'
-                        }`}
-                    >
-                        {counters.travelers}
-                    </span>
-                </button>
-
-                <button
-                    type="button"
-                    onClick={() => handleSelectQuickViewTab('DEBTORS')}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer inline-flex items-center gap-2 ${
-                        quickViewTab === 'DEBTORS'
-                            ? 'bg-rose-600 text-white shadow-xs'
-                            : counters.debtorCount > 0
-                            ? 'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100'
-                            : 'text-slate-600 hover:bg-slate-100'
-                    }`}
-                >
-                    <AlertOctagon className="w-3.5 h-3.5" />
-                    <span>Khách hàng Nợ xấu (Overdue Debt &gt; 0)</span>
-                    <span
-                        className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
-                            quickViewTab === 'DEBTORS'
-                                ? 'bg-white/20 text-white'
-                                : 'bg-rose-600 text-white'
-                        }`}
-                    >
-                        {counters.debtorCount}
-                    </span>
-                </button>
-
-                <button
-                    type="button"
-                    onClick={() => handleSelectQuickViewTab('INTERNAL_STAFF')}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer inline-flex items-center gap-2 ${
-                        quickViewTab === 'INTERNAL_STAFF'
-                            ? 'bg-blue-600 text-white shadow-xs'
-                            : 'text-slate-600 hover:bg-slate-100'
-                    }`}
-                >
-                    <Shield className="w-3.5 h-3.5" />
-                    <span>Nhân sự nội bộ (Admin / Staff)</span>
-                    <span
-                        className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
-                            quickViewTab === 'INTERNAL_STAFF'
-                                ? 'bg-white/20 text-white'
-                                : 'bg-blue-50 text-blue-700'
-                        }`}
-                    >
-                        {counters.internalStaff}
-                    </span>
-                </button>
             </div>
 
             {/* Notification Banner */}
             {notification && (
                 <div
-                    className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 text-xs font-medium animate-in fade-in slide-in-from-top-2 duration-200 ${
+                    className={`p-3 rounded-xl border flex items-center justify-between gap-3 text-xs font-medium animate-in fade-in slide-in-from-top-2 duration-200 ${
                         notification.type === 'success'
                             ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                             : 'bg-rose-50 text-rose-800 border-rose-200'
@@ -707,36 +500,24 @@ export default function InternalUsersManagementView({
                 statusFilter={statusFilter}
                 onStatusFilterChange={setStatusFilter}
                 roleFilter={roleFilter}
-                onRoleFilterChange={(val) => {
-                    setRoleFilter(val);
-                    if (val !== 'ALL' && quickViewTab !== 'ALL_ACCOUNTS') {
-                        setQuickViewTab('ALL_ACCOUNTS');
-                    }
-                }}
+                onRoleFilterChange={setRoleFilter}
                 debtFilter={debtFilter}
-                onDebtFilterChange={(val) => {
-                    setDebtFilter(val);
-                    if (val === 'HAS_DEBT') {
-                        setQuickViewTab('DEBTORS');
-                    } else if (quickViewTab === 'DEBTORS') {
-                        setQuickViewTab('ALL_ACCOUNTS');
-                    }
-                }}
+                onDebtFilterChange={setDebtFilter}
                 totalCount={counters.total}
                 activeCount={counters.active}
                 suspendedCount={counters.suspended}
                 pendingCount={counters.pending}
                 onRefresh={() => loadUsers(true)}
                 isRefreshing={isRefreshing}
-                onOpenCreateModal={() => setCreateModalOpen(true)}
                 onExportCsv={handleExportCsv}
                 isAdmin={isAdmin}
+                showCreateStaff={false}
             />
 
-            {/* Section 3: Two-Column Workspace (Table & Detail Panel) */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-                {/* Left side: Users Table (7-8 columns on large screens) */}
-                <div className="lg:col-span-7 xl:col-span-8">
+            {/* Section 3: Workspace (Table & Detail Panel) */}
+            <div className={`grid grid-cols-1 ${selectedUser ? 'lg:grid-cols-12' : ''} gap-5 items-start`}>
+                {/* Table column */}
+                <div className={selectedUser ? 'lg:col-span-7 xl:col-span-8' : 'w-full'}>
                     <UserTable
                         users={filteredUsers}
                         selectedUserId={selectedUser?.id}
@@ -746,7 +527,6 @@ export default function InternalUsersManagementView({
                         errorMessage={fetchError || undefined}
                         onRetry={() => loadUsers(false)}
                         onResetFilters={() => {
-                            setQuickViewTab('ALL_ACCOUNTS');
                             setSearchQuery('');
                             setStatusFilter('ALL');
                             setRoleFilter('ALL');
@@ -759,20 +539,22 @@ export default function InternalUsersManagementView({
                     />
                 </div>
 
-                {/* Right side: Detail & Control Panel (4-5 columns) */}
-                <div className="lg:col-span-5 xl:col-span-4 sticky top-6">
-                    <UserDetailControlPanel
-                        user={selectedUser}
-                        onClose={() => setSelectedUser(null)}
-                        isAdmin={isAdmin}
-                        onTriggerLock={handleTriggerLock}
-                        onTriggerActivate={handleTriggerActivate}
-                        onSaveRole={handleSaveRoleFromPanel}
-                        isUpdatingRole={isUpdatingRole}
-                        onDebtUpdated={handleDebtUpdated}
-                        onNavigateRbac={onNavigateRbac}
-                    />
-                </div>
+                {/* Right side: Detail & Control Panel */}
+                {selectedUser && (
+                    <div className="lg:col-span-5 xl:col-span-4 sticky top-6 animate-in fade-in slide-in-from-right-4 duration-200">
+                        <UserDetailControlPanel
+                            user={selectedUser}
+                            onClose={() => setSelectedUser(null)}
+                            isAdmin={isAdmin}
+                            onTriggerLock={handleTriggerLock}
+                            onTriggerActivate={handleTriggerActivate}
+                            onSaveRole={handleSaveRoleFromPanel}
+                            isUpdatingRole={isUpdatingRole}
+                            onDebtUpdated={handleDebtUpdated}
+                            onNavigateRbac={onNavigateRbac}
+                        />
+                    </div>
+                )}
             </div>
 
             {/* Action Confirmation Modal */}
@@ -787,14 +569,6 @@ export default function InternalUsersManagementView({
                     isProcessing={isProcessingAction}
                 />
             )}
-
-            {/* Create Staff Modal */}
-            <CreateStaffModal
-                isOpen={createModalOpen}
-                onClose={() => setCreateModalOpen(false)}
-                onSubmit={handleCreateStaffSubmit}
-                isSubmitting={isCreatingStaff}
-            />
         </div>
     );
 }

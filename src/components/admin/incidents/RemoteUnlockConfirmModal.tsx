@@ -59,7 +59,7 @@ export default function RemoteUnlockConfirmModal({
                                 id="unlock-modal-title"
                                 className="text-base font-black text-slate-900 tracking-tight"
                             >
-                                Xác nhận mở khóa tủ từ xa (UC-S05)
+                                Xác nhận mở khóa tủ từ xa
                             </h2>
                             <p className="text-[11px] text-slate-500 mt-0.5">
                                 Thao tác này có thể tác động trực tiếp đến tài sản khách hàng.
@@ -84,7 +84,7 @@ export default function RemoteUnlockConfirmModal({
                     <div className="flex items-start gap-2.5 p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-900">
                         <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" aria-hidden="true" />
                         <p className="font-semibold leading-relaxed">
-                            Bắt buộc nhập lý do Audit (UC-S05) — Thao tác này sẽ phát lệnh mở chốt MQTT và ghi vết vĩnh viễn vào Audit Logs
+                            Bắt buộc nhập lý do an ninh — Thao tác này sẽ phát lệnh mở chốt MQTT và ghi vết vĩnh viễn vào Nhật ký hệ thống
                         </p>
                     </div>
 
