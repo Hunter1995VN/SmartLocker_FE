@@ -23,6 +23,7 @@ import adminStationService, {
 interface StationPricingTabProps {
     station: StationAdminDetailDto;
     onPricingUpdated: () => void;
+    onShowToast?: (message: string, type?: 'success' | 'error') => void;
 }
 
 function toPercentageString(rateValue: number | undefined, fallbackPct: number): string {
@@ -35,7 +36,7 @@ function toPercentageString(rateValue: number | undefined, fallbackPct: number):
     return String(Math.min(100, Math.max(0, pct)));
 }
 
-export default function StationPricingTab({ station, onPricingUpdated }: StationPricingTabProps) {
+export default function StationPricingTab({ station, onPricingUpdated, onShowToast }: StationPricingTabProps) {
     const policyS = station.pricingPolicies?.find((p) => (p.size || '').toUpperCase() === 'S');
     const policyM = station.pricingPolicies?.find((p) => (p.size || '').toUpperCase() === 'M');
     const policyL = station.pricingPolicies?.find((p) => (p.size || '').toUpperCase() === 'L');
@@ -177,10 +178,12 @@ export default function StationPricingTab({ station, onPricingUpdated }: Station
         setFeedback(null);
 
                 if (!validate()) {
+            const errMsg = 'Vui lòng kiểm tra lại các ô nhập liệu có viền đỏ phía trên trước khi lưu!';
             setFeedback({
                 type: 'error',
-                message: 'Vui lòng kiểm tra lại các ô nhập liệu có viền đỏ phía trên trước khi lưu!',
+                message: errMsg,
             });
+            onShowToast?.(errMsg, 'error');
             setTimeout(() => {
                 const firstErr = document.querySelector('.border-rose-400');
                 if (firstErr) {
@@ -236,16 +239,20 @@ export default function StationPricingTab({ station, onPricingUpdated }: Station
                 }),
             ]);
 
+            const succMsg = `Đã lưu thành công bảng giá (${pricingMode === 'hourly' ? 'Theo giờ' : 'Theo ngày'}), phí phạt quá hạn và chính sách hoàn tiền cho trạm!`;
             setFeedback({
                 type: 'success',
-                message: `Đã lưu thành công bảng giá (${pricingMode === 'hourly' ? 'Theo giờ' : 'Theo ngày'}), mức phí phạt quá hạn và tỷ lệ hoàn tiền hủy đơn (UC-A04) cho trạm!`,
+                message: succMsg,
             });
+            onShowToast?.(succMsg, 'success');
             onPricingUpdated();
         } catch {
+            const errMsg = 'Có lỗi xảy ra khi lưu cấu hình giá & chính sách hoàn tiền. Vui lòng kiểm tra lại.';
             setFeedback({
                 type: 'error',
-                message: 'Có lỗi xảy ra khi lưu cấu hình giá & chính sách hoàn tiền. Vui lòng kiểm tra lại.',
+                message: errMsg,
             });
+            onShowToast?.(errMsg, 'error');
         } finally {
             setIsSaving(false);
         }
@@ -595,7 +602,10 @@ export default function StationPricingTab({ station, onPricingUpdated }: Station
                             </span>
                         </div>
                         <p className="text-[11px] text-slate-500">
-                            Mốc số giờ trước thời điểm bắt đầu thuê để phân loại hủy đơn sớm (Early) hay hủy sát giờ (Late).
+                            Số giờ tính từ thời điểm bấm Hủy đến giờ bắt đầu nhận tủ (StartAt), <strong>không phụ thuộc thời lượng thuê</strong> (thuê 1 tiếng hay 24 tiếng nếu hủy trước mốc này đều được tính là hủy sớm).
+                        </p>
+                        <p className="text-[10px] text-blue-600 bg-blue-50/80 p-1.5 rounded-lg border border-blue-100">
+                            💡 <strong>Ghi chú:</strong> Mốc này so sánh với giờ nhận tủ. Nếu trạm có nhiều khách đặt dùng ngay tại chỗ, Admin có thể giảm mốc này về 1h hoặc 0h để khách hủy không bị trừ phí.
                         </p>
                         <div className="flex items-center gap-2 pt-1">
                             <input
@@ -686,19 +696,43 @@ export default function StationPricingTab({ station, onPricingUpdated }: Station
                 </div>
             </div>
 
-            {/* Action Bar */}
-            <div className="pt-2 flex items-center justify-end border-t border-slate-100">
+            {/* Action Bar with bottom feedback */}
+            <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100">
+                <div className="flex-1 w-full">
+                    {feedback && (
+                        <div
+                            className={`p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 animate-in fade-in duration-150 ${
+                                feedback.type === 'success'
+                                    ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                                    : 'bg-rose-50 text-rose-800 border-rose-200'
+                            }`}
+                        >
+                            {feedback.type === 'success' ? (
+                                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                            ) : (
+                                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                            )}
+                            <span>{feedback.message}</span>
+                        </div>
+                    )}
+                </div>
+
                 <button
                     type="submit"
                     disabled={isSaving}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm shadow-blue-500/20 disabled:opacity-50 transition cursor-pointer"
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm shadow-blue-500/20 disabled:opacity-50 transition cursor-pointer shrink-0"
                 >
                     {isSaving ? (
-                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <>
+                            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            <span>Đang lưu cấu hình...</span>
+                        </>
                     ) : (
-                        <Save className="w-4 h-4" />
+                        <>
+                            <Save className="w-4 h-4" />
+                            <span>Lưu & Áp dụng Bảng giá + Chính sách Hoàn tiền (UC-A04)</span>
+                        </>
                     )}
-                    <span>Lưu & Áp dụng Bảng giá + Chính sách Hoàn tiền (UC-A04)</span>
                 </button>
             </div>
         </form>
