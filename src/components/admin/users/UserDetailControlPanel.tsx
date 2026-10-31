@@ -94,6 +94,42 @@ export default function UserDetailControlPanel({
         setRoleHasChanged(false);
     };
 
+    // 1-Click: Xác nhận đã thu nợ cước (0 đ) và mở khóa đặt tủ ngay
+    const handleQuickClearDebt = async () => {
+        if (!user || !isAdmin) return;
+        setIsUpdatingDebt(true);
+        setDebtFeedback(null);
+        const clearReason = debtReason.trim() || 'Khách hàng đã thanh toán đầy đủ công nợ cước (0 đ) — Mở khóa quyền đặt tủ';
+
+        try {
+            const res = await adminUserService.updateUserDebt(user.id, {
+                overdueDebt: 0,
+                reason: clearReason,
+                autoSuspendIfDebt: false,
+            });
+
+            if (res.success) {
+                const actionMsg = `Đã xóa dư nợ về 0 đ và mở khóa quyền đặt tủ cho ${user.fullName || user.email}!`;
+                setDebtFeedback({ type: 'success', text: actionMsg });
+                setDebtInput('0');
+                onDebtUpdated?.(user.id, 0, false, actionMsg);
+            } else {
+                setDebtFeedback({
+                    type: 'error',
+                    text: res.message || 'Thao tác xóa nợ thất bại.',
+                });
+            }
+        } catch (err: unknown) {
+            const axiosErr = err as { response?: { data?: { message?: string } } };
+            setDebtFeedback({
+                type: 'error',
+                text: axiosErr.response?.data?.message || 'Có lỗi xảy ra khi xóa nợ.',
+            });
+        } finally {
+            setIsUpdatingDebt(false);
+        }
+    };
+
     // Cập nhật dư nợ quá hạn
     const handleUpdateUserDebt = async () => {
         if (!user || !isAdmin) return;
@@ -377,6 +413,18 @@ export default function UserDetailControlPanel({
                                 />
                                 <span>Tự động tạm khóa tài khoản nếu có nợ (&gt; 0 đ)</span>
                             </label>
+
+                            {Number(user.overdueDebt || 0) > 0 && (
+                                <button
+                                    type="button"
+                                    onClick={handleQuickClearDebt}
+                                    disabled={isUpdatingDebt}
+                                    className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-sm shadow-emerald-500/20 disabled:opacity-50"
+                                >
+                                    <CheckCircle2 className="w-4 h-4" />
+                                    <span>{isUpdatingDebt ? 'Đang cập nhật...' : '✓ Đã thu nợ (0 đ) — Mở khóa đặt tủ ngay'}</span>
+                                </button>
+                            )}
 
                             <button
                                 type="button"

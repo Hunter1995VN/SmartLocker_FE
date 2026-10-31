@@ -7,7 +7,6 @@ import {
     CheckCircle2,
     AlertCircle,
     X,
-    Receipt,
     ArrowRight,
 } from 'lucide-react';
 import adminUserService from '../../../api/adminUserService';
@@ -28,12 +27,10 @@ interface NotificationState {
 
 interface InternalUsersManagementViewProps {
     onNavigateRbac?: () => void;
-    onNavigateDebt?: () => void;
 }
 
 export default function InternalUsersManagementView({
     onNavigateRbac,
-    onNavigateDebt,
 }: InternalUsersManagementViewProps = {}) {
     // 1. Current Logged-in User & Authorization check
     const currentAdminUser = useMemo(() => {
@@ -373,7 +370,7 @@ export default function InternalUsersManagementView({
                     <span>Quản trị hệ thống</span>
                     <span>/</span>
                     <span className="text-blue-600 font-bold">
-                        Quản lý tài khoản
+                        Khách hàng & Dư nợ
                     </span>
                 </nav>
 
@@ -381,30 +378,19 @@ export default function InternalUsersManagementView({
                     <div>
                         <div className="flex items-center gap-2.5 flex-wrap">
                             <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
-                                Quản Lý Tài Khoản Hệ Thống
+                                Khách Hàng & Quản Lý Dư Nợ
                             </h1>
                             <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-blue-100 text-blue-700 border border-blue-200">
-                                TOÀN BỘ VAI TRÒ (TRAVELER, STAFF, ADMIN)
+                                KHÁCH HÀNG & DƯ NỢ CƯỚC (TRAVELERS)
                             </span>
                         </div>
                         <p className="text-xs text-slate-500 mt-0.5">
-                            Quản lý danh sách mọi tài khoản trong hệ thống, phân quyền vai trò và kiểm soát quyền truy cập đăng nhập (Tạm khóa / Kích hoạt tài khoản).
+                            Quản lý danh sách khách thuê tủ, theo dõi công nợ cước quá hạn, tạm khóa quyền đặt tủ khi có nợ (giữ tài khoản hoạt động để khách thanh toán) và kiểm soát trạng thái tài khoản.
                         </p>
                     </div>
 
                     {/* Action buttons on header */}
                     <div className="flex items-center gap-2 shrink-0 flex-wrap">
-                        {onNavigateDebt && (
-                            <button
-                                type="button"
-                                onClick={onNavigateDebt}
-                                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-bold rounded-xl border border-amber-200 transition cursor-pointer"
-                            >
-                                <Receipt className="w-4 h-4 text-amber-600" />
-                                <span>Quản lý dư nợ (Travelers)</span>
-                                <ArrowRight className="w-3.5 h-3.5 text-amber-600" />
-                            </button>
-                        )}
                         {onNavigateRbac && (
                             <button
                                 type="button"
