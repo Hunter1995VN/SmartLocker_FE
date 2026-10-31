@@ -7,6 +7,7 @@ export interface KioskCheckInRequest {
 }
 
 export interface KioskCheckInResponse {
+  sessionToken?: string;
   bookingId: string;
   bookingCode: string;
   lockerId: string;
@@ -17,12 +18,14 @@ export interface KioskCheckInResponse {
 }
 
 export interface KioskCheckOutRequest {
+  sessionToken?: string;
   stationId: string;
   credentialType: 'QR' | 'ACCESS_CODE';
   payload: string;
 }
 
 export interface KioskCheckOutResponse {
+  sessionToken?: string;
   bookingId: string;
   bookingCode: string;
   lockerId?: string;
@@ -61,6 +64,9 @@ export interface KioskStationStatus {
 }
 
 export const kioskApi = {
+  operationStatus: async (data: {stationId: string; bookingId: string; sessionToken: string}) => {
+    return (await apiClient.post<{success: boolean; data: {operation: string; complete: boolean; doorState: string; manualReviewPending: boolean}}>('/api/kiosk/operation-status', data)).data;
+  },
   checkIn: async (data: KioskCheckInRequest) => {
     const res = await apiClient.post<{ success: boolean; data: KioskCheckInResponse; message?: string }>('/api/kiosk/check-in', data);
     return res.data;

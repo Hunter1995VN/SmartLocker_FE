@@ -4,7 +4,7 @@ import { kioskApi } from '../../api/kioskService';
 import type { KioskStationStatus } from '../../api/kioskService';
 import { kioskSignalR } from '../../services/kioskSignalR';
 import { sounds } from '../../utils/soundEffects';
-import Locker3DCanvas from '../../components/kiosk/Locker3DCanvas';
+import { kioskText } from '../../utils/kioskMessages';
 import { 
   SmartLockerLogo3D, 
   CheckInIcon3D, 
@@ -23,12 +23,6 @@ type KioskStep = 'WELCOME' | 'IDLE' | 'AUTH' | 'LOCKER_ACTIVE' | 'OVERDUE' | 'SU
 type OperationMode = 'CHECK_IN' | 'CHECK_OUT';
 type AuthMethod = 'QR' | 'ACCESS_CODE';
 
-const FALLBACK_STATIONS = [
-  { id: '22222222-2222-2222-2222-222222222222', name: 'SmartLocker Bến Thành', address: 'Quảng trường Quách Thị Trang, Q.1, TP.HCM' },
-  { id: '11111111-1111-1111-1111-111111111111', name: 'SmartLocker Sân Bay Tân Sơn Nhất', address: 'Nhà ga quốc nội T1, Tân Bình, TP.HCM' },
-  { id: '33333333-3333-3333-3333-333333333333', name: 'SmartLocker Phố Đi Bộ Nguyễn Huệ', address: '89 Nguyễn Huệ, Q.1, TP.HCM' },
-];
-
 export default function KioskPage() {
   // Step flow: Starts with WELCOME (Language Select)
   const [step, setStep] = useState<KioskStep>('WELCOME');
@@ -37,6 +31,7 @@ export default function KioskPage() {
   const [accessCode, setAccessCode] = useState<string>('');
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [lang, setLang] = useState<KioskLanguage>('VI');
+  const x = kioskText(lang);
 
   // Outdoor Sunlight Anti-Glare Mode (default true for outdoor tablet kiosk)
   const [outdoorMode, setOutdoorMode] = useState<boolean>(() => {
@@ -50,10 +45,10 @@ export default function KioskPage() {
     const qStation = urlParams.get('stationId');
     if (qStation) return qStation;
     const saved = localStorage.getItem('kiosk_station_id');
-    return saved || FALLBACK_STATIONS[0].id;
+    return saved || '';
   });
   const [stationStatus, setStationStatus] = useState<KioskStationStatus | null>(null);
-  const [allStations, setAllStations] = useState<Array<{ id: string; name: string; address: string }>>(FALLBACK_STATIONS);
+  const [allStations, setAllStations] = useState<Array<{ id: string; name: string; address: string }>>([]);
 
   // Active locker interaction
   const [activeBookingCode, setActiveBookingCode] = useState<string>('');
@@ -61,9 +56,15 @@ export default function KioskPage() {
   const [activeLockerId, setActiveLockerId] = useState<string>('');
   const [activeLockerCode, setActiveLockerCode] = useState<string>('');
   const [activeLockerSize, setActiveLockerSize] = useState<string>('');
-  const [activeDoorState, setActiveDoorState] = useState<string>('OPEN');
+  const [activeDoorState, setActiveDoorState] = useState<string>('UNKNOWN');
   const [overdueFee, setOverdueFee] = useState<number>(0);
 
+  const sessionTokenRef = useRef<string | undefined>(undefined);
+  const credentialRef = useRef<{ credentialType: 'QR' | 'ACCESS_CODE'; payload: string }>({ credentialType: 'QR', payload: '' });
+  const observedOpenRef = useRef(false);
+  const accessGrantedRef = useRef(false);
+  const submittingRef = useRef(false);
+  const operationStartedRef = useRef(0);
   const activeLockerIdRef = useRef<string>('');
   const activeLockerCodeRef = useRef<string>('');
   useEffect(() => {
@@ -79,7 +80,6 @@ export default function KioskPage() {
   const [showSensorModal, setShowSensorModal] = useState<boolean>(false);
   const [showHelpModal, setShowHelpModal] = useState<boolean>(false);
   const [doorTimerSeconds, setDoorTimerSeconds] = useState<number>(0);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   // Success auto-return countdown timer
   const [successCountdown, setSuccessCountdown] = useState<number>(6);
@@ -113,14 +113,17 @@ export default function KioskPage() {
       if (list.length > 0) {
         setAllStations(list);
         if (!stationId || !list.some(s => s.id === stationId)) {
-          const iotStation = list.find(s => s.id === '22222222-2222-2222-2222-222222222222' || s.name.toLowerCase().includes('bến thành'));
-          const selected = iotStation ? iotStation.id : list[0].id;
+
+          const selected = list[0].id;
           setStationId(selected);
           localStorage.setItem('kiosk_station_id', selected);
         }
       }
     }).catch((err) => {
-      console.warn('Backend stations offline, using fallback station hub:', err);
+      console.warn('Cannot load station data:', err);
+      setAllStations([]);
+      setStationStatus(null);
+      setErrorMessage(kioskText(lang)('networkError'));
     });
   }, []);
 
@@ -139,25 +142,21 @@ export default function KioskPage() {
       stationId,
       (event) => {
         const curId = activeLockerIdRef.current || activeLockerId;
-        const curCode = activeLockerCodeRef.current || activeLockerCode;
-        if ((curId && event.lockerId === curId) || (curCode && event.lockerCode === curCode)) {
+        const occurredAt = Date.parse(event.occurredAt);
+        if (!accessGrantedRef.current || !operationStartedRef.current || !Number.isFinite(occurredAt)
+          || occurredAt < operationStartedRef.current || event.stationId !== stationId) return;
+        if (curId && event.lockerId === curId) {
           setActiveDoorState(event.doorState);
-          if (event.doorState === 'CLOSED') {
-            if (soundEnabled) sounds.playUnlockSuccess();
-            setStep('SUCCESS');
+          if (event.doorState === 'OPEN') observedOpenRef.current = true;
+          if (event.doorState === 'CLOSED' && observedOpenRef.current) {
+            // Only the authenticated operation-status result confirms booking completion.
           } else {
             if (soundEnabled) sounds.playDoorOpenChime();
           }
         }
       },
-      (event) => {
-        const curId = activeLockerIdRef.current || activeLockerId;
-        const curCode = activeLockerCodeRef.current || activeLockerCode;
-        if ((curId && event.lockerId === curId) || (curCode && event.lockerCode === curCode)) {
-          setActiveDoorState('OPEN');
-          if (soundEnabled) sounds.playUnlockSuccess();
-        }
-      }
+      () => { /* Command acknowledgement is not proof that the door opened. */ },
+      () => { void kioskApi.getStationStatus(stationId).then(res => { if (res.success) setStationStatus(res.data); }).catch(() => setStationStatus(null)); }
     );
 
     return () => {
@@ -268,6 +267,14 @@ export default function KioskPage() {
 
   // Return to Welcome (Language Select) after completing transaction
   const handleReturnToWelcome = () => {
+    accessGrantedRef.current = false;
+    sessionTokenRef.current = undefined;
+    credentialRef.current = { credentialType: 'QR', payload: '' };
+    operationStartedRef.current = 0;
+    observedOpenRef.current = false;
+    activeLockerIdRef.current = '';
+    activeLockerCodeRef.current = '';
+    setLang('VI');
     setStep('WELCOME');
     setAccessCode('');
     setErrorMessage('');
@@ -280,7 +287,21 @@ export default function KioskPage() {
 
   // Process QR or PIN
   const handleProcessCredential = async (type: 'QR' | 'ACCESS_CODE', rawValue: string) => {
-    const targetStationId = stationId || allStations[0]?.id || FALLBACK_STATIONS[0].id;
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+    accessGrantedRef.current = false;
+    if (credentialRef.current.credentialType !== type || credentialRef.current.payload !== rawValue) {
+      sessionTokenRef.current = undefined;
+    }
+    observedOpenRef.current = false;
+    operationStartedRef.current = Date.now();
+    credentialRef.current = { credentialType: type, payload: rawValue };
+    const targetStationId = stationId;
+    if (!allStations.some(station => station.id === targetStationId)) {
+      submittingRef.current = false;
+      setErrorMessage(x('networkError'));
+      return;
+    }
     if (!stationId) {
       setStationId(targetStationId);
     }
@@ -297,20 +318,23 @@ export default function KioskPage() {
         });
 
         if (res.success && res.data) {
+          accessGrantedRef.current = true;
           if (soundEnabled) sounds.playUnlockSuccess();
+          sessionTokenRef.current = res.data.sessionToken;
           setActiveBookingId(res.data.bookingId);
           setActiveBookingCode(res.data.bookingCode);
           setActiveLockerId(res.data.lockerId);
           setActiveLockerCode(res.data.lockerCode);
           setActiveLockerSize(res.data.lockerSize);
-          setActiveDoorState(res.data.doorState || 'OPEN');
+          setActiveDoorState(res.data.doorState || 'UNKNOWN');
           setStep('LOCKER_ACTIVE');
         } else {
-          setErrorMessage(res.message || 'Mã không hợp lệ hoặc đơn chưa sẵn sàng.');
+          setErrorMessage(lang === 'VI' ? (res.message || x('authError')) : x('authError'));
           if (soundEnabled) sounds.playWarningAlert();
         }
       } else {
         const res = await kioskApi.checkOut({
+          sessionToken: sessionTokenRef.current,
           stationId: targetStationId,
           credentialType: type,
           payload: rawValue,
@@ -318,79 +342,62 @@ export default function KioskPage() {
 
         if (res.success && res.data) {
           if (res.data.isOverdue) {
+            sessionTokenRef.current = res.data.sessionToken;
+            setActiveBookingId(res.data.bookingId);
             setOverdueFee(res.data.overdueFee || 0);
             setActiveBookingCode(res.data.bookingCode || '');
             setStep('OVERDUE');
             if (soundEnabled) sounds.playWarningAlert();
           } else {
+            accessGrantedRef.current = true;
             if (soundEnabled) sounds.playUnlockSuccess();
-            setActiveBookingId(res.data.bookingId || '');
+            sessionTokenRef.current = res.data.sessionToken;
+          setActiveBookingId(res.data.bookingId || '');
             setActiveBookingCode(res.data.bookingCode || '');
             setActiveLockerId(res.data.lockerId || '');
             setActiveLockerCode(res.data.lockerCode || '');
             setActiveLockerSize(res.data.lockerSize || '');
-            setActiveDoorState(res.data.doorState || 'OPEN');
+            setActiveDoorState(res.data.doorState || 'UNKNOWN');
             setStep('LOCKER_ACTIVE');
           }
         } else {
-          setErrorMessage(res.message || 'Mã không hợp lệ.');
+          setErrorMessage(lang === 'VI' ? (res.message || x('authError')) : x('authError'));
           if (soundEnabled) sounds.playWarningAlert();
         }
       }
     } catch (err: any) {
       if (err.code === 'ERR_NETWORK' || !err.response) {
-        setErrorMessage('Không thể kết nối đến máy chủ Backend (http://localhost:5000). Vui lòng đảm bảo Backend API đã chạy.');
+        setErrorMessage(x('networkError'));
       } else {
-        setErrorMessage(err.response?.data?.message || 'Lỗi xử lý xác thực.');
+        setErrorMessage(lang === 'VI' ? (err.response?.data?.message || x('authError')) : x('authError'));
       }
       if (soundEnabled) sounds.playWarningAlert();
     } finally {
+      submittingRef.current = false;
       setLoading(false);
     }
   };
 
-  // UC-C27: Manual confirmation
-  const handleManualConfirm = async () => {
-    if (!activeBookingId || !activeLockerId) return;
-    setLoading(true);
-
-    let photoBase64: string | undefined = undefined;
-    if (videoRef.current) {
+  useEffect(() => {
+    if (step !== 'LOCKER_ACTIVE' || !activeBookingId || !sessionTokenRef.current) return;
+    let disposed = false;
+    let pending = false;
+    const poll = async () => {
+      if (pending) return; pending = true;
       try {
-        const canvas = document.createElement('canvas');
-        canvas.width = 320;
-        canvas.height = 240;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-          photoBase64 = canvas.toDataURL('image/jpeg', 0.7);
-        }
-      } catch (e) {
-        console.warn('Canvas capture error', e);
-      }
-    }
+        const result = await kioskApi.operationStatus({ stationId, bookingId: activeBookingId, sessionToken: sessionTokenRef.current! });
+        if (disposed || !result.success || result.data.operation !== opMode) return;
+        setActiveDoorState(result.data.doorState);
+        if (result.data.doorState === 'OPEN') observedOpenRef.current = true;
+        if (result.data.complete) { accessGrantedRef.current = false; setStep('SUCCESS'); }
+      } catch { /* Keep the operation pending; connection loss cannot complete it. */ }
+      finally { pending = false; }
+    };
+    void poll(); const timer = window.setInterval(poll, 2000);
+    return () => { disposed = true; window.clearInterval(timer); };
+  }, [step, activeBookingId, stationId, opMode]);
 
-    try {
-      const res = await kioskApi.manualConfirm({
-        stationId,
-        bookingId: activeBookingId,
-        lockerId: activeLockerId,
-        photoBase64,
-        notes: 'Xác nhận thủ công trên Kiosk khi cảm biến cửa chưa ghi nhận.',
-      });
-
-      if (res.success) {
-        setShowSensorModal(false);
-        setStep('SUCCESS');
-      } else {
-        setErrorMessage(res.message || 'Xác nhận thất bại.');
-      }
-    } catch (err: any) {
-      setErrorMessage(err.response?.data?.message || 'Lỗi xác nhận.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const handleManualConfirm = async () => { setShowSensorModal(false); setShowHelpModal(true); };
 
   return (
     <div className={`h-screen max-h-screen font-sans flex flex-col justify-between selection:bg-slate-300 select-none overflow-hidden transition-colors duration-200 ${
@@ -778,12 +785,11 @@ export default function KioskPage() {
                 ? 'bg-white border-slate-200 shadow-sm text-slate-900'
                 : 'bg-[#131b28] border-slate-800 shadow-lg text-slate-100'
             }`}>
-              <Locker3DCanvas 
-                doorState="CLOSED" 
-                outdoorMode={outdoorMode}
-                lang={lang}
-                className="w-full h-full flex flex-col justify-between" 
-              />
+              <div className="w-full h-full flex flex-col justify-center items-center p-6 text-center gap-4">
+                <strong>{stationStatus?.stationName || x('networkError')}</strong>
+                <p>{stationStatus?.connectivityStatus || 'UNKNOWN'}</p>
+                <p>{t.depositDesc}</p><p>{t.retrieveDesc}</p>
+              </div>
             </div>
 
           </div>
@@ -987,13 +993,10 @@ export default function KioskPage() {
             <div className={`md:col-span-6 rounded-2xl border p-2 relative min-h-[280px] max-h-[340px] flex items-center justify-center ${
               outdoorMode ? 'bg-slate-50 border-slate-200' : 'bg-slate-900 border-slate-800'
             }`}>
-              <Locker3DCanvas 
-                activeLockerCode={activeLockerCode}
-                doorState={activeDoorState}
-                outdoorMode={outdoorMode}
-                lang={lang}
-                className="w-full h-full min-h-[280px] max-h-[340px]"
-              />
+              <div role="status" aria-label="Cảm biến cửa tủ" className="text-center space-y-5">
+                <strong className="text-4xl">{activeLockerCode || '—'}</strong>
+                <p className="text-2xl">{activeDoorState}</p><p>{activeDoorState === 'OPEN' ? t.doorCloseInstruction : x('waitingDoor')}</p>
+              </div>
             </div>
 
             {/* Right 6 Columns: Status Details */}
@@ -1009,7 +1012,7 @@ export default function KioskPage() {
                   Vị trí ngăn tủ của bạn
                 </span>
                 <span className="text-4xl md:text-5xl font-black font-mono text-sky-600 dark:text-sky-400">
-                  {activeLockerCode || 'S-01'}
+                  {activeLockerCode || '—'}
                 </span>
               </div>
 
@@ -1038,7 +1041,7 @@ export default function KioskPage() {
               </div>
 
               <button
-                onClick={() => setStep('SUCCESS')}
+                onClick={() => setShowHelpModal(true)}
                 className={`w-full py-3 rounded-xl text-xs font-bold uppercase transition-colors ${
                   outdoorMode ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-slate-700 hover:bg-slate-600 text-white'
                 }`}
@@ -1139,12 +1142,11 @@ export default function KioskPage() {
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
           <div className="bg-[#141b27] border border-amber-500 rounded-2xl p-6 max-w-sm w-full text-center space-y-4 text-white">
             <span className="text-xs font-bold text-amber-400 uppercase">
-              XÁC NHẬN ĐÓNG CỬA THỦ CÔNG
+              CHỜ XÁC NHẬN CẢM BIẾN
             </span>
             <p className="text-xs text-slate-300 leading-relaxed">
-              Cảm biến ô tủ <strong>{activeLockerCode}</strong> chưa nhận tín hiệu. Nếu bạn đã đẩy chặt cửa, vui lòng bấm xác nhận.
+              Cảm biến ô tủ <strong>{activeLockerCode}</strong> chưa nhận đủ tín hiệu cửa. Vui lòng liên hệ nhân viên; thao tác trên màn hình không thay thế cảm biến.
             </p>
-            <video ref={videoRef} autoPlay playsInline muted className="hidden"></video>
             <div className="flex gap-2">
               <button
                 onClick={() => setShowSensorModal(false)}
@@ -1157,7 +1159,7 @@ export default function KioskPage() {
                 disabled={loading}
                 className="flex-1 py-2.5 rounded-lg bg-amber-500 text-slate-950 text-xs font-bold"
               >
-                {loading ? 'Đang xác nhận...' : 'Đã đóng cửa'}
+                {x('staff')}
               </button>
             </div>
           </div>
