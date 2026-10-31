@@ -247,6 +247,7 @@ export default function StationManagementView() {
                         onDeleteRequest={() => setIsDeleteModalOpen(true)}
                         onRefreshStation={() => void fetchStations(selectedStation?.id)}
                         isUpdating={isUpdating}
+                        onShowToast={showToast}
                     />
                 </div>
             </div>

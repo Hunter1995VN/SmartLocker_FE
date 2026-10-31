@@ -28,6 +28,7 @@ interface StationDetailPanelProps {
     onDeleteRequest: () => void;
     onRefreshStation: () => void;
     isUpdating: boolean;
+    onShowToast?: (message: string, type?: 'success' | 'error') => void;
 }
 
 export default function StationDetailPanel({
@@ -37,6 +38,7 @@ export default function StationDetailPanel({
     onDeleteRequest,
     onRefreshStation,
     isUpdating,
+    onShowToast,
 }: StationDetailPanelProps) {
     const [activeTab, setActiveTab] = useState<'info' | 'lockers' | 'pricing'>('info');
 
@@ -165,6 +167,7 @@ export default function StationDetailPanel({
                         key={station.id}
                         station={station}
                         onPricingUpdated={onRefreshStation}
+                        onShowToast={onShowToast}
                     />
                 )}
             </div>
