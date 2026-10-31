@@ -1,9 +1,9 @@
 /**
  * AD-FE-05: UC-A06 — Manage Internal Users
  * Modal xác nhận trước khi thực hiện thao tác nhạy cảm:
- * - Khóa / Tạm khóa tài khoản (có nhập lý do)
- * - Kích hoạt tài khoản
- * - Thay đổi quyền hạn (Role)
+ * - Khóa / Tạm khóa đăng nhập hệ thống (có nhập lý do)
+ * - Mở khóa đăng nhập hệ thống
+ * - Thay đổi quyền hạn (Role RBAC)
  */
 import { useState } from 'react';
 import { AlertTriangle, Lock, Unlock, Shield, X } from 'lucide-react';
@@ -68,9 +68,9 @@ export default function UserActionConfirmModal({
                         )}
                         <div>
                             <h3 className="text-sm font-bold text-slate-900">
-                                {actionType === 'LOCK' && (isTraveler ? 'Khóa tài khoản khách hàng?' : 'Khóa tài khoản nhân sự?')}
-                                {actionType === 'ACTIVATE' && (isTraveler ? 'Kích hoạt tài khoản khách hàng?' : 'Kích hoạt tài khoản nhân sự?')}
-                                {actionType === 'CHANGE_ROLE' && 'Xác nhận thay đổi vai trò?'}
+                                {actionType === 'LOCK' && (isTraveler ? 'Tạm khóa đăng nhập khách hàng?' : 'Tạm khóa đăng nhập nhân sự?')}
+                                {actionType === 'ACTIVATE' && (isTraveler ? 'Mở khóa đăng nhập khách hàng?' : 'Mở khóa đăng nhập nhân sự?')}
+                                {actionType === 'CHANGE_ROLE' && 'Xác nhận thay đổi vai trò RBAC?'}
                             </h3>
                             <p className="text-xs text-slate-500">
                                 {isTraveler ? 'Khách hàng: ' : 'Nhân sự: '}<strong className="text-slate-800">{user.fullName || user.email}</strong>
@@ -91,23 +91,28 @@ export default function UserActionConfirmModal({
                 <form onSubmit={handleConfirmSubmit} className="p-5 space-y-4 text-xs">
                     {/* Explanation */}
                     {actionType === 'LOCK' && (
-                        <div className="p-3 bg-rose-50 border border-rose-200/80 rounded-xl text-rose-800 space-y-1">
+                        <div className="p-3 bg-rose-50 border border-rose-200/80 rounded-xl text-rose-800 space-y-1.5">
                             <p className="font-bold flex items-center gap-1.5">
                                 <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
-                                {isTraveler ? 'Cảnh báo khóa tài khoản khách hàng:' : 'Cảnh báo bảo mật:'}
+                                {isTraveler ? 'Cảnh báo tạm khóa đăng nhập:' : 'Cảnh báo bảo mật:'}
                             </p>
-                            <p className="text-rose-700">
+                            <p className="text-rose-700 leading-relaxed">
                                 {isTraveler
-                                    ? 'Tài khoản khách hàng này sẽ bị tạm khóa (SUSPENDED), không thể đăng nhập hoặc đặt ô tủ mới cho đến khi được mở khóa.'
+                                    ? 'Tài khoản khách hàng này sẽ bị chuyển sang trạng thái SUSPENDED, hoàn toàn không thể đăng nhập vào ứng dụng di động hoặc trang web.'
                                     : 'Tài khoản này sẽ ngay lập tức bị thu hồi quyền truy cập Admin Portal và các chức năng vận hành trạm.'}
                             </p>
+                            {isTraveler && (
+                                <p className="text-[11px] text-amber-700 font-medium bg-amber-50/80 p-2 rounded-lg border border-amber-200">
+                                    💡 <strong>Mẹo:</strong> Nếu chỉ muốn chặn khách hàng đặt tủ mới do nợ cước (vẫn để họ đăng nhập trả tiền qua PayOS), hãy sử dụng nút <strong>Khóa đặt tủ</strong> bên trang <em>Quản lý dư nợ</em>.
+                                </p>
+                            )}
                         </div>
                     )}
 
                     {actionType === 'ACTIVATE' && (
-                        <p className="text-slate-600">
+                        <p className="text-slate-600 leading-relaxed bg-emerald-50/60 p-3 rounded-xl border border-emerald-100">
                             {isTraveler
-                                ? 'Tài khoản sẽ được chuyển sang trạng thái ACTIVE và khách hàng có thể tiếp tục đăng nhập, sử dụng dịch vụ bình thường.'
+                                ? 'Tài khoản sẽ được chuyển sang trạng thái ACTIVE. Khách hàng có thể đăng nhập vào ứng dụng và sử dụng các dịch vụ hệ thống bình thường.'
                                 : 'Tài khoản sẽ được chuyển sang trạng thái ACTIVE và nhân sự có thể đăng nhập thực hiện các thao tác vận hành trạm.'}
                         </p>
                     )}
@@ -129,7 +134,7 @@ export default function UserActionConfirmModal({
                     {actionType === 'LOCK' && (
                         <div>
                             <label htmlFor="lock-reason-input" className="block text-slate-700 font-semibold mb-1">
-                                Lý do tạm khóa tài khoản:
+                                Lý do tạm khóa đăng nhập:
                             </label>
                             <textarea
                                 id="lock-reason-input"
@@ -137,8 +142,8 @@ export default function UserActionConfirmModal({
                                 onChange={(e) => setReason(e.target.value)}
                                 placeholder={
                                     isTraveler
-                                        ? 'Nhập lý do tạm khóa (vd: Nợ cước quá hạn chưa thanh toán, vi phạm điều khoản dịch vụ, nghi vấn gian lận...)'
-                                        : 'Nhập lý do tạm khóa (vd: Vi phạm quy trình vận hành trạm, nghi vấn lộ bảo mật...)'
+                                        ? 'Nhập lý do tạm khóa đăng nhập (vd: Gian lận, phá hoại thiết bị, vi phạm chính sách bảo mật...)'
+                                        : 'Nhập lý do tạm khóa đăng nhập (vd: Vi phạm quy trình vận hành trạm, nghi vấn lộ bảo mật...)'
                                 }
                                 rows={3}
                                 className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 text-xs"
@@ -148,25 +153,25 @@ export default function UserActionConfirmModal({
 
                     {/* User credentials summary */}
                     <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-slate-500 text-[11px]">
-                        <span>Email: {user.email}</span>
-                        <span>SĐT: {user.phone || 'Chưa có'}</span>
+                        <span>ID người dùng:</span>
+                        <span className="font-mono text-slate-700">{user.id.slice(0, 16)}...</span>
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                    {/* Action buttons */}
+                    <div className="flex items-center justify-end gap-2 pt-2">
                         <button
                             type="button"
                             onClick={onClose}
                             disabled={isProcessing}
-                            className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl font-semibold transition cursor-pointer"
+                            className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl transition cursor-pointer font-semibold disabled:opacity-50"
                         >
-                            Hủy
+                            Hủy bỏ
                         </button>
 
                         <button
                             type="submit"
                             disabled={isProcessing}
-                            className={`px-4 py-2 font-bold text-white rounded-xl transition cursor-pointer shadow-xs inline-flex items-center gap-1.5 ${
+                            className={`px-4 py-2 rounded-xl text-white font-bold transition cursor-pointer shadow-xs disabled:opacity-50 ${
                                 actionType === 'LOCK'
                                     ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-600/20'
                                     : actionType === 'ACTIVATE'
@@ -174,18 +179,13 @@ export default function UserActionConfirmModal({
                                     : 'bg-purple-600 hover:bg-purple-700 shadow-purple-600/20'
                             }`}
                         >
-                            {isProcessing ? (
-                                <>
-                                    <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                    <span>Đang xử lý...</span>
-                                </>
-                            ) : (
-                                <span>
-                                    {actionType === 'LOCK' && 'Xác nhận khóa'}
-                                    {actionType === 'ACTIVATE' && 'Kích hoạt ngay'}
-                                    {actionType === 'CHANGE_ROLE' && 'Xác nhận đổi quyền'}
-                                </span>
-                            )}
+                            {isProcessing
+                                ? 'Đang xử lý...'
+                                : actionType === 'LOCK'
+                                ? 'Xác nhận tạm khóa'
+                                : actionType === 'ACTIVATE'
+                                ? 'Xác nhận mở khóa'
+                                : 'Xác nhận đổi vai trò'}
                         </button>
                     </div>
                 </form>

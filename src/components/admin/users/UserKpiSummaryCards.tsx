@@ -1,6 +1,6 @@
 /**
  * AD-FE-05: Quản lý tài khoản hệ thống
- * Hàng 4 thẻ KPI tóm tắt tài khoản khách hàng, nhân sự nội bộ và trạng thái truy cập hệ thống.
+ * Hàng 4 thẻ KPI tóm tắt tài khoản khách hàng, nhân sự nội bộ và phân định trạng thái đăng nhập vs tạm khóa đặt tủ.
  */
 import { Users, Shield, KeyRound, UserCheck } from 'lucide-react';
 import type { UserAdminListItemDto } from '../../../api/adminUserService';
@@ -12,7 +12,14 @@ interface UserKpiSummaryCardsProps {
 
 export default function UserKpiSummaryCards({ users, isLoading = false }: UserKpiSummaryCardsProps) {
     const totalCount = users.length;
-    const activeCount = users.filter((u) => (u.status || '').toUpperCase() === 'ACTIVE').length;
+
+    const isBookingBlockedFn = (u: UserAdminListItemDto) =>
+        (u.status || '').toUpperCase() === 'ACTIVE' &&
+        (u.role || '').toUpperCase() === 'TRAVELER' &&
+        (Number(u.overdueDebt || 0) > 0 || Boolean(u.isBookingBlocked));
+
+    const bookingBlockedCount = users.filter(isBookingBlockedFn).length;
+    const activeNormalCount = users.filter((u) => (u.status || '').toUpperCase() === 'ACTIVE' && !isBookingBlockedFn(u)).length;
     const suspendedCount = users.filter((u) => (u.status || '').toUpperCase() === 'SUSPENDED').length;
     const pendingCount = users.filter((u) => (u.status || '').toUpperCase() === 'PENDING_VERIFICATION').length;
 
@@ -39,7 +46,7 @@ export default function UserKpiSummaryCards({ users, isLoading = false }: UserKp
 
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {/* Card 1: Tổng tài khoản hệ thống */}
+            {/* Card 1: Tổng tài khoản hệ thống & phân định trạng thái */}
             <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-slate-300 transition">
                 <div className="flex items-start justify-between">
                     <div>
@@ -58,17 +65,23 @@ export default function UserKpiSummaryCards({ users, isLoading = false }: UserKp
                     </div>
                 </div>
 
-                <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center gap-2.5 text-xs font-medium text-slate-600 flex-wrap">
-                    <span className="inline-flex items-center gap-1.5">
+                <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center gap-2 text-[11px] font-medium text-slate-600 flex-wrap">
+                    <span className="inline-flex items-center gap-1" title="Tài khoản hoạt động bình thường">
                         <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                        <span>{activeCount} Hoạt động</span>
+                        <span>{activeNormalCount} Bình thường</span>
                     </span>
-                    <span className="inline-flex items-center gap-1.5">
+                    {bookingBlockedCount > 0 && (
+                        <span className="inline-flex items-center gap-1 text-amber-700" title="Được đăng nhập nhưng tạm khóa đặt tủ">
+                            <span className="w-2 h-2 rounded-full bg-amber-500" />
+                            <span>{bookingBlockedCount} Khóa đặt tủ</span>
+                        </span>
+                    )}
+                    <span className="inline-flex items-center gap-1 text-rose-700" title="Bị tạm khóa đăng nhập">
                         <span className="w-2 h-2 rounded-full bg-rose-500" />
-                        <span>{suspendedCount} Đã khóa</span>
+                        <span>{suspendedCount} Khóa đăng nhập</span>
                     </span>
                     {pendingCount > 0 && (
-                        <span className="inline-flex items-center gap-1.5">
+                        <span className="inline-flex items-center gap-1 text-sky-700" title="Chờ xác nhận">
                             <span className="w-2 h-2 rounded-full bg-sky-500" />
                             <span>{pendingCount} Chờ</span>
                         </span>
@@ -138,19 +151,19 @@ export default function UserKpiSummaryCards({ users, isLoading = false }: UserKp
                 </div>
             </div>
 
-            {/* Card 4: Tỷ lệ tài khoản hợp lệ */}
+            {/* Card 4: Quyền Đăng Nhập & Dịch Vụ */}
             <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-slate-300 transition">
                 <div className="flex items-start justify-between">
                     <div>
                         <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                            Trạng Thái Đăng Nhập
+                            Quyền Đăng Nhập Hệ Thống
                         </span>
                         <div className="flex items-baseline gap-2 mt-1">
                             <span className="text-2xl font-extrabold text-slate-900 tracking-tight">
-                                {totalCount > 0 ? `${Math.round((activeCount / totalCount) * 100)}%` : '100%'}
+                                {totalCount > 0 ? `${Math.round(((activeNormalCount + bookingBlockedCount) / totalCount) * 100)}%` : '100%'}
                             </span>
                             <span className="text-xs font-semibold text-slate-500">
-                                ({activeCount}/{totalCount || 1} active)
+                                ({activeNormalCount + bookingBlockedCount}/{totalCount || 1} tài khoản)
                             </span>
                         </div>
                     </div>
@@ -159,11 +172,18 @@ export default function UserKpiSummaryCards({ users, isLoading = false }: UserKp
                     </div>
                 </div>
 
-                <div className="mt-3 pt-2.5 border-t border-slate-100">
-                    <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50/80 px-2 py-0.5 rounded-lg border border-emerald-200/60">
+                <div className="mt-3 pt-2.5 border-t border-slate-100 text-[11px] flex items-center justify-between font-medium">
+                    <span className="text-emerald-700 font-semibold flex items-center gap-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                        Kiểm soát quyền truy cập toàn hệ thống
+                        {activeNormalCount} đầy đủ quyền
                     </span>
+                    {bookingBlockedCount > 0 ? (
+                        <span className="text-amber-700 font-semibold flex items-center gap-1 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+                            {bookingBlockedCount} khóa đặt tủ
+                        </span>
+                    ) : (
+                        <span className="text-slate-400">Không có tài khoản bị chặn đặt</span>
+                    )}
                 </div>
             </div>
         </div>

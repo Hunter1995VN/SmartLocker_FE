@@ -1,7 +1,7 @@
 /**
  * AD-FE-05: Quản lý tài khoản hệ thống
  * Bảng hiển thị danh sách toàn bộ tài khoản (Traveler, Staff, Admin)
- * Phân quyền vai trò và kiểm soát quyền truy cập đăng nhập (Tạm khóa / Kích hoạt).
+ * Phân định rõ ràng trạng thái: Tạm khóa đăng nhập / Tạm khóa đặt tủ / Hoạt động bình thường.
  */
 import {
     Shield,
@@ -16,7 +16,7 @@ import {
 import type { UserAdminListItemDto } from '../../../api/adminUserService';
 import {
     getRoleConfig,
-    getStatusConfig,
+    getUserAccountStatus,
     formatDate,
     getInitials,
 } from './userConstants';
@@ -117,7 +117,7 @@ export default function UserTable({
                         <tr className="bg-slate-50/70 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
                             <th className="py-3 px-4">Tài khoản / Định danh</th>
                             <th className="py-3 px-4">Vai trò</th>
-                            <th className="py-3 px-4">Trạng thái đăng nhập</th>
+                            <th className="py-3 px-4">Trạng thái tài khoản</th>
                             <th className="py-3 px-4">Ngày tạo</th>
                             <th className="py-3 px-4 text-right">Thao tác</th>
                         </tr>
@@ -126,7 +126,7 @@ export default function UserTable({
                         {users.map((user) => {
                             const isSelected = selectedUserId === user.id;
                             const roleCfg = getRoleConfig(user.role);
-                            const statusCfg = getStatusConfig(user.status);
+                            const accountStatus = getUserAccountStatus(user);
                             const isActive = (user.status || '').toUpperCase() === 'ACTIVE';
                             const isSuspended = (user.status || '').toUpperCase() === 'SUSPENDED';
 
@@ -187,12 +187,24 @@ export default function UserTable({
 
                                     {/* Column 3: Status Badge */}
                                     <td className="py-3 px-4 whitespace-nowrap">
-                                        <span
-                                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border ${statusCfg.badgeClass}`}
-                                        >
-                                            <span className={`w-1.5 h-1.5 rounded-full ${statusCfg.dotClass}`} />
-                                            <span>{statusCfg.label}</span>
-                                        </span>
+                                        <div className="flex flex-col gap-0.5">
+                                            <span
+                                                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border w-fit ${accountStatus.badgeClass}`}
+                                            >
+                                                <span className={`w-1.5 h-1.5 rounded-full ${accountStatus.dotClass}`} />
+                                                <span>{accountStatus.label}</span>
+                                            </span>
+                                            {accountStatus.key === 'BOOKING_BLOCKED' && (
+                                                <span className="text-[10px] text-amber-600 font-medium pl-1">
+                                                    (Vẫn được đăng nhập)
+                                                </span>
+                                            )}
+                                            {accountStatus.key === 'SUSPENDED' && (
+                                                <span className="text-[10px] text-rose-600 font-medium pl-1">
+                                                    (Không thể đăng nhập)
+                                                </span>
+                                            )}
+                                        </div>
                                     </td>
 
                                     {/* Column 4: Created At */}
@@ -220,7 +232,7 @@ export default function UserTable({
                                                             type="button"
                                                             onClick={() => onTriggerLock(user)}
                                                             className="p-1.5 rounded-lg transition cursor-pointer text-slate-400 hover:text-rose-600 hover:bg-rose-50"
-                                                            title="Tạm khóa tài khoản đăng nhập"
+                                                            title="Tạm khóa đăng nhập hệ thống"
                                                         >
                                                             <Lock className="w-4 h-4" />
                                                         </button>
@@ -231,7 +243,7 @@ export default function UserTable({
                                                             type="button"
                                                             onClick={() => onTriggerActivate(user)}
                                                             className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition cursor-pointer"
-                                                            title="Mở khóa tài khoản đăng nhập"
+                                                            title="Mở khóa đăng nhập hệ thống"
                                                         >
                                                             <Unlock className="w-4 h-4" />
                                                         </button>
