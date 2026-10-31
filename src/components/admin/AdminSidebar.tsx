@@ -15,6 +15,7 @@ import {
     Ticket,
     RotateCcw,
     CreditCard,
+    Receipt,
     PackageX,
     FileText,
     BarChart3,
@@ -29,6 +30,7 @@ export type AdminMenuKey =
     | 'promotions'
     | 'rbac'
     | 'users'
+    | 'debt'
     | 'lockers'
     | 'incidents'
     | 'abandoned'
@@ -251,7 +253,22 @@ export default function AdminSidebar({
                             >
                                 <span className="flex items-center gap-2.5">
                                     <Users className={`w-4 h-4 ${activeMenu === 'users' ? 'text-white' : 'text-slate-400'}`} />
-                                    <span>Quản lý khách hàng</span>
+                                    <span>Quản lý tài khoản</span>
+                                </span>
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => onSelectMenu?.('debt')}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition cursor-pointer text-left ${
+                                    activeMenu === 'debt'
+                                        ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-600/30'
+                                        : 'text-slate-600 hover:bg-slate-50'
+                                }`}
+                            >
+                                <span className="flex items-center gap-2.5">
+                                    <Receipt className={`w-4 h-4 ${activeMenu === 'debt' ? 'text-white' : 'text-amber-500'}`} />
+                                    <span>Quản lý dư nợ</span>
                                 </span>
                             </button>
 

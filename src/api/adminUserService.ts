@@ -32,6 +32,7 @@ export interface UserAdminListItemDto {
     role: string;
     status: string;
     overdueDebt: number;
+    isBookingBlocked?: boolean;
     avatarUrl?: string;
     createdAt: string;
     updatedAt?: string;

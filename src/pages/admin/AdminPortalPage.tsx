@@ -35,6 +35,7 @@ import StationFleetTable from '../../components/admin/StationFleetTable';
 import StationManagementView from '../../components/admin/stations/StationManagementView';
 import PromotionVoucherManagementView from '../../components/admin/promotions/PromotionVoucherManagementView';
 import InternalUsersManagementView from '../../components/admin/users/InternalUsersManagementView';
+import CustomerDebtManagementView from '../../components/admin/users/CustomerDebtManagementView';
 import InternalRbacManagementView from '../../components/admin/rbac/InternalRbacManagementView';
 import RealtimeLockerGridView from '../../components/admin/lockers/RealtimeLockerGridView';
 import AbandonedPropertyView from '../../components/admin/abandoned/AbandonedPropertyView';
@@ -211,6 +212,11 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                     ) : activeMenu === 'users' ? (
                         <InternalUsersManagementView
                             onNavigateRbac={() => setActiveMenu('rbac')}
+                            onNavigateDebt={() => setActiveMenu('debt')}
+                        />
+                    ) : activeMenu === 'debt' ? (
+                        <CustomerDebtManagementView
+                            onNavigateUsers={() => setActiveMenu('users')}
                         />
                     ) : activeMenu === 'stations' ? (
                         <StationManagementView />
