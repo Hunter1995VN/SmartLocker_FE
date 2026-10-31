@@ -1,6 +1,6 @@
 /**
  * AD-FE-06: Quản lý dư nợ & Kiểm soát quyền đặt tủ (Chỉ tính Travelers)
- * Theo dõi công nợ cước quá hạn của khách thuê tủ, tạm khóa quyền đặt tủ mới (BR-P08)
+ * Theo dõi công nợ cước quá hạn của khách thuê tủ, tạm khóa/mở khóa quyền đặt tủ mới (BR-P08)
  * trong khi vẫn giữ tài khoản ACTIVE để khách đăng nhập xem đơn và quét VietQR thanh toán online.
  */
 import { useState, useEffect, useCallback, useMemo } from 'react';
@@ -163,7 +163,53 @@ export default function CustomerDebtManagementView({
         return result;
     }, [travelers, searchQuery, debtFilter]);
 
-    // 8. Handle 1-Click Clear Debt (0đ) & Re-enable Booking
+    // 8. Handle 1-Click Tạm Khóa Đặt Tủ Cho Khách Hàng (Block Booking)
+    const handleQuickBlockBooking = async (customer: UserAdminListItemDto) => {
+        if (!isAdmin) return;
+        setIsUpdatingDebt(true);
+        const penaltyAmount = 15000;
+        const blockReason =
+            debtReason.trim() ||
+            `Quản trị viên tạm khóa quyền đặt tủ đối với khách hàng ${customer.fullName || customer.email}`;
+
+        try {
+            const res = await adminUserService.updateUserDebt(customer.id, {
+                overdueDebt: penaltyAmount,
+                reason: blockReason,
+                autoSuspendIfDebt: false, // Maintain ACTIVE login so customer can still access portal
+            });
+
+            if (res.success) {
+                const succMsg = `Đã tạm khóa quyền đặt tủ của ${customer.fullName || customer.email}! (Tài khoản vẫn đăng nhập bình thường)`;
+                setNotification({ type: 'success', message: succMsg });
+                // In-memory update
+                setTravelers((prev) =>
+                    prev.map((u) =>
+                        u.id === customer.id
+                            ? { ...u, overdueDebt: penaltyAmount, isBookingBlocked: true }
+                            : u
+                    )
+                );
+                setSelectedCustomer((prev) =>
+                    prev && prev.id === customer.id
+                        ? { ...prev, overdueDebt: penaltyAmount, isBookingBlocked: true }
+                        : prev
+                );
+            } else {
+                setNotification({ type: 'error', message: res.message || 'Thao tác tạm khóa đặt tủ thất bại.' });
+            }
+        } catch (err: unknown) {
+            const axiosErr = err as { response?: { data?: { message?: string } } };
+            setNotification({
+                type: 'error',
+                message: axiosErr.response?.data?.message || 'Có lỗi xảy ra khi tạm khóa đặt tủ.',
+            });
+        } finally {
+            setIsUpdatingDebt(false);
+        }
+    };
+
+    // 9. Handle 1-Click Mở Khóa Đặt Tủ & Thu Nợ (0đ) (Unblock Booking)
     const handleQuickClearDebt = async (customer: UserAdminListItemDto) => {
         if (!isAdmin) return;
         setIsUpdatingDebt(true);
@@ -177,7 +223,7 @@ export default function CustomerDebtManagementView({
             });
 
             if (res.success) {
-                const succMsg = `Đã thu nợ thành công! Khách hàng ${customer.fullName || customer.email} đã sạch nợ (0 đ) và được mở lại quyền đặt tủ ngay.`;
+                const succMsg = `Đã mở khóa quyền đặt tủ thành công! Khách hàng ${customer.fullName || customer.email} đã sạch nợ (0 đ) và được phép đặt tủ ngay.`;
                 setNotification({ type: 'success', message: succMsg });
                 // Optimistic in-memory update (no API reload needed!)
                 setTravelers((prev) =>
@@ -187,20 +233,20 @@ export default function CustomerDebtManagementView({
                     prev && prev.id === customer.id ? { ...prev, overdueDebt: 0, isBookingBlocked: false } : prev
                 );
             } else {
-                setNotification({ type: 'error', message: res.message || 'Thao tác thu nợ thất bại.' });
+                setNotification({ type: 'error', message: res.message || 'Thao tác mở khóa đặt tủ thất bại.' });
             }
         } catch (err: unknown) {
             const axiosErr = err as { response?: { data?: { message?: string } } };
             setNotification({
                 type: 'error',
-                message: axiosErr.response?.data?.message || 'Có lỗi xảy ra khi cập nhật công nợ.',
+                message: axiosErr.response?.data?.message || 'Có lỗi xảy ra khi mở khóa quyền đặt tủ.',
             });
         } finally {
             setIsUpdatingDebt(false);
         }
     };
 
-    // 9. Handle Save Manual Debt Adjustment
+    // 10. Handle Save Manual Debt Adjustment
     const handleSaveDebtAdjustment = async () => {
         if (!selectedCustomer || !isAdmin) return;
         const parsed = Math.max(0, Number(debtInput || 0));
@@ -255,7 +301,7 @@ export default function CustomerDebtManagementView({
         }
     };
 
-    // 10. Handle Batch Block Debtors
+    // 11. Handle Batch Block Debtors
     const handleBatchBlockDebtors = async () => {
         if (!isAdmin || kpis.debtorCount === 0) return;
         setIsBatchBlocking(true);
@@ -283,7 +329,7 @@ export default function CustomerDebtManagementView({
         }
     };
 
-    // 11. Export CSV
+    // 12. Export CSV
     const handleExportCsv = () => {
         if (filteredTravelers.length === 0) {
             setNotification({ type: 'error', message: 'Không có dữ liệu khách hàng để xuất CSV.' });
@@ -701,17 +747,30 @@ export default function CustomerDebtManagementView({
                                                 {/* Actions */}
                                                 <td className="py-3 px-4 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                                                     <div className="flex items-center justify-end gap-1.5">
-                                                        {isAdmin && hasDebt && (
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => handleQuickClearDebt(user)}
-                                                                disabled={isUpdatingDebt}
-                                                                className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-200 transition cursor-pointer"
-                                                                title="Xác nhận khách đã nộp tiền cước và mở lại quyền đặt tủ"
-                                                            >
-                                                                <CheckCircle2 className="w-3.5 h-3.5" />
-                                                                <span>Thu nợ (0 đ)</span>
-                                                            </button>
+                                                        {isAdmin && (
+                                                            hasDebt ? (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleQuickClearDebt(user)}
+                                                                    disabled={isUpdatingDebt}
+                                                                    className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-200 transition cursor-pointer"
+                                                                    title="Mở khóa quyền đặt tủ cho khách hàng này (tất toán 0 đ)"
+                                                                >
+                                                                    <Unlock className="w-3.5 h-3.5 text-emerald-600" />
+                                                                    <span>Mở khóa đặt tủ</span>
+                                                                </button>
+                                                            ) : (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleQuickBlockBooking(user)}
+                                                                    disabled={isUpdatingDebt}
+                                                                    className="inline-flex items-center gap-1 px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded-lg border border-rose-200 transition cursor-pointer"
+                                                                    title="Tạm khóa quyền đặt tủ mới của khách hàng này"
+                                                                >
+                                                                    <Lock className="w-3.5 h-3.5 text-rose-600" />
+                                                                    <span>Khóa đặt tủ</span>
+                                                                </button>
+                                                            )
                                                         )}
 
                                                         <button
@@ -725,7 +784,7 @@ export default function CustomerDebtManagementView({
                                                             title="Xem chi tiết công nợ & thao tác"
                                                         >
                                                             <Receipt className="w-3.5 h-3.5" />
-                                                            <span>{hasDebt ? 'Xử lý nợ' : 'Quản lý nợ'}</span>
+                                                            <span>Chi tiết</span>
                                                         </button>
                                                     </div>
                                                 </td>
@@ -796,7 +855,66 @@ export default function CustomerDebtManagementView({
                                 </div>
                             </div>
 
-                            {/* Debt Status Card */}
+                            {/* Section: Booking Access Control (Tạm khóa / Mở khóa quyền đặt tủ) */}
+                            <div className="p-4 rounded-xl border space-y-3 bg-white border-slate-200">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                                        <Lock className="w-4 h-4 text-slate-600" />
+                                        <span>Quyền đặt tủ (Booking)</span>
+                                    </span>
+                                    {Number(selectedCustomer.overdueDebt || 0) > 0 ? (
+                                        <span className="px-2 py-0.5 rounded text-[11px] font-extrabold bg-rose-100 text-rose-700 border border-rose-200">
+                                            TẠM KHÓA ĐẶT TỦ
+                                        </span>
+                                    ) : (
+                                        <span className="px-2 py-0.5 rounded text-[11px] font-extrabold bg-emerald-100 text-emerald-700 border border-emerald-200">
+                                            ĐƯỢC PHÉP ĐẶT TỦ
+                                        </span>
+                                    )}
+                                </div>
+
+                                <p className="text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-100 leading-relaxed">
+                                    {Number(selectedCustomer.overdueDebt || 0) > 0
+                                        ? 'Khách hàng này đang bị tạm dừng quyền tạo đơn đặt tủ mới theo quy tắc BR-P08. Tài khoản vẫn duy trì ACTIVE để đăng nhập quét VietQR thanh toán.'
+                                        : 'Khách hàng không có nợ quá hạn và hoàn toàn đủ điều kiện tạo đơn đặt tủ mới tại mọi trạm trong hệ thống.'}
+                                </p>
+
+                                {isAdmin && (
+                                    <div className="pt-1">
+                                        {Number(selectedCustomer.overdueDebt || 0) > 0 ? (
+                                            <button
+                                                type="button"
+                                                onClick={() => handleQuickClearDebt(selectedCustomer)}
+                                                disabled={isUpdatingDebt}
+                                                className="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-sm shadow-emerald-500/20 disabled:opacity-50"
+                                            >
+                                                <Unlock className="w-4 h-4" />
+                                                <span>
+                                                    {isUpdatingDebt
+                                                        ? 'Đang xử lý...'
+                                                        : 'Mở khóa quyền đặt tủ (Tất toán nợ 0 đ)'}
+                                                </span>
+                                            </button>
+                                        ) : (
+                                            <button
+                                                type="button"
+                                                onClick={() => handleQuickBlockBooking(selectedCustomer)}
+                                                disabled={isUpdatingDebt}
+                                                className="w-full py-2.5 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition cursor-pointer inline-flex items-center justify-center gap-1.5 border border-rose-200 disabled:opacity-50"
+                                            >
+                                                <Lock className="w-4 h-4 text-rose-600" />
+                                                <span>
+                                                    {isUpdatingDebt
+                                                        ? 'Đang xử lý...'
+                                                        : 'Tạm khóa quyền đặt tủ'}
+                                                </span>
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Section: Debt Status & Adjustment Card */}
                             <div className="p-4 rounded-xl border space-y-3 bg-white border-slate-200">
                                 <div className="flex items-center justify-between">
                                     <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
@@ -823,23 +941,6 @@ export default function CustomerDebtManagementView({
                                         Khi dư nợ &gt; 0 đ, hệ thống tự động <strong>tạm khóa quyền đặt tủ mới</strong>. Tài khoản vẫn duy trì trạng thái <strong>ACTIVE</strong> để khách hàng đăng nhập xem hóa đơn và quét mã QR PayOS thanh toán online.
                                     </p>
                                 </div>
-
-                                {/* 1-Click Fast Waiver Button */}
-                                {Number(selectedCustomer.overdueDebt || 0) > 0 && (
-                                    <button
-                                        type="button"
-                                        onClick={() => handleQuickClearDebt(selectedCustomer)}
-                                        disabled={isUpdatingDebt}
-                                        className="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-sm shadow-emerald-500/20 disabled:opacity-50"
-                                    >
-                                        <CheckCircle2 className="w-4 h-4" />
-                                        <span>
-                                            {isUpdatingDebt
-                                                ? 'Đang xử lý...'
-                                                : '✓ Đã thu nợ (0 đ) — Mở khóa đặt tủ ngay'}
-                                        </span>
-                                    </button>
-                                )}
 
                                 {/* Manual Debt Adjustment Form */}
                                 <div className="space-y-2 pt-2 border-t border-slate-100">
