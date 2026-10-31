@@ -1,4 +1,4 @@
-/**
+﻿/**
  * AD-FE-03: UC-A04 — Manage Lockers, Pricing, Overdue Penalty & Refund Policies
  * Tab 3: Pricing Matrix & Overdue / Cancellation Refund Policies Management (UC-A04).
  * Cho phép cấu hình giá thuê theo giờ/ngày, mức phí phạt quá hạn, thời gian ân hạn
@@ -176,7 +176,19 @@ export default function StationPricingTab({ station, onPricingUpdated }: Station
         e.preventDefault();
         setFeedback(null);
 
-        if (!validate()) return;
+                if (!validate()) {
+            setFeedback({
+                type: 'error',
+                message: 'Vui lòng kiểm tra lại các ô nhập liệu có viền đỏ phía trên trước khi lưu!',
+            });
+            setTimeout(() => {
+                const firstErr = document.querySelector('.border-rose-400');
+                if (firstErr) {
+                    firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100);
+            return;
+        }
 
         setIsSaving(true);
         try {
