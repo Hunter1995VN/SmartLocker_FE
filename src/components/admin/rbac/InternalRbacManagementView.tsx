@@ -63,7 +63,7 @@ interface ConfirmDialogState {
 const FALLBACK_PERMISSION_MATRIX: RbacPermissionItemDto[] = [
     {
         code: 'RBAC_INTERNAL_USERS',
-        module: 'Nhân sự & Phân quyền (UC-A05)',
+        module: 'Nhân sự & Phân quyền',
         name: 'Tạo, sửa, cấp lại mật khẩu, khóa & phân quyền Admin / Staff',
         description: 'Toàn quyền quản lý vòng đời tài khoản nội bộ và thay đổi vai trò RBAC',
         adminAllowed: true,
@@ -74,7 +74,7 @@ const FALLBACK_PERMISSION_MATRIX: RbacPermissionItemDto[] = [
     },
     {
         code: 'DEBT_CONTROL',
-        module: 'Kiểm soát Nợ xấu (UC-A06)',
+        module: 'Kiểm soát Nợ xấu',
         name: 'Điều chỉnh dư nợ quá hạn & Chặn hàng loạt tài khoản nợ xấu',
         description: 'Ghi nhận/xóa nợ quá hạn và tự động khóa tài khoản khách hàng vi phạm',
         adminAllowed: true,
@@ -85,7 +85,7 @@ const FALLBACK_PERMISSION_MATRIX: RbacPermissionItemDto[] = [
     },
     {
         code: 'OPS_DASHBOARD',
-        module: 'Giám sát Vận hành (UC-A02)',
+        module: 'Giám sát Vận hành',
         name: 'Xem Dashboard vận hành, tỷ lệ lấp đầy & cảnh báo IoT',
         description: 'Theo dõi KPI toàn mạng lưới trạm tủ và cảnh báo mất kết nối thiết bị',
         adminAllowed: true,
@@ -96,7 +96,7 @@ const FALLBACK_PERMISSION_MATRIX: RbacPermissionItemDto[] = [
     },
     {
         code: 'STATION_PRICING_CONFIG',
-        module: 'Trạm & Bảng giá (UC-A03, UC-A04)',
+        module: 'Trạm & Bảng giá',
         name: 'Tạo/sửa trạm tủ, cấu hình bảng giá thuê, phí phạt & hoàn tiền',
         description: 'Thay đổi thông số thương mại, đơn giá theo kích thước ô tủ và chính sách phạt',
         adminAllowed: true,
@@ -107,7 +107,7 @@ const FALLBACK_PERMISSION_MATRIX: RbacPermissionItemDto[] = [
     },
     {
         code: 'LOCKER_MAINTENANCE',
-        module: 'Lưới Ô Tủ Thời gian thực (UC-S02)',
+        module: 'Lưới Ô Tủ Thời gian thực',
         name: 'Giám sát ma trận ô tủ & chuyển trạng thái Bảo trì (Maintenance)',
         description: 'Đưa ô tủ gặp lỗi cảm biến/khóa từ sang chế độ bảo trì kỹ thuật',
         adminAllowed: true,
@@ -118,7 +118,7 @@ const FALLBACK_PERMISSION_MATRIX: RbacPermissionItemDto[] = [
     },
     {
         code: 'EMERGENCY_UNLOCK',
-        module: 'Sự cố & Cứu hộ Khẩn cấp (UC-S04, UC-S05)',
+        module: 'Sự cố & Cứu hộ Khẩn cấp',
         name: 'Tiếp nhận sự cố & Gửi lệnh mở khóa khẩn cấp từ xa (Emergency Unlock)',
         description: 'Kích hoạt mở chốt từ xa khi khách kẹt đồ hoặc sự cố phần cứng có xác minh',
         adminAllowed: true,
@@ -129,7 +129,7 @@ const FALLBACK_PERMISSION_MATRIX: RbacPermissionItemDto[] = [
     },
     {
         code: 'ABANDONED_REPORT',
-        module: 'Tài sản Bỏ quên > 72h (UC-S10, UC-S11)',
+        module: 'Tài sản Bỏ quên > 72h',
         name: 'Lập biên bản thu giữ niêm phong & Bàn giao đồ thất lạc',
         description: 'Xử lý hiện trường các đơn quá hạn trên 72 giờ và chụp ảnh niêm phong',
         adminAllowed: true,
@@ -140,7 +140,7 @@ const FALLBACK_PERMISSION_MATRIX: RbacPermissionItemDto[] = [
     },
     {
         code: 'ABANDONED_FOUR_EYES',
-        module: 'Phê duyệt 4 Mắt (UC-A07)',
+        module: 'Phê duyệt 4 Mắt',
         name: 'Phê duyệt quyết định thanh lý / tiêu hủy tài sản vô thừa nhận (4-Eyes)',
         description: 'Nguyên tắc kiểm soát chéo: Admin phê duyệt độc lập với nhân viên lập đề xuất',
         adminAllowed: true,
@@ -151,7 +151,7 @@ const FALLBACK_PERMISSION_MATRIX: RbacPermissionItemDto[] = [
     },
     {
         code: 'PAYOS_RECONCILIATION',
-        module: 'Đối soát Tài chính (UC-A12)',
+        module: 'Đối soát Tài chính',
         name: 'Đối soát dòng tiền PayOS, xử lý lệch giao dịch & hoàn tiền',
         description: 'Kiểm toán doanh thu, tra soát webhook thanh toán và xác nhận hoàn tiền',
         adminAllowed: true,
@@ -162,7 +162,7 @@ const FALLBACK_PERMISSION_MATRIX: RbacPermissionItemDto[] = [
     },
     {
         code: 'AUDIT_LOGS_SECURITY',
-        module: 'Nhật ký An ninh (UC-A08)',
+        module: 'Nhật ký An ninh',
         name: 'Tra cứu & xuất báo cáo Nhật ký Truy vết An ninh toàn hệ thống',
         description: 'Giám sát mọi hành động nhạy cảm, đăng nhập và thay đổi dữ liệu',
         adminAllowed: true,
@@ -532,10 +532,10 @@ export default function InternalRbacManagementView({
                 activeUsers: stats.activeAdmins,
                 suspendedUsers: stats.totalAdmins - stats.activeAdmins,
                 keyPermissions: [
-                    'Quản lý tài khoản nội bộ & phân quyền RBAC (UC-A05)',
-                    'Kiểm soát nợ quá hạn & chặn hàng loạt nợ xấu (UC-A06)',
-                    'Cấu hình trạm tủ, bảng giá, phí phạt & hoàn tiền (UC-A03, UC-A04)',
-                    'Phê duyệt 4 mắt tài sản bỏ quên > 72h & Đối soát PayOS (UC-A07, UC-A12)',
+                    'Quản lý tài khoản nội bộ & phân quyền RBAC',
+                    'Kiểm soát nợ quá hạn & chặn tài khoản nợ xấu',
+                    'Cấu hình trạm tủ, bảng giá, phí phạt & hoàn tiền',
+                    'Phê duyệt 4 mắt tài sản bỏ quên > 72h & Đối soát PayOS',
                 ],
                 restrictions: [
                     'Không thể tự khóa, tự xóa hoặc tự hạ quyền chính mình',
@@ -552,9 +552,9 @@ export default function InternalRbacManagementView({
                 activeUsers: stats.activeStaff,
                 suspendedUsers: stats.totalStaff - stats.activeStaff,
                 keyPermissions: [
-                    'Xem Dashboard vận hành & lưới ô tủ thời gian thực (UC-A02, UC-S02)',
-                    'Đặt chế độ bảo trì ô tủ & mở khóa cứu hộ khẩn cấp (UC-S04, UC-S05)',
-                    'Lập biên bản thu giữ & bàn giao tài sản bỏ quên > 72h (UC-S10, UC-S11)',
+                    'Xem Dashboard vận hành & lưới ô tủ thời gian thực',
+                    'Đặt chế độ bảo trì ô tủ & mở khóa cứu hộ khẩn cấp',
+                    'Lập biên bản thu giữ & bàn giao tài sản bỏ quên > 72h',
                 ],
                 restrictions: [
                     'Không được tạo/sửa/khóa tài khoản hoặc thay đổi vai trò RBAC',
@@ -708,7 +708,7 @@ export default function InternalRbacManagementView({
                 role: panelRoleDraft,
                 reason:
                     panelRoleReason.trim() ||
-                    `Quản trị viên chuyển đổi vai trò từ ${currentRole} sang ${panelRoleDraft} (UC-A05)`,
+                    `Quản trị viên chuyển đổi vai trò từ ${currentRole} sang ${panelRoleDraft}`,
             });
             if (res.success) {
                 setNotification({
@@ -759,7 +759,7 @@ export default function InternalRbacManagementView({
             if (confirmDialog.kind === 'LOCK') {
                 const res = await adminUserService.updateUserStatus(target.id, {
                     status: 'SUSPENDED',
-                    reason: confirmReason.trim() || 'Tạm khóa tài khoản nhân sự nội bộ (UC-A05)',
+                    reason: confirmReason.trim() || 'Tạm khóa tài khoản nhân sự nội bộ',
                 });
                 if (res.success) {
                     setNotification({
@@ -774,7 +774,7 @@ export default function InternalRbacManagementView({
             } else if (confirmDialog.kind === 'ACTIVATE') {
                 const res = await adminUserService.updateUserStatus(target.id, {
                     status: 'ACTIVE',
-                    reason: confirmReason.trim() || 'Khôi phục quyền truy cập tài khoản nội bộ (UC-A05)',
+                    reason: confirmReason.trim() || 'Khôi phục quyền truy cập tài khoản nội bộ',
                 });
                 if (res.success) {
                     setNotification({
@@ -789,7 +789,7 @@ export default function InternalRbacManagementView({
             } else if (confirmDialog.kind === 'DEACTIVATE') {
                 const res = await adminUserService.deactivateInternalUser(
                     target.id,
-                    confirmReason.trim() || 'Thu hồi vĩnh viễn quyền truy cập nhân sự nghỉ việc / chuyển bộ phận (UC-A05)'
+                    confirmReason.trim() || 'Thu hồi vĩnh viễn quyền truy cập nhân sự nghỉ việc / chuyển bộ phận'
                 );
                 if (res.success) {
                     setNotification({
@@ -806,7 +806,7 @@ export default function InternalRbacManagementView({
                     role: confirmDialog.nextRole,
                     reason:
                         confirmReason.trim() ||
-                        `Điều chỉnh phân quyền RBAC sang ${confirmDialog.nextRole} (UC-A05)`,
+                        `Điều chỉnh phân quyền RBAC sang ${confirmDialog.nextRole}`,
                 });
                 if (res.success) {
                     setNotification({
@@ -896,7 +896,7 @@ export default function InternalRbacManagementView({
                     <span>An ninh & Nhân sự nội bộ</span>
                     <span>/</span>
                     <span className="text-blue-600 font-bold">
-                        Quản lý tài khoản nội bộ & Phân quyền vai trò (UC-A05)
+                        Quản lý nhân sự nội bộ & Phân quyền vai trò
                     </span>
                 </nav>
 
@@ -907,7 +907,7 @@ export default function InternalRbacManagementView({
                                 Quản Lý Tài Khoản Nội Bộ & Phân Quyền Vai Trò (Admin / Staff RBAC)
                             </h1>
                             <span className="px-2.5 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-purple-100 text-purple-700 border border-purple-200">
-                                UC-A05 · ENTERPRISE RBAC
+                                ENTERPRISE RBAC
                             </span>
                         </div>
                         <p className="text-xs text-slate-500 mt-1 max-w-3xl">
@@ -1130,7 +1130,7 @@ export default function InternalRbacManagementView({
                         onClick={onNavigateDebtUsers}
                         className="px-3 py-1.5 rounded-xl text-[11px] font-bold text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition cursor-pointer inline-flex items-center gap-1.5"
                     >
-                        <span>Chuyển sang Khách hàng & Nợ xấu (UC-A06)</span>
+                        <span>Chuyển sang Quản lý khách hàng</span>
                         <ExternalLink className="w-3.5 h-3.5" />
                     </button>
                 )}
@@ -1636,7 +1636,7 @@ export default function InternalRbacManagementView({
                                                     <ul className="space-y-1 text-slate-600">
                                                         <li className="flex items-center gap-1.5">
                                                             <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 shrink-0" />
-                                                            <span>Quản lý nhân sự nội bộ & gán vai trò RBAC (UC-A05)</span>
+                                                            <span>Quản lý nhân sự nội bộ & gán vai trò RBAC</span>
                                                         </li>
                                                         <li className="flex items-center gap-1.5">
                                                             <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 shrink-0" />
@@ -1644,14 +1644,14 @@ export default function InternalRbacManagementView({
                                                         </li>
                                                         <li className="flex items-center gap-1.5">
                                                             <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 shrink-0" />
-                                                            <span>Phê duyệt 4 mắt xử lý tài sản bỏ quên &gt; 72h (UC-A07)</span>
+                                                            <span>Phê duyệt 4 mắt xử lý tài sản bỏ quên &gt; 72h</span>
                                                         </li>
                                                     </ul>
                                                 ) : (
                                                     <ul className="space-y-1 text-slate-600">
                                                         <li className="flex items-center gap-1.5">
                                                             <CheckCircle2 className="w-3.5 h-3.5 text-teal-600 shrink-0" />
-                                                            <span>Giám sát lưới tủ, bảo trì ô tủ & mở khóa cứu hộ (UC-S05)</span>
+                                                            <span>Giám sát lưới tủ, bảo trì ô tủ & mở khóa cứu hộ</span>
                                                         </li>
                                                         <li className="flex items-center gap-1.5">
                                                             <CheckCircle2 className="w-3.5 h-3.5 text-teal-600 shrink-0" />

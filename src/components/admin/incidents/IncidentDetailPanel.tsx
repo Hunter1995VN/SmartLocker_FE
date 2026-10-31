@@ -9,7 +9,7 @@
  *   - Reported reason
  *   - Trạng thái sự cố
  *   - Form "Cập Nhật Xử Lý Sự Cố (UC-S04)" (IN_PROGRESS / RESOLVED / CANCELLED + resolutionNote)
- *   - Nút "Mở khóa tủ từ xa (UC-S05)" + confirmation dialog có nhập Audit Reason bắt buộc
+ *   - Nút "Mở khóa tủ từ xa" + confirmation dialog có nhập Audit Reason bắt buộc
  *   - Loading / Success / Error state sau khi gọi API
  */
 import { useState, useEffect, type ComponentType } from 'react';
@@ -207,7 +207,7 @@ export default function IncidentDetailPanel({
                         ...incident,
                         status: 'RESOLVED',
                         remoteUnlocked: true,
-                        resolutionNote: res.message ?? `[Mở khóa từ xa UC-S05] ${reason}`,
+                        resolutionNote: res.message ?? `[Mở khóa từ xa] ${reason}`,
                         resolvedAt: new Date().toISOString(),
                     });
                 }
@@ -398,7 +398,7 @@ export default function IncidentDetailPanel({
                             <div className="flex items-center justify-between">
                                 <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
                                     <ClipboardCheck className="w-4 h-4 text-blue-600" />
-                                    <span>Cập Nhật Xử Lý Sự Cố (UC-S04)</span>
+                                    <span>Cập Nhật Xử Lý Sự Cố</span>
                                 </h3>
                                 <span className="text-[10px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
                                     Staff / Admin
@@ -577,7 +577,7 @@ export default function IncidentDetailPanel({
                             ) : (
                                 <>
                                     <UnlockKeyhole className="w-4 h-4" aria-hidden="true" />
-                                    Mở khóa tủ từ xa (UC-S05)
+                                    Mở khóa tủ từ xa
                                 </>
                             )}
                         </button>

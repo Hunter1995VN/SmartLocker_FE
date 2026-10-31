@@ -450,7 +450,7 @@ export default function PromotionVoucherManagementView({
                 <div>
                     <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-blue-600 mb-1">
                         <Megaphone className="w-3.5 h-3.5" />
-                        <span>Growth & Revenue Control · UC-A09</span>
+                        <span>Chiến Dịch Khuyến Mại & Voucher</span>
                     </div>
                     <h1 className="text-xl font-extrabold text-slate-900 tracking-tight">
                         Chiến dịch Khuyến mại, Mã Voucher & Ngân sách Chiết khấu

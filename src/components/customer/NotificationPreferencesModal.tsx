@@ -1,5 +1,5 @@
 /**
- * UC-T22: Thiết lập tùy chọn kênh nhận thông báo (SMS, Email, WebPush)
+ * THIẾT LẬP THÔNG BÁO: Thiết lập tùy chọn kênh nhận thông báo (SMS, Email, WebPush)
  * Modal cấu hình kênh nhận thông báo & loại cảnh báo cho Traveler.
  */
 import React, { useState, useEffect } from 'react';
@@ -98,7 +98,7 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
                             <div className="flex items-center gap-2">
                                 <h2 className="text-base font-bold">Thiết Lập Kênh Nhận Thông Báo</h2>
                                 <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-blue-500/30 text-blue-100 border border-blue-400/30">
-                                    UC-T22
+                                    THIẾT LẬP THÔNG BÁO
                                 </span>
                             </div>
                             <p className="text-xs text-blue-200 mt-0.5">

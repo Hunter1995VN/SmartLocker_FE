@@ -1,5 +1,5 @@
 /**
- * AD-FE-02: UC-A02 — Operations Dashboard
+ * AD-FE-02: Operations Dashboard
  * Thanh điều hướng Sidebar chuẩn theo thiết kế SmartLocker Operations Portal.
  * Hiển thị avatar, tên người dùng, role badge (ADMIN/STAFF), và nút Đăng xuất.
  */
@@ -81,7 +81,7 @@ export default function AdminSidebar({
                     {/* Group: OVERVIEW */}
                     <div>
                         <p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
-                            Overview
+                            Tổng quan
                         </p>
                         <div className="space-y-0.5">
                             <button
@@ -94,7 +94,7 @@ export default function AdminSidebar({
                                 }`}
                             >
                                 <LayoutDashboard className={`w-4 h-4 ${activeMenu === 'dashboard' ? 'text-white' : 'text-slate-400'}`} />
-                                <span>Dashboard</span>
+                                <span>Bảng điều khiển</span>
                             </button>
                         </div>
                     </div>
@@ -102,7 +102,7 @@ export default function AdminSidebar({
                     {/* Group: OPERATIONS */}
                     <div>
                         <p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
-                            Operations
+                            Vận hành trạm
                         </p>
                         <div className="space-y-0.5 text-slate-600">
                             <button
@@ -116,7 +116,7 @@ export default function AdminSidebar({
                             >
                                 <span className="flex items-center gap-2.5">
                                     <Layers className={`w-4 h-4 ${activeMenu === 'stations' ? 'text-white' : 'text-slate-400'}`} />
-                                    <span>Stations & Pricing</span>
+                                    <span>Trạm & Bảng giá</span>
                                 </span>
                             </button>
 
@@ -131,7 +131,7 @@ export default function AdminSidebar({
                             >
                                 <span className="flex items-center gap-2.5">
                                     <Box className={`w-4 h-4 ${activeMenu === 'lockers' ? 'text-white' : 'text-slate-400'}`} />
-                                    <span>Lockers Grid</span>
+                                    <span>Lưới ô tủ</span>
                                 </span>
                             </button>
 
@@ -142,7 +142,7 @@ export default function AdminSidebar({
                             >
                                 <span className="flex items-center gap-2.5">
                                     <Cpu className="w-4 h-4 text-slate-400" />
-                                    <span>IoT Devices</span>
+                                    <span>Thiết bị IoT</span>
                                 </span>
                                 {offlineDevicesCount > 0 ? (
                                     <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" title={`${offlineDevicesCount} thiết bị offline`} />
@@ -162,7 +162,7 @@ export default function AdminSidebar({
                             >
                                 <span className="flex items-center gap-2.5">
                                     <ShieldAlert className={`w-4 h-4 ${activeMenu === 'incidents' ? 'text-white' : 'text-slate-400'}`} />
-                                    <span>Incidents (UC-S04/S05)</span>
+                                    <span>Sự cố & Hỗ trợ</span>
                                 </span>
                                 {openIncidentsCount > 0 && (
                                     <span className={`px-1.5 py-0.2 rounded-full font-bold text-[10px] border ${
@@ -180,7 +180,7 @@ export default function AdminSidebar({
                     {/* Group: MANAGEMENT */}
                     <div>
                         <p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
-                            Management
+                            Quản lý & Nghiệp vụ
                         </p>
                         <div className="space-y-0.5 text-slate-600">
                             <button
@@ -189,7 +189,7 @@ export default function AdminSidebar({
                                 className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-pointer text-left"
                             >
                                 <DollarSign className="w-4 h-4 text-slate-400" />
-                                <span>Pricing & Penalty (UC-A04)</span>
+                                <span>Bảng giá & Phụ phí</span>
                             </button>
 
                             <button
@@ -203,7 +203,7 @@ export default function AdminSidebar({
                             >
                                 <span className="flex items-center gap-2.5">
                                     <Ticket className={`w-4 h-4 ${activeMenu === 'promotions' ? 'text-white' : 'text-emerald-500'}`} />
-                                    <span>Promotions & Budget (UC-A09)</span>
+                                    <span>Khuyến mãi & Voucher</span>
                                 </span>
                                 <span
                                     className={`px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase ${
@@ -227,7 +227,7 @@ export default function AdminSidebar({
                             >
                                 <span className="flex items-center gap-2.5">
                                     <UserCog className={`w-4 h-4 ${activeMenu === 'rbac' ? 'text-white' : 'text-purple-500'}`} />
-                                    <span>Staff & RBAC (UC-A05)</span>
+                                    <span>Nhân sự & Phân quyền</span>
                                 </span>
                                 <span
                                     className={`px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase ${
@@ -251,7 +251,7 @@ export default function AdminSidebar({
                             >
                                 <span className="flex items-center gap-2.5">
                                     <Users className={`w-4 h-4 ${activeMenu === 'users' ? 'text-white' : 'text-slate-400'}`} />
-                                    <span>Accounts & Debt (UC-A06)</span>
+                                    <span>Quản lý khách hàng</span>
                                 </span>
                             </button>
 
@@ -265,7 +265,7 @@ export default function AdminSidebar({
                                 }`}
                             >
                                 <CreditCard className={`w-4 h-4 ${activeMenu === 'reconciliation' ? 'text-white' : 'text-slate-400'}`} />
-                                <span>PayOS Reconciliation (UC-A12)</span>
+                                <span>Đối soát PayOS</span>
                             </button>
 
                             <button
@@ -279,7 +279,7 @@ export default function AdminSidebar({
                             >
                                 <span className="flex items-center gap-2.5">
                                     <RotateCcw className={`w-4 h-4 ${activeMenu === 'refunds' ? 'text-white' : 'text-purple-500'}`} />
-                                    <span>Manual Refunds (UC-A11)</span>
+                                    <span>Duyệt hoàn tiền</span>
                                 </span>
                                 <span
                                     className={`px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase ${
@@ -288,7 +288,7 @@ export default function AdminSidebar({
                                             : 'bg-purple-50 text-purple-700 border border-purple-200/80'
                                     }`}
                                 >
-                                    EX
+                                    REFUND
                                 </span>
                             </button>
 
@@ -302,7 +302,7 @@ export default function AdminSidebar({
                                 }`}
                             >
                                 <PackageX className={`w-4 h-4 ${activeMenu === 'abandoned' ? 'text-white' : 'text-slate-400'}`} />
-                                <span>Abandoned 72h (UC-S10/A07)</span>
+                                <span>Hành lý quá hạn 72h</span>
                             </button>
                         </div>
                     </div>
@@ -310,7 +310,7 @@ export default function AdminSidebar({
                     {/* Group: SECURITY & LOGS */}
                     <div>
                         <p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
-                            Security & Logs
+                            Bảo mật & Nhật ký
                         </p>
                         <div className="space-y-0.5 text-slate-600">
                             <button
@@ -323,7 +323,7 @@ export default function AdminSidebar({
                                 }`}
                             >
                                 <FileText className={`w-4 h-4 ${activeMenu === 'audit' ? 'text-white' : 'text-slate-400'}`} />
-                                <span>Audit Logs (UC-A08)</span>
+                                <span>Nhật ký hệ thống</span>
                             </button>
 
                             <button
@@ -332,7 +332,7 @@ export default function AdminSidebar({
                                 className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-pointer text-left"
                             >
                                 <BarChart3 className="w-4 h-4 text-slate-400" />
-                                <span>Financial Reports</span>
+                                <span>Báo cáo tài chính</span>
                             </button>
                         </div>
                     </div>

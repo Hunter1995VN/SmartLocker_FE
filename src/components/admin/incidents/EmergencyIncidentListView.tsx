@@ -4,7 +4,7 @@
  * Màn hình chính "Cứu hộ khẩn cấp & Mở khoá tủ từ xa":
  *   - Tải danh sách sự cố từ GET /api/admin/incidents
  *   - Hiển thị filter theo status (Tất cả / Đang mở / Đang xử lý / Đã xử lý) và mức độ nghiêm trọng (Severity)
- *   - Nút "+ Tiếp nhận / Báo cáo sự cố mới (UC-S04)" mở modal tạo phiếu sự cố
+ *   - Nút "+ Tiếp nhận / Báo cáo sự cố mới" mở modal tạo phiếu sự cố
  *   - Click incident → hiện IncidentDetailPanel bên phải (desktop) / bên dưới (mobile)
  *   - Loading, Empty, Error state đầy đủ
  */
@@ -185,7 +185,7 @@ export default function EmergencyIncidentListView({ userRole }: EmergencyInciden
                                 Cứu hộ khẩn cấp &amp; Mở khoá tủ từ xa
                             </h1>
                             <p className="text-xs text-slate-500">
-                                UC-S04 &amp; UC-S05 · Tiếp nhận xử lý sự cố an ninh / kẹt tủ &amp; Mở khóa khẩn cấp có Audit
+                                Tiếp nhận xử lý sự cố & Mở khóa khẩn cấp có ghi vết an ninh
                             </p>
                         </div>
                     </div>
@@ -199,7 +199,7 @@ export default function EmergencyIncidentListView({ userRole }: EmergencyInciden
                             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-sm shadow-rose-500/20 transition cursor-pointer shrink-0"
                         >
                             <Plus className="w-4 h-4" aria-hidden="true" />
-                            <span>+ Tiếp nhận / Báo cáo sự cố mới (UC-S04)</span>
+                            <span>+ Báo cáo sự cố mới</span>
                         </button>
                     )}
 
@@ -369,7 +369,7 @@ export default function EmergencyIncidentListView({ userRole }: EmergencyInciden
                                 Chưa chọn sự cố
                             </h3>
                             <p className="text-xs text-slate-400 max-w-xs">
-                                Chọn một sự cố từ danh sách bên trái để xem chi tiết, cập nhật biên bản xử lý (UC-S04) hoặc mở khóa tủ từ xa (UC-S05).
+                                Chọn một sự cố từ danh sách bên trái để xem chi tiết, cập nhật biên bản xử lý hoặc mở khóa tủ từ xa.
                             </p>
                         </div>
                     )}
@@ -531,7 +531,7 @@ function CreateIncidentModal({
                                 id="create-incident-modal-title"
                                 className="text-base font-black text-slate-900 tracking-tight"
                             >
-                                Tiếp nhận / Báo cáo sự cố mới (UC-S04)
+                                Tiếp nhận / Báo cáo sự cố mới
                             </h2>
                             <p className="text-[11px] text-slate-500 mt-0.5">
                                 Tạo phiếu Incident Ticket để theo dõi xử lý kẹt tủ, lỗi cảm biến hoặc cảnh báo an ninh.

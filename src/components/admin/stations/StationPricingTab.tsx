@@ -1,6 +1,5 @@
-﻿/**
- * AD-FE-03: UC-A04 — Manage Lockers, Pricing, Overdue Penalty & Refund Policies
- * Tab 3: Pricing Matrix & Overdue / Cancellation Refund Policies Management (UC-A04).
+/**
+ * Quản lý Bảng giá, Phí phạt & Chính sách hoàn tiền trạm
  * Cho phép cấu hình giá thuê theo giờ/ngày, mức phí phạt quá hạn, thời gian ân hạn
  * và tỷ lệ hoàn tiền khi hủy đơn (trước/sau mốc cutoff, No-Show) cho từng cỡ tủ S, M, L.
  */
@@ -31,7 +30,6 @@ function toPercentageString(rateValue: number | undefined, fallbackPct: number):
         return String(fallbackPct);
     }
     const num = Number(rateValue);
-    // If stored as decimal 0..1 (e.g. 1.0 or 0.5), convert to 0..100
     const pct = num <= 1 && num >= 0 ? Math.round(num * 100) : Math.round(num);
     return String(Math.min(100, Math.max(0, pct)));
 }
@@ -57,7 +55,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
         String(policyL?.pricePerBlock ?? station.priceL ?? 20000)
     );
 
-    // UC-A04: Overdue fee per hour for S, M, L & Grace period
+    // Overdue fee per hour for S, M, L & Grace period
     const [overdueFeeS, setOverdueFeeS] = useState<string>(
         String(policyS?.overdueFeePerHour ?? (station.priceS ?? 10000) * 1.5)
     );
@@ -71,7 +69,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
         String(basePolicy?.gracePeriodMinutes ?? 15)
     );
 
-    // UC-A04: Cancellation Refund Rate & No-Show Policy states
+    // Cancellation Refund Rate & No-Show Policy states
     const [refundCutoffHours, setRefundCutoffHours] = useState<string>(
         String(basePolicy?.refundCutoffHours ?? 2)
     );
@@ -151,7 +149,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
 
         const cutoff = Number(refundCutoffHours);
         if (Number.isNaN(cutoff) || cutoff < 0) {
-            errs.refundCutoffHours = 'Mốc thời gian hủy đơn phải >= 0 giờ';
+            errs.refundCutoffHours = 'Mốc thời gian hủy đơn phải >= 0 phút';
         }
 
         const earlyPct = Number(refundRateEarlyPct);
@@ -177,7 +175,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
         e.preventDefault();
         setFeedback(null);
 
-                if (!validate()) {
+        if (!validate()) {
             const errMsg = 'Vui lòng kiểm tra lại các ô nhập liệu có viền đỏ phía trên trước khi lưu!';
             setFeedback({
                 type: 'error',
@@ -202,7 +200,6 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
             const rateLate = Math.min(1, Math.max(0, Number(refundRateLatePct) / 100));
             const noShowMins = Math.max(5, parseInt(noShowWindowMinutes, 10) || 30);
 
-            // Update S, M, L in parallel including UC-A04 Overdue & Refund parameters
             await Promise.all([
                 adminStationService.updatePricingPolicy(station.id, {
                     size: 'S',
@@ -282,7 +279,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                 <div>
                     <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
                         <Tag className="w-4 h-4 text-blue-600" />
-                        <span>Chế độ định giá (Pricing Model — UC-A04)</span>
+                        <span>Chế độ định giá (Pricing Model)</span>
                     </h4>
                     <p className="text-[11px] text-slate-400 mt-0.5">
                         Lựa chọn áp dụng đơn vị tính block thời gian thuê tủ cho S, M, L
@@ -511,16 +508,16 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                 </table>
             </div>
 
-            {/* Dedicated Card: Chính Sách Phí Phạt Quá Hạn & Tỷ Lệ Hoàn Tiền Khi Hủy Đơn (UC-A04) */}
+            {/* Dedicated Card: Chính Sách Phí Phạt Quá Hạn & Tỷ Lệ Hoàn Tiền Khi Hủy Đơn */}
             <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-5 shadow-2xs">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3.5">
                     <div>
                         <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
                             <RotateCcw className="w-4 h-4 text-blue-600" />
-                            <span>Chính Sách Phí Phạt Quá Hạn & Tỷ Lệ Hoàn Tiền Khi Hủy Đơn (UC-A04)</span>
+                            <span>Chính Sách Phí Phạt Quá Hạn & Tỷ Lệ Hoàn Tiền Khi Hủy Đơn</span>
                         </h4>
                         <p className="text-[11px] text-slate-500 mt-0.5">
-                            Cấu hình ngưỡng ân hạn quá hạn, mốc giờ hủy đơn tiêu chuẩn và tỷ lệ % hoàn tiền tự động vào ví khách hàng
+                            Cấu hình ngưỡng ân hạn quá hạn, mốc giờ hủy đơn tiêu chuẩn và tỷ lệ % hoàn tiền theo thời gian giữ chỗ
                         </p>
                     </div>
                     <span className="px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-blue-50 text-blue-700 border border-blue-200 shrink-0">
@@ -629,7 +626,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                                 <span>Tỷ lệ hoàn tiền khi hủy đơn</span>
                             </label>
                             <span className="text-[10px] font-bold text-purple-700 bg-purple-100/90 px-2 py-0.5 rounded border border-purple-200">
-                                Admin duyệt giải ngân (UC-A11)
+                                Admin duyệt giải ngân
                             </span>
                         </div>
 
@@ -688,7 +685,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                             Hủy trong <strong>{refundCutoffHours || 15} phút đầu</strong>: Đề xuất hoàn <strong>{refundRateEarlyPct || 100}%</strong> &nbsp;|&nbsp;
                             Hủy từ phút <strong>{refundCutoffHours || 15} - {noShowWindowMinutes || 30}</strong>: Đề xuất hoàn <strong>{refundRateLatePct || 50}%</strong> &nbsp;|&nbsp;
                             Quá <strong>{noShowWindowMinutes || 30} phút</strong>: Hủy No-Show (0%).<br />
-                            🔒 <em>Lưu ý: Mọi phiếu yêu cầu hoàn tiền sẽ gửi về mục <strong>Manual Refunds (UC-A11)</strong> để Admin thẩm định và bấm duyệt giải ngân.</em>
+                            🔒 <em>Lưu ý: Mọi phiếu yêu cầu hoàn tiền sẽ gửi về mục <strong>Duyệt hoàn tiền</strong> để Admin thẩm định và bấm duyệt giải ngân.</em>
                         </p>
                     </div>
                 </div>
@@ -728,7 +725,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                     ) : (
                         <>
                             <Save className="w-4 h-4" />
-                            <span>Lưu & Áp dụng Bảng giá + Chính sách Hoàn tiền (UC-A04)</span>
+                            <span>Lưu & Áp dụng Bảng giá + Chính sách Hoàn tiền</span>
                         </>
                     )}
                 </button>

@@ -1,8 +1,8 @@
 /**
- * AD-FE-05: UC-A05 & UC-A06 — Manage Customers, Internal Users & Overdue Debt Control
+ * AD-FE-05: Quản lý khách hàng & Kiểm soát dư nợ
  * Thanh bộ lọc trạng thái dạng tabs, tìm kiếm họ tên/email/phone, lọc vai trò và lọc tình trạng dư nợ.
  */
-import { Search, Filter, RotateCw, Plus, Download, AlertOctagon } from 'lucide-react';
+import { Search, RotateCw, Plus, Download, AlertOctagon } from 'lucide-react';
 
 interface UserFilterBarProps {
     searchQuery: string;
@@ -19,9 +19,10 @@ interface UserFilterBarProps {
     pendingCount: number;
     onRefresh: () => void;
     isRefreshing: boolean;
-    onOpenCreateModal: () => void;
+    onOpenCreateModal?: () => void;
     onExportCsv: () => void;
     isAdmin: boolean;
+    showCreateStaff?: boolean;
 }
 
 export default function UserFilterBar({
@@ -42,6 +43,7 @@ export default function UserFilterBar({
     onOpenCreateModal,
     onExportCsv,
     isAdmin,
+    showCreateStaff = false,
 }: UserFilterBarProps) {
     const tabs: Array<{ id: string; label: string; count: number }> = [
         { id: 'ALL', label: 'Tất cả trạng thái', count: totalCount },
@@ -51,9 +53,9 @@ export default function UserFilterBar({
     ];
 
     return (
-        <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs space-y-4">
+        <div className="bg-white rounded-2xl p-3 sm:p-3.5 border border-slate-200/80 shadow-xs space-y-3">
             {/* Top row: Status Tabs & Quick Action Buttons */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-slate-100 pb-2.5">
                 {/* Status Tabs */}
                 <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
                     {tabs.map((tab) => {
@@ -63,7 +65,7 @@ export default function UserFilterBar({
                                 key={tab.id}
                                 type="button"
                                 onClick={() => onStatusFilterChange(tab.id)}
-                                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition cursor-pointer flex items-center gap-2 ${
+                                className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition cursor-pointer flex items-center gap-1.5 ${
                                     isSelected
                                         ? 'bg-blue-600 text-white shadow-xs'
                                         : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
@@ -96,11 +98,11 @@ export default function UserFilterBar({
                         <span>Xuất CSV</span>
                     </button>
 
-                    {isAdmin && (
+                    {isAdmin && showCreateStaff && onOpenCreateModal && (
                         <button
                             type="button"
                             onClick={onOpenCreateModal}
-                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition cursor-pointer shadow-xs shadow-blue-600/20"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition cursor-pointer shadow-xs shadow-blue-600/20"
                         >
                             <Plus className="w-3.5 h-3.5" />
                             <span>Tạo tài khoản Staff</span>
@@ -110,7 +112,7 @@ export default function UserFilterBar({
             </div>
 
             {/* Bottom row: Search input, Role dropdown, Debt filter & Refresh */}
-            <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+            <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5">
                 {/* Search Input */}
                 <div className="relative flex-1">
                     <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -118,67 +120,52 @@ export default function UserFilterBar({
                         type="text"
                         value={searchQuery}
                         onChange={(e) => onSearchChange(e.target.value)}
-                        placeholder="Tìm kiếm khách hàng hoặc nhân sự theo Tên, Email, Số điện thoại..."
-                        className="w-full pl-10 pr-4 py-2 text-xs bg-slate-50/80 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition text-slate-800 placeholder-slate-400"
+                        placeholder="Tìm kiếm khách hàng theo Tên, Email, Số điện thoại..."
+                        className="w-full pl-9 pr-4 py-2 text-xs bg-slate-50/70 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:bg-white text-slate-800 placeholder-slate-400 transition"
                     />
-                    {searchQuery && (
-                        <button
-                            type="button"
-                            onClick={() => onSearchChange('')}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs px-1 cursor-pointer"
-                        >
-                            ✕
-                        </button>
-                    )}
                 </div>
 
-                {/* Filter Dropdowns & Refresh */}
-                <div className="flex flex-wrap items-center gap-2.5">
-                    {onDebtFilterChange && (
-                        <div className="flex items-center gap-1.5">
-                            <label htmlFor="debt-filter-select" className="text-xs font-semibold text-slate-500 whitespace-nowrap flex items-center gap-1">
-                                <AlertOctagon className="w-3.5 h-3.5 text-rose-500" />
-                                <span>Dư nợ:</span>
-                            </label>
-                            <select
-                                id="debt-filter-select"
-                                value={debtFilter}
-                                onChange={(e) => onDebtFilterChange(e.target.value)}
-                                className="px-3 py-2 text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 text-slate-700 cursor-pointer"
-                            >
-                                <option value="ALL">Tất cả dư nợ</option>
-                                <option value="HAS_DEBT">Có nợ xấu (&gt; 0 đ)</option>
-                                <option value="NO_DEBT">Không nợ (0 đ)</option>
-                            </select>
-                        </div>
-                    )}
-
-                    <div className="flex items-center gap-2">
-                        <label htmlFor="role-filter-select" className="text-xs font-semibold text-slate-500 whitespace-nowrap flex items-center gap-1">
-                            <Filter className="w-3.5 h-3.5 text-slate-400" />
-                            <span>Vai trò:</span>
-                        </label>
+                {/* Right Filter Dropdowns */}
+                <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                    {/* Overdue Debt Filter */}
+                    <div className="flex items-center gap-1 bg-slate-50 border border-slate-200/80 rounded-xl px-2 py-1">
+                        <AlertOctagon className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                        <span className="text-[11px] font-semibold text-slate-500 hidden sm:inline">Dư nợ:</span>
                         <select
-                            id="role-filter-select"
+                            value={debtFilter}
+                            onChange={(e) => onDebtFilterChange?.(e.target.value)}
+                            className="bg-transparent text-xs font-semibold text-slate-700 focus:outline-hidden cursor-pointer"
+                        >
+                            <option value="ALL">Tất cả dư nợ</option>
+                            <option value="HAS_DEBT">Có nợ cước (&gt; 0 đ)</option>
+                            <option value="NO_DEBT">Không nợ (0 đ)</option>
+                        </select>
+                    </div>
+
+                    {/* Role Filter */}
+                    <div className="flex items-center gap-1 bg-slate-50 border border-slate-200/80 rounded-xl px-2 py-1">
+                        <span className="text-[11px] font-semibold text-slate-500 hidden sm:inline">Vai trò:</span>
+                        <select
                             value={roleFilter}
                             onChange={(e) => onRoleFilterChange(e.target.value)}
-                            className="px-3 py-2 text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 text-slate-700 cursor-pointer"
+                            className="bg-transparent text-xs font-semibold text-slate-700 focus:outline-hidden cursor-pointer"
                         >
                             <option value="ALL">Tất cả vai trò</option>
                             <option value="TRAVELER">Khách hàng (Traveler)</option>
-                            <option value="STAFF">Vận hành (Staff)</option>
+                            <option value="STAFF">Nhân viên trạm (Staff)</option>
                             <option value="ADMIN">Quản trị viên (Admin)</option>
                         </select>
                     </div>
 
+                    {/* Refresh Button */}
                     <button
                         type="button"
                         onClick={onRefresh}
                         disabled={isRefreshing}
-                        className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl border border-slate-200/80 transition cursor-pointer disabled:opacity-50"
-                        title="Tải lại dữ liệu"
+                        className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 border border-slate-200/80 rounded-xl transition cursor-pointer disabled:opacity-50"
+                        title="Tải lại danh sách"
                     >
-                        <RotateCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-blue-600' : ''}`} />
+                        <RotateCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
                     </button>
                 </div>
             </div>
