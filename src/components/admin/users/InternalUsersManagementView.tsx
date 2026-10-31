@@ -55,7 +55,7 @@ export default function InternalUsersManagementView({
 
     // 3. Filter States
     const [searchQuery, setSearchQuery] = useState('');
-    const [statusFilter, setStatusFilter] = useState<string>('ALL'); // 'ALL' | 'ACTIVE' | 'SUSPENDED' | 'PENDING_VERIFICATION'
+    const [statusFilter, setStatusFilter] = useState<string>('ALL'); // 'ALL' | 'ACTIVE' | 'BOOKING_BLOCKED' | 'SUSPENDED' | 'PENDING_VERIFICATION'
     const [roleFilter, setRoleFilter] = useState<string>('ALL'); // 'ALL' | 'STAFF' | 'ADMIN' | 'TRAVELER'
 
     // 4. Feedback / Toast
@@ -123,10 +123,22 @@ export default function InternalUsersManagementView({
                 (u.email && u.email.toLowerCase().includes(query)) ||
                 (u.phone && u.phone.toLowerCase().includes(query));
 
-            // Status filter
-            const matchStatus =
-                statusFilter === 'ALL' ||
-                (u.status || '').toUpperCase() === statusFilter.toUpperCase();
+            // Status filter (ALL, ACTIVE, BOOKING_BLOCKED, SUSPENDED, PENDING_VERIFICATION)
+            const isBlockedBooking =
+                (u.status || '').toUpperCase() === 'ACTIVE' &&
+                (u.role || '').toUpperCase() === 'TRAVELER' &&
+                (Number(u.overdueDebt || 0) > 0 || Boolean(u.isBookingBlocked));
+
+            let matchStatus = true;
+            if (statusFilter === 'ALL') {
+                matchStatus = true;
+            } else if (statusFilter === 'BOOKING_BLOCKED') {
+                matchStatus = isBlockedBooking;
+            } else if (statusFilter === 'ACTIVE') {
+                matchStatus = (u.status || '').toUpperCase() === 'ACTIVE' && !isBlockedBooking;
+            } else {
+                matchStatus = (u.status || '').toUpperCase() === statusFilter.toUpperCase();
+            }
 
             // Role filter
             const matchRole =
@@ -139,14 +151,21 @@ export default function InternalUsersManagementView({
 
     // Counters for Quick Tab Badges
     const counters = useMemo(() => {
+        const isBookingBlockedFn = (u: UserAdminListItemDto) =>
+            (u.status || '').toUpperCase() === 'ACTIVE' &&
+            (u.role || '').toUpperCase() === 'TRAVELER' &&
+            (Number(u.overdueDebt || 0) > 0 || Boolean(u.isBookingBlocked));
+
         const total = users.length;
-        const active = users.filter((u) => (u.status || '').toUpperCase() === 'ACTIVE').length;
+        const bookingBlocked = users.filter(isBookingBlockedFn).length;
+        const activeNormal = users.filter((u) => (u.status || '').toUpperCase() === 'ACTIVE' && !isBookingBlockedFn(u)).length;
         const suspended = users.filter((u) => (u.status || '').toUpperCase() === 'SUSPENDED').length;
         const pending = users.filter((u) => (u.status || '').toUpperCase() === 'PENDING_VERIFICATION').length;
 
         return {
             total,
-            active,
+            active: activeNormal,
+            bookingBlocked,
             suspended,
             pending,
         };
@@ -177,7 +196,6 @@ export default function InternalUsersManagementView({
         setConfirmModalOpen(true);
     };
 
-
     const handleExecuteConfirmAction = async (reason?: string) => {
         if (!confirmTargetUser) return;
         setIsProcessingAction(true);
@@ -186,12 +204,12 @@ export default function InternalUsersManagementView({
             if (confirmActionType === 'LOCK') {
                 const res = await adminUserService.updateUserStatus(confirmTargetUser.id, {
                     status: 'SUSPENDED',
-                    reason: reason || 'Quản trị viên tạm khóa tài khoản',
+                    reason: reason || 'Quản trị viên tạm khóa đăng nhập hệ thống',
                 });
                 if (res.success) {
                     setNotification({
                         type: 'success',
-                        message: `Đã tạm khóa tài khoản của ${confirmTargetUser.fullName || confirmTargetUser.email} thành công.`,
+                        message: `Đã tạm khóa đăng nhập tài khoản của ${confirmTargetUser.fullName || confirmTargetUser.email} thành công.`,
                     });
                     await loadUsers(true);
                 } else {
@@ -203,12 +221,12 @@ export default function InternalUsersManagementView({
             } else if (confirmActionType === 'ACTIVATE') {
                 const res = await adminUserService.updateUserStatus(confirmTargetUser.id, {
                     status: 'ACTIVE',
-                    reason: 'Quản trị viên kích hoạt tài khoản',
+                    reason: 'Quản trị viên kích hoạt tài khoản đăng nhập',
                 });
                 if (res.success) {
                     setNotification({
                         type: 'success',
-                        message: `Đã kích hoạt tài khoản của ${confirmTargetUser.fullName || confirmTargetUser.email} thành công.`,
+                        message: `Đã mở khóa đăng nhập tài khoản của ${confirmTargetUser.fullName || confirmTargetUser.email} thành công.`,
                     });
                     await loadUsers(true);
                 } else {
@@ -283,18 +301,32 @@ export default function InternalUsersManagementView({
             return;
         }
 
-        const headers = ['ID', 'Họ và tên', 'Email', 'Số điện thoại', 'Vai trò', 'Dư nợ quá hạn (VNĐ)', 'Trạng thái', 'Ngày tạo'];
+        const headers = ['ID', 'Họ và tên', 'Email', 'Số điện thoại', 'Vai trò', 'Trạng thái tài khoản', 'Dư nợ quá hạn (VNĐ)', 'Ngày tạo'];
         const csvRows = [headers.join(',')];
 
         filteredUsers.forEach((u) => {
+            const isBlockedBooking =
+                (u.status || '').toUpperCase() === 'ACTIVE' &&
+                (u.role || '').toUpperCase() === 'TRAVELER' &&
+                (Number(u.overdueDebt || 0) > 0 || Boolean(u.isBookingBlocked));
+
+            const displayStatus =
+                (u.status || '').toUpperCase() === 'SUSPENDED'
+                    ? 'Tạm khóa đăng nhập'
+                    : isBlockedBooking
+                    ? 'Tạm khóa đặt tủ'
+                    : (u.status || '').toUpperCase() === 'PENDING_VERIFICATION'
+                    ? 'Chờ xác nhận'
+                    : 'Hoạt động bình thường';
+
             const row = [
                 `"${u.id}"`,
                 `"${(u.fullName || '').replace(/"/g, '""')}"`,
                 `"${(u.email || '').replace(/"/g, '""')}"`,
                 `"${(u.phone || '').replace(/"/g, '""')}"`,
                 `"${u.role || ''}"`,
+                `"${displayStatus}"`,
                 `"${u.overdueDebt || 0}"`,
-                `"${u.status || ''}"`,
                 `"${u.createdAt || ''}"`,
             ];
             csvRows.push(row.join(','));
@@ -304,14 +336,14 @@ export default function InternalUsersManagementView({
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', `SmartLocker_KhachHang_${new Date().toISOString().slice(0, 10)}.csv`);
+        link.setAttribute('download', `SmartLocker_TaiKhoan_${new Date().toISOString().slice(0, 10)}.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
 
         setNotification({
             type: 'success',
-            message: `Đã xuất danh sách ${filteredUsers.length} khách hàng ra file CSV!`,
+            message: `Đã xuất danh sách ${filteredUsers.length} tài khoản ra file CSV!`,
         });
     };
 
@@ -340,7 +372,7 @@ export default function InternalUsersManagementView({
                             </span>
                         </div>
                         <p className="text-xs text-slate-500 mt-0.5">
-                            Quản lý toàn bộ tài khoản trong hệ thống, phân quyền vai trò (Admin, Staff, Traveler) và kiểm soát quyền truy cập đăng nhập (Tạm khóa / Kích hoạt tài khoản).
+                            Quản lý toàn bộ tài khoản trong hệ thống, phân quyền vai trò và phân định rõ ràng giữa tạm khóa đăng nhập hệ thống vs tạm khóa quyền đặt tủ mới.
                         </p>
                     </div>
 
@@ -401,6 +433,7 @@ export default function InternalUsersManagementView({
                 onRoleFilterChange={setRoleFilter}
                 totalCount={counters.total}
                 activeCount={counters.active}
+                bookingBlockedCount={counters.bookingBlocked}
                 suspendedCount={counters.suspended}
                 pendingCount={counters.pending}
                 onRefresh={() => loadUsers(true)}
@@ -434,9 +467,9 @@ export default function InternalUsersManagementView({
                     />
                 </div>
 
-                {/* Right side: Detail & Control Panel */}
+                {/* Detail Control Panel column */}
                 {selectedUser && (
-                    <div className="lg:col-span-5 xl:col-span-4 sticky top-6 animate-in fade-in slide-in-from-right-4 duration-200">
+                    <div className="lg:col-span-5 xl:col-span-4 sticky top-6">
                         <UserDetailControlPanel
                             user={selectedUser}
                             onClose={() => setSelectedUser(null)}
@@ -450,7 +483,7 @@ export default function InternalUsersManagementView({
                 )}
             </div>
 
-            {/* Action Confirmation Modal */}
+            {/* Section 4: Action Confirmation Modal */}
             {confirmTargetUser && (
                 <UserActionConfirmModal
                     isOpen={confirmModalOpen}

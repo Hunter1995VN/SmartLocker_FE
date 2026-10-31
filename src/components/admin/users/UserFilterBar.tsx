@@ -1,18 +1,20 @@
 /**
  * AD-FE-05: Quản lý tài khoản hệ thống
- * Thanh bộ lọc trạng thái dạng tabs, tìm kiếm họ tên/email/phone, lọc vai trò và làm mới.
+ * Thanh bộ lọc trạng thái dạng tabs (Tất cả, Hoạt động bình thường, Tạm khóa đặt tủ, Tạm khóa đăng nhập, Chờ xác nhận),
+ * tìm kiếm họ tên/email/phone, lọc vai trò và làm mới.
  */
 import { Search, RotateCw, Plus, Download } from 'lucide-react';
 
 interface UserFilterBarProps {
     searchQuery: string;
     onSearchChange: (query: string) => void;
-    statusFilter: string; // 'ALL' | 'ACTIVE' | 'SUSPENDED' | 'PENDING_VERIFICATION'
+    statusFilter: string; // 'ALL' | 'ACTIVE' | 'BOOKING_BLOCKED' | 'SUSPENDED' | 'PENDING_VERIFICATION'
     onStatusFilterChange: (status: string) => void;
     roleFilter: string; // 'ALL' | 'ADMIN' | 'STAFF' | 'TRAVELER'
     onRoleFilterChange: (role: string) => void;
     totalCount: number;
     activeCount: number;
+    bookingBlockedCount: number;
     suspendedCount: number;
     pendingCount: number;
     onRefresh: () => void;
@@ -32,6 +34,7 @@ export default function UserFilterBar({
     onRoleFilterChange,
     totalCount,
     activeCount,
+    bookingBlockedCount,
     suspendedCount,
     pendingCount,
     onRefresh,
@@ -43,8 +46,9 @@ export default function UserFilterBar({
 }: UserFilterBarProps) {
     const tabs: Array<{ id: string; label: string; count: number }> = [
         { id: 'ALL', label: 'Tất cả trạng thái', count: totalCount },
-        { id: 'ACTIVE', label: 'Đang hoạt động', count: activeCount },
-        { id: 'SUSPENDED', label: 'Đã khóa', count: suspendedCount },
+        { id: 'ACTIVE', label: 'Hoạt động bình thường', count: activeCount },
+        { id: 'BOOKING_BLOCKED', label: 'Tạm khóa đặt tủ', count: bookingBlockedCount },
+        { id: 'SUSPENDED', label: 'Tạm khóa đăng nhập', count: suspendedCount },
         { id: 'PENDING_VERIFICATION', label: 'Chờ xác nhận', count: pendingCount },
     ];
 
@@ -63,7 +67,11 @@ export default function UserFilterBar({
                                 onClick={() => onStatusFilterChange(tab.id)}
                                 className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition cursor-pointer flex items-center gap-1.5 ${
                                     isSelected
-                                        ? 'bg-blue-600 text-white shadow-xs'
+                                        ? tab.id === 'BOOKING_BLOCKED'
+                                            ? 'bg-amber-600 text-white shadow-xs'
+                                            : tab.id === 'SUSPENDED'
+                                            ? 'bg-rose-600 text-white shadow-xs'
+                                            : 'bg-blue-600 text-white shadow-xs'
                                         : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                                 }`}
                             >
@@ -72,6 +80,10 @@ export default function UserFilterBar({
                                     className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
                                         isSelected
                                             ? 'bg-white/20 text-white'
+                                            : tab.id === 'BOOKING_BLOCKED' && tab.count > 0
+                                            ? 'bg-amber-100 text-amber-700'
+                                            : tab.id === 'SUSPENDED' && tab.count > 0
+                                            ? 'bg-rose-100 text-rose-700'
                                             : 'bg-slate-100 text-slate-500'
                                     }`}
                                 >
