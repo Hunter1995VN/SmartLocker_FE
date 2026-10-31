@@ -4,19 +4,21 @@ import { kioskApi } from '../../api/kioskService';
 import type { KioskStationStatus } from '../../api/kioskService';
 import { kioskSignalR } from '../../services/kioskSignalR';
 import { sounds } from '../../utils/soundEffects';
-import { kioskText } from '../../utils/kioskMessages';
-import { 
-  SmartLockerLogo3D, 
-  CheckInIcon3D, 
-  CheckOutIcon3D, 
+import { QRCodeSVG } from 'qrcode.react';
+import type { CreateBookingResponse } from '../../api/bookingService';
+import { kioskText, kioskLocales } from '../../utils/kioskMessages';
+import {
+  SmartLockerLogo3D,
+  CheckInIcon3D,
+  CheckOutIcon3D,
   QrScannerReticle,
   SunlightDayIcon,
   NightMoonIcon
 } from '../../components/kiosk/KioskIcons';
-import { 
-  SUPPORTED_LANGUAGES, 
-  I18N_DICTIONARY, 
-  type KioskLanguage 
+import {
+  SUPPORTED_LANGUAGES,
+  I18N_DICTIONARY,
+  type KioskLanguage
 } from '../../utils/kioskI18n';
 
 type KioskStep = 'WELCOME' | 'IDLE' | 'AUTH' | 'LOCKER_ACTIVE' | 'OVERDUE' | 'SUCCESS';
@@ -58,6 +60,7 @@ export default function KioskPage() {
   const [activeLockerSize, setActiveLockerSize] = useState<string>('');
   const [activeDoorState, setActiveDoorState] = useState<string>('UNKNOWN');
   const [overdueFee, setOverdueFee] = useState<number>(0);
+  const [overduePayment, setOverduePayment] = useState<CreateBookingResponse>();
 
   const sessionTokenRef = useRef<string | undefined>(undefined);
   const credentialRef = useRef<{ credentialType: 'QR' | 'ACCESS_CODE'; payload: string }>({ credentialType: 'QR', payload: '' });
@@ -268,6 +271,7 @@ export default function KioskPage() {
   // Return to Welcome (Language Select) after completing transaction
   const handleReturnToWelcome = () => {
     accessGrantedRef.current = false;
+    setOverduePayment(undefined);
     sessionTokenRef.current = undefined;
     credentialRef.current = { credentialType: 'QR', payload: '' };
     operationStartedRef.current = 0;
@@ -292,6 +296,7 @@ export default function KioskPage() {
     accessGrantedRef.current = false;
     if (credentialRef.current.credentialType !== type || credentialRef.current.payload !== rawValue) {
       sessionTokenRef.current = undefined;
+      setOverduePayment(undefined);
     }
     observedOpenRef.current = false;
     operationStartedRef.current = Date.now();
@@ -342,6 +347,7 @@ export default function KioskPage() {
 
         if (res.success && res.data) {
           if (res.data.isOverdue) {
+            setOverduePayment(undefined);
             sessionTokenRef.current = res.data.sessionToken;
             setActiveBookingId(res.data.bookingId);
             setOverdueFee(res.data.overdueFee || 0);
@@ -397,28 +403,45 @@ export default function KioskPage() {
     return () => { disposed = true; window.clearInterval(timer); };
   }, [step, activeBookingId, stationId, opMode]);
 
+  useEffect(() => {
+    if (step !== 'OVERDUE' || !overduePayment?.orderCode) return;
+    let disposed = false;
+    let pending = false;
+    const poll = async () => {
+      if (pending) return; pending = true;
+      try {
+        const result = await kioskApi.syncPayment(overduePayment.orderCode!);
+        if (!disposed && result.success && result.data.status === 'PAID' && result.data.isSuccess)
+          await handleProcessCredential(credentialRef.current.credentialType, credentialRef.current.payload);
+      } catch { /* A redirect or a failed sync is not proof of payment. */ }
+      finally { pending = false; }
+    };
+    void poll(); const timer = window.setInterval(poll, 5000);
+    return () => { disposed = true; window.clearInterval(timer); };
+  }, [step, overduePayment]);
+
   const handleManualConfirm = async () => { setShowSensorModal(false); setShowHelpModal(true); };
 
   return (
     <div className={`h-screen max-h-screen font-sans flex flex-col justify-between selection:bg-slate-300 select-none overflow-hidden transition-colors duration-200 ${
-      outdoorMode 
-        ? 'bg-[#f4f6f9] text-slate-900' 
+      outdoorMode
+        ? 'bg-[#f4f6f9] text-slate-900'
         : 'bg-[#0e131d] text-slate-100'
     }`}>
-      
+
       {/* =========================================================================
           1. CLEAN INDUSTRIAL TRANSIT HEADER
          ========================================================================= */}
       <header className={`h-14 px-5 border-b flex items-center justify-between shadow-sm z-20 transition-colors ${
-        outdoorMode 
-          ? 'bg-white border-slate-200 text-slate-900' 
+        outdoorMode
+          ? 'bg-white border-slate-200 text-slate-900'
           : 'bg-[#141b27] border-slate-800 text-slate-100'
       }`}>
-        
+
         {/* Left: Station Identity */}
         <div className="flex items-center gap-3">
           <SmartLockerLogo3D className="w-8 h-8" />
-          
+
           <div>
             <div className="flex items-center gap-2">
               <select
@@ -441,9 +464,9 @@ export default function KioskPage() {
               </select>
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Trạng thái kết nối sẵn sàng"></span>
             </div>
-            
+
             <div className="text-xs text-slate-500 dark:text-slate-400">
-              {stationStatus?.stationAddress || allStations.find(s => s.id === stationId)?.address || 'Khu vực tự phục vụ 24/7'}
+              {stationStatus?.stationAddress || allStations.find(s => s.id === stationId)?.address || 'Chưa tải được thông tin trạm'}
             </div>
           </div>
         </div>
@@ -457,7 +480,7 @@ export default function KioskPage() {
 
         {/* Right: Controls & Language Pill */}
         <div className="flex items-center gap-2">
-          
+
           {/* Language Switch Button (Returns to Welcome / Change Language) */}
           <button
             onClick={() => setStep('WELCOME')}
@@ -527,7 +550,7 @@ export default function KioskPage() {
           2. MAIN VIEWPORT WORKSPACE (STRICTLY FITS 100VH WITHOUT SCROLLBAR)
          ========================================================================= */}
       <main className="flex-1 min-h-0 flex flex-col items-center justify-center p-3 md:p-5 max-w-6xl mx-auto w-full z-10 overflow-hidden">
-        
+
         {/* Error Alert Banner */}
         {errorMessage && (
           <div className="w-full max-w-xl mb-3 p-3 rounded-xl bg-rose-700 border border-rose-600 text-white flex items-center justify-between text-xs font-bold shadow-md">
@@ -541,11 +564,11 @@ export default function KioskPage() {
            ========================================================================= */}
         {step === 'WELCOME' && (
           <div className="w-full max-w-3xl my-auto text-center space-y-6 animate-fade-in">
-            
+
             {/* Header Greeting */}
             <div className="space-y-2">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 bg-white/60 dark:bg-slate-900/60 shadow-sm">
-                <span>{stationStatus?.stationName || 'SMARTLOCKER AIRPORT HUB'}</span>
+                <span>{stationStatus?.stationName || 'Chưa tải được thông tin trạm'}</span>
                 <span>•</span>
                 <span className="text-emerald-600 dark:text-emerald-400 font-bold">24/7 TỰ PHỤC VỤ</span>
               </div>
@@ -594,31 +617,9 @@ export default function KioskPage() {
 
             {/* Quick Demonstration Toolbar */}
             <div className="flex items-center justify-center gap-2 pt-2 text-xs font-mono text-slate-500 dark:text-slate-400">
-              <span>⚡ Mã test nhanh:</span>
-              <button
-                onClick={() => {
-                  setLang('VI');
-                  setOpMode('CHECK_IN');
-                  setStep('AUTH');
-                  setAuthMethod('ACCESS_CODE');
-                  setAccessCode('888888');
-                }}
-                className="px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-700 hover:border-sky-500 text-xs font-bold"
-              >
-                1. Gửi (888888)
-              </button>
-              <button
-                onClick={() => {
-                  setLang('VI');
-                  setOpMode('CHECK_OUT');
-                  setStep('AUTH');
-                  setAuthMethod('ACCESS_CODE');
-                  setAccessCode('999999');
-                }}
-                className="px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-700 hover:border-emerald-500 text-xs font-bold"
-              >
-                2. Lấy (999999)
-              </button>
+
+
+
             </div>
 
           </div>
@@ -629,30 +630,30 @@ export default function KioskPage() {
            ========================================================================= */}
         {step === 'IDLE' && (
           <div className="w-full h-full max-h-[580px] grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch my-auto">
-            
+
             {/* Left 7 Columns: Tactile Action Cards (NO AI clutter, confident typography) */}
             <div className="lg:col-span-7 flex flex-col justify-between space-y-4">
-              
+
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    {stationStatus?.stationName || 'Trạm Sân Bay Tân Sơn Nhất'} • 24/7
+                    {stationStatus?.stationName || 'Chưa tải được thông tin trạm'} • 24/7
                   </span>
                 </div>
                 <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 dark:text-white uppercase leading-tight">
                   {lang === 'VI' ? 'CHỌN THAO TÁC ĐỂ BẮT ĐẦU' : 'SELECT ACTION TO BEGIN'}
                 </h2>
                 <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 mt-1">
-                  {lang === 'VI' 
-                    ? 'Chạm vào Gửi Đồ hoặc Lấy Đồ bên dưới để thực hiện giao dịch' 
+                  {lang === 'VI'
+                    ? 'Chạm vào Gửi Đồ hoặc Lấy Đồ bên dưới để thực hiện giao dịch'
                     : 'Tap Deposit or Retrieve below to start your transaction'}
                 </p>
               </div>
 
               {/* The Two Dominant Tactile Action Cards (Entire cards are touch buttons) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
-                
+
                 {/* 1. GỬI HÀNH LÝ / DEPOSIT - Full card is touch button */}
                 <button
                   onClick={() => {
@@ -736,44 +737,14 @@ export default function KioskPage() {
                 outdoorMode ? 'bg-white border-slate-200 text-slate-600' : 'bg-slate-900/60 border-slate-800 text-slate-400'
               }`}>
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-slate-900 dark:text-white">Mã test nhanh:</span>
-                  <button
-                    onClick={() => {
-                      setOpMode('CHECK_IN');
-                      setStep('AUTH');
-                      setAuthMethod('ACCESS_CODE');
-                      setAccessCode('888888');
-                    }}
-                    className="px-2 py-0.5 rounded border border-slate-300 dark:border-slate-700 text-xs font-bold hover:text-sky-600"
-                  >
-                    1. Gửi (888888)
-                  </button>
-                  <button
-                    onClick={() => {
-                      setOpMode('CHECK_OUT');
-                      setStep('AUTH');
-                      setAuthMethod('ACCESS_CODE');
-                      setAccessCode('999999');
-                    }}
-                    className="px-2 py-0.5 rounded border border-slate-300 dark:border-slate-700 text-xs font-bold hover:text-emerald-600"
-                  >
-                    2. Lấy (999999)
-                  </button>
-                  <button
-                    onClick={() => {
-                      setOpMode('CHECK_OUT');
-                      setStep('AUTH');
-                      setAuthMethod('ACCESS_CODE');
-                      setAccessCode('777777');
-                    }}
-                    className="px-2 py-0.5 rounded border border-slate-300 dark:border-slate-700 text-xs font-bold hover:text-amber-500"
-                  >
-                    3. Quá hạn (777777)
-                  </button>
+
+
+
+
                 </div>
 
                 <div className="text-slate-500 text-xs font-mono">
-                  S-01 • M-02 • L-03
+
                 </div>
               </div>
 
@@ -804,7 +775,7 @@ export default function KioskPage() {
               ? 'bg-white border-slate-200 text-slate-900'
               : 'bg-[#131b28] border-slate-800 text-slate-100'
           }`}>
-            
+
             {/* Header */}
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
               <button
@@ -817,11 +788,11 @@ export default function KioskPage() {
               >
                 ← {t.cancel}
               </button>
-              
+
               <span className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
                 {opMode === 'CHECK_IN' ? t.depositTitle : t.retrieveTitle}
               </span>
-              
+
               <div className="w-12"></div>
             </div>
 
@@ -835,7 +806,7 @@ export default function KioskPage() {
                   setAuthMethod('QR');
                 }}
                 className={`py-2 rounded-lg font-bold text-xs uppercase tracking-wider transition-all ${
-                  authMethod === 'QR' 
+                  authMethod === 'QR'
                     ? (outdoorMode ? 'bg-sky-600 text-white shadow-sm' : 'bg-sky-500 text-slate-950 font-black')
                     : 'text-slate-600 dark:text-slate-400'
                 }`}
@@ -848,7 +819,7 @@ export default function KioskPage() {
                   setAuthMethod('ACCESS_CODE');
                 }}
                 className={`py-2 rounded-lg font-bold text-xs uppercase tracking-wider transition-all ${
-                  authMethod === 'ACCESS_CODE' 
+                  authMethod === 'ACCESS_CODE'
                     ? (outdoorMode ? 'bg-sky-600 text-white shadow-sm' : 'bg-sky-500 text-slate-950 font-black')
                     : 'text-slate-600 dark:text-slate-400'
                 }`}
@@ -864,7 +835,7 @@ export default function KioskPage() {
                   outdoorMode ? 'bg-slate-900 border-slate-300' : 'bg-black border-slate-800'
                 }`}>
                   <div id="kiosk-qr-reader" className="w-full h-full"></div>
-                  
+
                   <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                     <QrScannerReticle className="w-48 h-48" />
                   </div>
@@ -905,7 +876,7 @@ export default function KioskPage() {
                       <div
                         key={idx}
                         className={`w-7 h-9 rounded-lg flex items-center justify-center font-bold text-base transition-all ${
-                          char 
+                          char
                             ? (outdoorMode ? 'border-2 border-sky-600 text-sky-800 bg-white shadow-sm' : 'border-2 border-sky-400 text-sky-300 bg-slate-800')
                             : (outdoorMode ? 'border border-slate-300 text-slate-400 bg-white' : 'border border-slate-800 text-slate-700 bg-slate-900')
                         }`}
@@ -936,7 +907,7 @@ export default function KioskPage() {
                 </div>
 
                 <button
-                  disabled={accessCode.length < 4 || loading}
+                  disabled={accessCode.length !== 8 || loading}
                   onClick={() => handleProcessCredential('ACCESS_CODE', accessCode)}
                   className={`w-full py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all ${
                     accessCode.length >= 4 && !loading
@@ -951,28 +922,10 @@ export default function KioskPage() {
 
             {/* Quick Test Presets inside Auth */}
             <div className="pt-3 mt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[11px]">
-              <span className="text-slate-500">Mã kiểm tra:</span>
+
               <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAccessCode('888888');
-                    handleProcessCredential('ACCESS_CODE', '888888');
-                  }}
-                  className="px-2 py-1 rounded bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-300/40 font-mono font-bold"
-                >
-                  Check-In 888888
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAccessCode('999999');
-                    handleProcessCredential('ACCESS_CODE', '999999');
-                  }}
-                  className="px-2 py-1 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-300/40 font-mono font-bold"
-                >
-                  Check-Out 999999
-                </button>
+
+
               </div>
             </div>
 
@@ -988,7 +941,7 @@ export default function KioskPage() {
               ? 'bg-white border-sky-600 text-slate-900'
               : 'bg-[#131b28] border-sky-500/50 text-slate-100'
           }`}>
-            
+
             {/* Left 6 Columns: 3D Model with Door Physically Open */}
             <div className={`md:col-span-6 rounded-2xl border p-2 relative min-h-[280px] max-h-[340px] flex items-center justify-center ${
               outdoorMode ? 'bg-slate-50 border-slate-200' : 'bg-slate-900 border-slate-800'
@@ -1001,7 +954,7 @@ export default function KioskPage() {
 
             {/* Right 6 Columns: Status Details */}
             <div className="md:col-span-6 space-y-4">
-              
+
               <div className="flex justify-between items-center text-xs font-mono border-b pb-2 border-slate-200 dark:border-slate-800">
                 <span>ĐƠN: {activeBookingCode}</span>
                 <span className="font-bold">CỠ: {activeLockerSize || 'S'}</span>
@@ -1069,16 +1022,29 @@ export default function KioskPage() {
             <div className={`p-4 rounded-xl border ${
               outdoorMode ? 'bg-amber-50 border-amber-200' : 'bg-slate-900 border-slate-800'
             }`}>
-              <span className="text-xs text-slate-500 block mb-1">PHỤ PHÍ PHÁT SINH</span>
+              <span className="text-xs text-slate-500 block mb-1">{x('fee')}</span>
               <span className="text-3xl font-black text-amber-600 dark:text-amber-400 font-mono">
-                {overdueFee.toLocaleString('vi-VN')} đ
+                {overdueFee.toLocaleString(kioskLocales[lang])} đ
               </span>
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400">
               {t.overdueSubtitle}
             </p>
+            {overduePayment ? <div className="space-y-3 flex flex-col items-center">
+              <QRCodeSVG value={overduePayment.qrCode || overduePayment.paymentUrl} size={210} />
+              <p className="text-xs">{overduePayment.qrCode ? x('scanPay') : x('paymentPageQr')}</p>
+            </div> : <button disabled={loading} className="rounded-xl bg-blue-700 text-white px-6 py-3" onClick={async () => {
+              if (loading || !activeBookingId) return; setLoading(true); setErrorMessage('');
+              try {
+                const result = await kioskApi.payOverdue({ stationId, bookingId: activeBookingId, ...credentialRef.current, sessionToken: sessionTokenRef.current });
+                if (result.success && result.data.paymentUrl) { setOverduePayment(result.data); setOverdueFee(result.data.amount); }
+                else setErrorMessage(lang === 'VI' ? (result.message || x('submitError')) : x('submitError'));
+              } catch (error) {
+                setErrorMessage(lang === 'VI' ? ((error as { response?: { data?: { message?: string } } }).response?.data?.message || x('submitError')) : x('submitError'));
+              } finally { setLoading(false); }
+            }}>{loading ? x('sending') : x('payFee')}</button>}
             <button
-              onClick={() => setStep('IDLE')}
+              onClick={handleReturnToWelcome}
               className="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white uppercase"
             >
               {t.close}
@@ -1175,7 +1141,7 @@ export default function KioskPage() {
             </span>
             <div className="p-3 bg-slate-900 rounded-xl text-left text-xs space-y-1.5 text-slate-300">
               <div>Hotline khẩn cấp: <strong className="text-sky-400 font-mono">1900 6868</strong></div>
-              <div>Trạm: <strong className="text-white">{stationStatus?.stationName || 'Tân Sơn Nhất Airport'}</strong></div>
+              <div>Trạm: <strong className="text-white">{stationStatus?.stationName || 'Chưa tải được thông tin trạm'}</strong></div>
               <div className="text-[11px] text-slate-400">Nhân viên trạm luôn trực hỗ trợ khách hàng 24/24.</div>
             </div>
             <button
@@ -1196,7 +1162,7 @@ export default function KioskPage() {
           ? 'bg-white border-slate-200 text-slate-500'
           : 'bg-[#101622] border-slate-800/80 text-slate-500'
       }`}>
-        <span>SmartLocker Transit OS v3.3 • Sân Bay Tân Sơn Nhất</span>
+        <span>SmartLocker</span>
         <span>Hỗ trợ: 1900 6868</span>
       </footer>
 
