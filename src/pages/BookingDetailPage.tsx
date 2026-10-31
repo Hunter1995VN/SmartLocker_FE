@@ -15,7 +15,6 @@ import {
   Info,
   Navigation,
   Headphones,
-  FileText,
   PlusCircle,
   QrCode,
   AlertTriangle,
@@ -163,7 +162,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
       if (!disposed && res.success && res.data?.bookingId === bookingId) setOfflineTicket(res.data);
     }).catch(() => { /* The explicit offline view can retry without replacing the online QR. */ });
     return () => { disposed = true; };
-  }, [bookingId, ticketEligible]);
+  }, [bookingId, ticketEligible, booking?.id]);
 
   const handleOpenOfflineTicket = async () => {
     if (!ticketEligible) return;
@@ -631,7 +630,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                   className={`h-11 px-3 bg-white border border-primary/40 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors shadow-xs ${booking?.canExtend === false ? 'opacity-50 cursor-not-allowed text-gray-500 border-gray-300' : 'hover:bg-[#eff4ff] text-primary cursor-pointer'}`}
                 >
                   <PlusCircle className="w-4 h-4" />
-                  <span>Extend (+1h · 15k)</span>
+                  <span>Gia hạn thời gian</span>
                 </button>
                 <button
                   onClick={() => onNavigate('map')}
@@ -695,31 +694,23 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
               <h3 className="text-base font-bold text-[#0b1c30]">Storage &amp; Security Audit</h3>
               <div className="divide-y divide-outline-variant/20 text-xs">
                 <div className="py-2.5 flex justify-between">
-                  <span className="text-[#434655]">Check-in Timestamp</span>
-                  <span className="font-mono text-[#0b1c30] font-medium">{booking?.startAt ? new Date(parseServerTime(booking.startAt)).toLocaleString('en-US') : 'N/A'}</span>
+                  <span className="text-[#434655]">Thời điểm gửi đồ</span>
+                  <span className="font-mono text-[#0b1c30] font-medium">{booking?.checkedInAt ? new Date(parseServerTime(booking.checkedInAt)).toLocaleString('vi-VN') : 'Chưa gửi đồ'}</span>
                 </div>
                 <div className="py-2.5 flex justify-between">
-                  <span className="text-[#434655]">Baggage Declaration</span>
-                  <span className="text-[#0b1c30] font-medium">Standard Storage</span>
+                  <span className="text-[#434655]">Kích cỡ tủ</span>
+                  <span className="text-[#0b1c30] font-medium">{size}</span>
                 </div>
                 <div className="py-2.5 flex justify-between">
-                  <span className="text-[#434655]">Security Seal ID</span>
+                  <span className="text-[#434655]">Mã đơn đặt tủ</span>
                   <span className="font-mono font-semibold text-primary">{orderId}</span>
                 </div>
                 <div className="py-2.5 flex justify-between">
                   <span className="text-[#434655]">Total Rate Billed</span>
-                  <span className="text-[#0b1c30] font-bold">{formatCurrency(amount)} VND (Prepaid)</span>
+                  <span className="text-[#0b1c30] font-bold">{formatCurrency(amount)} VND ({booking.payments?.some(p => p.kind === 'BASE' && p.status === 'PAID') ? 'Đã thanh toán' : 'Chưa thanh toán'})</span>
                 </div>
               </div>
-              <div className="pt-2">
-                <button
-                  onClick={() => alert('Downloading electronic VAT invoice...')}
-                  className="text-xs text-primary font-semibold hover:underline flex items-center gap-1 cursor-pointer"
-                >
-                  <FileText className="w-3.5 h-3.5" />
-                  Download VAT Receipt (E-Invoice)
-                </button>
-              </div>
+
             </div>
           </div>
         </div>
@@ -760,7 +751,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
             setTimeout(() => {
               setExtendSuccessToast(null);
             }, 4000);
-          } catch (error) {
+          } catch {
             setExtendSuccessToast('Có lỗi xảy ra khi gia hạn đơn hàng.');
           }
         }}
@@ -789,7 +780,6 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
           </div>
           <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-[#434655]">
             <a className="hover:text-primary transition-colors" href="#">Security Architecture</a>
-            <a className="hover:text-primary transition-colors" href="#">Compliance &amp; SOC2</a>
             <a className="hover:text-primary transition-colors" href="#">Terms of Service</a>
             <a className="hover:text-primary transition-colors" href="#">Support Telemetry</a>
           </div>

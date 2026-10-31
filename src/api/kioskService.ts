@@ -1,4 +1,5 @@
 import apiClient from './client';
+import type { CreateBookingResponse } from './bookingService';
 
 export interface KioskCheckInRequest {
   stationId: string;
@@ -64,6 +65,10 @@ export interface KioskStationStatus {
 }
 
 export const kioskApi = {
+  payOverdue: async (data: KioskCheckOutRequest & { bookingId: string }) =>
+    (await apiClient.post<{ success: boolean; data: CreateBookingResponse; message?: string }>('/api/kiosk/pay-overdue', data)).data,
+  syncPayment: async (orderCode: number) =>
+    (await apiClient.post<{ success: boolean; data: { status: string; isSuccess: boolean } }>(`/api/Payments/sync/${orderCode}`)).data,
   operationStatus: async (data: {stationId: string; bookingId: string; sessionToken: string}) => {
     return (await apiClient.post<{success: boolean; data: {operation: string; complete: boolean; doorState: string; manualReviewPending: boolean}}>('/api/kiosk/operation-status', data)).data;
   },
