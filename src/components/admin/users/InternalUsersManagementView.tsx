@@ -57,7 +57,6 @@ export default function InternalUsersManagementView({
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState<string>('ALL'); // 'ALL' | 'ACTIVE' | 'SUSPENDED' | 'PENDING_VERIFICATION'
     const [roleFilter, setRoleFilter] = useState<string>('ALL'); // 'ALL' | 'STAFF' | 'ADMIN' | 'TRAVELER'
-    const [debtFilter, setDebtFilter] = useState<string>('ALL'); // 'ALL' | 'HAS_DEBT' | 'NO_DEBT'
 
     // 4. Feedback / Toast
     const [notification, setNotification] = useState<NotificationState | null>(null);
@@ -134,16 +133,9 @@ export default function InternalUsersManagementView({
                 roleFilter === 'ALL' ||
                 (u.role || '').toUpperCase() === roleFilter.toUpperCase();
 
-            // Debt filter
-            const debt = Number(u.overdueDebt || 0);
-            const matchDebt =
-                debtFilter === 'ALL' ||
-                (debtFilter === 'HAS_DEBT' && debt > 0) ||
-                (debtFilter === 'NO_DEBT' && debt <= 0);
-
-            return matchSearch && matchStatus && matchRole && matchDebt;
+            return matchSearch && matchStatus && matchRole;
         });
-    }, [users, searchQuery, statusFilter, roleFilter, debtFilter]);
+    }, [users, searchQuery, statusFilter, roleFilter]);
 
     // Counters for Quick Tab Badges
     const counters = useMemo(() => {
@@ -151,17 +143,12 @@ export default function InternalUsersManagementView({
         const active = users.filter((u) => (u.status || '').toUpperCase() === 'ACTIVE').length;
         const suspended = users.filter((u) => (u.status || '').toUpperCase() === 'SUSPENDED').length;
         const pending = users.filter((u) => (u.status || '').toUpperCase() === 'PENDING_VERIFICATION').length;
-        const debtors = users.filter((u) => Number(u.overdueDebt || 0) > 0);
-        const debtorCount = debtors.length;
-        const totalOverdueDebt = debtors.reduce((sum, u) => sum + Math.max(0, Number(u.overdueDebt || 0)), 0);
 
         return {
             total,
             active,
             suspended,
             pending,
-            debtorCount,
-            totalOverdueDebt,
         };
     }, [users]);
 
@@ -171,7 +158,6 @@ export default function InternalUsersManagementView({
         setConfirmActionType('LOCK');
         setConfirmModalOpen(true);
     };
-
     const handleTriggerActivate = (user: UserAdminListItemDto) => {
         setConfirmTargetUser(user);
         setConfirmActionType('ACTIVATE');
@@ -191,38 +177,6 @@ export default function InternalUsersManagementView({
         setConfirmModalOpen(true);
     };
 
-
-
-    const handleDebtUpdated = (
-        userId: string,
-        newDebt: number,
-        autoSuspended: boolean,
-        message: string
-    ) => {
-        setUsers((prev) =>
-            prev.map((u) => {
-                if (u.id === userId) {
-                    return {
-                        ...u,
-                        overdueDebt: newDebt,
-                        status: autoSuspended ? 'SUSPENDED' : u.status,
-                    };
-                }
-                return u;
-            })
-        );
-        setSelectedUser((prev) => {
-            if (prev && prev.id === userId) {
-                return {
-                    ...prev,
-                    overdueDebt: newDebt,
-                    status: autoSuspended ? 'SUSPENDED' : prev.status,
-                };
-            }
-            return prev;
-        });
-        setNotification({ type: 'success', message });
-    };
 
     const handleExecuteConfirmAction = async (reason?: string) => {
         if (!confirmTargetUser) return;
@@ -445,8 +399,6 @@ export default function InternalUsersManagementView({
                 onStatusFilterChange={setStatusFilter}
                 roleFilter={roleFilter}
                 onRoleFilterChange={setRoleFilter}
-                debtFilter={debtFilter}
-                onDebtFilterChange={setDebtFilter}
                 totalCount={counters.total}
                 activeCount={counters.active}
                 suspendedCount={counters.suspended}
@@ -474,7 +426,6 @@ export default function InternalUsersManagementView({
                             setSearchQuery('');
                             setStatusFilter('ALL');
                             setRoleFilter('ALL');
-                            setDebtFilter('ALL');
                         }}
                         isAdmin={isAdmin}
                         onTriggerLock={handleTriggerLock}
@@ -494,7 +445,6 @@ export default function InternalUsersManagementView({
                             onTriggerActivate={handleTriggerActivate}
                             onSaveRole={handleSaveRoleFromPanel}
                             isUpdatingRole={isUpdatingRole}
-                            onDebtUpdated={handleDebtUpdated}
                         />
                     </div>
                 )}

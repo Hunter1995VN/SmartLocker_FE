@@ -1,8 +1,8 @@
 /**
- * AD-FE-05: Quản lý khách hàng & Kiểm soát dư nợ
- * Hàng 4 thẻ KPI tóm tắt khách hàng, nhân sự và kiểm soát nợ quá hạn.
+ * AD-FE-05: Quản lý tài khoản hệ thống
+ * Hàng 4 thẻ KPI tóm tắt tài khoản khách hàng, nhân sự nội bộ và trạng thái truy cập hệ thống.
  */
-import { Users, Shield, AlertOctagon, KeyRound } from 'lucide-react';
+import { Users, Shield, KeyRound, UserCheck } from 'lucide-react';
 import type { UserAdminListItemDto } from '../../../api/adminUserService';
 
 interface UserKpiSummaryCardsProps {
@@ -19,13 +19,6 @@ export default function UserKpiSummaryCards({ users, isLoading = false }: UserKp
     const adminCount = users.filter((u) => (u.role || '').toUpperCase() === 'ADMIN').length;
     const staffCount = users.filter((u) => (u.role || '').toUpperCase() === 'STAFF').length;
     const travelerCount = users.filter((u) => (u.role || '').toUpperCase() === 'TRAVELER').length;
-
-    // Thống kê Khách hàng có nợ xấu (overdueDebt > 0)
-    const debtors = users.filter((u) => Number(u.overdueDebt || 0) > 0);
-    const debtorCount = debtors.length;
-    const totalOverdueDebt = debtors.reduce((sum, u) => sum + Math.max(0, Number(u.overdueDebt || 0)), 0);
-    const suspendedDebtorCount = debtors.filter((u) => (u.status || '').toUpperCase() === 'SUSPENDED').length;
-    const unblockedDebtorCount = Math.max(0, debtorCount - suspendedDebtorCount);
 
     if (isLoading) {
         return (
@@ -46,16 +39,16 @@ export default function UserKpiSummaryCards({ users, isLoading = false }: UserKp
 
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {/* Card 1: Tổng khách hàng */}
+            {/* Card 1: Tổng tài khoản hệ thống */}
             <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-slate-300 transition">
                 <div className="flex items-start justify-between">
                     <div>
                         <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                            Tổng Khách Hàng
+                            Tổng Tài Khoản Hệ Thống
                         </span>
                         <div className="flex items-baseline gap-2 mt-1">
                             <span className="text-2xl font-extrabold text-slate-900 tracking-tight">
-                                {travelerCount || totalCount}
+                                {totalCount}
                             </span>
                             <span className="text-xs font-semibold text-slate-500">tài khoản</span>
                         </div>
@@ -83,80 +76,54 @@ export default function UserKpiSummaryCards({ users, isLoading = false }: UserKp
                 </div>
             </div>
 
-            {/* Card 2: Khách Hàng Có Nợ Quá Hạn */}
-            <div
-                className={`rounded-2xl p-4 border shadow-xs flex flex-col justify-between transition ${
-                    debtorCount > 0
-                        ? 'bg-rose-50/40 border-rose-200 hover:border-rose-300'
-                        : 'bg-white border-slate-200/80 hover:border-slate-300'
-                }`}
-            >
+            {/* Card 2: Khách hàng (Travelers) */}
+            <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-slate-300 transition">
                 <div className="flex items-start justify-between">
                     <div>
-                        <span className="text-[11px] font-bold text-rose-600 uppercase tracking-wider">
-                            Khách Hàng Nợ Quá Hạn
+                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                            Khách Hàng (Traveler)
                         </span>
                         <div className="flex items-baseline gap-2 mt-1">
-                            <span className={`text-2xl font-extrabold tracking-tight ${debtorCount > 0 ? 'text-rose-700' : 'text-slate-900'}`}>
-                                {debtorCount}
+                            <span className="text-2xl font-extrabold text-slate-900 tracking-tight">
+                                {travelerCount}
                             </span>
-                            <span className="text-xs font-bold text-rose-600">
-                                ({totalOverdueDebt.toLocaleString('vi-VN')} đ)
-                            </span>
+                            <span className="text-xs font-semibold text-slate-500">người dùng</span>
                         </div>
                     </div>
-                    <div
-                        className={`w-9 h-9 rounded-xl border flex items-center justify-center ${
-                            debtorCount > 0
-                                ? 'bg-rose-100 border-rose-200 text-rose-600'
-                                : 'bg-emerald-50 border-emerald-100 text-emerald-600'
-                        }`}
-                    >
-                        <AlertOctagon className="w-4 h-4" />
+                    <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
+                        <UserCheck className="w-4 h-4" />
                     </div>
                 </div>
 
-                <div className="mt-3 pt-2.5 border-t border-slate-200/60 flex items-center justify-between text-xs font-medium">
-                    {debtorCount > 0 ? (
-                        <>
-                            <span className="text-rose-700 font-semibold text-[11px]">
-                                {unblockedDebtorCount > 0
-                                    ? `${unblockedDebtorCount} chưa bị chặn`
-                                    : 'Tất cả nợ quá hạn đã bị chặn'}
-                            </span>
-                            <span className="px-2 py-0.5 rounded-md bg-rose-100 text-rose-700 font-bold text-[10px]">
-                                {suspendedDebtorCount}/{debtorCount} đã khóa
-                            </span>
-                        </>
-                    ) : (
-                        <span className="text-emerald-700 font-semibold text-[11px]">
-                            Không có tài khoản nợ quá hạn (0 đ)
-                        </span>
-                    )}
+                <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-slate-600">
+                    <span className="text-emerald-700 font-semibold text-[11px]">
+                        Chiếm {totalCount > 0 ? Math.round((travelerCount / totalCount) * 100) : 0}% tổng người dùng
+                    </span>
+                    <span className="text-[10px] text-slate-400">Khách thuê tủ</span>
                 </div>
             </div>
 
-            {/* Card 3: Phân bổ nhân sự & khách hàng */}
+            {/* Card 3: Cơ Cấu Nhân Sự Nội Bộ */}
             <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-slate-300 transition">
                 <div className="flex items-start justify-between">
                     <div className="flex-1 pr-2">
                         <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                            Cơ Cấu Tài Khoản
+                            Nhân Sự Nội Bộ
                         </span>
                         <div className="mt-1 space-y-0.5">
                             <div className="flex items-center justify-between text-xs text-slate-700 font-semibold gap-2">
                                 <span className="flex items-center gap-1.5">
-                                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                                    <span>Khách hàng</span>
+                                    <span className="w-2 h-2 rounded-full bg-blue-600" />
+                                    <span>Vận hành (Staff)</span>
                                 </span>
-                                <span className="font-extrabold">{travelerCount}</span>
+                                <span className="font-extrabold">{staffCount}</span>
                             </div>
                             <div className="flex items-center justify-between text-xs text-slate-700 font-semibold gap-2">
                                 <span className="flex items-center gap-1.5">
-                                    <span className="w-2 h-2 rounded-full bg-blue-600" />
-                                    <span>Nhân sự nội bộ</span>
+                                    <span className="w-2 h-2 rounded-full bg-purple-600" />
+                                    <span>Quản trị (Admin)</span>
                                 </span>
-                                <span className="font-extrabold">{staffCount + adminCount}</span>
+                                <span className="font-extrabold">{adminCount}</span>
                             </div>
                         </div>
                     </div>
@@ -166,7 +133,7 @@ export default function UserKpiSummaryCards({ users, isLoading = false }: UserKp
                 </div>
 
                 <div className="mt-3 pt-2.5 border-t border-slate-100 text-[11px] text-slate-500 flex items-center justify-between font-medium">
-                    <span>Staff: {staffCount} • Admin: {adminCount}</span>
+                    <span>Tổng: {staffCount + adminCount} tài khoản</span>
                     <span className="text-purple-600 font-bold">Phân quyền RBAC</span>
                 </div>
             </div>
@@ -176,7 +143,7 @@ export default function UserKpiSummaryCards({ users, isLoading = false }: UserKp
                 <div className="flex items-start justify-between">
                     <div>
                         <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                            Tỷ Lệ Tài Khoản Hợp Lệ
+                            Trạng Thái Đăng Nhập
                         </span>
                         <div className="flex items-baseline gap-2 mt-1">
                             <span className="text-2xl font-extrabold text-slate-900 tracking-tight">
@@ -195,7 +162,7 @@ export default function UserKpiSummaryCards({ users, isLoading = false }: UserKp
                 <div className="mt-3 pt-2.5 border-t border-slate-100">
                     <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50/80 px-2 py-0.5 rounded-lg border border-emerald-200/60">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                        Tự động chặn khi có nợ quá hạn
+                        Kiểm soát quyền truy cập toàn hệ thống
                     </span>
                 </div>
             </div>

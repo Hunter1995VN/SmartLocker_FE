@@ -58,7 +58,7 @@ export default function CustomerDebtManagementView({
     const [selectedCustomer, setSelectedCustomer] = useState<UserAdminListItemDto | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
-    const [, setFetchError] = useState<string | null>(null);
+    const [fetchError, setFetchError] = useState<string | null>(null);
 
     // 3. Filter States
     const [searchQuery, setSearchQuery] = useState('');
@@ -71,15 +71,15 @@ export default function CustomerDebtManagementView({
     const [isBatchBlocking, setIsBatchBlocking] = useState<boolean>(false);
     const [notification, setNotification] = useState<NotificationState | null>(null);
 
-    // Synchronize drawer when selectedCustomer changes
+    // Synchronize drawer input when selectedCustomer changes
     useEffect(() => {
         if (selectedCustomer) {
             setDebtInput(String(Math.max(0, Number(selectedCustomer.overdueDebt || 0))));
             setDebtReason('');
         }
-    }, [selectedCustomer]);
+    }, [selectedCustomer?.id, selectedCustomer?.overdueDebt]);
 
-    // 5. Fetch Travelers Only
+    // 5. Fetch Travelers Only (Dependency [] so loadData is stable and never re-triggers infinite loop)
     const loadData = useCallback(async (isRefresh = false) => {
         if (isRefresh) setIsRefreshing(true);
         else setIsLoading(true);
@@ -92,18 +92,18 @@ export default function CustomerDebtManagementView({
             });
 
             if (res.success && res.data) {
-                // Ensure only Travelers are included
                 const rawList = Array.isArray(res.data) ? res.data : [];
                 const onlyTravelers = rawList.filter(
                     (u: UserAdminListItemDto) => (u.role || '').toUpperCase() === 'TRAVELER'
                 );
                 setTravelers(onlyTravelers);
 
-                // Update selectedCustomer reference if it exists
-                if (selectedCustomer) {
-                    const updated = onlyTravelers.find((u: UserAdminListItemDto) => u.id === selectedCustomer.id);
-                    if (updated) setSelectedCustomer(updated);
-                }
+                // Update selectedCustomer if already selected
+                setSelectedCustomer((prev) => {
+                    if (!prev) return null;
+                    const updated = onlyTravelers.find((u: UserAdminListItemDto) => u.id === prev.id);
+                    return updated || prev;
+                });
             } else {
                 setFetchError(res.message || 'Không thể tải danh sách khách hàng.');
             }
@@ -114,7 +114,7 @@ export default function CustomerDebtManagementView({
             setIsLoading(false);
             setIsRefreshing(false);
         }
-    }, [selectedCustomer]);
+    }, []);
 
     useEffect(() => {
         loadData();
@@ -179,7 +179,7 @@ export default function CustomerDebtManagementView({
             if (res.success) {
                 const succMsg = `Đã thu nợ thành công! Khách hàng ${customer.fullName || customer.email} đã sạch nợ (0 đ) và được mở lại quyền đặt tủ ngay.`;
                 setNotification({ type: 'success', message: succMsg });
-                // Optimistic update
+                // Optimistic in-memory update (no API reload needed!)
                 setTravelers((prev) =>
                     prev.map((u) => (u.id === customer.id ? { ...u, overdueDebt: 0, isBookingBlocked: false } : u))
                 );
@@ -230,6 +230,7 @@ export default function CustomerDebtManagementView({
                     : `Đã xóa nợ về 0 đ cho ${selectedCustomer.fullName || selectedCustomer.email}. Quyền đặt tủ đã được mở lại!`;
 
                 setNotification({ type: 'success', message: succMsg });
+                // In-memory update
                 setTravelers((prev) =>
                     prev.map((u) =>
                         u.id === selectedCustomer.id ? { ...u, overdueDebt: parsed, isBookingBlocked: isDebt } : u
@@ -373,6 +374,23 @@ export default function CustomerDebtManagementView({
                     </div>
                 </div>
             </div>
+
+            {/* Error banner if fetch failed */}
+            {fetchError && (
+                <div className="p-3 rounded-xl border bg-rose-50 border-rose-200 text-rose-800 text-xs flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                        <span>{fetchError}</span>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => loadData(false)}
+                        className="text-xs font-bold text-rose-700 underline cursor-pointer"
+                    >
+                        Thử lại
+                    </button>
+                </div>
+            )}
 
             {/* Notification Banner */}
             {notification && (
