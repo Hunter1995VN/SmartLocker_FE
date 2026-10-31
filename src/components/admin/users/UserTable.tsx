@@ -127,7 +127,7 @@ export default function UserTable({
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr className="bg-slate-50/70 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
-                            <th className="py-3 px-4">Khách hàng / Định danh</th>
+                            <th className="py-3 px-4">Tài khoản / Định danh</th>
                             <th className="py-3 px-4">Vai trò</th>
                             <th className="py-3 px-4">Dư nợ quá hạn</th>
                             <th className="py-3 px-4">Trạng thái</th>
