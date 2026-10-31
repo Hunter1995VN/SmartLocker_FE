@@ -243,8 +243,9 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
             });
             onShowToast?.(succMsg, 'success');
             onPricingUpdated();
-        } catch {
-            const errMsg = 'Có lỗi xảy ra khi lưu cấu hình giá & chính sách hoàn tiền. Vui lòng kiểm tra lại.';
+        } catch (err: unknown) {
+            const axiosErr = err as { response?: { data?: { message?: string } } };
+            const errMsg = axiosErr?.response?.data?.message || 'Có lỗi xảy ra khi lưu cấu hình giá & chính sách hoàn tiền. Vui lòng kiểm tra lại.';
             setFeedback({
                 type: 'error',
                 message: errMsg,

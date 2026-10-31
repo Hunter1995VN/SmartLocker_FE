@@ -245,10 +245,15 @@ export default function UserTable({
                                             <button
                                                 type="button"
                                                 onClick={() => onSelectUser(user)}
-                                                className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition cursor-pointer"
-                                                title="Xem chi tiết & Kiểm soát nợ"
+                                                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer border ${
+                                                    hasDebt
+                                                        ? 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100'
+                                                        : 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'
+                                                }`}
+                                                title="Xem chi tiết, quản lý nợ cước & hồ sơ"
                                             >
-                                                <Eye className="w-4 h-4" />
+                                                <Eye className="w-3.5 h-3.5" />
+                                                <span>{hasDebt ? 'Xử lý nợ' : 'Quản lý nợ'}</span>
                                             </button>
 
                                             {isAdmin && (
