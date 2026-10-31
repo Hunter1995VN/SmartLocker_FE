@@ -590,56 +590,53 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                         )}
                     </div>
 
-                    {/* 3. Refund Cutoff Hours */}
+                    {/* 3. Mốc hủy đơn trong thời gian giữ chỗ */}
                     <div className="p-3.5 rounded-xl bg-blue-50/40 border border-blue-200/70 space-y-2">
                         <div className="flex items-center justify-between">
                             <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                                 <Clock className="w-3.5 h-3.5 text-blue-600" />
-                                <span>Mốc thời gian hủy đơn tiêu chuẩn (Cutoff)</span>
+                                <span>Mốc hủy đơn trong thời gian giữ chỗ ({noShowWindowMinutes || 30} phút)</span>
                             </label>
                             <span className="text-[10px] font-bold text-blue-700 bg-blue-100/80 px-2 py-0.5 rounded">
-                                Trước giờ nhận tủ
+                                Theo thời gian giữ chỗ
                             </span>
                         </div>
                         <p className="text-[11px] text-slate-500">
-                            Số giờ tính từ thời điểm bấm Hủy đến giờ bắt đầu nhận tủ (StartAt), <strong>không phụ thuộc thời lượng thuê</strong> (thuê 1 tiếng hay 24 tiếng nếu hủy trước mốc này đều được tính là hủy sớm).
-                        </p>
-                        <p className="text-[10px] text-blue-600 bg-blue-50/80 p-1.5 rounded-lg border border-blue-100">
-                            💡 <strong>Ghi chú:</strong> Mốc này so sánh với giờ nhận tủ. Nếu trạm có nhiều khách đặt dùng ngay tại chỗ, Admin có thể giảm mốc này về 1h hoặc 0h để khách hủy không bị trừ phí.
+                            Dựa trên tổng thời gian giữ chỗ chờ nhận tủ ({noShowWindowMinutes || 30} phút). Ví dụ nếu khách đổi ý hủy trong 15 phút đầu sẽ được coi là hủy sớm.
                         </p>
                         <div className="flex items-center gap-2 pt-1">
                             <input
                                 type="number"
-                                min="0"
-                                max="72"
+                                min="1"
+                                max={Number(noShowWindowMinutes) || 60}
                                 step="1"
                                 value={refundCutoffHours}
                                 onChange={(e) => setRefundCutoffHours(e.target.value)}
-                                className="w-28 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-mono font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                className="w-24 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-mono font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200"
                             />
-                            <span className="text-xs font-semibold text-slate-600">giờ trước hạn</span>
+                            <span className="text-xs font-semibold text-slate-600">phút đầu (Mốc hủy sớm)</span>
                         </div>
                         {errors.refundCutoffHours && (
                             <p className="text-[10px] text-rose-500">{errors.refundCutoffHours}</p>
                         )}
                     </div>
 
-                    {/* 4. Early & Late Refund Rates (%) */}
+                    {/* 4. Tỷ lệ hoàn tiền & Chế độ duyệt hoàn tiền */}
                     <div className="p-3.5 rounded-xl bg-emerald-50/40 border border-emerald-200/70 space-y-2">
                         <div className="flex items-center justify-between">
                             <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                                 <Percent className="w-3.5 h-3.5 text-emerald-600" />
-                                <span>Tỷ lệ hoàn tiền khi hủy đơn (Early / Late)</span>
+                                <span>Tỷ lệ hoàn tiền khi hủy đơn</span>
                             </label>
-                            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded">
-                                Hoàn tiền tự động
+                            <span className="text-[10px] font-bold text-purple-700 bg-purple-100/90 px-2 py-0.5 rounded border border-purple-200">
+                                Admin duyệt giải ngân (UC-A11)
                             </span>
                         </div>
 
                         <div className="grid grid-cols-2 gap-3 pt-1">
                             <div>
                                 <span className="block text-[11px] font-semibold text-slate-600 mb-1">
-                                    Hủy sớm (&ge; {refundCutoffHours || 0}h trước):
+                                    Hủy trong {refundCutoffHours || 15} phút đầu:
                                 </span>
                                 <div className="flex items-center gap-1.5">
                                     <input
@@ -650,7 +647,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                                         onChange={(e) => setRefundRateEarlyPct(e.target.value)}
                                         className="w-20 px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-mono font-bold text-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-200"
                                     />
-                                    <span className="text-xs font-bold text-emerald-700">%</span>
+                                    <span className="text-xs font-bold text-emerald-700">% hoàn</span>
                                 </div>
                                 {errors.refundRateEarlyPct && (
                                     <p className="text-[10px] text-rose-500 mt-0.5">{errors.refundRateEarlyPct}</p>
@@ -659,7 +656,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
 
                             <div>
                                 <span className="block text-[11px] font-semibold text-slate-600 mb-1">
-                                    Hủy sát giờ (&lt; {refundCutoffHours || 0}h):
+                                    Hủy từ phút {refundCutoffHours || 15} - {noShowWindowMinutes || 30}:
                                 </span>
                                 <div className="flex items-center gap-1.5">
                                     <input
@@ -670,7 +667,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                                         onChange={(e) => setRefundRateLatePct(e.target.value)}
                                         className="w-20 px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-mono font-bold text-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-200"
                                     />
-                                    <span className="text-xs font-bold text-amber-700">%</span>
+                                    <span className="text-xs font-bold text-amber-700">% hoàn</span>
                                 </div>
                                 {errors.refundRateLatePct && (
                                     <p className="text-[10px] text-rose-500 mt-0.5">{errors.refundRateLatePct}</p>
@@ -687,10 +684,11 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                             Tóm tắt quy tắc áp dụng thực tế tại trạm:
                         </p>
                         <p className="text-[11px] text-slate-300">
-                            • Hủy trước <strong>{refundCutoffHours || 0} giờ</strong>: Hoàn <strong>{refundRateEarlyPct || 0}%</strong> phí đặt tủ &nbsp;|&nbsp;
-                            Hủy dưới <strong>{refundCutoffHours || 0} giờ</strong>: Hoàn <strong>{refundRateLatePct || 0}%</strong> &nbsp;|&nbsp;
-                            Quá <strong>{noShowWindowMinutes || 30} phút</strong> không nhận tủ: Tính <strong>No-Show</strong> &nbsp;|&nbsp;
-                            Trễ quá <strong>{graceMinutes || 15} phút</strong>: Tính phí phạt quá hạn theo giờ.
+                            • Thời gian giữ chỗ chờ nhận tủ: <strong>{noShowWindowMinutes || 30} phút</strong> &nbsp;|&nbsp;
+                            Hủy trong <strong>{refundCutoffHours || 15} phút đầu</strong>: Đề xuất hoàn <strong>{refundRateEarlyPct || 100}%</strong> &nbsp;|&nbsp;
+                            Hủy từ phút <strong>{refundCutoffHours || 15} - {noShowWindowMinutes || 30}</strong>: Đề xuất hoàn <strong>{refundRateLatePct || 50}%</strong> &nbsp;|&nbsp;
+                            Quá <strong>{noShowWindowMinutes || 30} phút</strong>: Hủy No-Show (0%).<br />
+                            🔒 <em>Lưu ý: Mọi phiếu yêu cầu hoàn tiền sẽ gửi về mục <strong>Manual Refunds (UC-A11)</strong> để Admin thẩm định và bấm duyệt giải ngân.</em>
                         </p>
                     </div>
                 </div>
