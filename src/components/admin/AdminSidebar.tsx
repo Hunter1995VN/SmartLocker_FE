@@ -4,6 +4,7 @@
  * Hiển thị avatar, tên người dùng, role badge (ADMIN/STAFF), và nút Đăng xuất.
  */
 import {
+    Receipt,
     LayoutDashboard,
     Box,
     Layers,
@@ -11,7 +12,6 @@ import {
     ShieldAlert,
     DollarSign,
     Users,
-    UserCog,
     Ticket,
     RotateCcw,
     CreditCard,
@@ -29,6 +29,7 @@ export type AdminMenuKey =
     | 'promotions'
     | 'rbac'
     | 'users'
+    | 'debt'
     | 'lockers'
     | 'incidents'
     | 'abandoned'
@@ -218,30 +219,6 @@ export default function AdminSidebar({
 
                             <button
                                 type="button"
-                                onClick={() => onSelectMenu?.('rbac')}
-                                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition cursor-pointer text-left ${
-                                    activeMenu === 'rbac'
-                                        ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-600/30'
-                                        : 'text-slate-600 hover:bg-slate-50'
-                                }`}
-                            >
-                                <span className="flex items-center gap-2.5">
-                                    <UserCog className={`w-4 h-4 ${activeMenu === 'rbac' ? 'text-white' : 'text-purple-500'}`} />
-                                    <span>Nhân sự & Phân quyền</span>
-                                </span>
-                                <span
-                                    className={`px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase ${
-                                        activeMenu === 'rbac'
-                                            ? 'bg-white/20 text-white'
-                                            : 'bg-purple-50 text-purple-700 border border-purple-200/80'
-                                    }`}
-                                >
-                                    RBAC
-                                </span>
-                            </button>
-
-                            <button
-                                type="button"
                                 onClick={() => onSelectMenu?.('users')}
                                 className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition cursor-pointer text-left ${
                                     activeMenu === 'users'
@@ -251,7 +228,22 @@ export default function AdminSidebar({
                             >
                                 <span className="flex items-center gap-2.5">
                                     <Users className={`w-4 h-4 ${activeMenu === 'users' ? 'text-white' : 'text-slate-400'}`} />
-                                    <span>Khách hàng & Dư nợ</span>
+                                    <span>Quản lý tài khoản</span>
+                                </span>
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => onSelectMenu?.('debt')}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition cursor-pointer text-left ${
+                                    activeMenu === 'debt'
+                                        ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-600/30'
+                                        : 'text-slate-600 hover:bg-slate-50'
+                                }`}
+                            >
+                                <span className="flex items-center gap-2.5">
+                                    <Receipt className={`w-4 h-4 ${activeMenu === 'debt' ? 'text-white' : 'text-amber-500'}`} />
+                                    <span>Quản lý dư nợ</span>
                                 </span>
                             </button>
 
