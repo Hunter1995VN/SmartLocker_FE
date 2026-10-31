@@ -1,6 +1,10 @@
 import apiClient from './client';
 import { offlineTicketStore } from '../utils/offlineTicketStore';
 
+export async function upgradeOnlineTicket(bookingId: string): Promise<void> {
+  await apiClient.post(`/api/bookings/${bookingId}/ticket/upgrade-pin`, { confirmReplaceLegacyCredential: true });
+}
+
 // ─── Common Response Wrapper ─────────────────────────────────────────────────
 
 export interface ApiResponse<T> {
