@@ -26,6 +26,10 @@ import {
     RefreshCw,
     UnlockKeyhole,
     ClipboardCheck,
+    Camera,
+    Maximize2,
+    Eye,
+    X,
 } from 'lucide-react';
 import type {
     IncidentDetailDto,
@@ -151,6 +155,7 @@ export default function IncidentDetailPanel({
     const [unlock, setUnlock] = useState<UnlockResult>({ phase: 'idle' });
 
     // UC-S04 Resolution state
+    const [showImageLightbox, setShowImageLightbox] = useState<boolean>(false);
     const [targetStatus, setTargetStatus] = useState<ResolutionTargetStatus>('RESOLVED');
     const [resolutionNote, setResolutionNote] = useState<string>(incident.resolutionNote ?? '');
     const [isUpdatingStatus, setIsUpdatingStatus] = useState<boolean>(false);
@@ -402,6 +407,39 @@ export default function IncidentDetailPanel({
                         </div>
                     )}
 
+                                        {/* Evidence Image */}
+                    {incident.evidenceImageUrl && (
+                        <div className="py-3 border-b border-slate-100">
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider flex items-center gap-1.5">
+                                    <Camera className="w-3.5 h-3.5 text-blue-600" />
+                                    Ảnh bằng chứng hiện trường
+                                </span>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowImageLightbox(true)}
+                                    className="text-[11px] text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1 cursor-pointer"
+                                >
+                                    <Maximize2 className="w-3 h-3" />
+                                    Phóng to ảnh
+                                </button>
+                            </div>
+                            <div
+                                onClick={() => setShowImageLightbox(true)}
+                                className="relative rounded-xl overflow-hidden border border-slate-200/90 bg-slate-50 flex items-center justify-center max-h-52 cursor-pointer group"
+                            >
+                                <img
+                                    src={incident.evidenceImageUrl}
+                                    alt={`Bằng chứng ${incident.incidentCode}`}
+                                    className="w-full h-auto max-h-52 object-contain transition group-hover:scale-[1.02]"
+                                />
+                                <div className="absolute inset-0 bg-slate-900/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-semibold gap-1.5 backdrop-blur-[1px]">
+                                    <Eye className="w-4 h-4" />
+                                    <span>Bấm để xem ảnh đầy đủ</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                     {/* Resolution info (if already resolved) */}
                     {incidentResolved && incident.resolutionNote && (
                         <div className="py-3">
@@ -621,6 +659,40 @@ export default function IncidentDetailPanel({
                     )}
                 </div>
             </div>
+
+            {/* Lightbox Image Preview Modal */}
+            {showImageLightbox && incident.evidenceImageUrl && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+                    onClick={() => setShowImageLightbox(false)}
+                >
+                    <div
+                        className="relative max-w-4xl max-h-[90vh] bg-white rounded-2xl overflow-hidden shadow-2xl p-2 w-full"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="flex items-center justify-between p-3 border-b border-slate-100">
+                            <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                                <Camera className="w-4 h-4 text-blue-600" />
+                                Bằng chứng sự cố: #{incident.incidentCode}
+                            </span>
+                            <button
+                                type="button"
+                                onClick={() => setShowImageLightbox(false)}
+                                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
+                        <div className="p-2 flex items-center justify-center overflow-auto max-h-[78vh] bg-slate-900/5 rounded-xl">
+                            <img
+                                src={incident.evidenceImageUrl}
+                                alt={`Bằng chứng ${incident.incidentCode}`}
+                                className="max-h-[75vh] w-auto rounded-lg object-contain"
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }

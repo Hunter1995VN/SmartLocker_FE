@@ -76,6 +76,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
 
     // 2. Data States
     const [stats, setStats] = useState<AdminDashboardStatsDto | null>(null);
+    const [openIncidentsBadge, setOpenIncidentsBadge] = useState<number | null>(null);
     const [revenueData, setRevenueData] = useState<RevenueChartItemDto[]>([]);
     const [stationOccupancies, setStationOccupancies] = useState<StationOccupancyItemDto[]>([]);
     const [incidents, setIncidents] = useState<IncidentDto[]>([]);
@@ -188,7 +189,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
             {/* Left Fixed Navigation Sidebar */}
             <AdminSidebar
                 user={user}
-                openIncidentsCount={stats?.openSecurityIncidents ?? 0}
+                openIncidentsCount={openIncidentsBadge ?? (stats?.openSecurityIncidents ?? 0)}
                 offlineDevicesCount={stats?.offlineIoTDevices ?? 0}
                 onLogout={onLogout}
                 activeMenu={activeMenu}
@@ -201,7 +202,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                     {activeMenu === 'abandoned' ? (
                         <AbandonedPropertyView userRole={role} />
                     ) : activeMenu === 'incidents' ? (
-                        <><LostItemQueue /><StationRatingSummary /><EmergencyIncidentListView userRole={role} /></>
+                        <><LostItemQueue /><StationRatingSummary /><EmergencyIncidentListView userRole={role} onOpenCountChange={(count) => setOpenIncidentsBadge(count)} onIncidentsChanged={() => { void fetchStats(); }} /></>
                     ) : activeMenu === 'lockers' ? (
                         <RealtimeLockerGridView />
                     ) : activeMenu === 'rbac' ? (
@@ -241,7 +242,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                             <DashboardHeader
                                 role={role}
                                 offlineDevicesCount={stats?.offlineIoTDevices ?? 0}
-                                openIncidentsCount={stats?.openSecurityIncidents ?? 0}
+                                openIncidentsCount={openIncidentsBadge ?? (stats?.openSecurityIncidents ?? 0)}
                                 lastUpdated={lastUpdated}
                                 isRefreshing={isRefreshing}
                                 onRefresh={handleManualRefresh}
