@@ -403,7 +403,7 @@ function CreateIncidentModal({
     const [lockers, setLockers] = useState<LockerGridItemDto[]>([]);
     const [stationId, setStationId] = useState<string>('');
     const [lockerId, setLockerId] = useState<string>('');
-    const [bookingId, setBookingId] = useState<string>('');
+    // bookingId removed for admin modal
     const [type, setType] = useState<string>('DOOR_JAMMED');
     const [severity, setSeverity] = useState<'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'>('HIGH');
     const [description, setDescription] = useState<string>('');
@@ -472,7 +472,7 @@ function CreateIncidentModal({
         const payload: CreateIncidentRequest = {
             stationId: stationId.trim(),
             lockerId: lockerId.trim(),
-            bookingId: bookingId.trim() ? bookingId.trim() : null,
+            bookingId: null,
             type,
             severity,
             description: description.trim(),
@@ -660,18 +660,6 @@ function CreateIncidentModal({
                     </div>
 
                     {/* Optional Booking ID */}
-                    <div>
-                        <label className="block font-bold text-slate-700 mb-1">
-                            Mã phiên đặt tủ liên quan (Booking ID — Tùy chọn)
-                        </label>
-                        <input
-                            type="text"
-                            value={bookingId}
-                            onChange={(e) => setBookingId(e.target.value)}
-                            placeholder="Để trống nếu sự cố phát sinh ngoài phiên thuê..."
-                            className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-slate-800 font-mono placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
-                        />
-                    </div>
 
                     {/* Description */}
                     <div>
