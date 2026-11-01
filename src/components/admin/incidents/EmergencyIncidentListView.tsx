@@ -8,7 +8,7 @@
  *   - Click incident → hiện IncidentDetailPanel bên phải (desktop) / bên dưới (mobile)
  *   - Loading, Empty, Error state đầy đủ
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
     ShieldAlert,
     RefreshCw,
@@ -20,6 +20,9 @@ import {
     Plus,
     X,
     Filter,
+    Camera,
+    Upload,
+    Trash2,
 } from 'lucide-react';
 import adminIncidentService, {
     type IncidentDetailDto,
@@ -36,6 +39,8 @@ import IncidentDetailPanel from './IncidentDetailPanel';
 interface EmergencyIncidentListViewProps {
     /** role = 'admin' | 'staff' | other — dùng để kiểm soát permission của nút unlock */
     userRole: string;
+    onOpenCountChange?: (count: number) => void;
+    onIncidentsChanged?: () => void;
 }
 
 // ─── Types & Constants ────────────────────────────────────────────────────────
@@ -103,7 +108,11 @@ function statusChip(status: string) {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export default function EmergencyIncidentListView({ userRole }: EmergencyIncidentListViewProps) {
+export default function EmergencyIncidentListView({
+    userRole,
+    onOpenCountChange,
+    onIncidentsChanged,
+}: EmergencyIncidentListViewProps) {
     const canUnlock =
         userRole.toLowerCase() === 'admin' || userRole.toLowerCase() === 'staff';
 
@@ -123,11 +132,14 @@ export default function EmergencyIncidentListView({ userRole }: EmergencyInciden
             if (showSpinner) setIsLoading(true);
             setLoadError(null);
             try {
-                const statusParam = filter === 'ALL' ? undefined : filter;
-                const sevParam = severityFilter === 'ALL' ? undefined : severityFilter;
-                const res = await adminIncidentService.getIncidents(statusParam, sevParam);
+                // Tải toàn bộ danh sách để đồng bộ chính xác số lượng badge và các tab lọc client-side
+                const res = await adminIncidentService.getIncidents();
                 if (res.success && Array.isArray(res.data)) {
                     setIncidents(res.data);
+                    const openCount = res.data.filter((i) =>
+                        ['OPEN', 'IN_PROGRESS'].includes((i.status || '').toUpperCase())
+                    ).length;
+                    onOpenCountChange?.(openCount);
                     setSelected((prev) => {
                         if (!prev) return null;
                         const updated = res.data.find((i) => i.id === prev.id);
@@ -158,15 +170,31 @@ export default function EmergencyIncidentListView({ userRole }: EmergencyInciden
 
     // ── Incident update callback from detail panel ─────────────────────────────
     const handleIncidentUpdated = (updated: IncidentDetailDto) => {
-        setIncidents((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
+        setIncidents((prev) => {
+            const next = prev.map((i) => (i.id === updated.id ? updated : i));
+            const openCount = next.filter((i) =>
+                ['OPEN', 'IN_PROGRESS'].includes((i.status || '').toUpperCase())
+            ).length;
+            onOpenCountChange?.(openCount);
+            return next;
+        });
         setSelected(updated);
+        onIncidentsChanged?.();
     };
 
     // ── Incident created callback from modal ───────────────────────────────────
     const handleIncidentCreated = (created: IncidentDetailDto) => {
-        setIncidents((prev) => [created, ...prev]);
+        setIncidents((prev) => {
+            const next = [created, ...prev];
+            const openCount = next.filter((i) =>
+                ['OPEN', 'IN_PROGRESS'].includes((i.status || '').toUpperCase())
+            ).length;
+            onOpenCountChange?.(openCount);
+            return next;
+        });
         setSelected(created);
         setIsCreateModalOpen(false);
+        onIncidentsChanged?.();
         void fetchIncidents(false);
     };
 
@@ -417,6 +445,38 @@ function CreateIncidentModal({
     const [type, setType] = useState<string>('DOOR_JAMMED');
     const [severity, setSeverity] = useState<'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'>('HIGH');
     const [description, setDescription] = useState<string>('');
+    const [evidenceImage, setEvidenceImage] = useState<string | null>(null);
+    const [evidenceError, setEvidenceError] = useState<string | null>(null);
+    const [isReadingPhoto, setIsReadingPhoto] = useState<boolean>(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        setEvidenceError(null);
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            setEvidenceError('Chỉ hỗ trợ tệp hình ảnh (PNG, JPG, WEBP, JPEG).');
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            setEvidenceError('Ảnh tối đa 5MB. Vui lòng chọn ảnh nhẹ hơn.');
+            return;
+        }
+
+        setIsReadingPhoto(true);
+        const reader = new FileReader();
+        reader.onload = () => {
+            setEvidenceImage(reader.result as string);
+            setIsReadingPhoto(false);
+        };
+        reader.onerror = () => {
+            setEvidenceError('Không đọc được tệp ảnh. Vui lòng thử lại.');
+            setIsReadingPhoto(false);
+        };
+        reader.readAsDataURL(file);
+    };
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [isLoadingStations, setIsLoadingStations] = useState<boolean>(true);
     const [isLoadingLockers, setIsLoadingLockers] = useState<boolean>(false);
@@ -521,6 +581,7 @@ function CreateIncidentModal({
             type: apiType,
             severity,
             description: apiDescription,
+            evidenceImageUrl: evidenceImage || undefined,
         };
 
         try {
@@ -740,6 +801,85 @@ function CreateIncidentModal({
                         />
                     </div>
 
+                    {/* Evidence Photo Upload */}
+                    <div>
+                        <div className="flex items-center justify-between mb-1">
+                            <label className="block font-bold text-slate-700">
+                                Ảnh bằng chứng hiện trường / kẹt tủ (Tùy chọn)
+                            </label>
+                            {evidenceImage && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setEvidenceImage(null);
+                                        if (fileInputRef.current) fileInputRef.current.value = '';
+                                    }}
+                                    className="text-[11px] text-rose-600 hover:text-rose-800 font-semibold flex items-center gap-1 cursor-pointer"
+                                >
+                                    <Trash2 className="w-3 h-3" />
+                                    Xóa ảnh
+                                </button>
+                            )}
+                        </div>
+
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            disabled={isSubmitting || isReadingPhoto}
+                            onChange={handlePhotoChange}
+                            className="hidden"
+                            id="incident-evidence-file"
+                        />
+
+                        {evidenceError && (
+                            <p className="text-rose-600 text-[11px] font-semibold mb-2">{evidenceError}</p>
+                        )}
+
+                        {evidenceImage ? (
+                            <div className="relative rounded-xl border border-slate-200 overflow-hidden bg-slate-50 p-2 flex items-center gap-3">
+                                <img
+                                    src={evidenceImage}
+                                    alt="Bằng chứng sự cố"
+                                    className="w-20 h-20 rounded-lg object-cover border border-slate-200"
+                                />
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                                        <Camera className="w-3.5 h-3.5 text-blue-600" />
+                                        Đã đính kèm ảnh bằng chứng
+                                    </p>
+                                    <p className="text-[11px] text-slate-500 mt-0.5">
+                                        Ảnh sẽ được lưu vào biên bản sự cố để kiểm tra đối chiếu an ninh.
+                                    </p>
+                                    <button
+                                        type="button"
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className="mt-1 text-[11px] text-blue-600 hover:text-blue-800 font-semibold cursor-pointer"
+                                    >
+                                        Đổi ảnh khác
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <label
+                                htmlFor="incident-evidence-file"
+                                className="border-2 border-dashed border-slate-300 hover:border-blue-400 rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 text-center cursor-pointer transition bg-slate-50/50 hover:bg-blue-50/20"
+                            >
+                                <div className="p-2 rounded-full bg-blue-50 text-blue-600">
+                                    <Upload className="w-4 h-4" />
+                                </div>
+                                <div>
+                                    <span className="font-bold text-slate-700 text-xs">
+                                        {isReadingPhoto ? 'Đang xử lý ảnh...' : 'Bấm để tải ảnh lên'}
+                                    </span>
+                                    <p className="text-[11px] text-slate-400 mt-0.5">
+                                        Hỗ trợ PNG, JPG, JPEG, WEBP (Tối đa 5MB)
+                                    </p>
+                                </div>
+                            </label>
+                        )}
+                    </div>
+
                     {/* Actions */}
                     <div className="pt-2 flex justify-end gap-2.5 border-t border-slate-100">
                         <button
@@ -825,6 +965,12 @@ function IncidentRow({
 
                 <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                     {statusChip(resolved ? 'RESOLVED' : incident.status)}
+                    {incident.evidenceImageUrl && (
+                        <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-blue-700 bg-blue-50 border border-blue-200/80 px-1.5 py-0.5 rounded">
+                            <Camera className="w-2.5 h-2.5" />
+                            Có ảnh
+                        </span>
+                    )}
                     <span className="text-[10px] text-slate-400 flex items-center gap-1">
                         <Clock className="w-2.5 h-2.5" aria-hidden="true" />
                         {new Date(incident.createdAt).toLocaleTimeString('vi-VN', {

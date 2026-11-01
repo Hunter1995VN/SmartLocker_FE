@@ -38,6 +38,7 @@ export interface IncidentDetailDto {
     status: string;
     severity: string;
     description: string;
+    evidenceImageUrl?: string;
     resolutionNote?: string;
     resolvedBy?: string;
     resolvedAt?: string;
@@ -53,6 +54,7 @@ export interface CreateIncidentRequest {
     type: string;
     severity: string;
     description: string;
+    evidenceImageUrl?: string;
 }
 
 /** Request body khi cập nhật trạng thái xử lý sự cố (UC-S04) */
