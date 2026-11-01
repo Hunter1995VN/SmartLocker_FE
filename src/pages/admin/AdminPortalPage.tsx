@@ -1,5 +1,3 @@
-import LostItemQueue from '../../components/admin/incidents/LostItemQueue';
-import StationRatingSummary from '../../components/admin/incidents/StationRatingSummary';
 /**
  * AD-FE-02: UC-A02 — View Operations Dashboard
  * Màn hình Operations Dashboard chính cho Admin Portal (Admin & Staff)
@@ -202,7 +200,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                     {activeMenu === 'abandoned' ? (
                         <AbandonedPropertyView userRole={role} />
                     ) : activeMenu === 'incidents' ? (
-                        <><LostItemQueue /><StationRatingSummary /><EmergencyIncidentListView userRole={role} onOpenCountChange={(count) => setOpenIncidentsBadge(count)} onIncidentsChanged={() => { void fetchStats(); }} /></>
+                        <EmergencyIncidentListView userRole={role} onOpenCountChange={(count) => setOpenIncidentsBadge(count)} onIncidentsChanged={() => { void fetchStats(); }} />
                     ) : activeMenu === 'lockers' ? (
                         <RealtimeLockerGridView />
                     ) : activeMenu === 'rbac' ? (
