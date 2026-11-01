@@ -1,4 +1,4 @@
-/**
+﻿/**
  * AD-FE-06: UC-T14 → A08, S-02, UC-S04, UC-S05 — Emergency Incident List View
  *
  * Màn hình chính "Cứu hộ khẩn cấp & Mở khoá tủ từ xa":
