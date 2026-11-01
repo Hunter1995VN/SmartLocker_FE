@@ -34,6 +34,7 @@ import type {
 } from '../../../api/adminIncidentService';
 import adminIncidentService from '../../../api/adminIncidentService';
 import RemoteUnlockConfirmModal from './RemoteUnlockConfirmModal';
+import { parseIncidentType } from './EmergencyIncidentListView';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -147,6 +148,7 @@ export default function IncidentDetailPanel({
     canUnlock,
     onIncidentUpdated,
 }: IncidentDetailPanelProps) {
+    const parsedInfo = parseIncidentType(incident.type, incident.description);
     const [unlock, setUnlock] = useState<UnlockResult>({ phase: 'idle' });
 
     // UC-S04 Resolution state
@@ -352,7 +354,7 @@ export default function IncidentDetailPanel({
                             mono
                         />
                     )}
-                    <DetailRow icon={ShieldAlert} label="Loại sự cố" value={incident.type} />
+                    <DetailRow icon={ShieldAlert} label="Loại sự cố" value={parsedInfo.displayType} />
 
                     {incident.description && (
                         <div className="py-3 border-b border-slate-100">
@@ -360,7 +362,7 @@ export default function IncidentDetailPanel({
                                 Mô tả sự cố
                             </p>
                             <p className="text-xs text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                {incident.description}
+                                {parsedInfo.cleanDescription}
                             </p>
                         </div>
                     )}

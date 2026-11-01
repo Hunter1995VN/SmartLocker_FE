@@ -1,4 +1,4 @@
-/**
+﻿/**
  * AD-FE-06: UC-T14 → A08, S-02, UC-S04, UC-S05 — Emergency Incident List View
  *
  * Màn hình chính "Cứu hộ khẩn cấp & Mở khoá tủ từ xa":
@@ -61,6 +61,17 @@ const SEVERITY_OPTIONS: { value: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'; label: 
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+
+export function parseIncidentType(type: string, desc?: string): { displayType: string; cleanDescription: string } {
+    if (type === 'OTHER' && desc) {
+        const match = desc.match(/^\[([A-Z_]+)\]\s*(.*)$/s);
+        if (match && ['SENSOR_ERROR', 'INTRUSION', 'SYSTEM_ERROR', 'WRONG_LOCKER', 'LOST_ITEMS'].includes(match[1])) {
+            return { displayType: match[1], cleanDescription: match[2] || desc };
+        }
+    }
+    return { displayType: type || 'OTHER', cleanDescription: desc || '' };
+}
+
 
 function severityDot(severity: string): string {
     const s = (severity || '').toUpperCase();
@@ -403,16 +414,18 @@ function CreateIncidentModal({
     const [lockers, setLockers] = useState<LockerGridItemDto[]>([]);
     const [stationId, setStationId] = useState<string>('');
     const [lockerId, setLockerId] = useState<string>('');
-    const [bookingId, setBookingId] = useState<string>('');
     const [type, setType] = useState<string>('DOOR_JAMMED');
     const [severity, setSeverity] = useState<'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'>('HIGH');
     const [description, setDescription] = useState<string>('');
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [isLoadingStations, setIsLoadingStations] = useState<boolean>(true);
+    const [isLoadingLockers, setIsLoadingLockers] = useState<boolean>(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     // Load stations on mount
     useEffect(() => {
         let active = true;
+        setIsLoadingStations(true);
         adminStationService
             .getStations()
             .then((res) => {
@@ -423,11 +436,13 @@ function CreateIncidentModal({
                 }
             })
             .catch(() => {
-                // Fallback from existing incidents if station API fails
                 if (!active) return;
                 if (existingIncidents.length > 0) {
                     setStationId(existingIncidents[0].stationId);
                 }
+            })
+            .finally(() => {
+                if (active) setIsLoadingStations(false);
             });
         return () => {
             active = false;
@@ -436,8 +451,14 @@ function CreateIncidentModal({
 
     // Load lockers when stationId changes
     useEffect(() => {
-        if (!stationId) return;
+        if (!stationId) {
+            setLockers([]);
+            setLockerId('');
+            return;
+        }
         let active = true;
+        setIsLoadingLockers(true);
+        setLockerId('');
         adminStationService
             .getStationLockersGrid(stationId)
             .then((res) => {
@@ -453,33 +474,54 @@ function CreateIncidentModal({
             .catch(() => {
                 if (!active) return;
                 setLockers([]);
+                setLockerId('');
+            })
+            .finally(() => {
+                if (active) setIsLoadingLockers(false);
             });
         return () => {
             active = false;
         };
     }, [stationId]);
 
+
+    const matchedLocker = lockers.find((l) => l.id === lockerId);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!stationId.trim() || !lockerId.trim() || description.trim().length < 5) {
-            setErrorMsg('Vui lòng chọn Trạm, Ô tủ và nhập mô tả sự cố (tối thiểu 5 ký tự).');
+        if (!stationId.trim()) {
+            setErrorMsg('Vui lòng chọn Trạm tủ.');
+            return;
+        }
+        if (!lockerId.trim()) {
+            setErrorMsg('Vui lòng chọn Ô tủ gặp sự cố.');
+            return;
+        }
+        if (description.trim().length < 5) {
+            setErrorMsg('Vui lòng nhập mô tả sự cố (tối thiểu 5 ký tự).');
             return;
         }
 
         setIsSubmitting(true);
         setErrorMsg(null);
 
+        // Safe backend compatibility mapping:
+        // Đảm bảo tương thích với cả backend hiện tại lẫn backend cập nhật
+        let apiType = type;
+        let apiDescription = description.trim();
+        if (['SENSOR_ERROR', 'INTRUSION', 'SYSTEM_ERROR'].includes(type)) {
+            apiType = 'OTHER';
+            apiDescription = `[${type}] ${apiDescription}`;
+        }
+
         const payload: CreateIncidentRequest = {
             stationId: stationId.trim(),
             lockerId: lockerId.trim(),
-            bookingId: bookingId.trim() ? bookingId.trim() : null,
-            type,
+            bookingId: matchedLocker?.currentBooking?.bookingId ?? null,
+            type: apiType,
             severity,
-            description: description.trim(),
+            description: apiDescription,
         };
-
-        const matchedStation = stations.find((s) => s.id === stationId);
-        const matchedLocker = lockers.find((l) => l.id === lockerId);
 
         try {
             const res = await adminIncidentService.createIncident(payload);
@@ -488,25 +530,27 @@ function CreateIncidentModal({
             } else {
                 setErrorMsg(res.message ?? 'Không thể tạo phiếu sự cố.');
             }
-        } catch {
-            // Fallback local incident creation if backend offline
-            const fallbackCreated: IncidentDetailDto = {
-                id: `inc-${Date.now()}`,
-                incidentCode: `INC-${Math.floor(1000 + Math.random() * 9000)}`,
-                stationId: payload.stationId,
-                stationName: matchedStation?.name ?? 'Trạm SmartLocker Trung Tâm',
-                lockerId: payload.lockerId,
-                lockerCode: matchedLocker?.lockerCode ?? 'A-01',
-                bookingId: payload.bookingId ?? undefined,
-                reportedBy: 'Ca trực Vận hành (Staff)',
-                type: payload.type,
-                severity: payload.severity,
-                status: 'OPEN',
-                description: payload.description,
-                remoteUnlocked: false,
-                createdAt: new Date().toISOString(),
+        } catch (err: unknown) {
+            console.error('Lỗi tạo sự cố:', err);
+            const axiosErr = err as {
+                response?: {
+                    data?: {
+                        message?: string;
+                        title?: string;
+                        errors?: Record<string, string[]>;
+                    };
+                };
+                message?: string;
             };
-            onCreated(fallbackCreated);
+            const msg =
+                axiosErr.response?.data?.message ||
+                (axiosErr.response?.data?.errors
+                    ? Object.values(axiosErr.response.data.errors).flat().join(', ')
+                    : null) ||
+                axiosErr.response?.data?.title ||
+                axiosErr.message ||
+                'Không thể kết nối máy chủ để tạo sự cố. Vui lòng thử lại.';
+            setErrorMsg(msg);
         } finally {
             setIsSubmitting(false);
         }
@@ -565,7 +609,12 @@ function CreateIncidentModal({
                             <label className="block font-bold text-slate-700 mb-1">
                                 Trạm tủ (Station) <span className="text-rose-500">*</span>
                             </label>
-                            {stations.length > 0 ? (
+                            {isLoadingStations ? (
+                                <div className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-400 font-medium flex items-center gap-2">
+                                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-slate-400" />
+                                    <span>Đang tải danh sách trạm...</span>
+                                </div>
+                            ) : stations.length > 0 ? (
                                 <select
                                     value={stationId}
                                     onChange={(e) => setStationId(e.target.value)}
@@ -593,7 +642,12 @@ function CreateIncidentModal({
                             <label className="block font-bold text-slate-700 mb-1">
                                 Ô tủ gặp sự cố (Locker) <span className="text-rose-500">*</span>
                             </label>
-                            {lockers.length > 0 ? (
+                            {isLoadingLockers ? (
+                                <div className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-400 font-medium flex items-center gap-2">
+                                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-slate-400" />
+                                    <span>Đang tải danh sách ô tủ...</span>
+                                </div>
+                            ) : lockers.length > 0 ? (
                                 <select
                                     value={lockerId}
                                     onChange={(e) => setLockerId(e.target.value)}
@@ -602,20 +656,33 @@ function CreateIncidentModal({
                                     {lockers.map((lk) => (
                                         <option key={lk.id} value={lk.id}>
                                             {lk.lockerCode} (Size {lk.size} · {lk.businessStatus})
+                                            {lk.currentBooking ? ` [Đang thuê: ${lk.currentBooking.customerName || lk.currentBooking.bookingCode}]` : ''}
                                         </option>
                                     ))}
                                 </select>
                             ) : (
-                                <input
-                                    type="text"
-                                    value={lockerId}
-                                    onChange={(e) => setLockerId(e.target.value)}
-                                    placeholder="Nhập ID ô tủ..."
-                                    className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-slate-800 font-mono"
-                                />
+                                <div className="w-full px-3 py-2 rounded-xl border border-amber-200 bg-amber-50 text-amber-700 font-medium text-[11px]">
+                                    Trạm này hiện chưa có ô tủ nào sẵn sàng.
+                                </div>
                             )}
                         </div>
                     </div>
+
+                    {/* Hiển thị thông tin đơn thuê nếu ô tủ đang có khách */}
+                    {matchedLocker?.currentBooking && (
+                        <div className="p-3 rounded-xl bg-blue-50 border border-blue-200/80 text-blue-900 text-xs flex items-center justify-between gap-2">
+                            <div>
+                                <span className="font-bold text-blue-700">Đơn thuê liên kết: </span>
+                                <span className="font-mono font-bold">#{matchedLocker.currentBooking.bookingCode}</span>
+                                <p className="text-[11px] text-blue-600 mt-0.5">
+                                    Khách: {matchedLocker.currentBooking.customerName} ({matchedLocker.currentBooking.customerPhone || 'Không có SĐT'})
+                                </p>
+                            </div>
+                            <span className="px-2 py-0.5 rounded-lg bg-blue-600 text-white font-bold text-[10px]">
+                                Đang lưu đồ
+                            </span>
+                        </div>
+                    )}
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {/* Incident Type */}
@@ -659,20 +726,6 @@ function CreateIncidentModal({
                         </div>
                     </div>
 
-                    {/* Optional Booking ID */}
-                    <div>
-                        <label className="block font-bold text-slate-700 mb-1">
-                            Mã phiên đặt tủ liên quan (Booking ID — Tùy chọn)
-                        </label>
-                        <input
-                            type="text"
-                            value={bookingId}
-                            onChange={(e) => setBookingId(e.target.value)}
-                            placeholder="Để trống nếu sự cố phát sinh ngoài phiên thuê..."
-                            className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-slate-800 font-mono placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
-                        />
-                    </div>
-
                     {/* Description */}
                     <div>
                         <label className="block font-bold text-slate-700 mb-1">
@@ -699,11 +752,11 @@ function CreateIncidentModal({
                         </button>
                         <button
                             type="submit"
-                            disabled={isSubmitting}
-                            className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold shadow-md shadow-rose-500/20 transition cursor-pointer disabled:opacity-50"
+                            disabled={isSubmitting || !stationId || !lockerId}
+                            className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold shadow-md shadow-rose-500/20 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {isSubmitting ? (
-                                <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                             ) : (
                                 <Plus className="w-4 h-4" />
                             )}
@@ -715,7 +768,6 @@ function CreateIncidentModal({
         </div>
     );
 }
-
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function IncidentRow({
