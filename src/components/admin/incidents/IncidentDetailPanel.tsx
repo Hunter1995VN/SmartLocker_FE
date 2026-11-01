@@ -26,7 +26,6 @@ import {
     RefreshCw,
     UnlockKeyhole,
     ClipboardCheck,
-    Save,
 } from 'lucide-react';
 import type {
     IncidentDetailDto,
@@ -303,6 +302,42 @@ export default function IncidentDetailPanel({
         }
     };
 
+    const submitButtonConfig = (() => {
+        switch (targetStatus) {
+            case 'IN_PROGRESS':
+                return {
+                    label: 'Cập nhật tiến độ: Đang xử lý',
+                    Icon: Clock,
+                    className: 'bg-amber-600 hover:bg-amber-700 shadow-amber-500/20 text-white',
+                };
+            case 'CANCELLED':
+                return {
+                    label: 'Xác nhận hủy phiếu sự cố',
+                    Icon: XCircle,
+                    className: 'bg-slate-700 hover:bg-slate-800 shadow-slate-500/20 text-white',
+                };
+            case 'RESOLVED':
+            default:
+                return {
+                    label: 'Lưu kết quả & Đóng sự cố (Đã xử lý xong)',
+                    Icon: CheckCircle2,
+                    className: 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20 text-white',
+                };
+        }
+    })();
+
+    const notePlaceholder = (() => {
+        switch (targetStatus) {
+            case 'IN_PROGRESS':
+                return 'Nhập tiến độ xử lý hiện tại (VD: Kỹ thuật viên đang có mặt tại trạm kiểm tra nguồn cấp, đã cô lập ô tủ)...';
+            case 'CANCELLED':
+                return 'Nhập lý do hủy phiếu (VD: Khách hàng xác nhận thao tác nhầm, ô tủ vẫn hoạt động tốt)...';
+            case 'RESOLVED':
+            default:
+                return 'Nhập nội dung biên bản xử lý (VD: Đã thay thế solenoid ngăn tủ, test đóng mở 5 lần bình thường)...';
+        }
+    })();
+
     // ── Render ────────────────────────────────────────────────────────────────
 
     return (
@@ -446,7 +481,7 @@ export default function IncidentDetailPanel({
                                     rows={2}
                                     value={resolutionNote}
                                     onChange={(e) => setResolutionNote(e.target.value)}
-                                    placeholder="Nhập nội dung kiểm tra thực tế tại trạm, nguyên nhân và biện pháp khắc phục..."
+                                    placeholder={notePlaceholder}
                                     className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/70 focus:bg-white text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500"
                                 />
                             </div>
@@ -467,14 +502,14 @@ export default function IncidentDetailPanel({
                             <button
                                 type="submit"
                                 disabled={isUpdatingStatus}
-                                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition cursor-pointer disabled:opacity-50"
+                                className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold shadow-sm transition cursor-pointer disabled:opacity-50 ${submitButtonConfig.className}`}
                             >
                                 {isUpdatingStatus ? (
                                     <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                                 ) : (
-                                    <Save className="w-3.5 h-3.5" />
+                                    <submitButtonConfig.Icon className="w-3.5 h-3.5" />
                                 )}
-                                <span>Lưu kết quả xử lý &amp; Đóng sự cố</span>
+                                <span>{submitButtonConfig.label}</span>
                             </button>
                         </form>
                     )}
