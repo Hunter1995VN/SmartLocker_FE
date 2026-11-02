@@ -1,36 +1,30 @@
 /**
  * AD-FE-07: UC-S10 (UC-A09, S-03) — Staff Inspection Form (Mắt 1)
  *
- * Staff lập biên bản niêm phong đồ quá hạn 72h (Kèm ảnh/video kiểm kê):
+ * Staff lập biên bản niêm phong đồ quá hạn 72h:
  *  - Hỗ trợ chọn nhanh từ danh sách đơn đặt quá hạn 72h (getOverdueCandidates) hoặc nhập thủ công
- *  - Hỗ trợ thêm nhiều item (Danh mục, Mô tả, Số lượng, Tình trạng, Ghi chú)
- *  - Cho phép Add, Edit, Remove item trước khi submit
- *  - Đính kèm Ảnh / Video Kiểm Kê Hiện Trường
+ *  - Hỗ trợ thêm nhiều item tài sản (Danh mục, Mô tả, Số lượng, Tình trạng, Ghi chú)
+ *  - Tải lên ảnh bằng chứng thực tế từ máy / camera (DataURL base64) hoặc nhập URL
  *  - Mã tem niêm phong vật lý (Seal Barcode)
  *  - Tải trọng cân thực địa tại trạm (kg)
- *  - Submit → POST /api/admin/abandoned-properties (kèm photoUrls)
- *  - Sau khi submit thành công → status PENDING_APPROVAL, callback onSubmitted()
- *
- * Security:
- *  - Chỉ Staff hoặc Admin mới thấy form này.
- *  - Staff không có nút Approve hay Reject trong form này.
- *  - Không tự đổi status UI khi API thất bại.
+ *  - Ghi chú tình trạng tổng quan & Cam kết an toàn
+ *  - Submit → POST /api/admin/abandoned-properties
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
     Package,
     X,
     Send,
     AlertTriangle,
     CheckCircle2,
-    MapPin,
     Box,
     Plus,
     Trash2,
     Edit2,
     Shield,
     Camera,
-    Video,
+    Upload,
+    RefreshCw,
 } from 'lucide-react';
 import abandonedPropertyService, {
     type CreateAbandonedPropertyRequest,
@@ -64,12 +58,6 @@ export const ITEM_CONDITIONS = [
     'Cũ / Có vết trầy xước',
     'Hư hỏng / Rách',
     'Cần bảo quản đặc biệt',
-];
-
-const SAMPLE_KIOSK_EVIDENCE_URLS = [
-    'https://storage.smartlocker.vn/evidence/uc-s10-locker-bay-overview.jpg',
-    'https://storage.smartlocker.vn/evidence/uc-s10-seal-3m-barcode.jpg',
-    'https://storage.smartlocker.vn/evidence/uc-s10-kiosk-inspection-clip.mp4',
 ];
 
 interface InspectionFormProps {
@@ -107,14 +95,15 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
         stationId: prefill?.stationId ?? '',
         overdueHours: prefill?.overdueHours ? String(prefill.overdueHours) : '72',
         sealCode: `SL-SEAL-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
-        measuredWeight: '6.85',
+        measuredWeight: '',
         safetyVerified: true,
-        generalCondition: 'Balo còn nguyên vẹn, dây kéo bình thường, không có dấu hiệu cạy phá.',
+        generalCondition: '',
         notes: '',
     });
 
     // Overdue booking candidates from Backend (UC-S10)
     const [candidates, setCandidates] = useState<OverdueBookingCandidateDto[]>([]);
+    const [isLoadingCandidates, setIsLoadingCandidates] = useState(false);
     const [selectedCandidateId, setSelectedCandidateId] = useState<string>('');
     const [candidateHint, setCandidateHint] = useState<{
         bookingCode?: string;
@@ -129,6 +118,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
 
     useEffect(() => {
         let mounted = true;
+        setIsLoadingCandidates(true);
         abandonedPropertyService
             .getOverdueCandidates()
             .then((res) => {
@@ -137,7 +127,10 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                 }
             })
             .catch(() => {
-                // Keep manual / prefill fallback if endpoint is unavailable
+                // Keep manual fallback if endpoint fails
+            })
+            .finally(() => {
+                if (mounted) setIsLoadingCandidates(false);
             });
         return () => {
             mounted = false;
@@ -164,33 +157,16 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
         }
     };
 
-    const [items, setItems] = useState<InventoryItem[]>([
-        {
-            id: 'item-1',
-            category: 'Balo / Vali du lịch',
-            description: 'Balo vải dù màu đen The North Face',
-            quantity: 1,
-            condition: 'Nguyên vẹn / Còn mới',
-            note: 'Dây kéo tốt, đã dán tem niêm phong chéo khóa chính',
-        },
-        {
-            id: 'item-2',
-            category: 'Đồ điện tử (Laptop/Tablet/Phone)',
-            description: 'Laptop 14 inch kèm sạc trong ngăn chống sốc',
-            quantity: 1,
-            condition: 'Đã qua sử dụng (Tốt)',
-            note: 'Để nguyên trong ngăn đệm không mở mật mã',
-        },
-    ]);
+    const [items, setItems] = useState<InventoryItem[]>([]);
 
-    // Evidence Photo / Video URLs (UC-S10)
-    const [photoUrls, setPhotoUrls] = useState<string[]>([
-        SAMPLE_KIOSK_EVIDENCE_URLS[0],
-        SAMPLE_KIOSK_EVIDENCE_URLS[1],
-    ]);
+    // Evidence Photo Upload (Real files & URL)
+    const [photoUrls, setPhotoUrls] = useState<string[]>([]);
     const [newPhotoUrl, setNewPhotoUrl] = useState<string>('');
+    const [photoError, setPhotoError] = useState<string | null>(null);
+    const [isReadingPhoto, setIsReadingPhoto] = useState<boolean>(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Editing item modal/row state
+    // Editing item state
     const [editingItemId, setEditingItemId] = useState<string | null>(null);
     const [itemInput, setItemInput] = useState<Omit<InventoryItem, 'id'>>({
         category: ITEM_CATEGORIES[0],
@@ -207,7 +183,41 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
 
     const hasPrefill = !!(prefill?.bookingId && prefill?.lockerId && prefill?.stationId && !selectedCandidateId);
 
-    // ── Evidence Photo/Video handlers (UC-S10) ─────────────────────────────────
+    // ── File upload handler (Real Photos) ──────────────────────────────────────
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        setPhotoError(null);
+        if (!files || files.length === 0) return;
+
+        const maxFiles = 5;
+        if (photoUrls.length + files.length > maxFiles) {
+            setPhotoError(`Tối đa ${maxFiles} ảnh bằng chứng.`);
+            return;
+        }
+
+        setIsReadingPhoto(true);
+        Array.from(files).forEach((file) => {
+            if (!file.type.startsWith('image/')) {
+                setPhotoError('Chỉ hỗ trợ tệp định dạng hình ảnh (PNG, JPG, WEBP).');
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                setPhotoError('Dung lượng mỗi ảnh tối đa 5MB.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                if (typeof reader.result === 'string') {
+                    setPhotoUrls((prev) => [...prev, reader.result as string]);
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+        setIsReadingPhoto(false);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+    };
 
     const handleAddPhotoUrl = () => {
         const trimmed = newPhotoUrl.trim();
@@ -218,15 +228,8 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
         setNewPhotoUrl('');
     };
 
-    const handleCaptureKioskSample = () => {
-        const nextSample =
-            SAMPLE_KIOSK_EVIDENCE_URLS.find((u) => !photoUrls.includes(u)) ??
-            `https://storage.smartlocker.vn/evidence/kiosk-cam-${Date.now().toString().slice(-4)}.jpg`;
-        setPhotoUrls((prev) => [...prev, nextSample]);
-    };
-
-    const handleRemovePhotoUrl = (url: string) => {
-        setPhotoUrls((prev) => prev.filter((u) => u !== url));
+    const handleRemovePhotoUrl = (idx: number) => {
+        setPhotoUrls((prev) => prev.filter((_, i) => i !== idx));
     };
 
     // ── Item management ────────────────────────────────────────────────────────
@@ -247,7 +250,13 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
             );
             setEditingItemId(null);
         } else {
-            setItems((prev) => [...prev, { ...itemInput, id: `item-${Date.now()}` }]);
+            setItems((prev) => [
+                ...prev,
+                {
+                    ...itemInput,
+                    id: `item-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+                },
+            ]);
         }
 
         setItemInput({
@@ -272,18 +281,21 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
         setItemError(null);
     };
 
+    const handleCancelEditItem = () => {
+        setEditingItemId(null);
+        setItemInput({
+            category: ITEM_CATEGORIES[0],
+            description: '',
+            quantity: 1,
+            condition: ITEM_CONDITIONS[0],
+            note: '',
+        });
+        setItemError(null);
+    };
+
     const handleRemoveItem = (id: string) => {
         setItems((prev) => prev.filter((it) => it.id !== id));
-        if (editingItemId === id) {
-            setEditingItemId(null);
-            setItemInput({
-                category: ITEM_CATEGORIES[0],
-                description: '',
-                quantity: 1,
-                condition: ITEM_CONDITIONS[0],
-                note: '',
-            });
-        }
+        if (editingItemId === id) handleCancelEditItem();
     };
 
     // ── Validation ─────────────────────────────────────────────────────────────
@@ -291,12 +303,16 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
     const validate = (): boolean => {
         const next: Partial<Record<keyof FormFields, string>> = {};
 
-        if (!fields.bookingId.trim()) next.bookingId = 'Vui lòng nhập Booking ID';
-        if (!fields.lockerId.trim()) next.lockerId = 'Vui lòng nhập Locker ID';
-        if (!fields.stationId.trim()) next.stationId = 'Vui lòng nhập Station ID';
-
-        const hours = Number(fields.overdueHours);
-        if (!fields.overdueHours.trim() || isNaN(hours) || hours <= 0) {
+        if (!fields.bookingId.trim()) {
+            next.bookingId = 'Vui lòng chọn đơn đặt tủ hoặc nhập Booking ID';
+        }
+        if (!fields.lockerId.trim()) {
+            next.lockerId = 'Mã ô tủ (Locker ID) là bắt buộc';
+        }
+        if (!fields.stationId.trim()) {
+            next.stationId = 'Mã trạm (Station ID) là bắt buộc';
+        }
+        if (!fields.overdueHours.trim() || Number(fields.overdueHours) <= 0) {
             next.overdueHours = 'Số giờ quá hạn phải > 0';
         }
 
@@ -331,9 +347,11 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
         if (fields.measuredWeight) {
             lines.push(`Tải trọng thực địa: ${fields.measuredWeight.trim()} kg`);
         }
-        lines.push(`Tình trạng tổng quan: ${fields.generalCondition.trim() || 'Bình thường'}`);
+        if (fields.generalCondition.trim()) {
+            lines.push(`Tình trạng tổng quan: ${fields.generalCondition.trim()}`);
+        }
         lines.push(
-            `Cam kết an toàn: ${fields.safetyVerified ? 'Đã kiểm tra sơ bộ không có chất cấm/dễ cháy nổ' : 'Chưa kiểm tra'}`
+            `Cam kết an toàn: ${fields.safetyVerified ? 'Đã kiểm tra sơ bộ không có chất cấm/dễ cháy nổ' : 'Chưa kiểm tra an toàn'}`
         );
         lines.push(`Bằng chứng đính kèm: ${photoUrls.length} tệp ảnh/video hiện trường`);
         lines.push(`\nDanh mục ${items.length} tài sản kiểm kê:`);
@@ -379,39 +397,22 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
         }
     };
 
-    if (phase === 'confirm' || phase === 'submitting') {
-        return (
-            <ConfirmDialog
-                fields={fields}
-                items={items}
-                photoUrls={photoUrls}
-                prefill={candidateHint}
-                isSubmitting={phase === 'submitting'}
-                onConfirm={handleConfirmSubmit}
-                onCancel={handleCancelConfirm}
-            />
-        );
-    }
+    // ── Render ─────────────────────────────────────────────────────────────────
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xl overflow-hidden max-w-2xl w-full">
+        <div className="bg-white rounded-2xl shadow-2xl border border-slate-200/90 max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
             {/* Header */}
-            <div className="px-6 py-4 bg-amber-50/80 border-b border-amber-200/70 flex items-start justify-between gap-3">
-                <div className="flex items-center gap-2.5">
-                    <span className="p-2 rounded-xl bg-amber-500 text-white shadow-sm shrink-0">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold shadow-md shadow-blue-500/20">
                         <Package className="w-5 h-5" />
-                    </span>
+                    </div>
                     <div>
-                        <div className="flex items-center gap-2">
-                            <h2 className="text-base font-black text-slate-900 tracking-tight">
-                                Lập Biên Bản Niêm Phong Đồ Quá Hạn 72h
-                            </h2>
-                            <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-300">
-                                Mắt 1 (Nhân viên hiện trường)
-                            </span>
-                        </div>
-                        <p className="text-xs text-slate-600 mt-0.5">
-                            Kiểm kê &amp; niêm phong đồ bỏ quên quá hạn 72h (Kèm ảnh/video hiện trường)
+                        <h2 className="text-base font-black text-slate-900 tracking-tight">
+                            Lập Biên Bản Kiểm Kê Tài Sản Bỏ Quên Quá Hạn 72h
+                        </h2>
+                        <p className="text-xs text-slate-500">
+                            Bước 1: Kỹ thuật viên (Staff) kiểm kê hiện trường theo Nguyên tắc 4 mắt (Four-Eyes Principle)
                         </p>
                     </div>
                 </div>
@@ -420,340 +421,409 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                     onClick={onCancel}
                     className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
                 >
-                    <X className="w-4 h-4" />
+                    <X className="w-5 h-5" />
                 </button>
             </div>
 
-            <div className="p-6 space-y-6 overflow-y-auto max-h-[75vh]">
-                {/* Error Banner */}
-                {phase === 'error' && apiError && (
-                    <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-rose-50 border border-rose-200/80 text-xs text-rose-800">
-                        <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
+            {/* Scrollable Form Body */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-6 text-xs">
+                {apiError && (
+                    <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-start gap-2.5">
+                        <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                         <div>
-                            <p className="font-bold">Lập biên bản thất bại</p>
-                            <p className="mt-0.5">{apiError}</p>
+                            <p className="font-bold">Lỗi xử lý hệ thống</p>
+                            <p className="text-[11px] mt-0.5">{apiError}</p>
                         </div>
                     </div>
                 )}
 
-                {/* Section 1: Context & Locker Information */}
-                <section>
-                    <SectionTitle icon={MapPin} title="1. Thông tin vị trí & Đơn đặt tủ quá hạn 72h" />
-
-                    {candidates.length > 0 && (
-                        <div className="mt-3 p-3 rounded-xl bg-amber-50/70 border border-amber-200/80">
-                            <label className="block text-[11px] font-bold text-amber-900 mb-1">
-                                Chọn nhanh Đơn đặt tủ quá hạn 72h chờ lập biên bản:
-                            </label>
-                            <select
-                                value={selectedCandidateId}
-                                onChange={(e) => handleSelectCandidate(e.target.value)}
-                                className="w-full px-3 py-1.5 text-xs rounded-lg border border-amber-300 bg-white font-semibold text-slate-800 focus:outline-none focus:ring-1 focus:ring-amber-500"
-                            >
-                                <option value="">-- Hoặc sử dụng thông tin điền sẵn bên dưới --</option>
-                                {candidates.map((c) => (
-                                    <option key={c.bookingId} value={c.bookingId}>
-                                        Ô {c.lockerCode} · Đơn #{c.bookingCode} · {c.stationName} ({c.overdueHours}h quá hạn
-                                        {c.customerName ? ` - KH: ${c.customerName}` : ''})
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    )}
-
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
-                        <FormField
-                            label="Booking ID *"
-                            value={fields.bookingId}
-                            onChange={(val) => setFields((p) => ({ ...p, bookingId: val }))}
-                            error={errors.bookingId}
-                            readOnly={hasPrefill}
-                            hint={candidateHint.bookingCode ? `#${candidateHint.bookingCode}` : undefined}
-                            mono
-                        />
-                        <FormField
-                            label="Locker ID *"
-                            value={fields.lockerId}
-                            onChange={(val) => setFields((p) => ({ ...p, lockerId: val }))}
-                            error={errors.lockerId}
-                            readOnly={hasPrefill}
-                            hint={candidateHint.lockerCode ? `Tủ: ${candidateHint.lockerCode}` : undefined}
-                            mono
-                        />
-                        <FormField
-                            label="Station ID *"
-                            value={fields.stationId}
-                            onChange={(val) => setFields((p) => ({ ...p, stationId: val }))}
-                            error={errors.stationId}
-                            readOnly={hasPrefill}
-                            hint={candidateHint.stationName ? candidateHint.stationName : undefined}
-                            mono
-                        />
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
-                        <FormField
-                            label="Số giờ quá hạn (≥ 72h) *"
-                            type="number"
-                            value={fields.overdueHours}
-                            onChange={(val) => setFields((p) => ({ ...p, overdueHours: val }))}
-                            error={errors.overdueHours}
-                            hint="Ngưỡng niêm phong chuẩn: 72h"
-                        />
-                        <FormField
-                            label="Mã tem niêm phong vật lý *"
-                            value={fields.sealCode}
-                            onChange={(val) => setFields((p) => ({ ...p, sealCode: val }))}
-                            error={errors.sealCode}
-                            placeholder="VD: SL-SEAL-2025-0894"
-                            mono
-                        />
-                        <FormField
-                            label="Cân nặng thực tế tại trạm (kg)"
-                            value={fields.measuredWeight}
-                            onChange={(val) => setFields((p) => ({ ...p, measuredWeight: val }))}
-                            placeholder="6.85"
-                            hint="Đối chiếu cảm biến Loadcell"
-                        />
-                    </div>
-                </section>
-
-                {/* Section 2: Item List Management */}
-                <section>
-                    <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                        <div className="flex items-center gap-2">
-                            <Box className="w-3.5 h-3.5 text-slate-500" />
-                            <p className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
-                                2. Danh mục tài sản kiểm kê ({items.length} món)
-                            </p>
-                        </div>
-                        <span className="text-[11px] text-slate-400">
-                            Thêm / Sửa / Xóa từng vật thể tìm thấy
-                        </span>
-                    </div>
-
-                    {/* Table of items */}
-                    <div className="mt-3 border border-slate-200/90 rounded-xl overflow-hidden divide-y divide-slate-100">
-                        {items.length === 0 ? (
-                            <div className="p-4 text-center text-xs text-slate-400">
-                                Chưa có tài sản nào. Vui lòng thêm ít nhất 1 tài sản bên dưới.
-                            </div>
-                        ) : (
-                            items.map((it, idx) => (
-                                <div key={it.id} className="p-3 bg-white flex items-start justify-between gap-3 hover:bg-slate-50/70 transition">
-                                    <div className="flex items-start gap-2.5 min-w-0">
-                                        <span className="w-5 h-5 rounded-full bg-slate-100 text-slate-600 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
-                                            {idx + 1}
-                                        </span>
-                                        <div className="min-w-0">
-                                            <div className="flex items-center gap-2 flex-wrap">
-                                                <span className="text-xs font-bold text-slate-900">
-                                                    {it.description}
-                                                </span>
-                                                <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
-                                                    {it.category}
-                                                </span>
-                                                <span className="text-[11px] font-bold text-slate-600">
-                                                    x{it.quantity}
-                                                </span>
-                                            </div>
-                                            <p className="text-[11px] text-slate-500 mt-0.5">
-                                                Tình trạng: <strong className="text-slate-700">{it.condition}</strong>
-                                                {it.note ? ` · Ghi chú: ${it.note}` : ''}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-1 shrink-0">
-                                        <button
-                                            type="button"
-                                            onClick={() => handleEditItem(it)}
-                                            className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition cursor-pointer"
-                                            title="Sửa món này"
-                                        >
-                                            <Edit2 className="w-3.5 h-3.5" />
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => handleRemoveItem(it.id)}
-                                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
-                                            title="Xóa món này"
-                                        >
-                                            <Trash2 className="w-3.5 h-3.5" />
-                                        </button>
-                                    </div>
-                                </div>
-                            ))
+                {/* Section 1: Candidate Selection */}
+                <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                        <h3 className="font-bold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                            <Box className="w-4 h-4 text-blue-600" />
+                            <span>1. Chọn đơn đặt tủ quá hạn 72h chờ kiểm kê</span>
+                        </h3>
+                        {candidates.length > 0 && (
+                            <span className="text-[11px] font-semibold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
+                                {candidates.length} đơn chờ xử lý
+                            </span>
                         )}
                     </div>
 
-                    {itemError && (
-                        <p className="mt-2 text-xs text-rose-600 font-medium">{itemError}</p>
+                    {isLoadingCandidates ? (
+                        <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 text-center text-slate-500 flex items-center justify-center gap-2">
+                            <RefreshCw className="w-4 h-4 animate-spin text-blue-600" />
+                            <span>Đang kiểm tra danh sách đơn quá hạn 72h...</span>
+                        </div>
+                    ) : candidates.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-48 overflow-y-auto p-1">
+                            {candidates.map((c) => (
+                                <button
+                                    key={c.bookingId}
+                                    type="button"
+                                    onClick={() => handleSelectCandidate(c.bookingId)}
+                                    className={`p-3 rounded-xl border text-left transition cursor-pointer flex flex-col justify-between ${
+                                        fields.bookingId === c.bookingId
+                                            ? 'bg-blue-50 border-blue-500 ring-2 ring-blue-500/20'
+                                            : 'bg-white border-slate-200 hover:bg-slate-50'
+                                    }`}
+                                >
+                                    <div className="flex items-center justify-between">
+                                        <span className="font-mono font-bold text-slate-900 text-xs">
+                                            #{c.bookingCode} · Ô {c.lockerCode}
+                                        </span>
+                                        <span className="text-[10px] font-bold text-rose-600 font-mono bg-rose-50 px-1.5 py-0.5 rounded">
+                                            +{c.overdueHours}h quá hạn
+                                        </span>
+                                    </div>
+                                    <p className="text-[11px] text-slate-600 truncate mt-1">
+                                        {c.customerName || 'Khách hàng'} · {c.stationName}
+                                    </p>
+                                    {c.overdueDebt ? (
+                                        <p className="text-[10px] text-rose-600 font-bold mt-1">
+                                            Nợ cước: {c.overdueDebt.toLocaleString('vi-VN')} đ
+                                        </p>
+                                    ) : null}
+                                </button>
+                            ))}
+                        </div>
+                    ) : hasPrefill ? (
+                        <div className="p-3 rounded-xl bg-blue-50/80 border border-blue-200 text-blue-900 flex items-center justify-between">
+                            <div>
+                                <span className="font-bold">Đang lập cho đơn: </span>
+                                <span className="font-mono font-bold">#{candidateHint.bookingCode}</span>
+                                <span> tại Ô </span>
+                                <span className="font-mono font-bold text-blue-700">{candidateHint.lockerCode}</span>
+                                <span> ({candidateHint.stationName})</span>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 text-center">
+                            Không có đơn đặt tủ quá hạn nào chờ xử lý. Bạn có thể nhập mã thủ công bên dưới.
+                        </div>
                     )}
 
-                    {/* Add / Edit Item Sub-form */}
-                    <div className="mt-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200/90 space-y-3">
-                        <p className="text-xs font-bold text-slate-700 flex items-center justify-between">
-                            <span>{editingItemId ? '✏️ Chỉnh sửa tài sản' : '➕ Thêm tài sản mới'}</span>
-                            {editingItemId && (
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setEditingItemId(null);
-                                        setItemInput({
-                                            category: ITEM_CATEGORIES[0],
-                                            description: '',
-                                            quantity: 1,
-                                            condition: ITEM_CONDITIONS[0],
-                                            note: '',
-                                        });
-                                    }}
-                                    className="text-[11px] text-slate-500 hover:text-slate-800 underline cursor-pointer"
-                                >
-                                    Hủy sửa
-                                </button>
-                            )}
-                        </p>
+                    {/* Manual IDs if no candidate chosen */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                        <div>
+                            <label className="block font-bold text-slate-700 mb-1">
+                                Mã đơn (Booking ID) <span className="text-rose-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                value={fields.bookingId}
+                                onChange={(e) => setFields((p) => ({ ...p, bookingId: e.target.value }))}
+                                placeholder="Nhập Booking ID..."
+                                className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-mono text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                            />
+                            {errors.bookingId && <p className="text-rose-600 text-[10px] mt-0.5">{errors.bookingId}</p>}
+                        </div>
+                        <div>
+                            <label className="block font-bold text-slate-700 mb-1">
+                                Ô tủ (Locker ID) <span className="text-rose-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                value={fields.lockerId}
+                                onChange={(e) => setFields((p) => ({ ...p, lockerId: e.target.value }))}
+                                placeholder="Nhập Locker ID..."
+                                className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-mono text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                            />
+                            {errors.lockerId && <p className="text-rose-600 text-[10px] mt-0.5">{errors.lockerId}</p>}
+                        </div>
+                        <div>
+                            <label className="block font-bold text-slate-700 mb-1">
+                                Trạm (Station ID) <span className="text-rose-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                value={fields.stationId}
+                                onChange={(e) => setFields((p) => ({ ...p, stationId: e.target.value }))}
+                                placeholder="Nhập Station ID..."
+                                className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-mono text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                            />
+                            {errors.stationId && <p className="text-rose-600 text-[10px] mt-0.5">{errors.stationId}</p>}
+                        </div>
+                    </div>
+                </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {/* Section 2: Seal and Weight */}
+                <div className="space-y-3 pt-3 border-t border-slate-100">
+                    <h3 className="font-bold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                        <Shield className="w-4 h-4 text-blue-600" />
+                        <span>2. Mã tem niêm phong vật lý &amp; Trọng lượng kiểm kê</span>
+                    </h3>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label className="block font-bold text-slate-700 mb-1">
+                                Mã tem niêm phong (Seal Barcode) <span className="text-rose-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                value={fields.sealCode}
+                                onChange={(e) => setFields((p) => ({ ...p, sealCode: e.target.value }))}
+                                placeholder="VD: SL-SEAL-2026-1042..."
+                                className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-mono font-bold text-blue-700 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                            />
+                            {errors.sealCode && <p className="text-rose-600 text-[10px] mt-0.5">{errors.sealCode}</p>}
+                        </div>
+
+                        <div>
+                            <label className="block font-bold text-slate-700 mb-1">
+                                Tải trọng cân thực địa (kg)
+                            </label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                value={fields.measuredWeight}
+                                onChange={(e) => setFields((p) => ({ ...p, measuredWeight: e.target.value }))}
+                                placeholder="VD: 5.50..."
+                                className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block font-bold text-slate-700 mb-1">
+                                Số giờ quá hạn thực tế <span className="text-rose-500">*</span>
+                            </label>
+                            <input
+                                type="number"
+                                value={fields.overdueHours}
+                                onChange={(e) => setFields((p) => ({ ...p, overdueHours: e.target.value }))}
+                                className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                        <div>
+                            <label className="block font-bold text-slate-700 mb-1">
+                                Tình trạng tổng quan kiện hàng
+                            </label>
+                            <input
+                                type="text"
+                                value={fields.generalCondition}
+                                onChange={(e) => setFields((p) => ({ ...p, generalCondition: e.target.value }))}
+                                placeholder="VD: Vali kéo màu xám, khóa số còn nguyên, không có mùi lạ..."
+                                className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                            />
+                        </div>
+
+                        <div className="flex items-center pt-5">
+                            <label className="flex items-center gap-2 cursor-pointer select-none">
+                                <input
+                                    type="checkbox"
+                                    checked={fields.safetyVerified}
+                                    onChange={(e) => setFields((p) => ({ ...p, safetyVerified: e.target.checked }))}
+                                    className="w-4 h-4 accent-emerald-600 rounded"
+                                />
+                                <span className="font-semibold text-slate-700">
+                                    Cam kết: Đã kiểm tra sơ bộ, KHÔNG có chất cấm, chất cháy nổ hoặc hàng nguy hiểm
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Section 3: Detailed Inventory Items */}
+                <div className="space-y-3 pt-3 border-t border-slate-100">
+                    <div className="flex items-center justify-between">
+                        <h3 className="font-bold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                            <Package className="w-4 h-4 text-blue-600" />
+                            <span>3. Danh mục tài sản kiểm kê chi tiết ({items.length} món)</span>
+                        </h3>
+                    </div>
+
+                    {/* Add / Edit item input box */}
+                    <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
                             <div>
-                                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                                    Phân loại danh mục *
-                                </label>
+                                <label className="block text-[11px] font-bold text-slate-600 mb-1">Danh mục</label>
                                 <select
                                     value={itemInput.category}
                                     onChange={(e) => setItemInput((p) => ({ ...p, category: e.target.value }))}
-                                    className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-xs focus:outline-none"
                                 >
-                                    {ITEM_CATEGORIES.map((c) => (
-                                        <option key={c} value={c}>{c}</option>
+                                    {ITEM_CATEGORIES.map((cat) => (
+                                        <option key={cat} value={cat}>
+                                            {cat}
+                                        </option>
                                     ))}
                                 </select>
                             </div>
-
-                            <div>
-                                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                                    Tình trạng tài sản
-                                </label>
-                                <select
-                                    value={itemInput.condition}
-                                    onChange={(e) => setItemInput((p) => ({ ...p, condition: e.target.value }))}
-                                    className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                >
-                                    {ITEM_CONDITIONS.map((c) => (
-                                        <option key={c} value={c}>{c}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
-                            <div className="sm:col-span-3">
-                                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                                    Mô tả chi tiết tài sản *
+                            <div className="sm:col-span-2">
+                                <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                                    Mô tả tài sản <span className="text-rose-500">*</span>
                                 </label>
                                 <input
                                     type="text"
                                     value={itemInput.description}
                                     onChange={(e) => setItemInput((p) => ({ ...p, description: e.target.value }))}
-                                    placeholder="VD: Balo The North Face màu đen, ví da..."
-                                    className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    placeholder="VD: Laptop Dell XPS 13 inch màu bạc..."
+                                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-xs focus:outline-none"
                                 />
                             </div>
                             <div>
-                                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                                    Số lượng *
-                                </label>
+                                <label className="block text-[11px] font-bold text-slate-600 mb-1">Số lượng</label>
                                 <input
                                     type="number"
                                     min="1"
                                     value={itemInput.quantity}
-                                    onChange={(e) => setItemInput((p) => ({ ...p, quantity: Math.max(1, Number(e.target.value)) }))}
-                                    className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    onChange={(e) =>
+                                        setItemInput((p) => ({ ...p, quantity: Math.max(1, Number(e.target.value)) }))
+                                    }
+                                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-xs focus:outline-none"
                                 />
                             </div>
                         </div>
 
-                        <div>
-                            <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                                Ghi chú tình trạng / Đặc điểm nhận dạng
-                            </label>
-                            <input
-                                type="text"
-                                value={itemInput.note}
-                                onChange={(e) => setItemInput((p) => ({ ...p, note: e.target.value }))}
-                                placeholder="VD: Khóa bấm kim loại, quai đeo hơi sờn..."
-                                className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
-                            />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <div>
+                                <label className="block text-[11px] font-bold text-slate-600 mb-1">Tình trạng</label>
+                                <select
+                                    value={itemInput.condition}
+                                    onChange={(e) => setItemInput((p) => ({ ...p, condition: e.target.value }))}
+                                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-xs focus:outline-none"
+                                >
+                                    {ITEM_CONDITIONS.map((cond) => (
+                                        <option key={cond} value={cond}>
+                                            {cond}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-[11px] font-bold text-slate-600 mb-1">Ghi chú thêm</label>
+                                <input
+                                    type="text"
+                                    value={itemInput.note}
+                                    onChange={(e) => setItemInput((p) => ({ ...p, note: e.target.value }))}
+                                    placeholder="VD: Để trong túi chống sốc..."
+                                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-xs focus:outline-none"
+                                />
+                            </div>
                         </div>
 
-                        <div className="flex justify-end pt-1">
+                        {itemError && <p className="text-rose-600 text-[11px] font-semibold">{itemError}</p>}
+
+                        <div className="flex justify-end gap-2 pt-1">
+                            {editingItemId && (
+                                <button
+                                    type="button"
+                                    onClick={handleCancelEditItem}
+                                    className="px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 font-semibold cursor-pointer"
+                                >
+                                    Hủy sửa
+                                </button>
+                            )}
                             <button
                                 type="button"
                                 onClick={handleSaveItem}
-                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition cursor-pointer"
+                                className="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold flex items-center gap-1.5 shadow-sm cursor-pointer"
                             >
                                 <Plus className="w-3.5 h-3.5" />
-                                {editingItemId ? 'Lưu thay đổi' : 'Thêm vào danh mục'}
+                                <span>{editingItemId ? 'Lưu chỉnh sửa' : 'Thêm vào danh mục'}</span>
                             </button>
                         </div>
                     </div>
-                </section>
 
-                {/* Section 3: Đính kèm Ảnh / Video Kiểm Kê Hiện Trường */}
-                <section className="space-y-3">
-                    <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
-                        <div className="flex items-center gap-2">
-                            <Camera className="w-4 h-4 text-blue-600" />
-                            <p className="text-xs font-bold text-slate-700">
-                                3. Đính kèm Ảnh / Video Kiểm Kê Hiện Trường
-                            </p>
+                    {/* Items table / list */}
+                    {items.length > 0 ? (
+                        <div className="border border-slate-200 rounded-xl overflow-hidden">
+                            <table className="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold">
+                                        <th className="p-2.5 w-10 text-center">#</th>
+                                        <th className="p-2.5">Tài sản</th>
+                                        <th className="p-2.5 w-28">Danh mục</th>
+                                        <th className="p-2.5 w-16 text-center">SL</th>
+                                        <th className="p-2.5 w-32">Tình trạng</th>
+                                        <th className="p-2.5 w-20 text-center">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100">
+                                    {items.map((it, idx) => (
+                                        <tr key={it.id} className="hover:bg-slate-50/80">
+                                            <td className="p-2.5 text-center font-bold text-slate-400">{idx + 1}</td>
+                                            <td className="p-2.5">
+                                                <p className="font-semibold text-slate-900">{it.description}</p>
+                                                {it.note && <p className="text-[11px] text-slate-400 mt-0.5">{it.note}</p>}
+                                            </td>
+                                            <td className="p-2.5 text-slate-600">{it.category}</td>
+                                            <td className="p-2.5 text-center font-mono font-bold text-slate-900">{it.quantity}</td>
+                                            <td className="p-2.5 text-slate-600">{it.condition}</td>
+                                            <td className="p-2.5 text-center">
+                                                <div className="flex items-center justify-center gap-1">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleEditItem(it)}
+                                                        className="p-1 rounded text-slate-400 hover:text-blue-600 hover:bg-blue-50 cursor-pointer"
+                                                        title="Sửa"
+                                                    >
+                                                        <Edit2 className="w-3.5 h-3.5" />
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleRemoveItem(it.id)}
+                                                        className="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
+                                                        title="Xóa"
+                                                    >
+                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
-                        <button
-                            type="button"
-                            onClick={handleCaptureKioskSample}
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 text-[11px] font-bold hover:bg-blue-100 transition cursor-pointer"
-                        >
-                            <Video className="w-3.5 h-3.5" />
-                            Chụp ảnh mẫu từ Camera Kiosk
-                        </button>
+                    ) : (
+                        <div className="p-4 rounded-xl border border-dashed border-slate-300 text-center text-slate-400">
+                            Chưa có tài sản nào trong danh mục. Hãy nhập thông tin phía trên và nhấn &quot;Thêm vào danh mục&quot;.
+                        </div>
+                    )}
+                </div>
+
+                {/* Section 4: Real Evidence Photo Upload */}
+                <div className="space-y-3 pt-3 border-t border-slate-100">
+                    <div className="flex items-center justify-between">
+                        <h3 className="font-bold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                            <Camera className="w-4 h-4 text-blue-600" />
+                            <span>4. Ảnh bằng chứng hiện trường / Tem niêm phong ({photoUrls.length}/5 ảnh)</span>
+                        </h3>
                     </div>
 
-                    <div className="flex gap-2">
-                        <input
-                            type="text"
-                            value={newPhotoUrl}
-                            onChange={(e) => setNewPhotoUrl(e.target.value)}
-                            placeholder="Nhập URL ảnh/video bằng chứng hiện trường (https://...)"
-                            className="flex-1 px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        />
-                        <button
-                            type="button"
-                            onClick={handleAddPhotoUrl}
-                            className="px-3 py-1.5 rounded-lg bg-slate-800 text-white text-xs font-bold hover:bg-slate-700 transition cursor-pointer shrink-0"
-                        >
-                            Thêm bằng chứng
-                        </button>
-                    </div>
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleFileChange}
+                        className="hidden"
+                    />
 
+                    {photoError && <p className="text-rose-600 text-[11px] font-semibold">{photoError}</p>}
+
+                    {/* Image thumbnails */}
                     {photoUrls.length > 0 && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                             {photoUrls.map((url, idx) => (
                                 <div
-                                    key={`${url}-${idx}`}
-                                    className="flex items-center justify-between gap-2 p-2 rounded-lg bg-slate-50 border border-slate-200 text-[11px]"
+                                    key={idx}
+                                    className="relative rounded-xl border border-slate-200 overflow-hidden group bg-slate-50 aspect-video flex items-center justify-center"
                                 >
-                                    <div className="flex items-center gap-2 min-w-0">
-                                        <span className="px-1.5 py-0.5 rounded bg-slate-800 text-white font-mono text-[10px] shrink-0">
-                                            #{idx + 1}
-                                        </span>
-                                        <span className="truncate font-mono text-slate-700" title={url}>
-                                            {url.split('/').pop() || url}
-                                        </span>
-                                    </div>
+                                    <img
+                                        src={url}
+                                        alt={`Bằng chứng #${idx + 1}`}
+                                        className="w-full h-full object-cover"
+                                    />
                                     <button
                                         type="button"
-                                        onClick={() => handleRemovePhotoUrl(url)}
-                                        className="text-slate-400 hover:text-rose-600 p-1 cursor-pointer shrink-0"
-                                        title="Xóa tệp này"
+                                        onClick={() => handleRemovePhotoUrl(idx)}
+                                        className="absolute top-1 right-1 p-1 rounded-full bg-black/60 text-white hover:bg-rose-600 transition cursor-pointer"
+                                        title="Xóa ảnh này"
                                     >
                                         <X className="w-3.5 h-3.5" />
                                     </button>
@@ -761,256 +831,101 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                             ))}
                         </div>
                     )}
-                </section>
 
-                {/* Section 4: Inspection notes & Safety confirmation */}
-                <section className="space-y-3">
-                    <SectionTitle icon={Shield} title="4. Xác nhận an toàn & Ghi chú hiện trường" />
+                    {/* Action buttons to add photo */}
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={isReadingPhoto || photoUrls.length >= 5}
+                            className="px-4 py-2.5 rounded-xl border-2 border-dashed border-slate-300 hover:border-blue-400 bg-slate-50/60 hover:bg-blue-50/20 text-slate-700 font-bold flex items-center justify-center gap-2 transition cursor-pointer disabled:opacity-50"
+                        >
+                            <Upload className="w-4 h-4 text-blue-600" />
+                            <span>{isReadingPhoto ? 'Đang đọc ảnh...' : 'Tải ảnh từ máy / Chụp ảnh'}</span>
+                        </button>
 
-                    <label className="flex items-start gap-2.5 p-3 rounded-xl bg-emerald-50/80 border border-emerald-200/80 cursor-pointer">
-                        <input
-                            type="checkbox"
-                            checked={fields.safetyVerified}
-                            onChange={(e) => setFields((p) => ({ ...p, safetyVerified: e.target.checked }))}
-                            className="mt-0.5 accent-emerald-600 w-4 h-4 rounded"
-                        />
-                        <span className="text-xs text-emerald-900 font-semibold leading-relaxed">
-                            Đã kiểm tra sơ bộ an toàn vật lý: KHÔNG phát hiện chất cấm, chất lỏng dễ cháy nổ, vũ khí hoặc thực phẩm ôi thiu phát tán mùi.
-                        </span>
-                    </label>
-
-                    <div>
-                        <label className="block text-xs font-semibold text-slate-700 mb-1">
-                            Ghi chú hiện trường của Kỹ thuật viên (Staff)
-                        </label>
-                        <textarea
-                            value={fields.generalCondition}
-                            onChange={(e) => setFields((p) => ({ ...p, generalCondition: e.target.value }))}
-                            rows={2}
-                            placeholder="Mô tả bao quát tình trạng hiện trường..."
-                            className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 bg-white resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/30"
-                        />
+                        <div className="flex-1 flex gap-2">
+                            <input
+                                type="url"
+                                value={newPhotoUrl}
+                                onChange={(e) => setNewPhotoUrl(e.target.value)}
+                                placeholder="Hoặc dán URL ảnh trực tiếp..."
+                                className="flex-1 px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            />
+                            <button
+                                type="button"
+                                onClick={handleAddPhotoUrl}
+                                disabled={!newPhotoUrl.trim() || photoUrls.length >= 5}
+                                className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition cursor-pointer disabled:opacity-50"
+                            >
+                                Thêm URL
+                            </button>
+                        </div>
                     </div>
-                </section>
+                </div>
 
-                {/* Four-Eyes Reminder */}
-                <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-blue-50 border border-blue-200/80 text-xs text-blue-900">
-                    <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-blue-600" />
-                    <div>
-                        <p className="font-bold">Tuân thủ nguyên tắc 4 mắt (Four-Eyes Principle)</p>
-                        <p className="mt-0.5 text-blue-800">
-                            Biên bản sau khi tạo sẽ chuyển sang trạng thái <strong>CHỜ ADMIN DUYỆT (PENDING_APPROVAL)</strong>. Bạn sẽ không có quyền tự phê duyệt hồ sơ này.
-                        </p>
-                    </div>
+                {/* Section 5: Staff General Notes */}
+                <div className="space-y-2 pt-3 border-t border-slate-100">
+                    <label className="block font-bold text-slate-700">Ghi chú bổ sung của Staff:</label>
+                    <textarea
+                        rows={2}
+                        value={fields.notes}
+                        onChange={(e) => setFields((p) => ({ ...p, notes: e.target.value }))}
+                        placeholder="Nhập bất kỳ lưu ý nào khác (VD: Đã dán tem niêm phong chéo mép tủ, khách có hẹn lấy trước 18h...)"
+                        className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                    />
                 </div>
             </div>
 
-            {/* Footer */}
-            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/60 flex flex-col-reverse sm:flex-row gap-2.5 sm:justify-end">
+            {/* Footer Buttons */}
+            <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between">
                 <button
                     type="button"
                     onClick={onCancel}
-                    className="px-5 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 transition cursor-pointer"
+                    className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-100 transition cursor-pointer"
                 >
-                    Hủy
+                    Đóng
                 </button>
-                <button
-                    type="button"
-                    onClick={handleRequestSubmit}
-                    className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-500/25 transition cursor-pointer"
-                >
-                    <Send className="w-3.5 h-3.5" />
-                    Kiểm tra &amp; Gửi biên bản 72h (Mắt 1)
-                </button>
-            </div>
-        </div>
-    );
-}
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-function SectionTitle({
-    icon: Icon,
-    title,
-}: {
-    icon: React.ComponentType<{ className?: string }>;
-    title: string;
-}) {
-    return (
-        <div className="flex items-center gap-2 pb-1.5 border-b border-slate-100">
-            <Icon className="w-4 h-4 text-slate-400" />
-            <p className="text-xs font-bold text-slate-700">{title}</p>
-        </div>
-    );
-}
-
-function FormField({
-    label,
-    value,
-    onChange,
-    error,
-    readOnly = false,
-    placeholder = '',
-    hint,
-    type = 'text',
-    mono = false,
-}: {
-    label: string;
-    value: string;
-    onChange: (val: string) => void;
-    error?: string;
-    readOnly?: boolean;
-    placeholder?: string;
-    hint?: string;
-    type?: string;
-    mono?: boolean;
-}) {
-    return (
-        <div>
-            <label className="block text-[11px] font-semibold text-slate-700 mb-1">{label}</label>
-            <input
-                type={type}
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                readOnly={readOnly}
-                placeholder={placeholder}
-                className={`w-full px-3 py-1.5 text-xs rounded-lg border transition focus:outline-none focus:ring-1 focus:ring-blue-500 ${
-                    mono ? 'font-mono' : ''
-                } ${
-                    readOnly
-                        ? 'bg-slate-100 text-slate-500 border-slate-200 cursor-default'
-                        : error
-                        ? 'border-rose-300 bg-rose-50'
-                        : 'border-slate-200 bg-white'
-                }`}
-            />
-            {hint && !error && <p className="mt-0.5 text-[10px] text-slate-400">{hint}</p>}
-            {error && <p className="mt-0.5 text-[10px] text-rose-600 font-medium">{error}</p>}
-        </div>
-    );
-}
-
-function ConfirmDialog({
-    fields,
-    items,
-    photoUrls,
-    prefill,
-    isSubmitting,
-    onConfirm,
-    onCancel,
-}: {
-    fields: FormFields;
-    items: InventoryItem[];
-    photoUrls: string[];
-    prefill?: {
-        bookingCode?: string;
-        lockerCode?: string;
-        stationName?: string;
-        customerName?: string | null;
-    };
-    isSubmitting: boolean;
-    onConfirm: () => void;
-    onCancel: () => void;
-}) {
-    return (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
-            role="dialog"
-            aria-modal="true"
-        >
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg border border-slate-200/80 overflow-hidden">
-                <div className="px-6 pt-5 pb-4 border-b border-slate-100 flex items-start justify-between">
-                    <div>
-                        <h3 className="text-base font-black text-slate-900">
-                            Xác nhận gửi biên bản niêm phong 72h?
-                        </h3>
-                        <p className="text-xs text-slate-500 mt-0.5">
-                            Sau khi gửi, biên bản sẽ chuyển sang trạng thái PENDING_APPROVAL chờ Admin phê duyệt.
-                        </p>
-                    </div>
-                    {!isSubmitting && (
+                <div className="flex items-center gap-2">
+                    {phase === 'confirm' ? (
+                        <>
+                            <button
+                                type="button"
+                                onClick={handleCancelConfirm}
+                                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-100 transition cursor-pointer"
+                            >
+                                Quay lại sửa
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleConfirmSubmit}
+                                className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold flex items-center gap-2 shadow-md shadow-blue-500/20 transition cursor-pointer"
+                            >
+                                <Send className="w-4 h-4" />
+                                <span>Xác nhận ký biên bản (Mắt 1)</span>
+                            </button>
+                        </>
+                    ) : (
                         <button
                             type="button"
-                            onClick={onCancel}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+                            onClick={handleRequestSubmit}
+                            disabled={phase === 'submitting'}
+                            className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold flex items-center gap-2 shadow-md shadow-blue-500/20 transition cursor-pointer disabled:opacity-50"
                         >
-                            <X className="w-4 h-4" />
+                            {phase === 'submitting' ? (
+                                <>
+                                    <RefreshCw className="w-4 h-4 animate-spin" />
+                                    <span>Đang lưu biên bản...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <CheckCircle2 className="w-4 h-4" />
+                                    <span>Hoàn tất &amp; Gửi duyệt 4 mắt</span>
+                                </>
+                            )}
                         </button>
                     )}
-                </div>
-
-                <div className="px-6 py-4 space-y-2.5 text-xs max-h-[60vh] overflow-y-auto">
-                    <div className="p-3 bg-slate-50 rounded-xl space-y-1.5 border border-slate-100">
-                        <div className="flex justify-between">
-                            <span className="text-slate-500">Mã tem niêm phong:</span>
-                            <span className="font-mono font-bold text-slate-800">{fields.sealCode}</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span className="text-slate-500">Trạm / Tủ:</span>
-                            <span className="font-semibold text-slate-800">
-                                {prefill?.stationName || fields.stationId} · {prefill?.lockerCode || fields.lockerId}
-                            </span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span className="text-slate-500">Thời gian quá hạn:</span>
-                            <span className="font-bold text-amber-700">{fields.overdueHours} giờ</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span className="text-slate-500">Bằng chứng ảnh/video:</span>
-                            <span className="font-bold text-blue-700">{photoUrls.length} tệp đính kèm</span>
-                        </div>
-                        {fields.measuredWeight && (
-                            <div className="flex justify-between">
-                                <span className="text-slate-500">Tải trọng thực địa:</span>
-                                <span className="font-semibold text-slate-800">{fields.measuredWeight} kg</span>
-                            </div>
-                        )}
-                    </div>
-
-                    <div>
-                        <p className="font-bold text-slate-700 mb-1">Danh mục tài sản ({items.length} món):</p>
-                        <div className="space-y-1 border border-slate-200/80 rounded-lg p-2.5 bg-slate-50/50">
-                            {items.map((it, i) => (
-                                <p key={it.id} className="text-slate-700">
-                                    {i + 1}. <strong>{it.description}</strong> (x{it.quantity} · {it.category} · {it.condition})
-                                </p>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 p-2.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-800">
-                        <CheckCircle2 className="w-4 h-4 shrink-0 text-blue-500" />
-                        <span>Biên bản sẽ được gửi đến Quản trị viên (Admin) để thẩm tra (Nguyên tắc 4 mắt).</span>
-                    </div>
-                </div>
-
-                <div className="px-6 pb-5 pt-3 border-t border-slate-100 flex flex-col-reverse sm:flex-row gap-2.5 sm:justify-end">
-                    <button
-                        type="button"
-                        onClick={onCancel}
-                        disabled={isSubmitting}
-                        className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50 transition cursor-pointer"
-                    >
-                        Quay lại sửa
-                    </button>
-                    <button
-                        type="button"
-                        onClick={onConfirm}
-                        disabled={isSubmitting}
-                        className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition disabled:opacity-60 cursor-pointer"
-                    >
-                        {isSubmitting ? (
-                            <>
-                                <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                Đang lưu biên bản...
-                            </>
-                        ) : (
-                            <>
-                                <Send className="w-3.5 h-3.5" />
-                                Xác nhận gửi biên bản
-                            </>
-                        )}
-                    </button>
                 </div>
             </div>
         </div>

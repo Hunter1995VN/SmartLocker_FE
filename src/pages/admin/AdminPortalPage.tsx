@@ -198,7 +198,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
             <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
                 <main className="p-4 sm:p-6 lg:p-7 space-y-5 max-w-7xl w-full mx-auto">
                     {activeMenu === 'abandoned' ? (
-                        <AbandonedPropertyView userRole={role} />
+                        <AbandonedPropertyView userRole={role} currentUser={user} />
                     ) : activeMenu === 'incidents' ? (
                         <EmergencyIncidentListView userRole={role} onOpenCountChange={(count) => setOpenIncidentsBadge(count)} onIncidentsChanged={() => { void fetchStats(); }} />
                     ) : activeMenu === 'lockers' ? (
