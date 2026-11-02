@@ -35,6 +35,7 @@ export type AdminMenuKey =
     | 'abandoned'
     | 'reconciliation'
     | 'refunds'
+    | 'reports'
     | 'audit';
 
 interface AdminSidebarProps {
@@ -59,7 +60,7 @@ export default function AdminSidebar({
     const isStaff = role.toLowerCase() === 'staff';
 
     return (
-        <aside className="w-64 bg-white border-r border-slate-200/90 flex flex-col justify-between shrink-0 select-none min-h-screen">
+        <aside className="w-64 bg-white border-r border-slate-200/90 flex flex-col justify-between shrink-0 select-none min-h-screen print:hidden">
             {/* Top Logo & App Title */}
             <div>
                 <div className="p-5 border-b border-slate-100 flex items-center gap-3">
@@ -320,11 +321,26 @@ export default function AdminSidebar({
 
                             <button
                                 type="button"
-                                onClick={() => onSelectMenu?.('reconciliation')}
-                                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-pointer text-left"
+                                onClick={() => onSelectMenu?.('reports')}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition cursor-pointer text-left ${
+                                    activeMenu === 'reports'
+                                        ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-600/30'
+                                        : 'text-slate-600 hover:bg-slate-50'
+                                }`}
                             >
-                                <BarChart3 className="w-4 h-4 text-slate-400" />
-                                <span>Báo cáo tài chính</span>
+                                <span className="flex items-center gap-2.5">
+                                    <BarChart3 className={`w-4 h-4 ${activeMenu === 'reports' ? 'text-white' : 'text-indigo-500'}`} />
+                                    <span>Báo cáo tài chính</span>
+                                </span>
+                                <span
+                                    className={`px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase ${
+                                        activeMenu === 'reports'
+                                            ? 'bg-white/20 text-white'
+                                            : 'bg-indigo-50 text-indigo-700 border border-indigo-200/80'
+                                    }`}
+                                >
+                                    REPORT
+                                </span>
                             </button>
                         </div>
                     </div>
