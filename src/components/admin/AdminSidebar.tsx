@@ -7,6 +7,7 @@ import {
     Receipt,
     LayoutDashboard,
     Box,
+    Gauge,
     Layers,
     Cpu,
     ShieldAlert,
@@ -31,6 +32,7 @@ export type AdminMenuKey =
     | 'users'
     | 'debt'
     | 'lockers'
+    | 'occupancy'
     | 'incidents'
     | 'abandoned'
     | 'reconciliation'
@@ -134,6 +136,30 @@ export default function AdminSidebar({
                                 <span className="flex items-center gap-2.5">
                                     <Box className={`w-4 h-4 ${activeMenu === 'lockers' ? 'text-white' : 'text-slate-400'}`} />
                                     <span>Lưới ô tủ</span>
+                                </span>
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => onSelectMenu?.('occupancy')}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition cursor-pointer text-left ${
+                                    activeMenu === 'occupancy'
+                                        ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-600/30'
+                                        : 'text-slate-600 hover:bg-slate-50'
+                                }`}
+                            >
+                                <span className="flex items-center gap-2.5">
+                                    <Gauge className={`w-4 h-4 ${activeMenu === 'occupancy' ? 'text-white' : 'text-teal-500'}`} />
+                                    <span>Lấp đầy & Vòng quay tủ</span>
+                                </span>
+                                <span
+                                    className={`px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase ${
+                                        activeMenu === 'occupancy'
+                                            ? 'bg-white/20 text-white'
+                                            : 'bg-teal-50 text-teal-700 border border-teal-200/80'
+                                    }`}
+                                >
+                                    KPI
                                 </span>
                             </button>
 

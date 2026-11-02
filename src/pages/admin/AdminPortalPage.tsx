@@ -37,6 +37,7 @@ import InternalUsersManagementView from '../../components/admin/users/InternalUs
 import CustomerDebtManagementView from '../../components/admin/users/CustomerDebtManagementView';
 import InternalRbacManagementView from '../../components/admin/rbac/InternalRbacManagementView';
 import RealtimeLockerGridView from '../../components/admin/lockers/RealtimeLockerGridView';
+import OccupancyTurnoverAnalyticsView from '../../components/admin/analytics/OccupancyTurnoverAnalyticsView';
 import AbandonedPropertyView from '../../components/admin/abandoned/AbandonedPropertyView';
 import EmergencyIncidentListView from '../../components/admin/incidents/EmergencyIncidentListView';
 import FinancialReconciliationView from '../../components/admin/finance/FinancialReconciliationView';
@@ -205,6 +206,14 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                         <EmergencyIncidentListView userRole={role} onOpenCountChange={(count) => setOpenIncidentsBadge(count)} onIncidentsChanged={() => { void fetchStats(); }} />
                     ) : activeMenu === 'lockers' ? (
                         <RealtimeLockerGridView />
+                    ) : activeMenu === 'occupancy' ? (
+                        <OccupancyTurnoverAnalyticsView
+                            userRole={role}
+                            onNavigateLockers={() => setActiveMenu('lockers')}
+                            onNavigatePromotions={() => setActiveMenu('promotions')}
+                            onNavigateFinancialReports={() => setActiveMenu('reports')}
+                            onNavigateAudit={() => setActiveMenu('audit')}
+                        />
                     ) : activeMenu === 'rbac' ? (
                         <InternalRbacManagementView
                             onNavigateAudit={() => setActiveMenu('audit')}
@@ -266,6 +275,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                                 occupiedLockers={stats?.occupiedLockers ?? 0}
                                 maintenanceLockers={stats?.maintenanceLockers ?? 0}
                                 isLoading={isLoadingStats}
+                                onNavigateOccupancy={() => setActiveMenu('occupancy')}
                             />
 
                             {/* Section 3: Two Columns Grid */}
