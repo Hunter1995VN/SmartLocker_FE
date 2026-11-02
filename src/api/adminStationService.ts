@@ -1,5 +1,5 @@
 /**
- * AD-FE-03: UC-A03, UC-A04 — Manage Stations & Lockers
+ * AD-FE-03: UC-A03, UC-A04 — Manage Stations, Lockers, Pricing, Overdue Penalty & Refund Policies
  * API service kết nối với Backend ASP.NET Core:
  * - AdminStationsController (/api/admin/stations)
  * - AdminLockersController (/api/admin/lockers)
@@ -7,6 +7,21 @@
 import apiClient from './client';
 
 // ─── DTO Interfaces (đồng bộ 1:1 với Backend C# DTOs) ───────────────────────
+
+export interface StationPricingPolicyDto {
+    id?: string;
+    size: 'S' | 'M' | 'L' | string;
+    pricePerBlock: number;
+    blockHours: number;
+    overdueFeePerHour: number;
+    gracePeriodMinutes: number;
+    refundCutoffHours: number;
+    refundRateEarly: number;
+    refundRateLate: number;
+    minHours?: number;
+    maxHours?: number;
+    noShowWindowMinutes?: number;
+}
 
 export interface StationAdminDetailDto {
     id: string;
@@ -27,6 +42,7 @@ export interface StationAdminDetailDto {
     priceS?: number | null;
     priceM?: number | null;
     priceL?: number | null;
+    pricingPolicies?: StationPricingPolicyDto[];
     createdAt: string;
 }
 
@@ -63,6 +79,10 @@ export interface UpdatePricingPolicyRequest {
     blockHours?: number;
     overdueFeePerHour?: number;
     gracePeriodMinutes?: number;
+    refundCutoffHours?: number;
+    refundRateEarly?: number;
+    refundRateLate?: number;
+    noShowWindowMinutes?: number;
 }
 
 export interface ActiveBookingBriefDto {
@@ -156,7 +176,7 @@ export const adminStationService = {
     },
 
     /**
-     * UC-A04: Cập nhật bảng giá cho từng kích thước tủ (S, M, L)
+     * UC-A04: Cập nhật bảng giá, mức phí phạt quá hạn và tỷ lệ hoàn tiền khi hủy đơn cho từng kích thước tủ (S, M, L)
      * PUT /api/admin/stations/{stationId}/pricing
      */
     async updatePricingPolicy(stationId: string, data: UpdatePricingPolicyRequest): Promise<ApiResponse<boolean>> {
@@ -165,7 +185,7 @@ export const adminStationService = {
     },
 
     /**
-     * UC-A04: Lấy sơ đồ ô tủ chi tiết của trạm
+     * UC-A03 / UC-A04: Lấy sơ đồ ô tủ chi tiết của trạm
      * GET /api/admin/lockers/station/{stationId}/grid
      */
     async getStationLockersGrid(stationId: string): Promise<ApiResponse<LockerGridItemDto[]>> {

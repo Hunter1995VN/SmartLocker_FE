@@ -1,14 +1,17 @@
 /**
  * AD-FE-02: UC-A02 — View Operations Dashboard
  * Màn hình Operations Dashboard chính cho Admin Portal (Admin & Staff)
- * Giao diện bám sát theo thiết kế mockup SmartLocker Operations Control.
- * Tích hợp đầy đủ dữ liệu từ Backend API:
- * - KpiSummaryRow: Stations, Operational, Ready Lockers, Occupied, Reserved, Offline, Incidents, Revenue
- * - LockerCompartmentAllocation: Thanh phân bổ ngăn tủ đa màu sắc
- * - RevenueChart: Biểu đồ doanh thu tương tác SVG
- * - IoTTelemetryCard: Chỉ số đo đạc vi điều khiển ESP32, Uptime, MQTT Broker
- * - CriticalTriageCard: Cảnh báo sự cố phần cứng, lỗi kẹt chốt tủ
- * - StationFleetTable: Chi tiết danh sách trạm, dung lượng ô tủ và trạng thái kết nối
+ * Tích hợp đầy đủ các phân hệ Quản trị & Vận hành:
+ * - Dashboard tổng quan
+ * - Quản lý Trạm & Chính sách Giá / Phạt quá hạn / Hoàn tiền hủy đơn (UC-A03, UC-A04)
+ * - Ma trận Lưới Ô Tủ & Mở khóa khẩn cấp (UC-S02, UC-S05)
+ * - Trung tâm Sự cố & Cứu hộ mở khóa từ xa (UC-S04, UC-S05)
+ * - Quản lý Tài sản bỏ quên 72h, Duyệt 4 mắt & Bàn giao đồ thất lạc (UC-S10, UC-S11, UC-A07)
+ * - Quản lý Tài khoản Nội bộ & Phân quyền Vai trò Admin / Staff RBAC (UC-A05)
+ * - Quản lý Khách hàng & Kiểm soát Nợ xấu (UC-A06)
+ * - Đối soát tài chính định kỳ PayOS & CSDL (UC-A12)
+ * - Xuất Báo cáo Doanh thu Tài chính & Lưu lượng Giao dịch Thanh toán (UC-A10)
+ * - Tra cứu Nhật ký Truy vết An ninh toàn hệ thống Audit Logs (UC-A08)
  */
 import { useState, useEffect, useCallback } from 'react';
 import type { AuthResponse } from '../../api/authService';
@@ -20,6 +23,7 @@ import type {
     IncidentDto,
 } from '../../api/adminDashboardService';
 import AdminSidebar from '../../components/admin/AdminSidebar';
+import type { AdminMenuKey } from '../../components/admin/AdminSidebar';
 import DashboardHeader from '../../components/admin/DashboardHeader';
 import KpiSummaryRow from '../../components/admin/KpiSummaryRow';
 import LockerCompartmentAllocation from '../../components/admin/LockerCompartmentAllocation';
@@ -28,12 +32,18 @@ import IoTTelemetryCard from '../../components/admin/IoTTelemetryCard';
 import CriticalTriageCard from '../../components/admin/CriticalTriageCard';
 import StationFleetTable from '../../components/admin/StationFleetTable';
 import StationManagementView from '../../components/admin/stations/StationManagementView';
+import PromotionVoucherManagementView from '../../components/admin/promotions/PromotionVoucherManagementView';
 import InternalUsersManagementView from '../../components/admin/users/InternalUsersManagementView';
+import CustomerDebtManagementView from '../../components/admin/users/CustomerDebtManagementView';
+import InternalRbacManagementView from '../../components/admin/rbac/InternalRbacManagementView';
 import RealtimeLockerGridView from '../../components/admin/lockers/RealtimeLockerGridView';
+import OccupancyTurnoverAnalyticsView from '../../components/admin/analytics/OccupancyTurnoverAnalyticsView';
 import AbandonedPropertyView from '../../components/admin/abandoned/AbandonedPropertyView';
-import AdminRefundsManagementView from '../../components/admin/refunds/AdminRefundsManagementView';
 import EmergencyIncidentListView from '../../components/admin/incidents/EmergencyIncidentListView';
-
+import FinancialReconciliationView from '../../components/admin/finance/FinancialReconciliationView';
+import FinancialRevenueReportView from '../../components/admin/finance/FinancialRevenueReportView';
+import ManualRefundManagementView from '../../components/admin/refunds/ManualRefundManagementView';
+import AuditLogView from '../../components/admin/audit/AuditLogView';
 
 interface AdminPortalPageProps {
     onLogout: () => void;
@@ -67,6 +77,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
 
     // 2. Data States
     const [stats, setStats] = useState<AdminDashboardStatsDto | null>(null);
+    const [openIncidentsBadge, setOpenIncidentsBadge] = useState<number | null>(null);
     const [revenueData, setRevenueData] = useState<RevenueChartItemDto[]>([]);
     const [stationOccupancies, setStationOccupancies] = useState<StationOccupancyItemDto[]>([]);
     const [incidents, setIncidents] = useState<IncidentDto[]>([]);
@@ -78,7 +89,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
     const [chartError, setChartError] = useState<string | null>(null);
     const [selectedDays, setSelectedDays] = useState<number>(30);
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-    const [activeMenu, setActiveMenu] = useState<'dashboard' | 'stations' | 'users' | 'lockers' | 'incidents' | 'abandoned' | 'refunds'>('dashboard');
+    const [activeMenu, setActiveMenu] = useState<AdminMenuKey>('dashboard');
 
     // 4. API Fetch Functions
     const fetchStats = useCallback(async () => {
@@ -175,11 +186,11 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
     };
 
     return (
-        <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex font-sans select-none antialiased">
+        <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex font-sans select-none antialiased print:bg-white">
             {/* Left Fixed Navigation Sidebar */}
             <AdminSidebar
                 user={user}
-                openIncidentsCount={stats?.openSecurityIncidents ?? 0}
+                openIncidentsCount={openIncidentsBadge ?? (stats?.openSecurityIncidents ?? 0)}
                 offlineDevicesCount={stats?.offlineIoTDevices ?? 0}
                 onLogout={onLogout}
                 activeMenu={activeMenu}
@@ -188,26 +199,69 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
 
             {/* Right Main Viewport */}
             <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-                <main className="p-4 sm:p-6 lg:p-7 space-y-5 max-w-7xl w-full mx-auto">
+                <main className="p-4 sm:p-6 lg:p-7 space-y-5 max-w-7xl w-full mx-auto print:p-0 print:max-w-none">
                     {activeMenu === 'abandoned' ? (
-                        <AbandonedPropertyView userRole={role} />
+                        <AbandonedPropertyView userRole={role} currentUser={user} />
                     ) : activeMenu === 'incidents' ? (
-                        <EmergencyIncidentListView userRole={role} />
+                        <EmergencyIncidentListView userRole={role} onOpenCountChange={(count) => setOpenIncidentsBadge(count)} onIncidentsChanged={() => { void fetchStats(); }} />
                     ) : activeMenu === 'lockers' ? (
                         <RealtimeLockerGridView />
+                    ) : activeMenu === 'occupancy' ? (
+                        <OccupancyTurnoverAnalyticsView
+                            userRole={role}
+                            onNavigateLockers={() => setActiveMenu('lockers')}
+                            onNavigatePromotions={() => setActiveMenu('promotions')}
+                            onNavigateFinancialReports={() => setActiveMenu('reports')}
+                            onNavigateAudit={() => setActiveMenu('audit')}
+                        />
+                    ) : activeMenu === 'rbac' ? (
+                        <InternalRbacManagementView
+                            onNavigateAudit={() => setActiveMenu('audit')}
+                            onNavigateDebtUsers={() => setActiveMenu('users')}
+                        />
                     ) : activeMenu === 'users' ? (
-                        <InternalUsersManagementView />
+                        <InternalUsersManagementView
+                            onNavigateDebt={() => setActiveMenu('debt')}
+                        />
+                    ) : activeMenu === 'debt' ? (
+                        <CustomerDebtManagementView
+                            onNavigateUsers={() => setActiveMenu('users')}
+                        />
                     ) : activeMenu === 'stations' ? (
                         <StationManagementView />
+
+                    ) : activeMenu === 'promotions' ? (
+                        <PromotionVoucherManagementView
+                            onNavigateAudit={() => setActiveMenu('audit')}
+                        />
+                    ) : activeMenu === 'reconciliation' ? (
+                        <FinancialReconciliationView
+                            onNavigateManualRefunds={() => setActiveMenu('refunds')}
+                            onNavigateReports={() => setActiveMenu('reports')}
+                        />
+                    ) : activeMenu === 'reports' ? (
+                        <FinancialRevenueReportView
+                            userRole={role}
+                            onNavigateReconciliation={() => setActiveMenu('reconciliation')}
+                            onNavigateManualRefunds={() => setActiveMenu('refunds')}
+                            onNavigateAudit={() => setActiveMenu('audit')}
+                        />
                     ) : activeMenu === 'refunds' ? (
-                        <AdminRefundsManagementView />
+                        <ManualRefundManagementView
+                            userRole={role}
+                            onNavigateReconciliation={() => setActiveMenu('reconciliation')}
+                            onNavigateAudit={() => setActiveMenu('audit')}
+                        />
+                    ) : activeMenu === 'audit' ? (
+                        <AuditLogView />
+
                     ) : (
                         <>
                             {/* Top Header & Telemetry Controls */}
                             <DashboardHeader
                                 role={role}
                                 offlineDevicesCount={stats?.offlineIoTDevices ?? 0}
-                                openIncidentsCount={stats?.openSecurityIncidents ?? 0}
+                                openIncidentsCount={openIncidentsBadge ?? (stats?.openSecurityIncidents ?? 0)}
                                 lastUpdated={lastUpdated}
                                 isRefreshing={isRefreshing}
                                 onRefresh={handleManualRefresh}
@@ -223,6 +277,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                                 occupiedLockers={stats?.occupiedLockers ?? 0}
                                 maintenanceLockers={stats?.maintenanceLockers ?? 0}
                                 isLoading={isLoadingStats}
+                                onNavigateOccupancy={() => setActiveMenu('occupancy')}
                             />
 
                             {/* Section 3: Two Columns Grid */}
@@ -265,7 +320,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                 </main>
 
                 {/* Footer */}
-                <footer className="w-full py-4 text-center text-xs text-slate-400 border-t border-slate-200/80 bg-white mt-auto">
+                <footer className="w-full py-4 text-center text-xs text-slate-400 border-t border-slate-200/80 bg-white mt-auto print:hidden">
                     <span>SmartLocker Management System (SLMS) · Operations & Fleet Control</span>
                 </footer>
             </div>

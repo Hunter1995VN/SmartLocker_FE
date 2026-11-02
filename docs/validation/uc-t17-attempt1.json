@@ -1,0 +1,21 @@
+{
+  "checkedAt": "2026-10-29T14:55:40.381Z",
+  "uc": "T17",
+  "level": "Dev-based merge candidate; real production forms/API/SQL, explicitly authorized TEST illustration; no mocked requests",
+  "checks": [
+    {
+      "name": "Production customer form uploads actual JPEG illustration and creates linked TEST report",
+      "status": "PASS"
+    },
+    {
+      "name": "Duplicate OPEN, traveler staff action and premature handover rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "Production staff queue displays and decodes the persisted JPEG",
+      "status": "PASS"
+    }
+  ],
+  "error": "locator.selectOption: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByLabel('Kết quả', { exact: true })\u001b[22m\n",
+  "cleanup": "NOT_FOUND"
+}

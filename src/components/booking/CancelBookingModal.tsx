@@ -16,8 +16,9 @@ import { getCancelPreview, type CancelPreviewDto } from '../../api/bookingServic
 interface CancelBookingModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (reason: string) => Promise<void>;
-  bookingId: string;
+  onConfirm?: (reason: string) => Promise<void>;
+  onSuccess?: (reason: any, _refundAmount?: any) => Promise<void>;
+  bookingId?: string;
   bookingCode: string;
   lockerCode?: string;
   stationName?: string;
@@ -28,6 +29,7 @@ export const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
   isOpen,
   onClose,
   onConfirm,
+  onSuccess,
   bookingId,
   bookingCode,
   lockerCode = 'Standard Locker',
@@ -113,7 +115,8 @@ export const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
     setIsSubmitting(true);
     setErrorMsg(null);
     try {
-      await onConfirm(finalReason);
+      if (onConfirm) await onConfirm(finalReason);
+      else if (onSuccess) await onSuccess(finalReason, preview?.refundAmount);
     } catch (err: any) {
       setErrorMsg(err.response?.data?.message || 'Failed to cancel booking. Please try again.');
       setIsSubmitting(false);

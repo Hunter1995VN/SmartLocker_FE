@@ -1,18 +1,14 @@
-/**
- * AD-FE-06: UC-T14 → A08, S-02 — Emergency Incident List View
+﻿/**
+ * AD-FE-06: UC-T14 → A08, S-02, UC-S04, UC-S05 — Emergency Incident List View
  *
  * Màn hình chính "Cứu hộ khẩn cấp & Mở khoá tủ từ xa":
  *   - Tải danh sách sự cố từ GET /api/admin/incidents
- *   - Hiển thị filter theo status (tất cả / đang mở / đã xử lý)
+ *   - Hiển thị filter theo status (Tất cả / Đang mở / Đang xử lý / Đã xử lý) và mức độ nghiêm trọng (Severity)
+ *   - Nút "+ Tiếp nhận / Báo cáo sự cố mới" mở modal tạo phiếu sự cố
  *   - Click incident → hiện IncidentDetailPanel bên phải (desktop) / bên dưới (mobile)
  *   - Loading, Empty, Error state đầy đủ
- *
- * Tích hợp với:
- *   - adminIncidentService (API thực tế)
- *   - IncidentDetailPanel (chi tiết + nút unlock)
- *   - Existing AdminPortalPage architecture (activeMenu state)
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
     ShieldAlert,
     RefreshCw,
@@ -21,8 +17,21 @@ import {
     CheckCircle2,
     AlertTriangle,
     Inbox,
+    Plus,
+    X,
+    Filter,
+    Camera,
+    Upload,
+    Trash2,
 } from 'lucide-react';
-import adminIncidentService, { type IncidentDetailDto } from '../../../api/adminIncidentService';
+import adminIncidentService, {
+    type IncidentDetailDto,
+    type CreateIncidentRequest,
+} from '../../../api/adminIncidentService';
+import adminStationService, {
+    type StationAdminDetailDto,
+    type LockerGridItemDto,
+} from '../../../api/adminStationService';
 import IncidentDetailPanel from './IncidentDetailPanel';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -30,11 +39,44 @@ import IncidentDetailPanel from './IncidentDetailPanel';
 interface EmergencyIncidentListViewProps {
     /** role = 'admin' | 'staff' | other — dùng để kiểm soát permission của nút unlock */
     userRole: string;
+    onOpenCountChange?: (count: number) => void;
+    onIncidentsChanged?: () => void;
 }
+
+// ─── Types & Constants ────────────────────────────────────────────────────────
+
+type FilterTab = 'ALL' | 'OPEN' | 'IN_PROGRESS' | 'RESOLVED';
+type SeverityFilter = 'ALL' | 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
+
+const INCIDENT_TYPES: { value: string; label: string }[] = [
+    { value: 'DOOR_JAMMED', label: 'DOOR_JAMMED — Kẹt cơ khí cửa tủ' },
+    { value: 'LOCK_FAILURE', label: 'LOCK_FAILURE — Lỗi chốt khóa điện từ (Solenoid)' },
+    { value: 'SENSOR_ERROR', label: 'SENSOR_ERROR — Cảm biến cửa / tải trọng báo sai' },
+    { value: 'INTRUSION', label: 'INTRUSION — Cảnh báo cạy phá / xâm nhập trái phép' },
+    { value: 'PAYMENT_ISSUE', label: 'PAYMENT_ISSUE — Lỗi thanh toán / kẹt phiên nhận đồ' },
+    { value: 'SYSTEM_ERROR', label: 'SYSTEM_ERROR — Mất kết nối MCU / lỗi hệ thống' },
+    { value: 'OTHER', label: 'OTHER — Sự cố vận hành khác' },
+];
+
+const SEVERITY_OPTIONS: { value: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'; label: string }[] = [
+    { value: 'CRITICAL', label: 'CRITICAL — Khẩn cấp (Cần xử lý ngay)' },
+    { value: 'HIGH', label: 'HIGH — Cao (Ảnh hưởng khách hàng)' },
+    { value: 'MEDIUM', label: 'MEDIUM — Trung bình (Cần kiểm tra)' },
+    { value: 'LOW', label: 'LOW — Thấp (Ghi nhận theo dõi)' },
+];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-type FilterTab = 'ALL' | 'OPEN' | 'RESOLVED';
+export function parseIncidentType(type: string, desc?: string): { displayType: string; cleanDescription: string } {
+    if (type === 'OTHER' && desc) {
+        const match = desc.match(/^\[([A-Z_]+)\]\s*(.*)$/s);
+        if (match && ['SENSOR_ERROR', 'INTRUSION', 'SYSTEM_ERROR', 'WRONG_LOCKER', 'LOST_ITEMS'].includes(match[1])) {
+            return { displayType: match[1], cleanDescription: match[2] || desc };
+        }
+    }
+    return { displayType: type || 'OTHER', cleanDescription: desc || '' };
+}
+
 
 function severityDot(severity: string): string {
     const s = (severity || '').toUpperCase();
@@ -52,6 +94,7 @@ function statusChip(status: string) {
         IN_PROGRESS: { label: 'Đang xử lý', cls: 'bg-amber-50 text-amber-700 border-amber-200' },
         VERIFIED: { label: 'Đã xác minh', cls: 'bg-blue-50 text-blue-700 border-blue-200' },
         FAILED: { label: 'Thất bại', cls: 'bg-red-50 text-red-700 border-red-200' },
+        CANCELLED: { label: 'Đã hủy', cls: 'bg-slate-100 text-slate-600 border-slate-300' },
     };
     const cfg = map[upper] ?? { label: status, cls: 'bg-slate-100 text-slate-600 border-slate-200' };
     return (
@@ -65,7 +108,11 @@ function statusChip(status: string) {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export default function EmergencyIncidentListView({ userRole }: EmergencyIncidentListViewProps) {
+export default function EmergencyIncidentListView({
+    userRole,
+    onOpenCountChange,
+    onIncidentsChanged,
+}: EmergencyIncidentListViewProps) {
     const canUnlock =
         userRole.toLowerCase() === 'admin' || userRole.toLowerCase() === 'staff';
 
@@ -75,37 +122,44 @@ export default function EmergencyIncidentListView({ userRole }: EmergencyInciden
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [loadError, setLoadError] = useState<string | null>(null);
     const [filter, setFilter] = useState<FilterTab>('ALL');
+    const [severityFilter, setSeverityFilter] = useState<SeverityFilter>('ALL');
     const [selected, setSelected] = useState<IncidentDetailDto | null>(null);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     // ── Fetch ──────────────────────────────────────────────────────────────────
-    const fetchIncidents = useCallback(async (showSpinner = true) => {
-        if (showSpinner) setIsLoading(true);
-        setLoadError(null);
-        try {
-            const statusParam = filter === 'ALL' ? undefined : filter;
-            const res = await adminIncidentService.getIncidents(statusParam);
-            if (res.success && Array.isArray(res.data)) {
-                setIncidents(res.data);
-                // Keep selected in sync if it was updated
-                setSelected((prev) => {
-                    if (!prev) return null;
-                    const updated = res.data.find((i) => i.id === prev.id);
-                    return updated ?? prev;
-                });
-            } else {
-                setLoadError(res.message ?? 'Không thể tải danh sách sự cố.');
+    const fetchIncidents = useCallback(
+        async (showSpinner = true) => {
+            if (showSpinner) setIsLoading(true);
+            setLoadError(null);
+            try {
+                // Tải toàn bộ danh sách để đồng bộ chính xác số lượng badge và các tab lọc client-side
+                const res = await adminIncidentService.getIncidents();
+                if (res.success && Array.isArray(res.data)) {
+                    setIncidents(res.data);
+                    const openCount = res.data.filter((i) =>
+                        ['OPEN', 'IN_PROGRESS'].includes((i.status || '').toUpperCase())
+                    ).length;
+                    onOpenCountChange?.(openCount);
+                    setSelected((prev) => {
+                        if (!prev) return null;
+                        const updated = res.data.find((i) => i.id === prev.id);
+                        return updated ?? prev;
+                    });
+                } else {
+                    setLoadError(res.message ?? 'Không thể tải danh sách sự cố.');
+                }
+            } catch {
+                setLoadError('Lỗi kết nối. Vui lòng thử lại.');
+            } finally {
+                setIsLoading(false);
+                setIsRefreshing(false);
             }
-        } catch {
-            setLoadError('Lỗi kết nối. Vui lòng thử lại.');
-        } finally {
-            setIsLoading(false);
-            setIsRefreshing(false);
-        }
-    }, [filter]);
+        },
+        [filter, severityFilter]
+    );
 
     useEffect(() => {
         void fetchIncidents();
-        // When filter changes, deselect
         setSelected(null);
     }, [fetchIncidents]);
 
@@ -116,9 +170,43 @@ export default function EmergencyIncidentListView({ userRole }: EmergencyInciden
 
     // ── Incident update callback from detail panel ─────────────────────────────
     const handleIncidentUpdated = (updated: IncidentDetailDto) => {
-        setIncidents((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
+        setIncidents((prev) => {
+            const next = prev.map((i) => (i.id === updated.id ? updated : i));
+            const openCount = next.filter((i) =>
+                ['OPEN', 'IN_PROGRESS'].includes((i.status || '').toUpperCase())
+            ).length;
+            onOpenCountChange?.(openCount);
+            return next;
+        });
         setSelected(updated);
+        onIncidentsChanged?.();
     };
+
+    // ── Incident created callback from modal ───────────────────────────────────
+    const handleIncidentCreated = (created: IncidentDetailDto) => {
+        setIncidents((prev) => {
+            const next = [created, ...prev];
+            const openCount = next.filter((i) =>
+                ['OPEN', 'IN_PROGRESS'].includes((i.status || '').toUpperCase())
+            ).length;
+            onOpenCountChange?.(openCount);
+            return next;
+        });
+        setSelected(created);
+        setIsCreateModalOpen(false);
+        onIncidentsChanged?.();
+        void fetchIncidents(false);
+    };
+
+    // Client-side filter safety net
+    const visibleIncidents = incidents.filter((inc) => {
+        const matchStatus =
+            filter === 'ALL' || (inc.status || '').toUpperCase() === filter;
+        const matchSeverity =
+            severityFilter === 'ALL' ||
+            (inc.severity || '').toUpperCase() === severityFilter;
+        return matchStatus && matchSeverity;
+    });
 
     // ── Render ─────────────────────────────────────────────────────────────────
 
@@ -136,56 +224,125 @@ export default function EmergencyIncidentListView({ userRole }: EmergencyInciden
                                 Cứu hộ khẩn cấp &amp; Mở khoá tủ từ xa
                             </h1>
                             <p className="text-xs text-slate-500">
-                                UC-T14 → A08, S-02 · Xử lý sự cố không thể mở tủ
+                                Tiếp nhận xử lý sự cố & Mở khóa khẩn cấp có ghi vết an ninh
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <button
-                    type="button"
-                    onClick={handleRefresh}
-                    disabled={isLoading || isRefreshing}
-                    aria-label="Tải lại danh sách sự cố"
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-semibold transition disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed shrink-0"
-                >
-                    <RefreshCw
-                        className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`}
-                        aria-hidden="true"
-                    />
-                    Làm mới
-                </button>
+                <div className="flex items-center gap-2 flex-wrap">
+                    {canUnlock && (
+                        <button
+                            type="button"
+                            onClick={() => setIsCreateModalOpen(true)}
+                            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-sm shadow-rose-500/20 transition cursor-pointer shrink-0"
+                        >
+                            <Plus className="w-4 h-4" aria-hidden="true" />
+                            <span>+ Báo cáo sự cố mới</span>
+                        </button>
+                    )}
+
+                    <button
+                        type="button"
+                        onClick={handleRefresh}
+                        disabled={isLoading || isRefreshing}
+                        aria-label="Tải lại danh sách sự cố"
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-semibold transition disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed shrink-0"
+                    >
+                        <RefreshCw
+                            className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`}
+                            aria-hidden="true"
+                        />
+                        Làm mới
+                    </button>
+                </div>
             </div>
 
-            {/* Filter Tabs */}
-            <div className="flex gap-1.5 bg-white border border-slate-200/90 rounded-xl p-1 w-fit" role="tablist" aria-label="Lọc sự cố theo trạng thái">
-                {([
-                    { key: 'ALL', label: 'Tất cả' },
-                    { key: 'OPEN', label: 'Đang mở' },
-                    { key: 'RESOLVED', label: 'Đã xử lý' },
-                ] as { key: FilterTab; label: string }[]).map(({ key, label }) => (
-                    <button
-                        key={key}
-                        type="button"
-                        role="tab"
-                        aria-selected={filter === key}
-                        onClick={() => setFilter(key)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
-                            filter === key
-                                ? 'bg-blue-600 text-white shadow-sm'
-                                : 'text-slate-600 hover:bg-slate-50'
-                        }`}
-                    >
-                        {label}
-                        {key !== 'ALL' && (
-                            <span className={`ml-1 font-mono ${filter === key ? 'text-blue-100' : 'text-slate-400'}`}>
-                                ({incidents.filter((i) =>
-                                    (i.status || '').toUpperCase() === key
-                                ).length})
-                            </span>
-                        )}
-                    </button>
-                ))}
+            {/* Filters Bar: Status Tabs + Severity Filter */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                {/* Status Tabs */}
+                <div
+                    className="flex gap-1.5 bg-white border border-slate-200/90 rounded-xl p-1 w-fit flex-wrap"
+                    role="tablist"
+                    aria-label="Lọc sự cố theo trạng thái"
+                >
+                    {(
+                        [
+                            { key: 'ALL', label: 'Tất cả' },
+                            { key: 'OPEN', label: 'Đang mở' },
+                            { key: 'IN_PROGRESS', label: 'Đang xử lý' },
+                            { key: 'RESOLVED', label: 'Đã xử lý' },
+                        ] as { key: FilterTab; label: string }[]
+                    ).map(({ key, label }) => (
+                        <button
+                            key={key}
+                            type="button"
+                            role="tab"
+                            aria-selected={filter === key}
+                            onClick={() => setFilter(key)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                                filter === key
+                                    ? 'bg-blue-600 text-white shadow-sm'
+                                    : 'text-slate-600 hover:bg-slate-50'
+                            }`}
+                        >
+                            {label}
+                            {key !== 'ALL' && (
+                                <span
+                                    className={`ml-1 font-mono ${
+                                        filter === key ? 'text-blue-100' : 'text-slate-400'
+                                    }`}
+                                >
+                                    (
+                                    {
+                                        incidents.filter(
+                                            (i) => (i.status || '').toUpperCase() === key
+                                        ).length
+                                    }
+                                    )
+                                </span>
+                            )}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Severity Filter */}
+                <div className="flex items-center gap-2 bg-white border border-slate-200/90 rounded-xl px-3 py-1.5 w-fit">
+                    <Filter className="w-3.5 h-3.5 text-slate-400 shrink-0" aria-hidden="true" />
+                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                        Mức độ:
+                    </span>
+                    <div className="flex items-center gap-1">
+                        {(
+                            [
+                                { key: 'ALL', label: 'Tất cả' },
+                                { key: 'CRITICAL', label: 'Critical' },
+                                { key: 'HIGH', label: 'High' },
+                                { key: 'MEDIUM', label: 'Medium' },
+                                { key: 'LOW', label: 'Low' },
+                            ] as { key: SeverityFilter; label: string }[]
+                        ).map(({ key, label }) => (
+                            <button
+                                key={key}
+                                type="button"
+                                onClick={() => setSeverityFilter(key)}
+                                className={`px-2 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer ${
+                                    severityFilter === key
+                                        ? key === 'CRITICAL'
+                                            ? 'bg-rose-600 text-white'
+                                            : key === 'HIGH'
+                                            ? 'bg-rose-100 text-rose-800'
+                                            : key === 'MEDIUM'
+                                            ? 'bg-amber-100 text-amber-800'
+                                            : 'bg-slate-800 text-white'
+                                        : 'text-slate-600 hover:bg-slate-100'
+                                }`}
+                            >
+                                {label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
             </div>
 
             {/* Main Content: List + Detail */}
@@ -200,21 +357,28 @@ export default function EmergencyIncidentListView({ userRole }: EmergencyInciden
                             </h2>
                             {!isLoading && (
                                 <span className="text-[11px] text-slate-400 font-mono">
-                                    {incidents.length} sự cố
+                                    {visibleIncidents.length} sự cố
                                 </span>
                             )}
                         </div>
 
                         {/* List body */}
-                        <div className="divide-y divide-slate-100 max-h-[600px] overflow-y-auto" role="list" aria-label="Danh sách sự cố khẩn cấp">
+                        <div
+                            className="divide-y divide-slate-100 max-h-[600px] overflow-y-auto"
+                            role="list"
+                            aria-label="Danh sách sự cố khẩn cấp"
+                        >
                             {isLoading ? (
                                 <LoadingRows />
                             ) : loadError ? (
-                                <ErrorState message={loadError} onRetry={() => void fetchIncidents()} />
-                            ) : incidents.length === 0 ? (
+                                <ErrorState
+                                    message={loadError}
+                                    onRetry={() => void fetchIncidents()}
+                                />
+                            ) : visibleIncidents.length === 0 ? (
                                 <EmptyState />
                             ) : (
-                                incidents.map((inc) => (
+                                visibleIncidents.map((inc) => (
                                     <IncidentRow
                                         key={inc.id}
                                         incident={inc}
@@ -244,17 +408,506 @@ export default function EmergencyIncidentListView({ userRole }: EmergencyInciden
                                 Chưa chọn sự cố
                             </h3>
                             <p className="text-xs text-slate-400 max-w-xs">
-                                Chọn một sự cố từ danh sách bên trái để xem chi tiết và thực hiện
-                                mở khóa tủ từ xa.
+                                Chọn một sự cố từ danh sách bên trái để xem chi tiết, cập nhật biên bản xử lý hoặc mở khóa tủ từ xa.
                             </p>
                         </div>
                     )}
                 </div>
             </div>
+
+            {/* Create Incident Modal (UC-S04) */}
+            {isCreateModalOpen && (
+                <CreateIncidentModal
+                    existingIncidents={incidents}
+                    onClose={() => setIsCreateModalOpen(false)}
+                    onCreated={handleIncidentCreated}
+                />
+            )}
         </div>
     );
 }
 
+// ─── Create Incident Modal (UC-S04) ──────────────────────────────────────────
+
+function CreateIncidentModal({
+    existingIncidents,
+    onClose,
+    onCreated,
+}: {
+    existingIncidents: IncidentDetailDto[];
+    onClose: () => void;
+    onCreated: (created: IncidentDetailDto) => void;
+}) {
+    const [stations, setStations] = useState<StationAdminDetailDto[]>([]);
+    const [lockers, setLockers] = useState<LockerGridItemDto[]>([]);
+    const [stationId, setStationId] = useState<string>('');
+    const [lockerId, setLockerId] = useState<string>('');
+    const [type, setType] = useState<string>('DOOR_JAMMED');
+    const [severity, setSeverity] = useState<'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'>('HIGH');
+    const [description, setDescription] = useState<string>('');
+    const [evidenceImage, setEvidenceImage] = useState<string | null>(null);
+    const [evidenceError, setEvidenceError] = useState<string | null>(null);
+    const [isReadingPhoto, setIsReadingPhoto] = useState<boolean>(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        setEvidenceError(null);
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            setEvidenceError('Chỉ hỗ trợ tệp hình ảnh (PNG, JPG, WEBP, JPEG).');
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            setEvidenceError('Ảnh tối đa 5MB. Vui lòng chọn ảnh nhẹ hơn.');
+            return;
+        }
+
+        setIsReadingPhoto(true);
+        const reader = new FileReader();
+        reader.onload = () => {
+            setEvidenceImage(reader.result as string);
+            setIsReadingPhoto(false);
+        };
+        reader.onerror = () => {
+            setEvidenceError('Không đọc được tệp ảnh. Vui lòng thử lại.');
+            setIsReadingPhoto(false);
+        };
+        reader.readAsDataURL(file);
+    };
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [isLoadingStations, setIsLoadingStations] = useState<boolean>(true);
+    const [isLoadingLockers, setIsLoadingLockers] = useState<boolean>(false);
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+    // Load stations on mount
+    useEffect(() => {
+        let active = true;
+        setIsLoadingStations(true);
+        adminStationService
+            .getStations()
+            .then((res) => {
+                if (!active) return;
+                if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+                    setStations(res.data);
+                    setStationId(res.data[0].id);
+                }
+            })
+            .catch(() => {
+                if (!active) return;
+                if (existingIncidents.length > 0) {
+                    setStationId(existingIncidents[0].stationId);
+                }
+            })
+            .finally(() => {
+                if (active) setIsLoadingStations(false);
+            });
+        return () => {
+            active = false;
+        };
+    }, [existingIncidents]);
+
+    // Load lockers when stationId changes
+    useEffect(() => {
+        if (!stationId) {
+            setLockers([]);
+            setLockerId('');
+            return;
+        }
+        let active = true;
+        setIsLoadingLockers(true);
+        setLockerId('');
+        adminStationService
+            .getStationLockersGrid(stationId)
+            .then((res) => {
+                if (!active) return;
+                if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+                    setLockers(res.data);
+                    setLockerId(res.data[0].id);
+                } else {
+                    setLockers([]);
+                    setLockerId('');
+                }
+            })
+            .catch(() => {
+                if (!active) return;
+                setLockers([]);
+                setLockerId('');
+            })
+            .finally(() => {
+                if (active) setIsLoadingLockers(false);
+            });
+        return () => {
+            active = false;
+        };
+    }, [stationId]);
+
+
+    const matchedLocker = lockers.find((l) => l.id === lockerId);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!stationId.trim()) {
+            setErrorMsg('Vui lòng chọn Trạm tủ.');
+            return;
+        }
+        if (!lockerId.trim()) {
+            setErrorMsg('Vui lòng chọn Ô tủ gặp sự cố.');
+            return;
+        }
+        if (description.trim().length < 5) {
+            setErrorMsg('Vui lòng nhập mô tả sự cố (tối thiểu 5 ký tự).');
+            return;
+        }
+
+        setIsSubmitting(true);
+        setErrorMsg(null);
+
+        // Safe backend compatibility mapping:
+        // Đảm bảo tương thích với cả backend hiện tại lẫn backend cập nhật
+        let apiType = type;
+        let apiDescription = description.trim();
+        if (['SENSOR_ERROR', 'INTRUSION', 'SYSTEM_ERROR'].includes(type)) {
+            apiType = 'OTHER';
+            apiDescription = `[${type}] ${apiDescription}`;
+        }
+
+        const payload: CreateIncidentRequest = {
+            stationId: stationId.trim(),
+            lockerId: lockerId.trim(),
+            bookingId: matchedLocker?.currentBooking?.bookingId ?? null,
+            type: apiType,
+            severity,
+            description: apiDescription,
+            evidenceImageUrl: evidenceImage || undefined,
+        };
+
+        try {
+            const res = await adminIncidentService.createIncident(payload);
+            if (res.success && res.data) {
+                onCreated(res.data);
+            } else {
+                setErrorMsg(res.message ?? 'Không thể tạo phiếu sự cố.');
+            }
+        } catch (err: unknown) {
+            console.error('Lỗi tạo sự cố:', err);
+            const axiosErr = err as {
+                response?: {
+                    data?: {
+                        message?: string;
+                        title?: string;
+                        errors?: Record<string, string[]>;
+                    };
+                };
+                message?: string;
+            };
+            const msg =
+                axiosErr.response?.data?.message ||
+                (axiosErr.response?.data?.errors
+                    ? Object.values(axiosErr.response.data.errors).flat().join(', ')
+                    : null) ||
+                axiosErr.response?.data?.title ||
+                axiosErr.message ||
+                'Không thể kết nối máy chủ để tạo sự cố. Vui lòng thử lại.';
+            setErrorMsg(msg);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    return (
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="create-incident-modal-title"
+        >
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg border border-slate-200/80 overflow-hidden">
+                {/* Header */}
+                <div className="px-6 pt-5 pb-4 border-b border-slate-100 flex items-start justify-between gap-3 bg-slate-50/60">
+                    <div className="flex items-center gap-2.5">
+                        <span className="p-2 rounded-xl bg-rose-50 border border-rose-200/80 text-rose-600 shrink-0">
+                            <ShieldAlert className="w-5 h-5" aria-hidden="true" />
+                        </span>
+                        <div>
+                            <h2
+                                id="create-incident-modal-title"
+                                className="text-base font-black text-slate-900 tracking-tight"
+                            >
+                                Tiếp nhận / Báo cáo sự cố mới
+                            </h2>
+                            <p className="text-[11px] text-slate-500 mt-0.5">
+                                Tạo phiếu Incident Ticket để theo dõi xử lý kẹt tủ, lỗi cảm biến hoặc cảnh báo an ninh.
+                            </p>
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        disabled={isSubmitting}
+                        aria-label="Đóng hộp thoại tạo sự cố"
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition shrink-0 cursor-pointer"
+                    >
+                        <X className="w-4 h-4" aria-hidden="true" />
+                    </button>
+                </div>
+
+                {/* Form */}
+                <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4 text-xs max-h-[75vh] overflow-y-auto">
+                    {errorMsg && (
+                        <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 font-semibold flex items-center gap-2">
+                            <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600" />
+                            <span>{errorMsg}</span>
+                        </div>
+                    )}
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {/* Station Select */}
+                        <div>
+                            <label className="block font-bold text-slate-700 mb-1">
+                                Trạm tủ (Station) <span className="text-rose-500">*</span>
+                            </label>
+                            {isLoadingStations ? (
+                                <div className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-400 font-medium flex items-center gap-2">
+                                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-slate-400" />
+                                    <span>Đang tải danh sách trạm...</span>
+                                </div>
+                            ) : stations.length > 0 ? (
+                                <select
+                                    value={stationId}
+                                    onChange={(e) => setStationId(e.target.value)}
+                                    className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                                >
+                                    {stations.map((st) => (
+                                        <option key={st.id} value={st.id}>
+                                            {st.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            ) : (
+                                <input
+                                    type="text"
+                                    value={stationId}
+                                    onChange={(e) => setStationId(e.target.value)}
+                                    placeholder="Nhập ID trạm tủ..."
+                                    className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-slate-800 font-mono"
+                                />
+                            )}
+                        </div>
+
+                        {/* Locker Select */}
+                        <div>
+                            <label className="block font-bold text-slate-700 mb-1">
+                                Ô tủ gặp sự cố (Locker) <span className="text-rose-500">*</span>
+                            </label>
+                            {isLoadingLockers ? (
+                                <div className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-400 font-medium flex items-center gap-2">
+                                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-slate-400" />
+                                    <span>Đang tải danh sách ô tủ...</span>
+                                </div>
+                            ) : lockers.length > 0 ? (
+                                <select
+                                    value={lockerId}
+                                    onChange={(e) => setLockerId(e.target.value)}
+                                    className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-slate-800 font-semibold font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                                >
+                                    {lockers.map((lk) => (
+                                        <option key={lk.id} value={lk.id}>
+                                            {lk.lockerCode} (Size {lk.size} · {lk.businessStatus})
+                                            {lk.currentBooking ? ` [Đang thuê: ${lk.currentBooking.customerName || lk.currentBooking.bookingCode}]` : ''}
+                                        </option>
+                                    ))}
+                                </select>
+                            ) : (
+                                <div className="w-full px-3 py-2 rounded-xl border border-amber-200 bg-amber-50 text-amber-700 font-medium text-[11px]">
+                                    Trạm này hiện chưa có ô tủ nào sẵn sàng.
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Hiển thị thông tin đơn thuê nếu ô tủ đang có khách */}
+                    {matchedLocker?.currentBooking && (
+                        <div className="p-3 rounded-xl bg-blue-50 border border-blue-200/80 text-blue-900 text-xs flex items-center justify-between gap-2">
+                            <div>
+                                <span className="font-bold text-blue-700">Đơn thuê liên kết: </span>
+                                <span className="font-mono font-bold">#{matchedLocker.currentBooking.bookingCode}</span>
+                                <p className="text-[11px] text-blue-600 mt-0.5">
+                                    Khách: {matchedLocker.currentBooking.customerName} ({matchedLocker.currentBooking.customerPhone || 'Không có SĐT'})
+                                </p>
+                            </div>
+                            <span className="px-2 py-0.5 rounded-lg bg-blue-600 text-white font-bold text-[10px]">
+                                Đang lưu đồ
+                            </span>
+                        </div>
+                    )}
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {/* Incident Type */}
+                        <div>
+                            <label className="block font-bold text-slate-700 mb-1">
+                                Phân loại sự cố <span className="text-rose-500">*</span>
+                            </label>
+                            <select
+                                value={type}
+                                onChange={(e) => setType(e.target.value)}
+                                className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                            >
+                                {INCIDENT_TYPES.map((t) => (
+                                    <option key={t.value} value={t.value}>
+                                        {t.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Severity */}
+                        <div>
+                            <label className="block font-bold text-slate-700 mb-1">
+                                Mức độ nghiêm trọng <span className="text-rose-500">*</span>
+                            </label>
+                            <select
+                                value={severity}
+                                onChange={(e) =>
+                                    setSeverity(
+                                        e.target.value as 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+                                    )
+                                }
+                                className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                            >
+                                {SEVERITY_OPTIONS.map((sev) => (
+                                    <option key={sev.value} value={sev.value}>
+                                        {sev.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+
+                    {/* Description */}
+                    <div>
+                        <label className="block font-bold text-slate-700 mb-1">
+                            Mô tả chi tiết hiện trạng sự cố <span className="text-rose-500">*</span>
+                        </label>
+                        <textarea
+                            rows={3}
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            placeholder="Nhập chi tiết hiện tượng (VD: Khách báo đã thanh toán nhưng chốt khóa ngăn A-02 bị kẹt cơ khí không bung cửa)..."
+                            className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                        />
+                    </div>
+
+                    {/* Evidence Photo Upload */}
+                    <div>
+                        <div className="flex items-center justify-between mb-1">
+                            <label className="block font-bold text-slate-700">
+                                Ảnh bằng chứng hiện trường / kẹt tủ (Tùy chọn)
+                            </label>
+                            {evidenceImage && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setEvidenceImage(null);
+                                        if (fileInputRef.current) fileInputRef.current.value = '';
+                                    }}
+                                    className="text-[11px] text-rose-600 hover:text-rose-800 font-semibold flex items-center gap-1 cursor-pointer"
+                                >
+                                    <Trash2 className="w-3 h-3" />
+                                    Xóa ảnh
+                                </button>
+                            )}
+                        </div>
+
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            disabled={isSubmitting || isReadingPhoto}
+                            onChange={handlePhotoChange}
+                            className="hidden"
+                            id="incident-evidence-file"
+                        />
+
+                        {evidenceError && (
+                            <p className="text-rose-600 text-[11px] font-semibold mb-2">{evidenceError}</p>
+                        )}
+
+                        {evidenceImage ? (
+                            <div className="relative rounded-xl border border-slate-200 overflow-hidden bg-slate-50 p-2 flex items-center gap-3">
+                                <img
+                                    src={evidenceImage}
+                                    alt="Bằng chứng sự cố"
+                                    className="w-20 h-20 rounded-lg object-cover border border-slate-200"
+                                />
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                                        <Camera className="w-3.5 h-3.5 text-blue-600" />
+                                        Đã đính kèm ảnh bằng chứng
+                                    </p>
+                                    <p className="text-[11px] text-slate-500 mt-0.5">
+                                        Ảnh sẽ được lưu vào biên bản sự cố để kiểm tra đối chiếu an ninh.
+                                    </p>
+                                    <button
+                                        type="button"
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className="mt-1 text-[11px] text-blue-600 hover:text-blue-800 font-semibold cursor-pointer"
+                                    >
+                                        Đổi ảnh khác
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <label
+                                htmlFor="incident-evidence-file"
+                                className="border-2 border-dashed border-slate-300 hover:border-blue-400 rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 text-center cursor-pointer transition bg-slate-50/50 hover:bg-blue-50/20"
+                            >
+                                <div className="p-2 rounded-full bg-blue-50 text-blue-600">
+                                    <Upload className="w-4 h-4" />
+                                </div>
+                                <div>
+                                    <span className="font-bold text-slate-700 text-xs">
+                                        {isReadingPhoto ? 'Đang xử lý ảnh...' : 'Bấm để tải ảnh lên'}
+                                    </span>
+                                    <p className="text-[11px] text-slate-400 mt-0.5">
+                                        Hỗ trợ PNG, JPG, JPEG, WEBP (Tối đa 5MB)
+                                    </p>
+                                </div>
+                            </label>
+                        )}
+                    </div>
+
+                    {/* Actions */}
+                    <div className="pt-2 flex justify-end gap-2.5 border-t border-slate-100">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            disabled={isSubmitting}
+                            className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 font-semibold hover:bg-slate-50 transition cursor-pointer"
+                        >
+                            Hủy
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={isSubmitting || !stationId || !lockerId}
+                            className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold shadow-md shadow-rose-500/20 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {isSubmitting ? (
+                                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                                <Plus className="w-4 h-4" />
+                            )}
+                            <span>Tạo phiếu sự cố</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+}
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function IncidentRow({
@@ -266,7 +919,8 @@ function IncidentRow({
     isSelected: boolean;
     onClick: () => void;
 }) {
-    const resolved = (incident.status || '').toUpperCase() === 'RESOLVED' || incident.remoteUnlocked;
+    const resolved =
+        (incident.status || '').toUpperCase() === 'RESOLVED' || incident.remoteUnlocked;
 
     return (
         <button
@@ -294,18 +948,29 @@ function IncidentRow({
                         {incident.incidentCode}
                     </span>
                     {incident.remoteUnlocked && (
-                        <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" aria-label="Đã mở khóa từ xa" />
+                        <CheckCircle2
+                            className="w-3 h-3 text-emerald-500 shrink-0"
+                            aria-label="Đã mở khóa từ xa"
+                        />
                     )}
                 </div>
 
                 <p className="text-[11px] text-slate-600 flex items-center gap-1 truncate">
-                    <span className="font-mono font-semibold text-blue-700">{incident.lockerCode}</span>
+                    <span className="font-mono font-semibold text-blue-700">
+                        {incident.lockerCode}
+                    </span>
                     <span className="text-slate-400">·</span>
                     <span className="truncate">{incident.stationName}</span>
                 </p>
 
                 <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                     {statusChip(resolved ? 'RESOLVED' : incident.status)}
+                    {incident.evidenceImageUrl && (
+                        <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-blue-700 bg-blue-50 border border-blue-200/80 px-1.5 py-0.5 rounded">
+                            <Camera className="w-2.5 h-2.5" />
+                            Có ảnh
+                        </span>
+                    )}
                     <span className="text-[10px] text-slate-400 flex items-center gap-1">
                         <Clock className="w-2.5 h-2.5" aria-hidden="true" />
                         {new Date(incident.createdAt).toLocaleTimeString('vi-VN', {

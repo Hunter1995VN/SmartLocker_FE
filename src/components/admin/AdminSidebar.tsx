@@ -1,16 +1,20 @@
 /**
- * AD-FE-02: UC-A02 — Operations Dashboard
+ * AD-FE-02: Operations Dashboard
  * Thanh điều hướng Sidebar chuẩn theo thiết kế SmartLocker Operations Portal.
  * Hiển thị avatar, tên người dùng, role badge (ADMIN/STAFF), và nút Đăng xuất.
  */
 import {
+    Receipt,
     LayoutDashboard,
     Box,
+    Gauge,
     Layers,
     Cpu,
     ShieldAlert,
     DollarSign,
     Users,
+    Ticket,
+    RotateCcw,
     CreditCard,
     PackageX,
     FileText,
@@ -20,13 +24,29 @@ import {
 } from 'lucide-react';
 import type { AuthResponse } from '../../api/authService';
 
+export type AdminMenuKey =
+    | 'dashboard'
+    | 'stations'
+    | 'promotions'
+    | 'rbac'
+    | 'users'
+    | 'debt'
+    | 'lockers'
+    | 'occupancy'
+    | 'incidents'
+    | 'abandoned'
+    | 'reconciliation'
+    | 'refunds'
+    | 'reports'
+    | 'audit';
+
 interface AdminSidebarProps {
     user: AuthResponse | null;
     openIncidentsCount: number;
     offlineDevicesCount: number;
     onLogout?: () => void;
-    activeMenu?: 'dashboard' | 'stations' | 'users' | 'lockers' | 'incidents' | 'abandoned' | 'refunds';
-    onSelectMenu?: (menu: 'dashboard' | 'stations' | 'users' | 'lockers' | 'incidents' | 'abandoned' | 'refunds') => void;
+    activeMenu?: AdminMenuKey;
+    onSelectMenu?: (menu: AdminMenuKey) => void;
 }
 
 export default function AdminSidebar({
@@ -42,7 +62,7 @@ export default function AdminSidebar({
     const isStaff = role.toLowerCase() === 'staff';
 
     return (
-        <aside className="w-64 bg-white border-r border-slate-200/90 flex flex-col justify-between shrink-0 select-none min-h-screen">
+        <aside className="w-64 bg-white border-r border-slate-200/90 flex flex-col justify-between shrink-0 select-none min-h-screen print:hidden">
             {/* Top Logo & App Title */}
             <div>
                 <div className="p-5 border-b border-slate-100 flex items-center gap-3">
@@ -65,7 +85,7 @@ export default function AdminSidebar({
                     {/* Group: OVERVIEW */}
                     <div>
                         <p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
-                            Overview
+                            Tổng quan
                         </p>
                         <div className="space-y-0.5">
                             <button
@@ -78,7 +98,7 @@ export default function AdminSidebar({
                                 }`}
                             >
                                 <LayoutDashboard className={`w-4 h-4 ${activeMenu === 'dashboard' ? 'text-white' : 'text-slate-400'}`} />
-                                <span>Dashboard</span>
+                                <span>Bảng điều khiển</span>
                             </button>
                         </div>
                     </div>
@@ -86,7 +106,7 @@ export default function AdminSidebar({
                     {/* Group: OPERATIONS */}
                     <div>
                         <p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
-                            Operations
+                            Vận hành trạm
                         </p>
                         <div className="space-y-0.5 text-slate-600">
                             <button
@@ -100,7 +120,7 @@ export default function AdminSidebar({
                             >
                                 <span className="flex items-center gap-2.5">
                                     <Layers className={`w-4 h-4 ${activeMenu === 'stations' ? 'text-white' : 'text-slate-400'}`} />
-                                    <span>Stations</span>
+                                    <span>Trạm & Bảng giá</span>
                                 </span>
                             </button>
 
@@ -115,21 +135,49 @@ export default function AdminSidebar({
                             >
                                 <span className="flex items-center gap-2.5">
                                     <Box className={`w-4 h-4 ${activeMenu === 'lockers' ? 'text-white' : 'text-slate-400'}`} />
-                                    <span>Lockers</span>
+                                    <span>Lưới ô tủ</span>
                                 </span>
                             </button>
 
-                            <div className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-default">
+                            <button
+                                type="button"
+                                onClick={() => onSelectMenu?.('occupancy')}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition cursor-pointer text-left ${
+                                    activeMenu === 'occupancy'
+                                        ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-600/30'
+                                        : 'text-slate-600 hover:bg-slate-50'
+                                }`}
+                            >
+                                <span className="flex items-center gap-2.5">
+                                    <Gauge className={`w-4 h-4 ${activeMenu === 'occupancy' ? 'text-white' : 'text-teal-500'}`} />
+                                    <span>Lấp đầy & Vòng quay tủ</span>
+                                </span>
+                                <span
+                                    className={`px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase ${
+                                        activeMenu === 'occupancy'
+                                            ? 'bg-white/20 text-white'
+                                            : 'bg-teal-50 text-teal-700 border border-teal-200/80'
+                                    }`}
+                                >
+                                    KPI
+                                </span>
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => onSelectMenu?.('lockers')}
+                                className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-pointer text-left"
+                            >
                                 <span className="flex items-center gap-2.5">
                                     <Cpu className="w-4 h-4 text-slate-400" />
-                                    <span>IoT Devices</span>
+                                    <span>Thiết bị IoT</span>
                                 </span>
                                 {offlineDevicesCount > 0 ? (
                                     <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" title={`${offlineDevicesCount} thiết bị offline`} />
                                 ) : (
                                     <span className="w-2 h-2 rounded-full bg-emerald-500" title="IoT online" />
                                 )}
-                            </div>
+                            </button>
 
                             <button
                                 type="button"
@@ -142,7 +190,7 @@ export default function AdminSidebar({
                             >
                                 <span className="flex items-center gap-2.5">
                                     <ShieldAlert className={`w-4 h-4 ${activeMenu === 'incidents' ? 'text-white' : 'text-slate-400'}`} />
-                                    <span>Incidents</span>
+                                    <span>Sự cố & Hỗ trợ</span>
                                 </span>
                                 {openIncidentsCount > 0 && (
                                     <span className={`px-1.5 py-0.2 rounded-full font-bold text-[10px] border ${
@@ -160,13 +208,42 @@ export default function AdminSidebar({
                     {/* Group: MANAGEMENT */}
                     <div>
                         <p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
-                            Management
+                            Quản lý & Nghiệp vụ
                         </p>
                         <div className="space-y-0.5 text-slate-600">
-                            <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-default">
+                            <button
+                                type="button"
+                                onClick={() => onSelectMenu?.('stations')}
+                                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-pointer text-left"
+                            >
                                 <DollarSign className="w-4 h-4 text-slate-400" />
-                                <span>Pricing Policies</span>
-                            </div>
+                                <span>Bảng giá & Phụ phí</span>
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => onSelectMenu?.('promotions')}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition cursor-pointer text-left ${
+                                    activeMenu === 'promotions'
+                                        ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-600/30'
+                                        : 'text-slate-600 hover:bg-slate-50'
+                                }`}
+                            >
+                                <span className="flex items-center gap-2.5">
+                                    <Ticket className={`w-4 h-4 ${activeMenu === 'promotions' ? 'text-white' : 'text-emerald-500'}`} />
+                                    <span>Khuyến mãi & Voucher</span>
+                                </span>
+                                <span
+                                    className={`px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase ${
+                                        activeMenu === 'promotions'
+                                            ? 'bg-white/20 text-white'
+                                            : 'bg-emerald-50 text-emerald-700 border border-emerald-200/80'
+                                    }`}
+                                >
+                                    PROMO
+                                </span>
+                            </button>
+
                             <button
                                 type="button"
                                 onClick={() => onSelectMenu?.('users')}
@@ -178,13 +255,62 @@ export default function AdminSidebar({
                             >
                                 <span className="flex items-center gap-2.5">
                                     <Users className={`w-4 h-4 ${activeMenu === 'users' ? 'text-white' : 'text-slate-400'}`} />
-                                    <span>Accounts</span>
+                                    <span>Quản lý tài khoản</span>
                                 </span>
                             </button>
-                            <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-default">
-                                <CreditCard className="w-4 h-4 text-slate-400" />
-                                <span>Bookings & Pay</span>
-                            </div>
+
+                            <button
+                                type="button"
+                                onClick={() => onSelectMenu?.('debt')}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition cursor-pointer text-left ${
+                                    activeMenu === 'debt'
+                                        ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-600/30'
+                                        : 'text-slate-600 hover:bg-slate-50'
+                                }`}
+                            >
+                                <span className="flex items-center gap-2.5">
+                                    <Receipt className={`w-4 h-4 ${activeMenu === 'debt' ? 'text-white' : 'text-amber-500'}`} />
+                                    <span>Quản lý dư nợ</span>
+                                </span>
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => onSelectMenu?.('reconciliation')}
+                                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition cursor-pointer text-left ${
+                                    activeMenu === 'reconciliation'
+                                        ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-600/30'
+                                        : 'text-slate-600 hover:bg-slate-50'
+                                }`}
+                            >
+                                <CreditCard className={`w-4 h-4 ${activeMenu === 'reconciliation' ? 'text-white' : 'text-slate-400'}`} />
+                                <span>Đối soát PayOS</span>
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => onSelectMenu?.('refunds')}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition cursor-pointer text-left ${
+                                    activeMenu === 'refunds'
+                                        ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-600/30'
+                                        : 'text-slate-600 hover:bg-slate-50'
+                                }`}
+                            >
+                                <span className="flex items-center gap-2.5">
+                                    <RotateCcw className={`w-4 h-4 ${activeMenu === 'refunds' ? 'text-white' : 'text-purple-500'}`} />
+                                    <span>Duyệt hoàn tiền</span>
+                                </span>
+                                <span
+                                    className={`px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase ${
+                                        activeMenu === 'refunds'
+                                            ? 'bg-white/20 text-white'
+                                            : 'bg-purple-50 text-purple-700 border border-purple-200/80'
+                                    }`}
+                                >
+                                    REFUND
+                                </span>
+                            </button>
+
                             <button
                                 type="button"
                                 onClick={() => onSelectMenu?.('abandoned')}
@@ -195,7 +321,7 @@ export default function AdminSidebar({
                                 }`}
                             >
                                 <PackageX className={`w-4 h-4 ${activeMenu === 'abandoned' ? 'text-white' : 'text-slate-400'}`} />
-                                <span>Abandoned Cargo</span>
+                                <span>Hành lý quá hạn 72h</span>
                             </button>
                             <button
                                 type="button"
@@ -215,17 +341,45 @@ export default function AdminSidebar({
                     {/* Group: SECURITY & LOGS */}
                     <div>
                         <p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
-                            Security & Logs
+                            Bảo mật & Nhật ký
                         </p>
                         <div className="space-y-0.5 text-slate-600">
-                            <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-default">
-                                <FileText className="w-4 h-4 text-slate-400" />
-                                <span>Audit Log</span>
-                            </div>
-                            <div className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-default">
-                                <BarChart3 className="w-4 h-4 text-slate-400" />
-                                <span>Reports</span>
-                            </div>
+                            <button
+                                type="button"
+                                onClick={() => onSelectMenu?.('audit')}
+                                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition cursor-pointer text-left ${
+                                    activeMenu === 'audit'
+                                        ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-600/30'
+                                        : 'text-slate-600 hover:bg-slate-50'
+                                }`}
+                            >
+                                <FileText className={`w-4 h-4 ${activeMenu === 'audit' ? 'text-white' : 'text-slate-400'}`} />
+                                <span>Nhật ký hệ thống</span>
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => onSelectMenu?.('reports')}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition cursor-pointer text-left ${
+                                    activeMenu === 'reports'
+                                        ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-600/30'
+                                        : 'text-slate-600 hover:bg-slate-50'
+                                }`}
+                            >
+                                <span className="flex items-center gap-2.5">
+                                    <BarChart3 className={`w-4 h-4 ${activeMenu === 'reports' ? 'text-white' : 'text-indigo-500'}`} />
+                                    <span>Báo cáo tài chính</span>
+                                </span>
+                                <span
+                                    className={`px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase ${
+                                        activeMenu === 'reports'
+                                            ? 'bg-white/20 text-white'
+                                            : 'bg-indigo-50 text-indigo-700 border border-indigo-200/80'
+                                    }`}
+                                >
+                                    REPORT
+                                </span>
+                            </button>
                         </div>
                     </div>
                 </nav>

@@ -284,7 +284,7 @@ export default function RealtimeLockerGridView() {
                             Sơ Đồ Ô Tủ Trực Quan & Điều Khiển Trạng Thái
                         </h1>
                         <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold tracking-wider uppercase border border-slate-200">
-                            UC-A05 · S-01
+                            LƯỚI Ô TỦ THỜI GIAN THỰC
                         </span>
                         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />

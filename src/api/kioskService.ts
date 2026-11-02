@@ -1,4 +1,5 @@
 import apiClient from './client';
+import type { CreateBookingResponse } from './bookingService';
 
 export interface KioskCheckInRequest {
   stationId: string;
@@ -7,6 +8,7 @@ export interface KioskCheckInRequest {
 }
 
 export interface KioskCheckInResponse {
+  sessionToken?: string;
   bookingId: string;
   bookingCode: string;
   lockerId: string;
@@ -17,12 +19,14 @@ export interface KioskCheckInResponse {
 }
 
 export interface KioskCheckOutRequest {
+  sessionToken?: string;
   stationId: string;
   credentialType: 'QR' | 'ACCESS_CODE';
   payload: string;
 }
 
 export interface KioskCheckOutResponse {
+  sessionToken?: string;
   bookingId: string;
   bookingCode: string;
   lockerId?: string;
@@ -90,6 +94,13 @@ export interface KioskStationStatus {
 }
 
 export const kioskApi = {
+  payOverdue: async (data: KioskCheckOutRequest & { bookingId: string }) =>
+    (await apiClient.post<{ success: boolean; data: CreateBookingResponse; message?: string }>('/api/kiosk/pay-overdue', data)).data,
+  syncPayment: async (orderCode: number) =>
+    (await apiClient.post<{ success: boolean; data: { status: string; isSuccess: boolean } }>(`/api/Payments/sync/${orderCode}`)).data,
+  operationStatus: async (data: {stationId: string; bookingId: string; sessionToken: string}) => {
+    return (await apiClient.post<{success: boolean; data: {operation: string; complete: boolean; doorState: string; manualReviewPending: boolean}}>('/api/kiosk/operation-status', data)).data;
+  },
   checkIn: async (data: KioskCheckInRequest) => {
     const res = await apiClient.post<{ success: boolean; data: KioskCheckInResponse; message?: string }>('/api/kiosk/check-in', data);
     return res.data;
@@ -97,21 +108,6 @@ export const kioskApi = {
 
   checkOut: async (data: KioskCheckOutRequest) => {
     const res = await apiClient.post<{ success: boolean; data: KioskCheckOutResponse; message?: string }>('/api/kiosk/check-out', data);
-    return res.data;
-  },
-
-  payOverdue: async (data: KioskOverduePaymentRequest) => {
-    const res = await apiClient.post<{ success: boolean; data: KioskOverduePaymentResponse; message?: string }>('/api/kiosk/pay-overdue', data);
-    return res.data;
-  },
-
-  confirmOverduePayment: async (data: KioskOverduePaymentRequest) => {
-    const res = await apiClient.post<{ success: boolean; data: boolean; message?: string }>('/api/kiosk/confirm-overdue-payment', data);
-    return res.data;
-  },
-
-  syncPayment: async (orderCode: number | string) => {
-    const res = await apiClient.post<{ success: boolean; data: any; message?: string }>(`/api/payments/sync/${orderCode}`);
     return res.data;
   },
 

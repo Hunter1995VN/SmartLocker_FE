@@ -15,6 +15,7 @@ import StationBookingPage from './pages/StationBookingPage';
 import BookingPaymentPage from './pages/BookingPaymentPage';
 import BookingDetailPage from './pages/BookingDetailPage';
 import MyBookingsPage from './pages/MyBookingsPage';
+import ProfilePage from './pages/ProfilePage';
 import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminPortalPage from './pages/admin/AdminPortalPage';
 import KioskPage from './pages/kiosk/KioskPage';
@@ -34,6 +35,7 @@ type Page =
     | 'booking-payment'
     | 'booking-detail'
     | 'my-bookings'
+    | 'profile'
     | 'admin-login'
     | 'admin'
     | 'kiosk';
@@ -44,6 +46,7 @@ interface PageData {
     stationId?: string;
     bookingId?: string;
     bookingData?: any;
+    tab?: 'info' | 'debt';
 }
 
 /** Chuyển đổi từ URL Pathname sang mã Page tương ứng */
@@ -73,6 +76,7 @@ const pathToPage = (pathname: string): Page => {
         case 'booking-payment': return 'booking-payment';
         case 'booking-detail': return 'booking-detail';
         case 'my-bookings': return 'my-bookings';
+        case 'profile': return 'profile';
         case 'kiosk': return 'kiosk';
         default: return 'home';
     }
@@ -84,6 +88,8 @@ const parseQueryAndState = (): PageData => {
     const stationId = searchParams.get('stationId') || undefined;
     const bookingId = searchParams.get('bookingId') || undefined;
     const email = searchParams.get('email') || undefined;
+    const tabParam = searchParams.get('tab');
+    const tab: 'info' | 'debt' | undefined = (tabParam === 'debt' || tabParam === 'info') ? tabParam : undefined;
 
     let bookingData = undefined;
     try {
@@ -96,6 +102,7 @@ const parseQueryAndState = (): PageData => {
         bookingId,
         email,
         bookingData,
+        tab,
     };
 };
 
@@ -119,7 +126,7 @@ function App() {
         const isAdminOrStaff = userRole === 'admin' || userRole === 'staff';
 
         if (pageFromUrl !== 'home') {
-            if (['dashboard', 'my-bookings'].includes(pageFromUrl) && !savedUser) {
+            if (['dashboard', 'my-bookings', 'profile'].includes(pageFromUrl) && !savedUser) {
                 return 'login';
             }
             // Nếu người dùng có quyền Admin hoặc Staff truy cập /dashboard, ưu tiên chuyển về Admin Portal
@@ -181,6 +188,7 @@ function App() {
         if (data.stationId) params.set('stationId', data.stationId);
         if (data.bookingId) params.set('bookingId', data.bookingId);
         if (data.email) params.set('email', data.email);
+        if (data.tab) params.set('tab', data.tab);
         const queryString = params.toString();
         if (queryString) targetUrl += `?${queryString}`;
 
@@ -302,6 +310,14 @@ function App() {
             {currentPage === 'my-bookings' && (
                 <MyBookingsPage
                     onNavigate={(mode, data) => navigateTo(mode as Page, data)}
+                />
+            )}
+
+            {currentPage === 'profile' && (
+                <ProfilePage
+                    onLogout={handleLogout}
+                    onNavigate={(mode, data) => navigateTo(mode as Page, data)}
+                    initialTab={pageData.tab || 'info'}
                 />
             )}
 

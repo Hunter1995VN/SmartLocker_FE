@@ -1,34 +1,38 @@
 /**
- * AD-FE-05: UC-A06 — Manage Internal Users
- * Container View hoàn chỉnh cho chức năng Quản lý tài khoản nhân viên nội bộ & Phân quyền.
- * Tích hợp 100% với Backend ASP.NET Core API qua adminUserService.
+ * AD-FE-05: Quản lý khách hàng & Kiểm soát dư nợ
+ * Giao diện quản lý danh sách khách hàng thuê tủ (Traveler), theo dõi dư nợ quá hạn & chặn tài khoản vi phạm.
  */
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
+    Receipt,
     CheckCircle2,
     AlertCircle,
     X,
-    Plus,
+    ArrowRight,
 } from 'lucide-react';
 import adminUserService from '../../../api/adminUserService';
 import type {
     UserAdminListItemDto,
     UserRole,
-    CreateStaffRequest,
 } from '../../../api/adminUserService';
 import UserKpiSummaryCards from './UserKpiSummaryCards';
 import UserFilterBar from './UserFilterBar';
 import UserTable from './UserTable';
 import UserDetailControlPanel from './UserDetailControlPanel';
 import UserActionConfirmModal, { type ActionType } from './UserActionConfirmModal';
-import CreateStaffModal from './CreateStaffModal';
 
 interface NotificationState {
     type: 'success' | 'error';
     message: string;
 }
 
-export default function InternalUsersManagementView() {
+interface InternalUsersManagementViewProps {
+    onNavigateDebt?: () => void;
+}
+
+export default function InternalUsersManagementView({
+    onNavigateDebt,
+}: InternalUsersManagementViewProps = {}) {
     // 1. Current Logged-in User & Authorization check
     const currentAdminUser = useMemo(() => {
         try {
@@ -51,27 +55,24 @@ export default function InternalUsersManagementView() {
 
     // 3. Filter States
     const [searchQuery, setSearchQuery] = useState('');
-    const [statusFilter, setStatusFilter] = useState<string>('ALL'); // 'ALL' | 'ACTIVE' | 'SUSPENDED' | 'PENDING_VERIFICATION'
+    const [statusFilter, setStatusFilter] = useState<string>('ALL'); // 'ALL' | 'ACTIVE' | 'BOOKING_BLOCKED' | 'SUSPENDED' | 'PENDING_VERIFICATION'
     const [roleFilter, setRoleFilter] = useState<string>('ALL'); // 'ALL' | 'STAFF' | 'ADMIN' | 'TRAVELER'
 
     // 4. Feedback / Toast
     const [notification, setNotification] = useState<NotificationState | null>(null);
 
-    // 5. Modal States
+    // 5. Modal & Action States
     const [confirmModalOpen, setConfirmModalOpen] = useState(false);
     const [confirmActionType, setConfirmActionType] = useState<ActionType>('LOCK');
     const [confirmTargetUser, setConfirmTargetUser] = useState<UserAdminListItemDto | null>(null);
     const [confirmTargetRole, setConfirmTargetRole] = useState<UserRole | undefined>(undefined);
     const [isProcessingAction, setIsProcessingAction] = useState(false);
-
-    const [createModalOpen, setCreateModalOpen] = useState(false);
-    const [isCreatingStaff, setIsCreatingStaff] = useState(false);
     const [isUpdatingRole, setIsUpdatingRole] = useState(false);
 
-    // Auto-dismiss notification after 4s
+    // Auto-dismiss notification after 4.5s
     useEffect(() => {
         if (!notification) return;
-        const timer = setTimeout(() => setNotification(null), 4000);
+        const timer = setTimeout(() => setNotification(null), 4500);
         return () => clearTimeout(timer);
     }, [notification]);
 
@@ -88,11 +89,10 @@ export default function InternalUsersManagementView() {
             const res = await adminUserService.getUsers();
             if (res.success && res.data) {
                 setUsers(res.data);
-                // Cập nhật selectedUser nếu đang chọn
                 setSelectedUser((prev) => {
-                    if (!prev) return res.data && res.data.length > 0 ? res.data[0] : null;
+                    if (!prev) return null;
                     const found = res.data?.find((u) => u.id === prev.id);
-                    return found || (res.data && res.data.length > 0 ? res.data[0] : null);
+                    return found || null;
                 });
             } else {
                 setFetchError(res.message || 'Không thể tải danh sách tài khoản');
@@ -115,62 +115,83 @@ export default function InternalUsersManagementView() {
     // 7. Filter & Search Logic
     const filteredUsers = useMemo(() => {
         return users.filter((u) => {
-            // Filter by status tab
-            if (statusFilter !== 'ALL') {
-                const uStatus = (u.status || '').toUpperCase();
-                if (uStatus !== statusFilter) return false;
+            // Search match (name, email, phone)
+            const query = searchQuery.trim().toLowerCase();
+            const matchSearch =
+                !query ||
+                (u.fullName && u.fullName.toLowerCase().includes(query)) ||
+                (u.email && u.email.toLowerCase().includes(query)) ||
+                (u.phone && u.phone.toLowerCase().includes(query));
+
+            // Status filter (ALL, ACTIVE, BOOKING_BLOCKED, SUSPENDED, PENDING_VERIFICATION)
+            const isBlockedBooking =
+                (u.status || '').toUpperCase() === 'ACTIVE' &&
+                (u.role || '').toUpperCase() === 'TRAVELER' &&
+                (Number(u.overdueDebt || 0) > 0 || Boolean(u.isBookingBlocked));
+
+            let matchStatus = true;
+            if (statusFilter === 'ALL') {
+                matchStatus = true;
+            } else if (statusFilter === 'BOOKING_BLOCKED') {
+                matchStatus = isBlockedBooking;
+            } else if (statusFilter === 'ACTIVE') {
+                matchStatus = (u.status || '').toUpperCase() === 'ACTIVE' && !isBlockedBooking;
+            } else {
+                matchStatus = (u.status || '').toUpperCase() === statusFilter.toUpperCase();
             }
 
-            // Filter by role dropdown
-            if (roleFilter !== 'ALL') {
-                const uRole = (u.role || '').toUpperCase();
-                if (uRole !== roleFilter) return false;
-            }
+            // Role filter
+            const matchRole =
+                roleFilter === 'ALL' ||
+                (u.role || '').toUpperCase() === roleFilter.toUpperCase();
 
-            // Filter by search query (fullName, email, phone)
-            if (searchQuery.trim()) {
-                const q = searchQuery.toLowerCase().trim();
-                const name = (u.fullName || '').toLowerCase();
-                const email = (u.email || '').toLowerCase();
-                const phone = (u.phone || '').toLowerCase();
-                if (!name.includes(q) && !email.includes(q) && !phone.includes(q)) {
-                    return false;
-                }
-            }
-
-            return true;
+            return matchSearch && matchStatus && matchRole;
         });
-    }, [users, statusFilter, roleFilter, searchQuery]);
+    }, [users, searchQuery, statusFilter, roleFilter]);
 
-    // Counters for Filter Tabs
+    // Counters for Quick Tab Badges
     const counters = useMemo(() => {
+        const isBookingBlockedFn = (u: UserAdminListItemDto) =>
+            (u.status || '').toUpperCase() === 'ACTIVE' &&
+            (u.role || '').toUpperCase() === 'TRAVELER' &&
+            (Number(u.overdueDebt || 0) > 0 || Boolean(u.isBookingBlocked));
+
         const total = users.length;
-        const active = users.filter((u) => (u.status || '').toUpperCase() === 'ACTIVE').length;
+        const bookingBlocked = users.filter(isBookingBlockedFn).length;
+        const activeNormal = users.filter((u) => (u.status || '').toUpperCase() === 'ACTIVE' && !isBookingBlockedFn(u)).length;
         const suspended = users.filter((u) => (u.status || '').toUpperCase() === 'SUSPENDED').length;
         const pending = users.filter((u) => (u.status || '').toUpperCase() === 'PENDING_VERIFICATION').length;
-        return { total, active, suspended, pending };
+
+        return {
+            total,
+            active: activeNormal,
+            bookingBlocked,
+            suspended,
+            pending,
+        };
     }, [users]);
 
-    // 8. Handlers for User Actions (Lock, Activate, Change Role)
+    // 8. Action Handlers
     const handleTriggerLock = (user: UserAdminListItemDto) => {
         setConfirmTargetUser(user);
         setConfirmActionType('LOCK');
-        setConfirmTargetRole(undefined);
         setConfirmModalOpen(true);
     };
-
     const handleTriggerActivate = (user: UserAdminListItemDto) => {
         setConfirmTargetUser(user);
         setConfirmActionType('ACTIVATE');
-        setConfirmTargetRole(undefined);
         setConfirmModalOpen(true);
     };
 
     const handleTriggerChangeRole = (user: UserAdminListItemDto) => {
-        const currentRole = (user.role || '').toUpperCase();
-        const nextRole: UserRole = currentRole === 'ADMIN' ? 'STAFF' : 'ADMIN';
         setConfirmTargetUser(user);
         setConfirmActionType('CHANGE_ROLE');
+        const nextRole: UserRole =
+            (user.role || '').toUpperCase() === 'TRAVELER'
+                ? 'STAFF'
+                : (user.role || '').toUpperCase() === 'STAFF'
+                ? 'ADMIN'
+                : 'STAFF';
         setConfirmTargetRole(nextRole);
         setConfirmModalOpen(true);
     };
@@ -183,12 +204,12 @@ export default function InternalUsersManagementView() {
             if (confirmActionType === 'LOCK') {
                 const res = await adminUserService.updateUserStatus(confirmTargetUser.id, {
                     status: 'SUSPENDED',
-                    reason: reason || 'Quản trị viên tạm khóa tài khoản',
+                    reason: reason || 'Quản trị viên tạm khóa đăng nhập hệ thống',
                 });
                 if (res.success) {
                     setNotification({
                         type: 'success',
-                        message: `Đã tạm khóa tài khoản của ${confirmTargetUser.fullName || confirmTargetUser.email} thành công.`,
+                        message: `Đã tạm khóa đăng nhập tài khoản của ${confirmTargetUser.fullName || confirmTargetUser.email} thành công.`,
                     });
                     await loadUsers(true);
                 } else {
@@ -200,12 +221,12 @@ export default function InternalUsersManagementView() {
             } else if (confirmActionType === 'ACTIVATE') {
                 const res = await adminUserService.updateUserStatus(confirmTargetUser.id, {
                     status: 'ACTIVE',
-                    reason: 'Quản trị viên kích hoạt tài khoản',
+                    reason: 'Quản trị viên kích hoạt tài khoản đăng nhập',
                 });
                 if (res.success) {
                     setNotification({
                         type: 'success',
-                        message: `Đã kích hoạt tài khoản của ${confirmTargetUser.fullName || confirmTargetUser.email} thành công.`,
+                        message: `Đã mở khóa đăng nhập tài khoản của ${confirmTargetUser.fullName || confirmTargetUser.email} thành công.`,
                     });
                     await loadUsers(true);
                 } else {
@@ -221,13 +242,13 @@ export default function InternalUsersManagementView() {
                 if (res.success) {
                     setNotification({
                         type: 'success',
-                        message: `Đã cập nhật phân quyền tài khoản thành ${confirmTargetRole} thành công.`,
+                        message: `Đã cập nhật vai trò tài khoản thành ${confirmTargetRole} thành công.`,
                     });
                     await loadUsers(true);
                 } else {
                     setNotification({
                         type: 'error',
-                        message: res.message || 'Cập nhật phân quyền thất bại.',
+                        message: res.message || 'Cập nhật vai trò thất bại.',
                     });
                 }
             }
@@ -243,7 +264,6 @@ export default function InternalUsersManagementView() {
         }
     };
 
-    // Save Role directly from Detail Panel
     const handleSaveRoleFromPanel = async (userId: string, newRole: UserRole) => {
         setIsUpdatingRole(true);
         try {
@@ -251,137 +271,122 @@ export default function InternalUsersManagementView() {
             if (res.success) {
                 setNotification({
                     type: 'success',
-                    message: `Đã cập nhật phân quyền tài khoản thành ${newRole} thành công.`,
+                    message: `Đã cập nhật vai trò tài khoản thành ${newRole} thành công.`,
                 });
                 await loadUsers(true);
             } else {
                 setNotification({
                     type: 'error',
-                    message: res.message || 'Cập nhật phân quyền thất bại.',
+                    message: res.message || 'Cập nhật vai trò thất bại.',
                 });
             }
         } catch (err: unknown) {
             const axiosErr = err as { response?: { data?: { message?: string } } };
             setNotification({
                 type: 'error',
-                message: axiosErr.response?.data?.message || 'Có lỗi xảy ra khi cập nhật phân quyền.',
+                message: axiosErr.response?.data?.message || 'Có lỗi xảy ra khi cập nhật vai trò.',
             });
         } finally {
             setIsUpdatingRole(false);
         }
     };
 
-    // Create Staff Handler
-    const handleCreateStaffSubmit = async (request: CreateStaffRequest): Promise<boolean> => {
-        setIsCreatingStaff(true);
-        try {
-            const res = await adminUserService.createStaff(request);
-            if (res.success && res.data) {
-                setNotification({
-                    type: 'success',
-                    message: `Đã tạo tài khoản nhân viên ${res.data.fullName} (${res.data.email}) thành công!`,
-                });
-                await loadUsers(true);
-                setSelectedUser(res.data);
-                return true;
-            } else {
-                setNotification({
-                    type: 'error',
-                    message: res.message || 'Tạo tài khoản nhân viên thất bại.',
-                });
-                return false;
-            }
-        } catch (err: unknown) {
-            const axiosErr = err as { response?: { data?: { message?: string } } };
-            setNotification({
-                type: 'error',
-                message: axiosErr.response?.data?.message || 'Có lỗi xảy ra khi tạo tài khoản nhân viên.',
-            });
-            return false;
-        } finally {
-            setIsCreatingStaff(false);
-        }
-    };
-
-    // Export CSV Handler
+    // Export CSV
     const handleExportCsv = () => {
         if (filteredUsers.length === 0) {
             setNotification({
                 type: 'error',
-                message: 'Không có dữ liệu nhân sự để xuất CSV.',
+                message: 'Không có dữ liệu tài khoản để xuất CSV.',
             });
             return;
         }
 
-        const headers = ['ID', 'Họ và tên', 'Email', 'Số điện thoại', 'Vai trò', 'Trạng thái', 'Ngày tạo'];
+        const headers = ['ID', 'Họ và tên', 'Email', 'Số điện thoại', 'Vai trò', 'Trạng thái tài khoản', 'Dư nợ quá hạn (VNĐ)', 'Ngày tạo'];
         const csvRows = [headers.join(',')];
 
         filteredUsers.forEach((u) => {
+            const isBlockedBooking =
+                (u.status || '').toUpperCase() === 'ACTIVE' &&
+                (u.role || '').toUpperCase() === 'TRAVELER' &&
+                (Number(u.overdueDebt || 0) > 0 || Boolean(u.isBookingBlocked));
+
+            const displayStatus =
+                (u.status || '').toUpperCase() === 'SUSPENDED'
+                    ? 'Tạm khóa đăng nhập'
+                    : isBlockedBooking
+                    ? 'Tạm khóa đặt tủ'
+                    : (u.status || '').toUpperCase() === 'PENDING_VERIFICATION'
+                    ? 'Chờ xác nhận'
+                    : 'Hoạt động bình thường';
+
             const row = [
                 `"${u.id}"`,
                 `"${(u.fullName || '').replace(/"/g, '""')}"`,
                 `"${(u.email || '').replace(/"/g, '""')}"`,
                 `"${(u.phone || '').replace(/"/g, '""')}"`,
                 `"${u.role || ''}"`,
-                `"${u.status || ''}"`,
+                `"${displayStatus}"`,
+                `"${u.overdueDebt || 0}"`,
                 `"${u.createdAt || ''}"`,
             ];
             csvRows.push(row.join(','));
         });
 
-        // Add UTF-8 BOM so Excel opens Vietnamese characters correctly
         const blob = new Blob(['\uFEFF' + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', `SmartLocker_Internal_Users_${new Date().toISOString().slice(0, 10)}.csv`);
+        link.setAttribute('download', `SmartLocker_TaiKhoan_${new Date().toISOString().slice(0, 10)}.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
 
         setNotification({
             type: 'success',
-            message: `Đã xuất danh sách ${filteredUsers.length} tài khoản nhân sự ra file CSV!`,
+            message: `Đã xuất danh sách ${filteredUsers.length} tài khoản ra file CSV!`,
         });
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4">
             {/* Top Breadcrumb & Page Header */}
             <div>
-                <nav className="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-2">
+                <nav className="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1.5">
                     <span>Quản trị</span>
                     <span>/</span>
                     <span>Quản trị hệ thống</span>
                     <span>/</span>
-                    <span className="text-blue-600 font-bold">Quản lý tài khoản nội bộ (UC-A06)</span>
+                    <span className="text-blue-600 font-bold">
+                        Quản lý tài khoản
+                    </span>
                 </nav>
 
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
-                        <div className="flex items-center gap-2.5">
-                            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-                                Quản Lý Tài Khoản Nhân Viên & Phân Quyền
+                        <div className="flex items-center gap-2.5 flex-wrap">
+                            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+                                Quản Lý Tài Khoản Hệ Thống
                             </h1>
-                            <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-purple-100 text-purple-700 border border-purple-200">
-                                RBAC v2.4
+                            <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-blue-100 text-blue-700 border border-blue-200">
+                                TOÀN BỘ TÀI KHOẢN (TRAVELER, STAFF, ADMIN)
                             </span>
                         </div>
-                        <p className="text-xs text-slate-500 mt-1 max-w-3xl">
-                            Kiểm soát danh tính, phân quyền vai trò (RBAC), quản lý kích hoạt và khóa an toàn đối với đội ngũ vận hành trạm và kỹ thuật viên bảo trì toàn hệ thống SmartLocker.
+                        <p className="text-xs text-slate-500 mt-0.5">
+                            Quản lý toàn bộ tài khoản trong hệ thống, phân quyền vai trò và phân định rõ ràng giữa tạm khóa đăng nhập hệ thống vs tạm khóa quyền đặt tủ mới.
                         </p>
                     </div>
 
                     {/* Action buttons on header */}
-                    <div className="flex items-center gap-2.5 shrink-0">
-                        {isAdmin && (
+                    <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                        {onNavigateDebt && (
                             <button
                                 type="button"
-                                onClick={() => setCreateModalOpen(true)}
-                                className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition cursor-pointer shadow-xs shadow-blue-600/20"
+                                onClick={onNavigateDebt}
+                                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-bold rounded-xl border border-amber-200 transition cursor-pointer"
                             >
-                                <Plus className="w-4 h-4" />
-                                <span>Tạo tài khoản Staff</span>
+                                <Receipt className="w-4 h-4 text-amber-600" />
+                                <span>Quản lý dư nợ (Travelers)</span>
+                                <ArrowRight className="w-3.5 h-3.5 text-amber-600" />
                             </button>
                         )}
                     </div>
@@ -391,7 +396,7 @@ export default function InternalUsersManagementView() {
             {/* Notification Banner */}
             {notification && (
                 <div
-                    className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 text-xs font-medium animate-in fade-in slide-in-from-top-2 duration-200 ${
+                    className={`p-3 rounded-xl border flex items-center justify-between gap-3 text-xs font-medium animate-in fade-in slide-in-from-top-2 duration-200 ${
                         notification.type === 'success'
                             ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                             : 'bg-rose-50 text-rose-800 border-rose-200'
@@ -428,19 +433,20 @@ export default function InternalUsersManagementView() {
                 onRoleFilterChange={setRoleFilter}
                 totalCount={counters.total}
                 activeCount={counters.active}
+                bookingBlockedCount={counters.bookingBlocked}
                 suspendedCount={counters.suspended}
                 pendingCount={counters.pending}
                 onRefresh={() => loadUsers(true)}
                 isRefreshing={isRefreshing}
-                onOpenCreateModal={() => setCreateModalOpen(true)}
                 onExportCsv={handleExportCsv}
                 isAdmin={isAdmin}
+                showCreateStaff={false}
             />
 
-            {/* Section 3: Two-Column Workspace (Table & Detail Panel) */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-                {/* Left side: Users Table (7-8 columns on large screens) */}
-                <div className="lg:col-span-7 xl:col-span-8">
+            {/* Section 3: Workspace (Table & Detail Panel) */}
+            <div className={`grid grid-cols-1 ${selectedUser ? 'lg:grid-cols-12' : ''} gap-5 items-start`}>
+                {/* Table column */}
+                <div className={selectedUser ? 'lg:col-span-7 xl:col-span-8' : 'w-full'}>
                     <UserTable
                         users={filteredUsers}
                         selectedUserId={selectedUser?.id}
@@ -461,21 +467,23 @@ export default function InternalUsersManagementView() {
                     />
                 </div>
 
-                {/* Right side: Detail & Control Panel (4-5 columns) */}
-                <div className="lg:col-span-5 xl:col-span-4 sticky top-6">
-                    <UserDetailControlPanel
-                        user={selectedUser}
-                        onClose={() => setSelectedUser(null)}
-                        isAdmin={isAdmin}
-                        onTriggerLock={handleTriggerLock}
-                        onTriggerActivate={handleTriggerActivate}
-                        onSaveRole={handleSaveRoleFromPanel}
-                        isUpdatingRole={isUpdatingRole}
-                    />
-                </div>
+                {/* Detail Control Panel column */}
+                {selectedUser && (
+                    <div className="lg:col-span-5 xl:col-span-4 sticky top-6">
+                        <UserDetailControlPanel
+                            user={selectedUser}
+                            onClose={() => setSelectedUser(null)}
+                            isAdmin={isAdmin}
+                            onTriggerLock={handleTriggerLock}
+                            onTriggerActivate={handleTriggerActivate}
+                            onSaveRole={handleSaveRoleFromPanel}
+                            isUpdatingRole={isUpdatingRole}
+                        />
+                    </div>
+                )}
             </div>
 
-            {/* Action Confirmation Modal */}
+            {/* Section 4: Action Confirmation Modal */}
             {confirmTargetUser && (
                 <UserActionConfirmModal
                     isOpen={confirmModalOpen}
@@ -487,14 +495,6 @@ export default function InternalUsersManagementView() {
                     isProcessing={isProcessingAction}
                 />
             )}
-
-            {/* Create Staff Modal */}
-            <CreateStaffModal
-                isOpen={createModalOpen}
-                onClose={() => setCreateModalOpen(false)}
-                onSubmit={handleCreateStaffSubmit}
-                isSubmitting={isCreatingStaff}
-            />
         </div>
     );
 }

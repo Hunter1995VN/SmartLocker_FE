@@ -1,26 +1,31 @@
 /**
- * AD-FE-05: UC-A06 — Manage Internal Users
- * Panel chi tiết nhân sự & điều khiển phân quyền (Role / Account Status Control).
- * Thiết kế bám sát 100% Mockup quy chuẩn SmartLocker Admin Portal.
+ * AD-FE-05: Quản lý tài khoản hệ thống
+ * Panel chi tiết hồ sơ tài khoản, phân quyền vai trò (Role RBAC)
+ * và kiểm soát quyền truy cập: Tạm khóa đăng nhập / Tạm khóa đặt tủ / Mở khóa hệ thống.
  */
 import { useState, useEffect } from 'react';
 import {
     X,
+    Shield,
     Lock,
     Unlock,
-    AlertTriangle,
-    Save,
-    Phone,
+    RotateCcw,
     Mail,
+    Phone,
     Calendar,
-    CheckSquare,
-    ExternalLink,
-    UserCheck,
+    Save,
+    Clock,
+    CheckCircle2,
+    Ban,
+    AlertTriangle,
 } from 'lucide-react';
-import type { UserAdminListItemDto, UserRole } from '../../../api/adminUserService';
+import type {
+    UserAdminListItemDto,
+    UserRole,
+} from '../../../api/adminUserService';
 import {
     getRoleConfig,
-    getStatusConfig,
+    getUserAccountStatus,
     formatDate,
     getInitials,
 } from './userConstants';
@@ -72,242 +77,266 @@ export default function UserDetailControlPanel({
         setRoleHasChanged(false);
     };
 
-    if (!user) {
-        return (
-            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-8 flex flex-col items-center justify-center text-center text-slate-400 min-h-[500px]">
-                <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center mb-3 text-slate-300">
-                    <UserCheck className="w-7 h-7" />
-                </div>
-                <h4 className="text-xs font-bold text-slate-600 uppercase tracking-wider">
-                    Chưa chọn nhân sự
-                </h4>
-                <p className="text-xs text-slate-400 mt-1 max-w-xs">
-                    Vui lòng nhấp vào một nhân viên trong bảng bên trái để xem hồ sơ và phân quyền.
-                </p>
-            </div>
-        );
-    }
+    if (!user) return null;
 
     const roleCfg = getRoleConfig(user.role);
-    const statusCfg = getStatusConfig(user.status);
+    const accountStatus = getUserAccountStatus(user);
     const isActive = (user.status || '').toUpperCase() === 'ACTIVE';
     const isSuspended = (user.status || '').toUpperCase() === 'SUSPENDED';
-    const isPending = (user.status || '').toUpperCase() === 'PENDING_VERIFICATION';
-
-    // Tạo mã nhân viên rút gọn
-    const empCode = `EMP-${user.id.substring(0, 4).toUpperCase()}`;
+    const isTraveler = (user.role || '').toUpperCase() === 'TRAVELER';
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs flex flex-col overflow-hidden">
-            {/* 1. Header: Live indicator & close button */}
-            <div className="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-lg p-5 space-y-5 animate-in fade-in duration-200">
+            {/* Header: Title + Close Button */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-700">
-                        Hồ sơ nhân sự
+                    <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                        HỒ SƠ TÀI KHOẢN
                     </span>
+                    <h3 className="text-sm font-bold text-slate-800">
+                        Chi tiết & Phân quyền
+                    </h3>
                 </div>
-                <div className="flex items-center gap-1">
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
-                        title="Đóng panel"
-                    >
-                        <X className="w-4 h-4" />
-                    </button>
+                <button
+                    type="button"
+                    onClick={onClose}
+                    className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition cursor-pointer"
+                    title="Đóng panel"
+                >
+                    <X className="w-4 h-4" />
+                </button>
+            </div>
+
+            {/* User Identity Card */}
+            <div className="flex items-center gap-3.5 p-3.5 bg-slate-50/70 rounded-2xl border border-slate-100">
+                <div
+                    className={`w-12 h-12 rounded-full ${roleCfg.avatarBg} ${roleCfg.avatarText} flex items-center justify-center font-black text-sm shrink-0 border border-slate-200/80 shadow-xs`}
+                >
+                    {getInitials(user.fullName)}
+                </div>
+                <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                        <h4 className="font-bold text-slate-900 text-sm truncate">
+                            {user.fullName || 'Chưa cập nhật tên'}
+                        </h4>
+                        <span className={`px-2 py-0.2 rounded-full text-[10px] font-bold border ${roleCfg.badgeClass}`}>
+                            {roleCfg.label}
+                        </span>
+                    </div>
+                    <p className="text-xs text-slate-500 font-mono truncate">{user.email}</p>
+                    {user.phone && (
+                        <p className="text-[11px] text-slate-400 font-mono mt-0.5">{user.phone}</p>
+                    )}
                 </div>
             </div>
 
-            {/* 2. Body: Scrollable contents */}
-            <div className="p-5 space-y-6 overflow-y-auto max-h-[calc(100vh-220px)]">
-                {/* Profile Card */}
-                <div className="flex items-start gap-3.5 p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/60">
-                    <div
-                        className={`w-12 h-12 rounded-xl ${roleCfg.avatarBg} ${roleCfg.avatarText} flex items-center justify-center font-extrabold text-base shrink-0 border border-slate-200/80 shadow-2xs`}
-                    >
-                        {getInitials(user.fullName)}
+            {/* Detailed Attributes Grid */}
+            <div className="space-y-2.5 text-xs">
+                <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
+                    <span className="text-slate-500 flex items-center gap-1.5">
+                        <Mail className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Email đăng nhập</span>
+                    </span>
+                    <span className="font-mono text-slate-800 font-semibold truncate max-w-[180px]">
+                        {user.email}
+                    </span>
+                </div>
+
+                <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
+                    <span className="text-slate-500 flex items-center gap-1.5">
+                        <Phone className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Số điện thoại</span>
+                    </span>
+                    <span className="font-mono text-slate-800 font-semibold">
+                        {user.phone || 'Chưa có'}
+                    </span>
+                </div>
+
+                <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
+                    <span className="text-slate-500 flex items-center gap-1.5">
+                        <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Ngày khởi tạo</span>
+                    </span>
+                    <span className="text-slate-700 font-mono">{formatDate(user.createdAt)}</span>
+                </div>
+
+                <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
+                    <span className="text-slate-500 flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Mã định danh (ID)</span>
+                    </span>
+                    <span className="font-mono text-[10px] text-slate-400 max-w-[170px] truncate" title={user.id}>
+                        {user.id}
+                    </span>
+                </div>
+            </div>
+
+            {/* Section: Role & RBAC Permissions */}
+            <div className="space-y-3 pt-2 border-t border-slate-100">
+                <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                        Phân quyền vai trò (Role RBAC)
+                    </span>
+                    {roleHasChanged && (
+                        <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                            Chưa lưu thay đổi
+                        </span>
+                    )}
+                </div>
+
+                {isAdmin ? (
+                    <div className="space-y-2.5">
+                        <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-50 rounded-xl border border-slate-200">
+                            {(['TRAVELER', 'STAFF', 'ADMIN'] as UserRole[]).map((r) => {
+                                const isCurrent = selectedRole === r;
+                                return (
+                                    <button
+                                        key={r}
+                                        type="button"
+                                        onClick={() => handleRoleSelectChange(r)}
+                                        className={`py-1.5 px-2 rounded-lg text-xs font-bold transition cursor-pointer text-center ${
+                                            isCurrent
+                                                ? 'bg-blue-600 text-white shadow-xs'
+                                                : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                                        }`}
+                                    >
+                                        {r === 'TRAVELER' ? 'Traveler' : r === 'STAFF' ? 'Staff' : 'Admin'}
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {roleHasChanged && (
+                            <div className="flex items-center gap-2 pt-1">
+                                <button
+                                    type="button"
+                                    onClick={handleSaveRoleClick}
+                                    disabled={isUpdatingRole}
+                                    className="flex-1 py-1.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition cursor-pointer inline-flex items-center justify-center gap-1.5 shadow-xs shadow-blue-600/20 disabled:opacity-50"
+                                >
+                                    <Save className="w-3.5 h-3.5" />
+                                    <span>{isUpdatingRole ? 'Đang lưu...' : 'Lưu vai trò mới'}</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleResetRole}
+                                    className="p-1.5 rounded-xl text-slate-500 hover:bg-slate-100 transition cursor-pointer"
+                                    title="Hủy thay đổi"
+                                >
+                                    <RotateCcw className="w-4 h-4" />
+                                </button>
+                            </div>
+                        )}
                     </div>
-                    <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                            <h3 className="font-extrabold text-slate-900 text-sm truncate">
-                                {user.fullName || 'Chưa đặt họ tên'}
-                            </h3>
-                            <span className="px-2 py-0.5 rounded text-[10px] font-extrabold bg-blue-600 text-white font-mono">
-                                {empCode}
+                ) : (
+                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-2 text-xs text-slate-600">
+                        <Shield className="w-4 h-4 text-slate-400" />
+                        <span>Vai trò hiện tại: <strong>{roleCfg.label}</strong> (Chỉ Admin mới được đổi)</span>
+                    </div>
+                )}
+            </div>
+
+            {/* Section: Compound Account Status & Access Permissions */}
+            <div className="space-y-3 pt-2 border-t border-slate-100">
+                <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                        Trạng thái tài khoản
+                    </span>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${accountStatus.badgeClass}`}>
+                        {accountStatus.label}
+                    </span>
+                </div>
+
+                {/* Sub-status breakdown */}
+                <div className="grid grid-cols-2 gap-2 text-[11px]">
+                    <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100 flex flex-col justify-between gap-1">
+                        <span className="text-slate-400 font-medium">Đăng nhập hệ thống:</span>
+                        {accountStatus.loginAllowed ? (
+                            <span className="font-bold text-emerald-700 flex items-center gap-1">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                Cho phép đăng nhập
                             </span>
-                        </div>
-                        <div className="mt-1 space-y-0.5 text-xs text-slate-500">
-                            <p className="flex items-center gap-1.5 truncate">
-                                <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                                <span className="truncate">{user.email}</span>
-                            </p>
-                            <p className="flex items-center gap-1.5">
-                                <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                                <span className="font-mono">{user.phone || 'Chưa có SĐT'}</span>
-                            </p>
-                            <p className="flex items-center gap-1.5 text-[11px] text-slate-400">
-                                <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                                <span>Gia nhập: {formatDate(user.createdAt)}</span>
-                            </p>
-                        </div>
+                        ) : (
+                            <span className="font-bold text-rose-700 flex items-center gap-1">
+                                <Ban className="w-3.5 h-3.5 text-rose-600" />
+                                Bị tạm khóa đăng nhập
+                            </span>
+                        )}
+                    </div>
+
+                    <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100 flex flex-col justify-between gap-1">
+                        <span className="text-slate-400 font-medium">Quyền đặt tủ mới:</span>
+                        {isTraveler ? (
+                            accountStatus.bookingAllowed ? (
+                                <span className="font-bold text-emerald-700 flex items-center gap-1">
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                    Được phép đặt tủ
+                                </span>
+                            ) : (
+                                <span className="font-bold text-amber-700 flex items-center gap-1">
+                                    <Lock className="w-3.5 h-3.5 text-amber-600" />
+                                    Bị tạm khóa đặt tủ
+                                </span>
+                            )
+                        ) : (
+                            <span className="font-semibold text-slate-600">
+                                Không áp dụng (Nhân sự)
+                            </span>
+                        )}
                     </div>
                 </div>
 
-                {/* Authorization alert if viewer is NOT Admin */}
-                {!isAdmin && (
-                    <div className="p-3 bg-amber-50 border border-amber-200/80 rounded-xl flex items-start gap-2.5 text-amber-800 text-xs">
-                        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                        <div>
-                            <span className="font-bold">Chế độ xem giới hạn (Staff):</span> Bạn chỉ có quyền xem thông tin. Thao tác khóa/kích hoạt hoặc thay đổi vai trò yêu cầu tài khoản Quản trị viên (ADMIN).
-                        </div>
+                {/* Contextual Guidance Banner */}
+                {accountStatus.key === 'BOOKING_BLOCKED' && (
+                    <div className="p-3 bg-amber-50/80 border border-amber-200/80 rounded-xl text-amber-900 text-xs space-y-1">
+                        <p className="font-bold flex items-center gap-1.5 text-amber-800">
+                            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                            Đang bị tạm khóa quyền đặt tủ mới
+                        </p>
+                        <p className="text-[11px] text-amber-700 leading-relaxed">
+                            Khách hàng vẫn được phép đăng nhập web/app để tra cứu thông tin và quét mã QR PayOS thanh toán phí nợ. Để mở khóa đặt tủ, chuyển sang mục <strong>Quản lý dư nợ</strong>.
+                        </p>
                     </div>
                 )}
 
-                {/* Section: Account Status & Actions */}
-                <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                            Trạng thái tài khoản
-                        </span>
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold border ${statusCfg.badgeClass}`}>
-                            {statusCfg.label}
-                        </span>
+                {accountStatus.key === 'SUSPENDED' && (
+                    <div className="p-3 bg-rose-50/80 border border-rose-200/80 rounded-xl text-rose-900 text-xs space-y-1">
+                        <p className="font-bold flex items-center gap-1.5 text-rose-800">
+                            <Ban className="w-4 h-4 text-rose-600 shrink-0" />
+                            Đang bị tạm khóa đăng nhập hệ thống
+                        </p>
+                        <p className="text-[11px] text-rose-700 leading-relaxed">
+                            Tài khoản không thể đăng nhập vào ứng dụng di động hoặc cổng Web. Mọi phiên hoạt động bị vô hiệu hóa cho đến khi được mở khóa lại.
+                        </p>
                     </div>
+                )}
 
-                    <p className="text-xs text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                        {statusCfg.description}
-                    </p>
-
-                    {/* Action buttons based on current status */}
-                    {isAdmin && (
-                        <div className="space-y-2 pt-1">
-                            {isActive && (
-                                <div className="grid grid-cols-2 gap-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => onTriggerLock(user)}
-                                        className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 text-xs font-bold rounded-xl transition cursor-pointer"
-                                    >
-                                        <Lock className="w-3.5 h-3.5" />
-                                        <span>Tạm khóa (Suspend)</span>
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => onTriggerLock(user)}
-                                        className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition cursor-pointer shadow-xs shadow-rose-600/20"
-                                    >
-                                        <Lock className="w-3.5 h-3.5" />
-                                        <span>Khóa an toàn</span>
-                                    </button>
-                                </div>
-                            )}
-
-                            {isSuspended && (
-                                <button
-                                    type="button"
-                                    onClick={() => onTriggerActivate(user)}
-                                    className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition cursor-pointer shadow-xs shadow-emerald-600/20"
-                                >
-                                    <Unlock className="w-4 h-4" />
-                                    <span>Kích hoạt lại tài khoản</span>
-                                </button>
-                            )}
-
-                            {isPending && (
-                                <button
-                                    type="button"
-                                    onClick={() => onTriggerActivate(user)}
-                                    className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition cursor-pointer shadow-xs shadow-emerald-600/20"
-                                >
-                                    <Unlock className="w-4 h-4" />
-                                    <span>Kích hoạt tài khoản ngay</span>
-                                </button>
-                            )}
-                        </div>
-                    )}
-                </div>
-
-                {/* Section: Role Management (Phân quyền vai trò RBAC) */}
-                <div className="space-y-3 pt-3 border-t border-slate-100">
-                    <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                            Phân quyền vai trò (RBAC)
-                        </span>
-                        <span className="text-[11px] font-semibold text-blue-600 flex items-center gap-1 cursor-pointer">
-                            <span>Chi tiết RBAC</span>
-                            <ExternalLink className="w-3 h-3" />
-                        </span>
-                    </div>
-
-                    <div>
-                        <label htmlFor="user-role-select" className="block text-xs font-semibold text-slate-700 mb-1.5">
-                            Vai trò phân bổ chính:
-                        </label>
-                        <select
-                            id="user-role-select"
-                            value={selectedRole}
-                            onChange={(e) => handleRoleSelectChange(e.target.value as UserRole)}
-                            disabled={!isAdmin || isUpdatingRole}
-                            className="w-full px-3 py-2 text-xs font-semibold bg-white border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 text-slate-800 disabled:bg-slate-100 disabled:opacity-60 cursor-pointer"
-                        >
-                            <option value="STAFF">Vận hành trạm (Staff / Field Technician)</option>
-                            <option value="ADMIN">Quản trị viên cấp cao (Super Admin)</option>
-                            <option value="TRAVELER">Khách hàng vãng lai (Traveler)</option>
-                        </select>
-                    </div>
-
-                    {/* Scope preview info */}
-                    <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-200/60 space-y-2 text-xs">
-                        <p className="font-bold text-slate-700">Quyền hạn đối với ô tủ & IoT:</p>
-                        <div className="space-y-1.5 text-slate-600">
-                            <label className="flex items-center gap-2 cursor-default">
-                                <CheckSquare className="w-3.5 h-3.5 text-blue-600" />
-                                <span>Chuyển trạng thái ô tủ sang Bảo trì (UC-A05)</span>
-                            </label>
-                            <label className="flex items-center gap-2 cursor-default">
-                                <CheckSquare className="w-3.5 h-3.5 text-blue-600" />
-                                <span>Đọc dữ liệu cảm biến & Telemetry trực tiếp (S-01)</span>
-                            </label>
-                            <label className="flex items-center gap-2 cursor-default">
-                                <CheckSquare className="w-3.5 h-3.5 text-slate-400" />
-                                <span className="text-slate-500">Mở khóa khẩn cấp từ xa (Chỉ Super Admin)</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    {/* Save Role Buttons (Hiển thị khi role thay đổi) */}
-                    {isAdmin && roleHasChanged && (
-                        <div className="flex items-center gap-2 pt-2">
+                {/* Lock / Unlock Login Action Buttons */}
+                {isAdmin && (
+                    <div className="pt-1">
+                        {isActive && (
                             <button
                                 type="button"
-                                onClick={handleResetRole}
-                                disabled={isUpdatingRole}
-                                className="flex-1 py-2 px-3 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition cursor-pointer"
+                                onClick={() => onTriggerLock(user)}
+                                className="w-full py-2 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition cursor-pointer inline-flex items-center justify-center gap-1.5 border border-rose-200"
                             >
-                                Hủy thay đổi
+                                <Lock className="w-3.5 h-3.5 text-rose-600" />
+                                <span>Tạm khóa đăng nhập hệ thống</span>
                             </button>
+                        )}
+
+                        {isSuspended && (
                             <button
                                 type="button"
-                                onClick={handleSaveRoleClick}
-                                disabled={isUpdatingRole}
-                                className="flex-1 py-2 px-3 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition cursor-pointer shadow-xs shadow-blue-600/20 inline-flex items-center justify-center gap-1.5"
+                                onClick={() => onTriggerActivate(user)}
+                                className="w-full py-2 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold transition cursor-pointer inline-flex items-center justify-center gap-1.5 border border-emerald-200"
                             >
-                                {isUpdatingRole ? (
-                                    <>
-                                        <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                        <span>Đang lưu...</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Save className="w-3.5 h-3.5" />
-                                        <span>Lưu phân quyền</span>
-                                    </>
-                                )}
+                                <Unlock className="w-3.5 h-3.5 text-emerald-600" />
+                                <span>Mở khóa đăng nhập hệ thống</span>
                             </button>
-                        </div>
-                    )}
-                </div>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );
