@@ -897,7 +897,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
 
                                 <div className="text-right shrink-0">
                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                                        Thời gian quá hạn
+                                        Đơn quá hạn khi lập BB
                                     </p>
                                     <p className="text-base font-black text-rose-600 font-mono">
                                         {overdueDisplay(activeRecord.overdueHours)}

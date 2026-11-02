@@ -74,7 +74,7 @@ export function overdueDisplay(hours: number): string {
     if (hours < 24) return `${hours} giờ`;
     const days = Math.floor(hours / 24);
     const rem = hours % 24;
-    return rem > 0 ? `${days} ngày ${rem} giờ` : `${days} ngày`;
+    return rem > 0 ? `${days} ngày ${rem}h (${hours}h)` : `${days} ngày (${hours}h)`;
 }
 
 // ─── Parser for itemDescription ───────────────────────────────────────────────
