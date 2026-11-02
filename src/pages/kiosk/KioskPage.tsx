@@ -3,6 +3,7 @@ import { Html5QrcodeScanner } from 'html5-qrcode';
 import { kioskApi } from '../../api/kioskService';
 import type { KioskStationStatus } from '../../api/kioskService';
 import { kioskSignalR } from '../../services/kioskSignalR';
+import KioskLockerStatus from '../../components/kiosk/KioskLockerStatus';
 import { sounds } from '../../utils/soundEffects';
 import { QRCodeSVG } from 'qrcode.react';
 import type { CreateBookingResponse } from '../../api/bookingService';
@@ -134,16 +135,22 @@ export default function KioskPage() {
   useEffect(() => {
     if (!stationId) return;
 
-    kioskApi.getStationStatus(stationId).then((res) => {
-      if (res.success && res.data) {
-        setStationStatus(res.data);
-      }
-    }).catch(console.error);
+    let cancelled = false;
+    setStationStatus(null);
+    const refreshStatus = async () => {
+      try {
+        const res = await kioskApi.getStationStatus(stationId);
+        if (!cancelled) setStationStatus(res.success ? res.data : null);
+      } catch { if (!cancelled) setStationStatus(null); }
+    };
+    void refreshStatus();
+    const statusTimer = setInterval(refreshStatus, 5000);
 
     // Connect SignalR
     kioskSignalR.connect(
       stationId,
       (event) => {
+        if (event.stationId === stationId) void refreshStatus();
         const curId = activeLockerIdRef.current || activeLockerId;
         const occurredAt = Date.parse(event.occurredAt);
         if (!accessGrantedRef.current || !operationStartedRef.current || !Number.isFinite(occurredAt)
@@ -163,6 +170,8 @@ export default function KioskPage() {
     );
 
     return () => {
+      cancelled = true;
+      clearInterval(statusTimer);
       kioskSignalR.disconnect();
     };
   }, [stationId, activeLockerId, activeLockerCode, soundEnabled]);
@@ -462,7 +471,7 @@ export default function KioskPage() {
                   </option>
                 ))}
               </select>
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Trạng thái kết nối sẵn sàng"></span>
+              <span className={`w-2 h-2 rounded-full ${stationStatus?.connectivityStatus === 'ONLINE' ? 'bg-emerald-500' : 'bg-amber-500'}`} title={stationStatus?.connectivityStatus || 'UNKNOWN'}></span>
             </div>
 
             <div className="text-xs text-slate-500 dark:text-slate-400">
@@ -636,7 +645,7 @@ export default function KioskPage() {
 
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  <span className={`w-2 h-2 rounded-full ${stationStatus?.connectivityStatus === 'ONLINE' ? 'bg-emerald-500' : 'bg-amber-500'}`}></span>
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     {stationStatus?.stationName || 'Chưa tải được thông tin trạm'} • 24/7
                   </span>
@@ -751,16 +760,12 @@ export default function KioskPage() {
             </div>
 
             {/* Right 5 Columns: 3D Locker Tower (Neat, proportional, fits frame) */}
-            <div className={`lg:col-span-5 border rounded-2xl relative transition-all flex flex-col overflow-hidden h-full ${
+            <div className={`lg:col-span-5 border rounded-2xl relative transition-all flex flex-col overflow-y-auto min-h-0 h-full ${
               outdoorMode
                 ? 'bg-white border-slate-200 shadow-sm text-slate-900'
                 : 'bg-[#131b28] border-slate-800 shadow-lg text-slate-100'
             }`}>
-              <div className="w-full h-full flex flex-col justify-center items-center p-6 text-center gap-4">
-                <strong>{stationStatus?.stationName || x('networkError')}</strong>
-                <p>{stationStatus?.connectivityStatus || 'UNKNOWN'}</p>
-                <p>{t.depositDesc}</p><p>{t.retrieveDesc}</p>
-              </div>
+              <KioskLockerStatus status={stationStatus} lang={lang} activeLockerId={activeLockerId} />
             </div>
 
           </div>
@@ -957,7 +962,7 @@ export default function KioskPage() {
 
               <div className="flex justify-between items-center text-xs font-mono border-b pb-2 border-slate-200 dark:border-slate-800">
                 <span>ĐƠN: {activeBookingCode}</span>
-                <span className="font-bold">CỠ: {activeLockerSize || 'S'}</span>
+                <span className="font-bold">CỠ: {activeLockerSize || '—'}</span>
               </div>
 
               <div>
