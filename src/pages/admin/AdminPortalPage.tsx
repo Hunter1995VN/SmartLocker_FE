@@ -31,6 +31,7 @@ import StationManagementView from '../../components/admin/stations/StationManage
 import InternalUsersManagementView from '../../components/admin/users/InternalUsersManagementView';
 import RealtimeLockerGridView from '../../components/admin/lockers/RealtimeLockerGridView';
 import AbandonedPropertyView from '../../components/admin/abandoned/AbandonedPropertyView';
+import AdminRefundsManagementView from '../../components/admin/refunds/AdminRefundsManagementView';
 import EmergencyIncidentListView from '../../components/admin/incidents/EmergencyIncidentListView';
 
 
@@ -77,7 +78,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
     const [chartError, setChartError] = useState<string | null>(null);
     const [selectedDays, setSelectedDays] = useState<number>(30);
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-    const [activeMenu, setActiveMenu] = useState<'dashboard' | 'stations' | 'users' | 'lockers' | 'incidents' | 'abandoned'>('dashboard');
+    const [activeMenu, setActiveMenu] = useState<'dashboard' | 'stations' | 'users' | 'lockers' | 'incidents' | 'abandoned' | 'refunds'>('dashboard');
 
     // 4. API Fetch Functions
     const fetchStats = useCallback(async () => {
@@ -198,6 +199,8 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                         <InternalUsersManagementView />
                     ) : activeMenu === 'stations' ? (
                         <StationManagementView />
+                    ) : activeMenu === 'refunds' ? (
+                        <AdminRefundsManagementView />
                     ) : (
                         <>
                             {/* Top Header & Telemetry Controls */}

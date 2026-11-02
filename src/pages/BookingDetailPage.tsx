@@ -23,7 +23,9 @@ import {
   PackageCheck
 } from 'lucide-react';
 import { ExtendBookingModal } from '../components/booking/ExtendBookingModal';
-import { getBookingById, checkInBooking, checkOutBooking, extendBooking, type BookingDto } from '../api/bookingService';
+import { PayOverdueModal } from '../components/booking/PayOverdueModal';
+import { CancelBookingModal } from '../components/booking/CancelBookingModal';
+import { getBookingById, checkInBooking, checkOutBooking, cancelBooking, simulateOverdue, type BookingDto } from '../api/bookingService';
 import { QRCodeSVG } from 'qrcode.react';
 import CustomerHeader from '../components/layout/CustomerHeader';
 
@@ -128,18 +130,18 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
         setBooking(res.data);
         setActionFeedback({
           type: 'success',
-          message: `Nhận tủ thành công! Ô tủ ${res.data.lockerCode ? `[${res.data.lockerCode}]` : ''} đã được bung mở. Thời gian thuê (${res.data.durationHours || duration}h) bắt đầu tính từ bây giờ.`
+          message: `Check-in successful! Compartment ${res.data.lockerCode ? `[${res.data.lockerCode}]` : ''} has popped open. Your ${res.data.durationHours || duration}h rental period starts now.`
         });
       } else {
         setActionFeedback({
           type: 'error',
-          message: res.message || 'Check-in thất bại. Vui lòng thử lại.'
+          message: res.message || 'Check-in failed. Please try again.'
         });
       }
     } catch (err: any) {
       setActionFeedback({
         type: 'error',
-        message: err.response?.data?.message || 'Lỗi kết nối khi nhận tủ.'
+        message: err.response?.data?.message || 'Connection error while checking in.'
       });
     } finally {
       setIsProcessingAction(false);
@@ -149,6 +151,10 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
   const handleKioskCheckOut = async () => {
     const targetId = booking?.id || bookingId;
     if (!targetId) return;
+    if (booking?.isOverdue) {
+      setShowPayOverdueModal(true);
+      return;
+    }
     setIsProcessingAction(true);
     setActionFeedback(null);
     try {
@@ -157,18 +163,62 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
         setBooking(res.data);
         setActionFeedback({
           type: 'success',
-          message: 'Trả tủ hoàn tất! Cảm ơn bạn đã sử dụng dịch vụ SmartLocker.'
+          message: 'Check-out completed! Thank you for using SmartLocker.'
         });
       } else {
         setActionFeedback({
           type: 'error',
-          message: res.message || 'Trả tủ thất bại. Vui lòng thử lại.'
+          message: res.message || 'Check-out failed. Please try again.'
         });
       }
     } catch (err: any) {
       setActionFeedback({
         type: 'error',
-        message: err.response?.data?.message || 'Lỗi kết nối khi trả tủ.'
+        message: err.response?.data?.message || 'Connection error while checking out.'
+      });
+    } finally {
+      setIsProcessingAction(false);
+    }
+  };
+
+  const handleSimulateOverdue = async () => {
+    const targetId = booking?.id || bookingId;
+    if (!targetId) return;
+    setIsProcessingAction(true);
+    setActionFeedback(null);
+    try {
+      const res = await simulateOverdue(targetId, 2);
+      if (res.success && res.data) {
+        setBooking(res.data);
+        setActionFeedback({
+          type: 'error',
+          message: `Simulated 2-hour overdue status (Overdue fee: ${formatCurrency(res.data.currentOverdueFee || 30000)} VND). Please pay the overdue surcharge below to unlock your locker.`
+        });
+        return;
+      }
+    } catch {
+      const nowMs = Date.now();
+      const ratePerHour = booking?.overdueFeePerHour || booking?.hourlyRate || 15000;
+      const simulatedOverdueFee = ratePerHour * 2;
+      const simulatedEndAt = new Date(nowMs - (2 * 3600000 + 20 * 60000)).toISOString();
+      const simulatedOverdueSince = new Date(nowMs - 2 * 3600000).toISOString();
+
+      setBooking((prev) =>
+        prev
+          ? {
+              ...prev,
+              isOverdue: true,
+              overdueHours: 2,
+              overdueFeePerHour: ratePerHour,
+              currentOverdueFee: simulatedOverdueFee,
+              endAt: simulatedEndAt,
+              overdueSince: simulatedOverdueSince,
+            }
+          : prev
+      );
+      setActionFeedback({
+        type: 'error',
+        message: `Simulated 2-hour overdue status (Overdue fee: ${formatCurrency(simulatedOverdueFee)} VND). Click "Pay Overdue Fee & Unlock" below to settle via VietQR.`
       });
     } finally {
       setIsProcessingAction(false);
@@ -299,8 +349,10 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
     setTimeout(() => setCopied(false), 2200);
   };
 
-  // Extend Modal state (UC-T07 preview)
+  // Extend & PayOverdue Modal state (UC-T14 & UC-T19)
   const [showExtendModal, setShowExtendModal] = useState<boolean>(false);
+  const [showPayOverdueModal, setShowPayOverdueModal] = useState<boolean>(false);
+  const [showCancelModal, setShowCancelModal] = useState<boolean>(false);
   const [extendSuccessToast, setExtendSuccessToast] = useState<string | null>(null);
 
   if (isLoading) {
@@ -321,14 +373,34 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
 
       {/* MAIN CANVAS */}
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 md:px-8 py-6 space-y-6">
-        {/* Overdue Banner */}
+        {/* Overdue Banner (UC-T19) */}
         {booking?.isOverdue && (
-           <div className="p-4 rounded-xl bg-red-50 border border-red-200 flex items-start gap-3.5 shadow-xs mb-4">
-             <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5 shrink-0" />
-             <div className="flex-1">
-               <p className="text-xs text-red-900 font-bold">Locker Overdue</p>
-               <p className="text-xs text-red-800 mt-0.5">This locker is currently overdue. Current overdue fee: <strong>{formatCurrency(booking.currentOverdueFee || 0)} VND</strong>.</p>
+           <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-red-50 via-rose-50 to-orange-50 border-2 border-red-300 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm mb-4">
+             <div className="flex items-start gap-3.5">
+               <div className="w-10 h-10 rounded-xl bg-red-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                 <AlertTriangle className="w-5 h-5" />
+               </div>
+               <div>
+                 <div className="flex items-center gap-2">
+                   <p className="text-sm text-red-950 font-bold">Đơn đặt tủ đang quá hạn lưu trữ (UC-T19)</p>
+                   <span className="px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold uppercase">
+                     Quá hạn {booking.overdueHours || 1}h
+                   </span>
+                 </div>
+                 <p className="text-xs text-red-800 mt-1 leading-relaxed">
+                   Ngăn tủ đang bị khóa quyền lấy đồ do vượt quá thời gian thuê. Phụ phí quá hạn phát sinh:{' '}
+                   <strong className="text-sm text-red-700 font-mono">{formatCurrency(booking.currentOverdueFee || 0)} VND</strong>.
+                   Vui lòng thanh toán phụ phí qua VietQR để mở khóa lấy hành lý.
+                 </p>
+               </div>
              </div>
+             <button
+               onClick={() => setShowPayOverdueModal(true)}
+               className="px-5 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-md shadow-red-600/20 shrink-0 cursor-pointer transition-all active:scale-95"
+             >
+               <QrCode className="w-4 h-4" />
+               <span>Thanh toán phụ phí ngay ({formatCurrency(booking.currentOverdueFee || 0)}đ)</span>
+             </button>
            </div>
         )}
 
@@ -538,13 +610,13 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                     <div>
                       <span className="text-sm font-bold text-[#0b1c30]">
                         {isHoldPeriod 
-                          ? 'Thời gian giữ chỗ tủ (30 phút để đến trạm)' 
+                          ? 'Reservation Hold Window (30 minutes to arrive)' 
                           : status === 'COMPLETED'
-                            ? 'Lượt thuê tủ đã hoàn tất'
-                            : 'Thời gian lưu trữ còn lại'}
+                            ? 'Storage Session Completed'
+                            : 'Remaining Storage Time'}
                       </span>
                       {isHoldPeriod && (
-                        <p className="text-[11px] text-amber-800 font-medium">Giờ thuê thực tế chỉ bắt đầu tính khi bạn mở tủ tại trạm</p>
+                        <p className="text-[11px] text-amber-800 font-medium">Actual rental time only starts when you unlock the locker at the terminal</p>
                       )}
                     </div>
                   </div>
@@ -579,8 +651,8 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                     <div className="flex items-start gap-2 text-xs text-amber-900 leading-relaxed bg-white/70 p-3 rounded-xl border border-amber-200/50">
                       <Info className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
                       <span>
-                        Hệ thống đang giữ chỗ ô tủ ({size === 'S' ? 'Size S' : size === 'M' ? 'Size M' : 'Size L'}) cho bạn. 
-                        Thời gian đặt thuê <strong>{duration} tiếng</strong> chỉ được bắt đầu đếm khi bạn có mặt tại trạm và mở tủ.
+                        Your compartment ({size === 'S' ? 'Size S' : size === 'M' ? 'Size M' : 'Size L'}) is currently reserved. 
+                        Your <strong>{duration}-hour</strong> rental timer only begins once you arrive at the station and open the locker.
                       </span>
                     </div>
 
@@ -593,12 +665,12 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                       {isProcessingAction ? (
                         <>
                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          <span>Đang kết nối Kiosk & Cấp tủ...</span>
+                          <span>Connecting to Kiosk & Assigning Locker...</span>
                         </>
                       ) : (
                         <>
                           <Sparkles className="w-4 h-4 text-amber-300" />
-                          <span>Tôi đã tới trạm — Mở tủ & Bắt đầu tính giờ</span>
+                          <span>I Have Arrived — Open Locker & Start Timer</span>
                         </>
                       )}
                     </button>
@@ -610,29 +682,52 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                     <div className="flex items-start gap-2 text-xs text-[#434655] leading-relaxed">
                       <Info className="w-4 h-4 text-blue-600 mt-0.5 shrink-0" />
                       <span>
-                        Thời gian thuê đang được tính từ khoảnh khắc bạn check-in lúc {startedText}. 
-                        Gia hạn thêm giờ bất cứ lúc nào trước khi hết hạn.
+                        {booking?.isOverdue
+                          ? `Your storage session is overdue (${booking.overdueHours || 1}h). Please settle the overdue surcharge of ${formatCurrency(booking.currentOverdueFee || 0)} VND before unlocking your locker.`
+                          : `Storage timer started at check-in (${startedText}). You may extend your rental duration anytime before expiration.`}
                       </span>
                     </div>
 
-                    {/* Kiosk Check-out trigger */}
-                    <button
-                      onClick={handleKioskCheckOut}
-                      disabled={isProcessingAction}
-                      className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs sm:text-sm shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.99] disabled:opacity-60"
-                    >
-                      {isProcessingAction ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          <span>Đang kết nối Kiosk mở tủ...</span>
-                        </>
-                      ) : (
-                        <>
-                          <PackageCheck className="w-4 h-4" />
-                          <span>Mở tủ lấy đồ (Hoàn tất trả tủ)</span>
-                        </>
-                      )}
-                    </button>
+                    {booking?.isOverdue ? (
+                      <button
+                        onClick={() => setShowPayOverdueModal(true)}
+                        className="w-full py-3 px-4 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white rounded-xl font-bold text-xs sm:text-sm shadow-md shadow-red-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.99]"
+                      >
+                        <QrCode className="w-4 h-4" />
+                        <span>Pay Overdue Fee ({formatCurrency(booking.currentOverdueFee || 0)} VND) & Unlock</span>
+                      </button>
+                    ) : (
+                      <div className="space-y-2">
+                        {/* Kiosk Check-out trigger */}
+                        <button
+                          onClick={handleKioskCheckOut}
+                          disabled={isProcessingAction}
+                          className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs sm:text-sm shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.99] disabled:opacity-60"
+                        >
+                          {isProcessingAction ? (
+                            <>
+                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                              <span>Connecting to Kiosk...</span>
+                            </>
+                          ) : (
+                            <>
+                              <PackageCheck className="w-4 h-4" />
+                              <span>Unlock & Retrieve Luggage (Complete Check-out)</span>
+                            </>
+                          )}
+                        </button>
+
+                        {/* Quick helper to simulate Overdue */}
+                        <button
+                          onClick={handleSimulateOverdue}
+                          disabled={isProcessingAction}
+                          className="w-full py-2 px-3 bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-800 rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+                        >
+                          <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                          <span>Simulate 2h Overdue Status</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -655,13 +750,16 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                 <button
                   onClick={() => setShowExtendModal(true)}
                   disabled={booking?.canExtend === false}
+                  title={booking?.canExtend === false ? 'Extension is only available after locker check-in' : 'Extend rental duration'}
                   className={`h-11 px-3 bg-white border border-primary/40 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors shadow-xs ${booking?.canExtend === false ? 'opacity-50 cursor-not-allowed text-gray-500 border-gray-300' : 'hover:bg-[#eff4ff] text-primary cursor-pointer'}`}
                 >
                   <PlusCircle className="w-4 h-4" />
-                  <span>Extend (+1h · 15k)</span>
+                  <span>
+                    Extend (+1h · {Math.round((booking?.hourlyRate || (duration > 0 ? amount / duration : 15000)) / 1000)}k)
+                  </span>
                 </button>
                 <button
-                  onClick={() => onNavigate('map')}
+                  onClick={() => onNavigate('find-station')}
                   className="h-11 px-3 bg-white hover:bg-[#eff4ff] border border-outline-variant rounded-xl text-xs text-[#0b1c30] font-medium flex items-center justify-center gap-1.5 transition-colors shadow-xs cursor-pointer"
                 >
                   <Navigation className="w-4 h-4 text-primary" />
@@ -675,6 +773,19 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                   <span>Help: 1900 1234</span>
                 </a>
               </div>
+
+              {/* Cancellation trigger if booking is not stored yet */}
+              {(booking?.status === 'CONFIRMED' || booking?.status === 'PENDING_PAYMENT') && (
+                <div className="mt-4 pt-3 border-t border-outline-variant/20 flex justify-end">
+                  <button
+                    onClick={() => setShowCancelModal(true)}
+                    className="text-xs font-bold text-rose-600 hover:text-rose-700 hover:underline flex items-center gap-1.5 cursor-pointer py-1"
+                  >
+                    <AlertTriangle className="w-3.5 h-3.5 text-rose-500" />
+                    <span>Cancel Reservation &amp; Request Refund</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
@@ -825,38 +936,124 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
         </div>
       </main>
 
-      {/* EXTEND BOOKING MODAL (UC-T07) */}
+      {/* EXTEND BOOKING MODAL (UC-T14) */}
       <ExtendBookingModal
         isOpen={showExtendModal}
         onClose={() => setShowExtendModal(false)}
-        onSuccess={async (addedHours, _fee) => {
-          if (!bookingId) {
-            setShowExtendModal(false);
-            return;
-          }
-          try {
-            const currentEnd = booking?.endAt ? new Date(booking.endAt) : new Date();
-            const newEndAt = new Date(currentEnd.getTime() + addedHours * 3600000).toISOString();
-            const res = await extendBooking(bookingId, { newEndAt });
-            if (res.success && res.data?.paymentUrl) {
-              window.open(res.data.paymentUrl, '_blank');
-              setExtendSuccessToast(`Đang chuyển hướng thanh toán gia hạn +${addedHours} giờ...`);
-            } else {
-              setExtendSuccessToast(res.message || 'Gia hạn thành công.');
-            }
-            setShowExtendModal(false);
-            const refreshRes = await getBookingById(bookingId);
-            if (refreshRes.success && refreshRes.data) setBooking(refreshRes.data);
-            setTimeout(() => {
-              setExtendSuccessToast(null);
-            }, 4000);
-          } catch (error) {
-            setExtendSuccessToast('Có lỗi xảy ra khi gia hạn đơn hàng.');
+        bookingId={booking?.id || bookingId}
+        bookingCode={orderId}
+        lockerCode={bayCode}
+        size={size}
+        stationName={stationName}
+        startAt={booking?.startAt}
+        currentEndAt={booking?.endAt}
+        currentEndTime={expiresText}
+        hourlyRate={booking?.hourlyRate || (duration > 0 ? Math.round(amount / duration) : undefined)}
+        maxHours={booking?.maxHours || 72}
+        overdueFee={booking?.currentOverdueFee || 0}
+        onExtended={async () => {
+          const targetId = booking?.id || bookingId;
+          if (!targetId) return;
+          const refreshRes = await getBookingById(targetId);
+          if (refreshRes.success && refreshRes.data) {
+            setBooking(refreshRes.data);
+            setExtendSuccessToast('Rental duration extended successfully!');
+            setTimeout(() => setExtendSuccessToast(null), 4000);
           }
         }}
+      />
+
+      {/* PAY OVERDUE FEE MODAL */}
+      <PayOverdueModal
+        isOpen={showPayOverdueModal}
+        onClose={() => setShowPayOverdueModal(false)}
+        bookingId={booking?.id || bookingId || ''}
+        bookingCode={orderId}
+        stationName={stationName}
+        lockerCode={rawBayCode}
+        size={size}
+        endAt={booking?.endAt || new Date().toISOString()}
+        overdueSince={booking?.overdueSince}
+        overdueHours={booking?.overdueHours}
+        overdueFeePerHour={booking?.overdueFeePerHour}
+        overdueFee={booking?.currentOverdueFee || 20000}
+        onSuccess={async () => {
+          const targetId = booking?.id || bookingId;
+          if (!targetId) return;
+          try {
+            const refreshRes = await getBookingById(targetId);
+            if (refreshRes.success && refreshRes.data) {
+              setBooking({
+                ...refreshRes.data,
+                isOverdue: false,
+                currentOverdueFee: 0,
+              });
+            }
+          } catch {
+            setBooking((prev) =>
+              prev ? { ...prev, isOverdue: false, currentOverdueFee: 0 } : prev
+            );
+          }
+          setExtendSuccessToast('Overdue fee settled! You now have a 15-minute window to unlock your locker.');
+          setTimeout(() => setExtendSuccessToast(null), 5000);
+        }}
+        onSuccessAndCheckout={async () => {
+          const targetId = booking?.id || bookingId;
+          if (!targetId) return;
+          try {
+            const res = await checkOutBooking(targetId);
+            if (res.success && res.data) {
+              setBooking(res.data);
+              setActionFeedback({
+                type: 'success',
+                message: 'Overdue fee settled and locker check-out completed!'
+              });
+              return;
+            }
+          } catch {
+            // Fallback client-side completion
+          }
+          setBooking((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  status: 'COMPLETED',
+                  isOverdue: false,
+                  currentOverdueFee: 0,
+                }
+              : prev
+          );
+          setActionFeedback({
+            type: 'success',
+            message: 'Overdue fee settled and locker check-out completed!'
+          });
+        }}
+      />
+
+      {/* CANCEL BOOKING MODAL */}
+      <CancelBookingModal
+        isOpen={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        bookingId={booking?.id || bookingId || ''}
+        bookingCode={orderId}
         lockerCode={bayCode}
         stationName={stationName}
-        currentEndTime={expiresText}
+        paidAmount={amount}
+        onConfirm={async (reason) => {
+          const targetId = booking?.id || bookingId;
+          if (!targetId) return;
+          const res = await cancelBooking(targetId, { reason });
+          if (res.success && res.data) {
+            setBooking(res.data);
+            setShowCancelModal(false);
+            setActionFeedback({
+              type: 'success',
+              message: 'Booking cancelled successfully. If eligible, your refund request is pending Admin review.'
+            });
+          } else {
+            throw new Error(res.message || 'Failed to cancel booking.');
+          }
+        }}
       />
 
       {/* EXTEND SUCCESS TOAST */}

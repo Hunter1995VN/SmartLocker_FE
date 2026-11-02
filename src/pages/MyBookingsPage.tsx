@@ -15,11 +15,13 @@ import {
   SlidersHorizontal,
   LockOpen,
   Ban,
-  CheckCircle
+  CheckCircle,
+  Info
 } from 'lucide-react';
 import { ExtendBookingModal } from '../components/booking/ExtendBookingModal';
 import { CancelBookingModal } from '../components/booking/CancelBookingModal';
-import { getMyBookings, extendBooking, cancelBooking, payOverdueFee, type BookingListItemDto } from '../api/bookingService';
+import { PayOverdueModal } from '../components/booking/PayOverdueModal';
+import { getMyBookings, cancelBooking, type BookingListItemDto } from '../api/bookingService';
 import CustomerHeader from '../components/layout/CustomerHeader';
 
 interface MyBookingsPageProps {
@@ -352,6 +354,18 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                         <QrCode className="w-4 h-4" />
                         <span>View Digital Key (QR Code)</span>
                       </button>
+                      {booking.isOverdue && (
+                        <button
+                          onClick={() => {
+                            setSelectedBooking(booking);
+                            setShowOverdueModal(true);
+                          }}
+                          className="inline-flex items-center gap-2 px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold rounded-xl shadow-sm transition-colors cursor-pointer active:scale-95"
+                        >
+                          <AlertCircle className="w-4 h-4" />
+                          <span>Pay Overdue Fee ({formatCurrency(booking.currentOverdueFee || 0)} VND)</span>
+                        </button>
+                      )}
                       {/* Outline Action: Extend Time */}
                       <button
                         onClick={() => {
@@ -514,105 +528,76 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
         )}
       </main>
 
-      {/* OVERDUE PAYMENT MODAL (UC-T09) */}
-      {showOverdueModal && selectedBooking && (
-        <div className="fixed inset-0 z-50 bg-[#0b1c30]/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md rounded-2xl border border-outline-variant/30 shadow-2xl p-6 space-y-5 animate-fade-in-up">
-            <div className="flex items-center justify-between border-b border-outline-variant/30 pb-3">
-              <div className="flex items-center gap-2">
-                <AlertCircle className="w-5 h-5 text-rose-600" />
-                <h3 className="text-base font-bold text-[#0b1c30]">Thanh toán phí phạt quá hạn</h3>
-              </div>
-              <button onClick={() => setShowOverdueModal(false)} className="text-secondary hover:text-[#0b1c30]">✕</button>
-            </div>
-
-            <div className="bg-rose-50 border border-rose-200 rounded-xl p-3.5 space-y-1 text-xs">
-              <p className="font-bold text-rose-900">Đơn hàng {selectedBooking.bookingCode} quá hạn</p>
-              <p className="text-rose-700">Trạm {selectedBooking.stationName} · Ô tủ {selectedBooking.lockerCode}</p>
-              <p className="text-rose-600">Theo quy định: Phí phạt 15,000 VND cho mỗi 30 phút quá hạn.</p>
-            </div>
-
-            <div className="bg-[#eff4ff] p-4 rounded-xl flex justify-between items-center text-xs">
-              <span className="font-semibold text-slate-700">Tổng phí cần nộp:</span>
-              <span className="font-mono text-xl font-extrabold text-rose-600">{formatCurrency(selectedBooking.currentOverdueFee || 0)} VND</span>
-            </div>
-
-            <div className="flex gap-3 pt-2">
-              <button
-                onClick={() => setShowOverdueModal(false)}
-                className="flex-1 py-2.5 rounded-xl border border-outline-variant text-xs font-semibold text-secondary hover:bg-slate-50 cursor-pointer"
-              >
-                Để sau
-              </button>
-              <button
-                onClick={async () => {
-                  try {
-                    const res = await payOverdueFee(selectedBooking.id);
-                    if (res.success && res.data?.paymentUrl) {
-                      window.open(res.data.paymentUrl, '_blank');
-                      showToast('Đang chuyển hướng đến trang thanh toán...');
-                    }
-                  } catch (e) {
-                    showToast('Có lỗi xảy ra khi tạo thanh toán phí phạt.');
-                  } finally {
-                    setShowOverdueModal(false);
-                  }
-                }}
-                className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95"
-              >
-                Xác nhận thanh toán
-              </button>
-            </div>
-          </div>
-        </div>
+      {/* OVERDUE PAYMENT MODAL */}
+      {selectedBooking && (
+        <PayOverdueModal
+          isOpen={showOverdueModal}
+          onClose={() => setShowOverdueModal(false)}
+          bookingId={selectedBooking.id}
+          bookingCode={selectedBooking.bookingCode}
+          stationName={selectedBooking.stationName}
+          lockerCode={selectedBooking.lockerCode}
+          size={selectedBooking.size}
+          endAt={selectedBooking.endAt}
+          overdueSince={selectedBooking.overdueSince}
+          overdueHours={selectedBooking.overdueHours}
+          overdueFeePerHour={selectedBooking.overdueFeePerHour}
+          overdueFee={selectedBooking.currentOverdueFee || 20000}
+          onSuccess={async () => {
+            await fetchBookings();
+            showToast('Overdue fee settled successfully!');
+          }}
+        />
       )}
 
-      {/* EXTEND BOOKING MODAL (UC-T07) */}
+      {/* EXTEND BOOKING MODAL (UC-T14) */}
       {selectedBooking && (
         <ExtendBookingModal
           isOpen={showExtendModal}
           onClose={() => setShowExtendModal(false)}
-          onSuccess={async (addedHours, _amount) => {
-            try {
-              const newEndAt = new Date(new Date(selectedBooking.endAt).getTime() + addedHours * 3600000).toISOString();
-              const res = await extendBooking(selectedBooking.id, { newEndAt });
-              if (res.success && res.data?.paymentUrl) {
-                window.open(res.data.paymentUrl, '_blank');
-                showToast(`Đang chuyển hướng thanh toán gia hạn...`);
-              }
-              setShowExtendModal(false);
-              fetchBookings();
-            } catch (error) {
-              showToast('Có lỗi xảy ra khi gia hạn đơn hàng.');
-            }
-          }}
-          lockerCode={selectedBooking.lockerCode}
+          bookingId={selectedBooking.id}
+          bookingCode={selectedBooking.bookingCode}
+          lockerCode={selectedBooking.lockerCode || `Size ${selectedBooking.size}`}
+          size={selectedBooking.size}
           stationName={selectedBooking.stationName}
+          startAt={selectedBooking.startAt}
+          currentEndAt={selectedBooking.endAt}
           currentEndTime={new Date(selectedBooking.endAt).toLocaleString('vi-VN')}
+          hourlyRate={
+            selectedBooking.hourlyRate ||
+            (selectedBooking.durationHours && selectedBooking.durationHours > 0
+              ? Math.round(selectedBooking.baseAmount / selectedBooking.durationHours)
+              : undefined)
+          }
+          maxHours={selectedBooking.maxHours || 72}
+          overdueFee={selectedBooking.currentOverdueFee || 0}
+          onExtended={async () => {
+            await fetchBookings();
+            showToast('Đã gia hạn thời gian thuê tủ thành công!');
+          }}
         />
       )}
 
-      {/* CANCEL BOOKING MODAL (UC-T08) */}
+      {/* CANCEL BOOKING MODAL */}
       {selectedBooking && (
         <CancelBookingModal
           isOpen={showCancelModal}
           onClose={() => setShowCancelModal(false)}
-          onSuccess={async (reason, _refundAmount) => {
-            try {
-              const res = await cancelBooking(selectedBooking.id, { reason });
-              if (res.success) {
-                showToast(`Đã hủy đơn thành công.`);
-                setShowCancelModal(false);
-                fetchBookings();
-              }
-            } catch (error) {
-              showToast('Lỗi khi hủy đơn hàng.');
-            }
-          }}
+          bookingId={selectedBooking.id}
           bookingCode={selectedBooking.bookingCode}
-          lockerCode={selectedBooking.lockerCode}
+          lockerCode={selectedBooking.lockerCode || `Size ${selectedBooking.size}`}
           stationName={selectedBooking.stationName}
           paidAmount={selectedBooking.baseAmount}
+          onConfirm={async (reason) => {
+            const res = await cancelBooking(selectedBooking.id, { reason });
+            if (res.success) {
+              showToast('Booking cancelled successfully.');
+              setShowCancelModal(false);
+              await fetchBookings();
+            } else {
+              throw new Error(res.message || 'Failed to cancel booking.');
+            }
+          }}
         />
       )}
 
@@ -640,22 +625,11 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
 
             {/* Calculation according to BR-T06 */}
             {(() => {
-              const start = new Date(cancelledDetailBooking.startAt).getTime();
-              const created = new Date(cancelledDetailBooking.createdAt).getTime();
-              const hoursBeforeStart = (start - created) / 3600000;
-              
-              let refundRate = 0;
-              let policyLabel = 'Non-refundable (Immediate Storage)';
-              if (hoursBeforeStart > 2) {
-                refundRate = 1.0;
-                policyLabel = '100% Full Refund (> 2 hours notice)';
-              } else if (hoursBeforeStart > 0) {
-                refundRate = 0.5;
-                policyLabel = '50% Partial Refund (< 2 hours notice)';
-              }
-
-              const refundAmount = cancelledDetailBooking.baseAmount * refundRate;
-              const isRefunded = refundAmount > 0;
+              const refundPayment = cancelledDetailBooking.payments?.find((p) => p.kind === 'REFUND');
+              const refundAmount = refundPayment ? refundPayment.amount : (cancelledDetailBooking.cancelPolicyRate ? cancelledDetailBooking.baseAmount * cancelledDetailBooking.cancelPolicyRate : 0);
+              const isRefundPending = refundPayment && refundPayment.status === 'PENDING';
+              const isRefundPaid = refundPayment && (refundPayment.status === 'PAID' || refundPayment.status === 'REFUNDED');
+              const hasRefund = refundAmount > 0;
 
               return (
                 <>
@@ -663,8 +637,18 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                   <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2.5 text-xs">
                     <div className="flex items-center justify-between">
                       <span className="text-secondary font-medium">Status</span>
-                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${isRefunded ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-800'}`}>
-                        {isRefunded ? 'CANCELLED & REFUNDED' : 'CANCELLED (NO REFUND)'}
+                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                        isRefundPaid 
+                          ? 'bg-emerald-100 text-emerald-800' 
+                          : isRefundPending 
+                            ? 'bg-amber-100 text-amber-800'
+                            : 'bg-slate-200 text-slate-800'
+                      }`}>
+                        {isRefundPaid 
+                          ? 'CANCELLED & REFUNDED' 
+                          : isRefundPending 
+                            ? 'CANCELLED (REFUND PENDING ADMIN APPROVAL)' 
+                            : 'CANCELLED (NO REFUND)'}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
@@ -672,9 +656,9 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                       <span className="font-semibold text-slate-900 text-right max-w-[200px] truncate">{cancelledDetailBooking.stationName}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-secondary font-medium">Booking Mode</span>
-                      <span className="font-semibold text-slate-900">
-                        {hoursBeforeStart <= 0.1 ? 'Store Right Now' : 'Schedule in Advance'}
+                      <span className="text-secondary font-medium">Cancellation Reason</span>
+                      <span className="font-semibold text-slate-900 text-right max-w-[200px] truncate">
+                        {cancelledDetailBooking.cancellationReason || 'Customer requested'}
                       </span>
                     </div>
                   </div>
@@ -686,31 +670,42 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                       <span className="font-semibold text-slate-900">{formatCurrency(cancelledDetailBooking.baseAmount)} VND</span>
                     </div>
                     <div className="flex justify-between items-center text-secondary">
-                      <span>Cancellation Policy:</span>
-                      <span className="font-bold text-slate-900">{policyLabel}</span>
+                      <span>Refund Policy:</span>
+                      <span className="font-bold text-slate-900">
+                        {hasRefund ? '100% Refundable' : '0% Non-refundable (Daily Limit Exceeded)'}
+                      </span>
                     </div>
                     <div className="pt-2 border-t border-blue-200/60 flex justify-between items-center">
-                      <span className="font-bold text-slate-800">Total Refunded:</span>
-                      <span className={`font-mono text-lg font-extrabold ${isRefunded ? 'text-emerald-700' : 'text-slate-500'}`}>
+                      <span className="font-bold text-slate-800">Refund Amount:</span>
+                      <span className={`font-mono text-lg font-extrabold ${hasRefund ? 'text-emerald-700' : 'text-slate-500'}`}>
                         {formatCurrency(refundAmount)} VND
                       </span>
                     </div>
                   </div>
 
                   {/* Refund Method Note */}
-                  <div className={`text-xs p-3 rounded-xl flex items-start gap-2.5 border ${isRefunded ? 'bg-emerald-50 border-emerald-200 text-[#434655]' : 'bg-amber-50 border-amber-200 text-amber-900'}`}>
-                    {isRefunded ? (
+                  <div className={`text-xs p-3 rounded-xl flex items-start gap-2.5 border ${
+                    hasRefund ? 'bg-emerald-50 border-emerald-200 text-[#434655]' : 'bg-amber-50 border-amber-200 text-amber-900'
+                  }`}>
+                    {isRefundPaid ? (
                       <>
                         <CheckCircle className="w-4 h-4 text-emerald-600 mt-0.5 shrink-0" />
                         <span className="leading-relaxed">
-                          Refund has been credited back to your bank account via PayOS. Funds typically reflect within 1-5 minutes.
+                          Refund has been approved by Operations Administration and credited back to your bank account via PayOS.
+                        </span>
+                      </>
+                    ) : isRefundPending ? (
+                      <>
+                        <Info className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
+                        <span className="leading-relaxed">
+                          Your refund request of <strong>{formatCurrency(refundAmount)} VND</strong> has been forwarded to the Operations Administration queue for review.
                         </span>
                       </>
                     ) : (
                       <>
                         <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
                         <span className="leading-relaxed">
-                          Immediate storage reservations or cancellations requested after the scheduled start time are non-refundable according to our service terms.
+                          Subsequent cancellations exceeding the daily abuse prevention limit are retained under our service terms.
                         </span>
                       </>
                     )}
