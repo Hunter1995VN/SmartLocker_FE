@@ -238,61 +238,28 @@ export default function FinancialReconciliationView({
     return (
         <div className="space-y-5">
             {/* Header */}
-            <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                <div className="flex items-start gap-3.5">
-                    <div className="w-11 h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-sm">
-                        <CreditCard className="w-6 h-6" />
-                    </div>
-                    <div>
-                        <div className="flex items-center gap-2 flex-wrap">
-                            <h1 className="text-lg font-extrabold text-slate-900">
-                                Đối Soát Tài Chính Định Kỳ PayOS & Cơ Sở Dữ Liệu
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs space-y-4">
+                {/* Top Row: Title, Badge and Primary Action */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
+                    <div className="flex items-center gap-3.5 min-w-0">
+                        <div className="w-11 h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                            <CreditCard className="w-6 h-6" />
+                        </div>
+                        <div className="flex items-center gap-2.5 flex-wrap">
+                            <h1 className="text-lg font-extrabold text-slate-900 tracking-tight">
+                                Đối Soát Tài Chính Định Kỳ PayOS &amp; Cơ Sở Dữ Liệu
                             </h1>
-                            <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                            <span className="px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full bg-blue-50 text-blue-700 border border-blue-200 shrink-0">
                                 ĐỐI SOÁT PAYOS NAPAS247
                             </span>
                         </div>
-                        <p className="text-xs text-slate-500 mt-1">
-                            So khớp tự động sao kê giao dịch cổng thanh toán PayOS (VietQR Napas 247) với bảng <code className="font-mono text-slate-700">Payments</code> và <code className="font-mono text-slate-700">Bookings</code> trong SQL Server để xử lý đơn trễ Webhook hoặc lệch trạng thái.
-                        </p>
                     </div>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-                    {onNavigateReports && (
-                        <button
-                            type="button"
-                            onClick={onNavigateReports}
-                            className="px-3.5 py-2 rounded-xl border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
-                        >
-                            <BarChart3 className="w-4 h-4" />
-                            <span>Báo cáo Doanh thu & Lưu lượng</span>
-                        </button>
-                    )}
-                    {onNavigateManualRefunds && (
-                        <button
-                            type="button"
-                            onClick={onNavigateManualRefunds}
-                            className="px-3.5 py-2 rounded-xl border border-purple-200 bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
-                        >
-                            <RotateCcw className="w-4 h-4" />
-                            <span>Phê duyệt Hoàn tiền Ngoại lệ</span>
-                        </button>
-                    )}
-                    <button
-                        type="button"
-                        onClick={handleExportCsv}
-                        className="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center gap-2 transition cursor-pointer"
-                    >
-                        <Download className="w-4 h-4 text-slate-500" />
-                        <span>Xuất Biên Bản Đối Soát (CSV)</span>
-                    </button>
 
                     <button
                         type="button"
                         onClick={() => void handleRunBatchReconciliation()}
                         disabled={isReconcilingBatch}
-                        className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white text-xs font-bold flex items-center gap-2 shadow-sm shadow-emerald-600/20 transition cursor-pointer"
+                        className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-sm shadow-emerald-600/20 transition cursor-pointer shrink-0"
                     >
                         <Zap className={`w-4 h-4 ${isReconcilingBatch ? 'animate-bounce' : ''}`} />
                         <span>
@@ -301,6 +268,44 @@ export default function FinancialReconciliationView({
                                 : 'Chạy Đối Soát Định Kỳ PayOS Ngay'}
                         </span>
                     </button>
+                </div>
+
+                {/* Bottom Row: Description & Secondary Tools */}
+                <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 pt-3 border-t border-slate-100 text-xs">
+                    <p className="text-slate-500 max-w-3xl leading-relaxed">
+                        So khớp tự động sao kê giao dịch cổng thanh toán PayOS (VietQR Napas 247) với bảng <code className="font-mono text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded">Payments</code> và <code className="font-mono text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded">Bookings</code> trong SQL Server để xử lý đơn trễ Webhook hoặc lệch trạng thái.
+                    </p>
+
+                    <div className="flex flex-wrap items-center gap-2 shrink-0">
+                        {onNavigateReports && (
+                            <button
+                                type="button"
+                                onClick={onNavigateReports}
+                                className="px-3.5 py-2 rounded-xl border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold flex items-center gap-2 transition cursor-pointer"
+                            >
+                                <BarChart3 className="w-4 h-4" />
+                                <span>Báo cáo Doanh thu &amp; Lưu lượng</span>
+                            </button>
+                        )}
+                        {onNavigateManualRefunds && (
+                            <button
+                                type="button"
+                                onClick={onNavigateManualRefunds}
+                                className="px-3.5 py-2 rounded-xl border border-purple-200 bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold flex items-center gap-2 transition cursor-pointer"
+                            >
+                                <RotateCcw className="w-4 h-4" />
+                                <span>Phê duyệt Hoàn tiền Ngoại lệ</span>
+                            </button>
+                        )}
+                        <button
+                            type="button"
+                            onClick={handleExportCsv}
+                            className="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold flex items-center gap-2 transition cursor-pointer"
+                        >
+                            <Download className="w-4 h-4 text-slate-500" />
+                            <span>Xuất Biên Bản Đối Soát (CSV)</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
