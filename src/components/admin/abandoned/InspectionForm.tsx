@@ -10,7 +10,7 @@
  *  - Ghi chú tình trạng tổng quan & Cam kết an toàn
  *  - Submit → POST /api/admin/abandoned-properties
  */
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import {
     Package,
     X,
@@ -115,6 +115,16 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
         lockerCode: prefill?.lockerCode,
         stationName: prefill?.stationName,
     });
+
+    const inferredSize = useMemo(() => {
+        const code = (candidateHint.lockerCode || '').toUpperCase();
+        if (code.startsWith('S') || code.includes('SIZE S')) return 'S';
+        if (code.startsWith('M') || code.includes('SIZE M')) return 'M';
+        if (code.startsWith('L') || code.includes('SIZE L')) return 'L';
+        return 'M';
+    }, [candidateHint.lockerCode]);
+
+    const maxWeightLimit = inferredSize === 'S' ? 10 : inferredSize === 'M' ? 20 : 35;
 
     useEffect(() => {
         let mounted = true;
@@ -320,6 +330,15 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
             next.sealCode = 'Mã tem niêm phong vật lý là bắt buộc';
         }
 
+        if (fields.measuredWeight.trim()) {
+            const w = Number(fields.measuredWeight);
+            if (isNaN(w) || w <= 0) {
+                next.measuredWeight = 'Tải trọng phải là số dương (> 0 kg)';
+            } else if (w > maxWeightLimit * 1.5) {
+                next.measuredWeight = `Tải trọng ${w} kg vượt quá giới hạn an toàn tối đa của ô ${inferredSize} (${maxWeightLimit} kg)!`;
+            }
+        }
+
         if (items.length === 0) {
             setItemError('Cần thêm ít nhất 1 tài sản vào biên bản kiểm kê');
             return false;
@@ -504,48 +523,45 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                         </div>
                     )}
 
-                    {/* Manual IDs if no candidate chosen */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-                        <div>
-                            <label className="block font-bold text-slate-700 mb-1">
-                                Mã đơn (Booking ID) <span className="text-rose-500">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                value={fields.bookingId}
-                                onChange={(e) => setFields((p) => ({ ...p, bookingId: e.target.value }))}
-                                placeholder="Nhập Booking ID..."
-                                className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-mono text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
-                            />
-                            {errors.bookingId && <p className="text-rose-600 text-[10px] mt-0.5">{errors.bookingId}</p>}
+                    {/* Selected Candidate Summary (Tự động nạp, không cần gõ GUID thủ công) */}
+                    {fields.bookingId ? (
+                        <div className="p-3.5 rounded-xl bg-blue-50/70 border border-blue-200 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                            <div className="space-y-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="font-mono font-black text-slate-900 text-xs">
+                                        Đơn #{candidateHint.bookingCode || fields.bookingId.slice(0, 8)}
+                                    </span>
+                                    <span className="px-2 py-0.5 rounded-md bg-blue-600 text-white font-mono text-[11px] font-bold">
+                                        Khoang {candidateHint.lockerCode || 'S-01'} (Size {inferredSize})
+                                    </span>
+                                    <span className="px-2 py-0.5 rounded-md bg-white border border-blue-200 text-slate-700 text-[11px] font-medium">
+                                        {candidateHint.stationName || 'Trạm'}
+                                    </span>
+                                </div>
+                                {candidateHint.customerName && (
+                                    <p className="text-[11px] text-slate-600">
+                                        Khách thuê: <strong>{candidateHint.customerName}</strong>
+                                    </p>
+                                )}
+                            </div>
+                            <div className="text-right shrink-0">
+                                <span className="text-[11px] font-mono font-bold text-rose-600 bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-lg inline-block">
+                                    Đã quá hạn: +{fields.overdueHours}h
+                                </span>
+                            </div>
                         </div>
-                        <div>
-                            <label className="block font-bold text-slate-700 mb-1">
-                                Ô tủ (Locker ID) <span className="text-rose-500">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                value={fields.lockerId}
-                                onChange={(e) => setFields((p) => ({ ...p, lockerId: e.target.value }))}
-                                placeholder="Nhập Locker ID..."
-                                className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-mono text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
-                            />
-                            {errors.lockerId && <p className="text-rose-600 text-[10px] mt-0.5">{errors.lockerId}</p>}
+                    ) : (
+                        <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs">
+                            <p className="font-bold flex items-center gap-1.5">
+                                <AlertTriangle className="w-4 h-4 text-amber-600" />
+                                Chưa chọn đơn đặt tủ quá hạn
+                            </p>
+                            <p className="text-[11px] mt-0.5 text-amber-700">
+                                Vui lòng click chọn một đơn quá hạn ở danh sách trên để tự động nạp thông tin ô tủ, trạm và thời gian quá hạn.
+                            </p>
+                            {errors.bookingId && <p className="text-rose-600 text-[10px] mt-1 font-bold">{errors.bookingId}</p>}
                         </div>
-                        <div>
-                            <label className="block font-bold text-slate-700 mb-1">
-                                Trạm (Station ID) <span className="text-rose-500">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                value={fields.stationId}
-                                onChange={(e) => setFields((p) => ({ ...p, stationId: e.target.value }))}
-                                placeholder="Nhập Station ID..."
-                                className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-mono text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
-                            />
-                            {errors.stationId && <p className="text-rose-600 text-[10px] mt-0.5">{errors.stationId}</p>}
-                        </div>
-                    </div>
+                    )}
                 </div>
 
                 {/* Section 2: Seal and Weight */}
@@ -571,29 +587,59 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                         </div>
 
                         <div>
-                            <label className="block font-bold text-slate-700 mb-1">
-                                Tải trọng cân thực địa (kg)
-                            </label>
-                            <input
-                                type="number"
-                                step="0.01"
-                                value={fields.measuredWeight}
-                                onChange={(e) => setFields((p) => ({ ...p, measuredWeight: e.target.value }))}
-                                placeholder="VD: 5.50..."
-                                className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
-                            />
+                            <div className="flex items-center justify-between mb-1">
+                                <label className="block font-bold text-slate-700 text-xs">
+                                    Tải trọng cân thực địa
+                                </label>
+                                <span className="text-[10px] text-slate-500 font-medium">
+                                    (Tối đa ô Size {inferredSize}: <strong>{maxWeightLimit} kg</strong>)
+                                </span>
+                            </div>
+                            <div className="relative">
+                                <input
+                                    type="number"
+                                    step="0.1"
+                                    min="0.1"
+                                    value={fields.measuredWeight}
+                                    onChange={(e) => setFields((p) => ({ ...p, measuredWeight: e.target.value }))}
+                                    placeholder={`VD: ${inferredSize === 'S' ? '4.5' : inferredSize === 'M' ? '12.5' : '22.0'}`}
+                                    className={`w-full pl-3 pr-8 py-2 rounded-xl border font-mono text-xs focus:ring-1 focus:outline-none ${
+                                        Number(fields.measuredWeight) > maxWeightLimit
+                                            ? 'border-amber-400 bg-amber-50/40 text-amber-900 focus:ring-amber-500'
+                                            : 'border-slate-300 bg-white text-slate-800 focus:ring-blue-500'
+                                    }`}
+                                />
+                                <span className="absolute right-3 top-2 text-xs font-bold text-slate-400 pointer-events-none">
+                                    kg
+                                </span>
+                            </div>
+                            {Number(fields.measuredWeight) > maxWeightLimit && (
+                                <p className="text-amber-700 text-[10px] mt-1 font-semibold flex items-center gap-1">
+                                    <AlertTriangle className="w-3 h-3 shrink-0 text-amber-600" />
+                                    Cảnh báo: Tải trọng {fields.measuredWeight} kg vượt định mức {maxWeightLimit} kg của ô {inferredSize}!
+                                </p>
+                            )}
+                            {errors.measuredWeight && (
+                                <p className="text-rose-600 text-[10px] mt-1 font-bold">{errors.measuredWeight}</p>
+                            )}
                         </div>
 
                         <div>
-                            <label className="block font-bold text-slate-700 mb-1">
-                                Số giờ quá hạn thực tế <span className="text-rose-500">*</span>
+                            <label className="block font-bold text-slate-700 mb-1 text-xs">
+                                Số giờ quá hạn thực tế
                             </label>
-                            <input
-                                type="number"
-                                value={fields.overdueHours}
-                                onChange={(e) => setFields((p) => ({ ...p, overdueHours: e.target.value }))}
-                                className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
-                            />
+                            <div className="relative">
+                                <input
+                                    type="number"
+                                    readOnly
+                                    value={fields.overdueHours}
+                                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-100 font-mono text-xs text-slate-600 cursor-not-allowed select-none"
+                                />
+                                <span className="absolute right-3 top-2 text-[11px] font-bold text-slate-400 pointer-events-none">
+                                    giờ
+                                </span>
+                            </div>
+                            <p className="text-[10px] text-slate-400 mt-0.5">Tự động tính từ mốc kết thúc đơn thuê</p>
                         </div>
                     </div>
 
