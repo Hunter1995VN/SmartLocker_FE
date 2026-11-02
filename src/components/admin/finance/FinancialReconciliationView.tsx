@@ -14,6 +14,7 @@ import {
     Search,
     Download,
     Zap,
+    BarChart3,
 } from 'lucide-react';
 import adminReconciliationService from '../../../api/adminReconciliationService';
 import type {
@@ -103,10 +104,12 @@ const FALLBACK_ITEMS: PaymentReconciliationItemDto[] = [
 
 interface FinancialReconciliationViewProps {
     onNavigateManualRefunds?: () => void;
+    onNavigateReports?: () => void;
 }
 
 export default function FinancialReconciliationView({
     onNavigateManualRefunds,
+    onNavigateReports,
 }: FinancialReconciliationViewProps = {}) {
     const [dashboard, setDashboard] = useState<ReconciliationDashboardDto | null>(null);
     const [items, setItems] = useState<PaymentReconciliationItemDto[]>([]);
@@ -256,6 +259,16 @@ export default function FinancialReconciliationView({
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+                    {onNavigateReports && (
+                        <button
+                            type="button"
+                            onClick={onNavigateReports}
+                            className="px-3.5 py-2 rounded-xl border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold flex items-center gap-2 transition cursor-pointer"
+                        >
+                            <BarChart3 className="w-4 h-4" />
+                            <span>Báo cáo Doanh thu & Lưu lượng</span>
+                        </button>
+                    )}
                     {onNavigateManualRefunds && (
                         <button
                             type="button"
