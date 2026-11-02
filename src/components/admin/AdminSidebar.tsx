@@ -323,6 +323,18 @@ export default function AdminSidebar({
                                 <PackageX className={`w-4 h-4 ${activeMenu === 'abandoned' ? 'text-white' : 'text-slate-400'}`} />
                                 <span>Hành lý quá hạn 72h</span>
                             </button>
+                            <button
+                                type="button"
+                                onClick={() => onSelectMenu?.('refunds')}
+                                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition cursor-pointer text-left ${
+                                    activeMenu === 'refunds'
+                                        ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-600/30'
+                                        : 'text-slate-600 hover:bg-slate-50'
+                                }`}
+                            >
+                                <CreditCard className={`w-4 h-4 ${activeMenu === 'refunds' ? 'text-white' : 'text-slate-400'}`} />
+                                <span>Refund Requests</span>
+                            </button>
                         </div>
                     </div>
 

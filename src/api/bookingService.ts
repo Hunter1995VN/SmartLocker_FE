@@ -39,6 +39,7 @@ export interface CreateBookingResponse {
   bookingCode: string;
   originalAmount?: number;
   discountAmount?: number;
+  voucherCode?: string;
   appliedVoucherCode?: string;
   amount: number;
   paymentUrl: string;
@@ -111,7 +112,12 @@ export interface BookingDto {
   createdAt: string;
   payments: PaymentDto[];
   currentOverdueFee?: number;
+  overdueFeePerHour?: number;
+  overdueHours?: number;
+  gracePeriodMinutes?: number;
   estimatedRefundAmount?: number;
+  hourlyRate?: number;
+  maxHours?: number;
   canExtend: boolean;
   canCancel: boolean;
   accessCode?: string;
@@ -142,12 +148,21 @@ export interface BookingListItemDto {
   checkedOutAt?: string;
   holdExpiresAt?: string;
   baseAmount: number;
+  hourlyRate?: number;
+  maxHours?: number;
   isOverdue: boolean;
+  overdueSince?: string;
+  overdueHours?: number;
+  overdueFeePerHour?: number;
   createdAt: string;
   currentOverdueFee?: number;
   canExtend?: boolean;
+  canCancel?: boolean;
   passcode?: string;
   durationHours?: number;
+  cancellationReason?: string;
+  cancelPolicyRate?: number;
+  payments?: PaymentDto[];
 }
 
 export interface BookingListResponse {
@@ -255,6 +270,32 @@ export const extendBooking = async (
   return response.data;
 };
 
+export interface CancelPreviewDto {
+  bookingId: string;
+  bookingCode: string;
+  status: string;
+  canCancel: boolean;
+  paidAmount: number;
+  refundRate: number;
+  refundAmount: number;
+  dailyCancellationCount: number;
+  isDailyLimitExceeded: boolean;
+  policyTier: string;
+  policyDescription: string;
+  reasonIfBlocked?: string;
+}
+
+/**
+ * Xem trước chính sách hoàn tiền trước khi hủy đơn.
+ * GET /api/Bookings/{id}/cancel-preview
+ */
+export const getCancelPreview = async (
+  id: string
+): Promise<ApiResponse<CancelPreviewDto>> => {
+  const response = await apiClient.get<ApiResponse<CancelPreviewDto>>(`/api/Bookings/${id}/cancel-preview`);
+  return response.data;
+};
+
 /**
  * Hủy booking và kích hoạt hoàn tiền (nếu đủ điều kiện theo chính sách).
  * POST /api/Bookings/{id}/cancel
@@ -268,14 +309,41 @@ export const cancelBooking = async (
 };
 
 /**
- * Thanh toán phí quá hạn.
+ * Thanh toán phí quá hạn (UC-T19).
  * POST /api/Bookings/{id}/pay-overdue
- * Backend tạo link PayOS mới cho khoản phụ phí.
+ * Backend tạo mã VietQR PayOS mới cho khoản phụ phí.
  */
 export const payOverdueFee = async (
   id: string
 ): Promise<ApiResponse<CreateBookingResponse>> => {
   const response = await apiClient.post<ApiResponse<CreateBookingResponse>>(`/api/Bookings/${id}/pay-overdue`);
+  return response.data;
+};
+
+/**
+ * Giả lập trạng thái quá hạn cho đơn đang STORED hoặc CONFIRMED (Test UC-T19).
+ * POST /api/Bookings/{id}/simulate-overdue?overdueHours=...
+ */
+export const simulateOverdue = async (
+  id: string,
+  overdueHours: number = 2
+): Promise<ApiResponse<BookingDto>> => {
+  const response = await apiClient.post<ApiResponse<BookingDto>>(`/api/Bookings/${id}/simulate-overdue?overdueHours=${overdueHours}`);
+  return response.data;
+};
+
+/**
+ * Xác nhận thanh toán phụ phí quá hạn nhanh (Demo/Test UC-T19).
+ * POST /api/kiosk/confirm-overdue-payment
+ */
+export const confirmOverduePaymentDemo = async (
+  bookingId: string,
+  bookingCode?: string
+): Promise<ApiResponse<boolean>> => {
+  const response = await apiClient.post<ApiResponse<boolean>>('/api/kiosk/confirm-overdue-payment', {
+    bookingId,
+    bookingCode,
+  });
   return response.data;
 };
 

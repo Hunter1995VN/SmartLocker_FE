@@ -33,10 +33,39 @@ export interface KioskCheckOutResponse {
   lockerCode?: string;
   lockerSize?: string;
   isOverdue: boolean;
+  overdueHours?: number;
+  overdueFeePerHour?: number;
   overdueFee: number;
   checkoutUrl?: string;
+  qrCode?: string;
+  accountNumber?: string;
+  accountName?: string;
+  bin?: string;
+  orderCode?: number;
+  paymentExpiresAt?: string;
   doorState?: string;
   message: string;
+}
+
+export interface KioskOverduePaymentRequest {
+  bookingId?: string;
+  bookingCode?: string;
+  stationId?: string;
+}
+
+export interface KioskOverduePaymentResponse {
+  bookingId: string;
+  bookingCode: string;
+  overdueHours: number;
+  overdueFeePerHour: number;
+  amount: number;
+  paymentUrl: string;
+  paymentExpiresAt: string;
+  qrCode?: string;
+  accountNumber?: string;
+  accountName?: string;
+  bin?: string;
+  orderCode: number;
 }
 
 export interface KioskManualConfirmRequest {
@@ -88,7 +117,7 @@ export const kioskApi = {
   },
 
   getStationStatus: async (stationId: string) => {
-    const res = await apiClient.get<{ success: boolean; data: KioskStationStatus }> (`/api/kiosk/station/${stationId}/status`);
+    const res = await apiClient.get<{ success: boolean; data: KioskStationStatus }>(`/api/kiosk/station/${stationId}/status`);
     return res.data;
   },
 

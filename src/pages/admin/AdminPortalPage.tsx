@@ -229,6 +229,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                         />
                     ) : activeMenu === 'stations' ? (
                         <StationManagementView />
+
                     ) : activeMenu === 'promotions' ? (
                         <PromotionVoucherManagementView
                             onNavigateAudit={() => setActiveMenu('audit')}
@@ -253,6 +254,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                         />
                     ) : activeMenu === 'audit' ? (
                         <AuditLogView />
+
                     ) : (
                         <>
                             {/* Top Header & Telemetry Controls */}
