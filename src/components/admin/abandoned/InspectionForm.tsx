@@ -523,45 +523,48 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                         </div>
                     )}
 
-                    {/* Selected Candidate Summary (Tự động nạp, không cần gõ GUID thủ công) */}
-                    {fields.bookingId ? (
-                        <div className="p-3.5 rounded-xl bg-blue-50/70 border border-blue-200 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                            <div className="space-y-1">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                    <span className="font-mono font-black text-slate-900 text-xs">
-                                        Đơn #{candidateHint.bookingCode || fields.bookingId.slice(0, 8)}
-                                    </span>
-                                    <span className="px-2 py-0.5 rounded-md bg-blue-600 text-white font-mono text-[11px] font-bold">
-                                        Khoang {candidateHint.lockerCode || 'S-01'} (Size {inferredSize})
-                                    </span>
-                                    <span className="px-2 py-0.5 rounded-md bg-white border border-blue-200 text-slate-700 text-[11px] font-medium">
-                                        {candidateHint.stationName || 'Trạm'}
-                                    </span>
-                                </div>
-                                {candidateHint.customerName && (
-                                    <p className="text-[11px] text-slate-600">
-                                        Khách thuê: <strong>{candidateHint.customerName}</strong>
-                                    </p>
-                                )}
-                            </div>
-                            <div className="text-right shrink-0">
-                                <span className="text-[11px] font-mono font-bold text-rose-600 bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-lg inline-block">
-                                    Đã quá hạn: +{fields.overdueHours}h
-                                </span>
-                            </div>
+                    {/* 3 ô ID: Tự động điền khi chọn đơn, vẫn cho phép xem/sửa theo yêu cầu */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1 text-xs">
+                        <div>
+                            <label className="block font-bold text-slate-700 mb-1">
+                                Mã đơn (Booking ID) <span className="text-rose-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                value={fields.bookingId}
+                                onChange={(e) => setFields((p) => ({ ...p, bookingId: e.target.value }))}
+                                placeholder="Nhập hoặc chọn Booking ID..."
+                                className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-mono text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                            />
+                            {errors.bookingId && <p className="text-rose-600 text-[10px] mt-0.5 font-bold">{errors.bookingId}</p>}
                         </div>
-                    ) : (
-                        <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs">
-                            <p className="font-bold flex items-center gap-1.5">
-                                <AlertTriangle className="w-4 h-4 text-amber-600" />
-                                Chưa chọn đơn đặt tủ quá hạn
-                            </p>
-                            <p className="text-[11px] mt-0.5 text-amber-700">
-                                Vui lòng click chọn một đơn quá hạn ở danh sách trên để tự động nạp thông tin ô tủ, trạm và thời gian quá hạn.
-                            </p>
-                            {errors.bookingId && <p className="text-rose-600 text-[10px] mt-1 font-bold">{errors.bookingId}</p>}
+                        <div>
+                            <label className="block font-bold text-slate-700 mb-1">
+                                Ô tủ (Locker ID) <span className="text-rose-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                value={fields.lockerId}
+                                onChange={(e) => setFields((p) => ({ ...p, lockerId: e.target.value }))}
+                                placeholder="Nhập hoặc chọn Locker ID..."
+                                className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-mono text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                            />
+                            {errors.lockerId && <p className="text-rose-600 text-[10px] mt-0.5 font-bold">{errors.lockerId}</p>}
                         </div>
-                    )}
+                        <div>
+                            <label className="block font-bold text-slate-700 mb-1">
+                                Trạm (Station ID) <span className="text-rose-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                value={fields.stationId}
+                                onChange={(e) => setFields((p) => ({ ...p, stationId: e.target.value }))}
+                                placeholder="Nhập hoặc chọn Station ID..."
+                                className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-mono text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                            />
+                            {errors.stationId && <p className="text-rose-600 text-[10px] mt-0.5 font-bold">{errors.stationId}</p>}
+                        </div>
+                    </div>
                 </div>
 
                 {/* Section 2: Seal and Weight */}
