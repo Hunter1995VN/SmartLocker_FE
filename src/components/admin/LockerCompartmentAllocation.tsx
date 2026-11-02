@@ -3,7 +3,7 @@
  * Thanh tiến trình phân bổ ngăn tủ (Locker Compartment Allocation) theo thiết kế mockup.
  * Thể hiện trực quan tỷ lệ khoang tủ: Sẵn sàng (Available), Đang dùng (Occupied), Bảo trì (Blocked/Maint).
  */
-import { Layers } from 'lucide-react';
+import { Layers, ArrowUpRight } from 'lucide-react';
 
 interface LockerCompartmentAllocationProps {
     totalLockers: number;
@@ -11,6 +11,7 @@ interface LockerCompartmentAllocationProps {
     occupiedLockers: number;
     maintenanceLockers: number;
     isLoading: boolean;
+    onNavigateOccupancy?: () => void;
 }
 
 export default function LockerCompartmentAllocation({
@@ -19,6 +20,7 @@ export default function LockerCompartmentAllocation({
     occupiedLockers,
     maintenanceLockers,
     isLoading,
+    onNavigateOccupancy,
 }: LockerCompartmentAllocationProps) {
     const availablePct = totalLockers > 0 ? (availableLockers / totalLockers) * 100 : 0;
     const occupiedPct = totalLockers > 0 ? (occupiedLockers / totalLockers) * 100 : 0;
@@ -44,6 +46,17 @@ export default function LockerCompartmentAllocation({
                         Tình trạng sử dụng và phân bổ ngăn tủ thông minh theo thời gian thực trên toàn bộ mạng lưới.
                     </p>
                 </div>
+
+                {onNavigateOccupancy && (
+                    <button
+                        type="button"
+                        onClick={onNavigateOccupancy}
+                        className="px-3.5 py-2 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-700 border border-teal-200 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shrink-0 self-start sm:self-auto"
+                    >
+                        <span>Phân tích Lấp đầy & Vòng quay</span>
+                        <ArrowUpRight className="w-3.5 h-3.5" />
+                    </button>
+                )}
             </div>
 
             {isLoading ? (
