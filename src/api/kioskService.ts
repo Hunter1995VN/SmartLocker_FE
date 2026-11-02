@@ -83,6 +83,8 @@ export interface KioskLockerItem {
   businessStatus: string;
   healthStatus: string;
   doorState: string;
+  connectivityStatus?: string;
+  lastDoorEventAt?: string;
 }
 
 export interface KioskStationStatus {

@@ -15,7 +15,6 @@ import {
   Backpack,
   Package,
   ChevronDown,
-  Navigation,
   Star,
   CheckCircle,
   Timer,
@@ -25,13 +24,14 @@ import {
   Ticket,
   X
 } from 'lucide-react';
-import { MOCK_STATIONS, getStationById, type StationDetail } from '../api/stationService';
+import { getStationById, type StationDetail } from '../api/stationService';
 import { createBooking } from '../api/bookingService';
 import adminPromotionService, {
   type AvailableVoucherItemDto,
   type VoucherValidationResultDto
 } from '../api/adminPromotionService';
 import CustomerHeader from '../components/layout/CustomerHeader';
+import { bookingQuote } from '../utils/bookingQuote';
 
 interface StationBookingPageProps {
   onNavigate: (page: string, props?: any) => void;
@@ -49,10 +49,9 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
   const [stationDetail, setStationDetail] = useState<StationDetail | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isRefreshing, setIsRefreshing] = useState(true);
   const [apiError, setApiError] = useState<string | null>(null);
 
-  // Track initial mount so subsequent changes don't flash/unmount the full page
-  const isInitialMount = useRef(true);
   const dateInputRef = useRef<HTMLInputElement>(null);
 
   // Storage Mode: NOW (store immediately) vs SCHEDULE (schedule in advance)
@@ -100,18 +99,10 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
 
   const { start: startDateObj, end: endDateObj } = getBookingDates();
 
-  const currentStation = stationDetail || MOCK_STATIONS.find(s => s.id === stationId) || {
-    id: '11111111-1111-1111-1111-111111111111',
-    name: 'SmartLocker San Bay Tan Son Nhat',
-    address: 'Domestic Terminal T1, Cong Hoa, Tan Binh, HCMC',
-    latitude: 10.8172,
-    longitude: 106.6600,
-    status: 'ACTIVE' as const,
-    opensAt: '00:00',
-    closesAt: '23:59',
-    totalS: 10, totalM: 8, totalL: 4,
-    availableS: 10, availableM: 8, availableL: 4,
-    contactPhone: '028 3848 5383',
+  const currentStation = stationDetail || {
+    id: '', name: '', address: '', latitude: 0, longitude: 0,
+    status: 'INACTIVE' as const, opensAt: '', closesAt: '',
+    totalS: 0, totalM: 0, totalL: 0, availableS: 0, availableM: 0, availableL: 0,
   };
 
   // Generate available time slots based on station operating hours
@@ -136,53 +127,26 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
   const availableTimeSlots = generateAvailableTimeSlots();
 
   useEffect(() => {
+    let cancelled = false;
     const fetchStation = async () => {
-      if (!stationId) {
-        setIsLoading(false);
-        return;
-      }
-      // Only show full-screen spinner on very first mount
-      if (isInitialMount.current) {
-        setIsLoading(true);
-      }
+      setIsRefreshing(true);
       setApiError(null);
       try {
         const { start, end } = getBookingDates();
-        const data = await getStationById(stationId, start.toISOString(), end.toISOString());
+        const data = stationId ? await getStationById(stationId, start.toISOString(), end.toISOString()) : null;
+        if (cancelled) return;
         setStationDetail(data);
-
-        // Auto-select available size if current selected size is full
-        if (data) {
-          const availS = data.availableS ?? data.totalS ?? 0;
-          const availM = data.availableM ?? data.totalM ?? 0;
-          const availL = data.availableL ?? data.totalL ?? 0;
-
-          if (selectedSize === 'S' && availS <= 0) {
-            if (availM > 0) setSelectedSize('M');
-            else if (availL > 0) setSelectedSize('L');
-            else setSelectedSize(null);
-          } else if (selectedSize === 'M' && availM <= 0) {
-            if (availS > 0) setSelectedSize('S');
-            else if (availL > 0) setSelectedSize('L');
-            else setSelectedSize(null);
-          } else if (selectedSize === 'L' && availL <= 0) {
-            if (availM > 0) setSelectedSize('M');
-            else if (availS > 0) setSelectedSize('S');
-            else setSelectedSize(null);
-          }
-        }
-      } catch (error) {
-        setApiError('Failed to load station information. Please try again later.');
+        if (!data) setApiError('Không tải được dữ liệu trạm. Vui lòng thử lại.');
+      } catch {
+        if (!cancelled) { setStationDetail(null); setApiError('Không tải được dữ liệu trạm.'); }
       } finally {
-        if (isInitialMount.current) {
-          setIsLoading(false);
-          isInitialMount.current = false;
-        }
+        if (!cancelled) { setIsLoading(false); setIsRefreshing(false); }
       }
     };
-    fetchStation();
+    void fetchStation();
+    const timer = setInterval(fetchStation, 15000);
+    return () => { cancelled = true; clearInterval(timer); };
   }, [stationId, bookingMode, dropOffDate, dropOffTime, selectedDuration]);
-
   // Handle custom duration submission cleanly without triggering live reload while typing
   const handleApplyCustomDuration = () => {
     let num = parseInt(customDurationInput, 10);
@@ -209,15 +173,11 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
   const isDifferentDay = startDateObj.toDateString() !== endDateObj.toDateString();
   const pickUpDisplay = `${formatTimeStr(endDateObj)} ${isDifferentDay ? '(Next Day)' : '(Today)'}`;
 
-  const basePrices = {
-    S: stationDetail?.priceS ?? 15000,
-    M: stationDetail?.priceM ?? 25000,
-    L: stationDetail?.priceL ?? 40000
-  };
+  const basePrices = { S: stationDetail?.priceS ?? 0, M: stationDetail?.priceM ?? 0, L: stationDetail?.priceL ?? 0 };
 
   const getPrice = (size: 'S' | 'M' | 'L' | null, duration: number) => {
     if (!size) return 0;
-    return basePrices[size] * duration;
+    return bookingQuote(stationDetail?.sizePricing, size, duration) ?? 0;
   };
 
   const currentPrice = getPrice(selectedSize, selectedDuration);
@@ -338,33 +298,20 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
   };
 
   // Real availability counts
-  const totalS = currentStation.totalS || 10;
-  const availS = Math.min(totalS, currentStation.availableS ?? currentStation.totalS ?? 10);
-  const isSAvailable = availS > 0;
+  const totalS = currentStation.totalS;
+  const availS = Math.min(totalS, currentStation.availableS);
+  const hasPolicy = (size: 'S' | 'M' | 'L') => bookingQuote(stationDetail?.sizePricing, size, selectedDuration) !== null;
+  const isSAvailable = !isRefreshing && availS > 0 && hasPolicy('S');
 
-  const totalM = currentStation.totalM || 8;
-  const availM = Math.min(totalM, currentStation.availableM ?? currentStation.totalM ?? 8);
-  const isMAvailable = availM > 0;
+  const totalM = currentStation.totalM;
+  const availM = Math.min(totalM, currentStation.availableM);
+  const isMAvailable = !isRefreshing && availM > 0 && hasPolicy('M');
 
-  const totalL = currentStation.totalL || 4;
-  const availL = Math.min(totalL, currentStation.availableL ?? currentStation.totalL ?? 4);
-  const isLAvailable = availL > 0;
-
-  // Generate locker slot arrays based on real station total counts
-  const sLockers = Array.from({ length: totalS }, (_, i) => ({
-    code: `S${String(i + 1).padStart(2, '0')}`,
-    isAvail: i < availS,
-  }));
-
-  const mLockers = Array.from({ length: totalM }, (_, i) => ({
-    code: `M${String(i + 1).padStart(2, '0')}`,
-    isAvail: i < availM,
-  }));
-
-  const lLockers = Array.from({ length: totalL }, (_, i) => ({
-    code: `L${String(i + 1).padStart(2, '0')}`,
-    isAvail: i < availL,
-  }));
+  const totalL = currentStation.totalL;
+  const availL = Math.min(totalL, currentStation.availableL);
+  const isLAvailable = !isRefreshing && availL > 0 && hasPolicy('L');
+  const canBook = !!stationDetail && stationDetail.id === stationId && stationDetail.status === 'ACTIVE' && !isRefreshing && !isSubmitting
+    && (selectedSize === 'S' ? isSAvailable : selectedSize === 'M' ? isMAvailable : selectedSize === 'L' ? isLAvailable : false);
 
   if (isLoading) {
     return (
@@ -376,6 +323,14 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
       </div>
     );
   }
+
+  if (!stationDetail) return (
+    <main className="min-h-screen grid place-content-center gap-4 p-8 text-center">
+      <p role="alert">{apiError || 'Trạm chưa có dữ liệu.'}</p>
+      <button onClick={() => window.location.reload()}>Tải lại</button>
+      <button onClick={() => onNavigate('find-station')}>Chọn trạm khác</button>
+    </main>
+  );
 
   return (
     <div className="bg-[#F8FAFC] text-[#0F172A] min-h-screen flex flex-col justify-between selection:bg-blue-100 selection:text-blue-900 pb-12">
@@ -769,7 +724,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                         <Backpack className="w-6 h-6" />
                       </div>
                       <span className={`text-xs font-bold px-2 py-1 rounded ${isSAvailable ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' : 'text-rose-700 bg-rose-50 border border-rose-200'}`}>
-                        {isSAvailable ? `${availS}/${totalS} left` : 'Full'}
+                        {isSAvailable ? `${availS}/${totalS} left` : 'Không khả dụng'}
                       </span>
                     </div>
                     <h3 className={`text-lg font-bold ${!isSAvailable ? 'text-slate-400' : 'text-[#0F172A]'}`}>Small (S)</h3>
@@ -781,7 +736,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   <div className={`p-4 border-t relative z-0 ${!isSAvailable ? 'border-slate-200 bg-slate-100' : selectedSize === 'S' ? 'border-blue-200 bg-blue-50/50' : 'border-slate-100 bg-slate-50/50'}`}>
                     <div className="flex items-baseline justify-between">
                       <span className={`text-lg font-bold ${!isSAvailable ? 'text-slate-400' : 'text-blue-600'}`}>{formatCurrency(basePrices.S)}</span>
-                      <span className={`text-xs font-medium ${!isSAvailable ? 'text-slate-400' : 'text-slate-500'}`}>/ hr</span>
+                      <span className={`text-xs font-medium ${!isSAvailable ? 'text-slate-400' : 'text-slate-500'}`}>/ {stationDetail?.sizePricing?.find(p => p.size === 'S')?.blockHours ?? '—'} giờ</span>
                     </div>
                     <button 
                       disabled={!isSAvailable} 
@@ -793,7 +748,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                         !isSAvailable ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : selectedSize === 'S' ? 'bg-blue-600 text-white cursor-pointer shadow-sm shadow-blue-500/30' : 'bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 cursor-pointer'
                       }`}
                     >
-                      {!isSAvailable ? 'Unavailable (Full)' : selectedSize === 'S' ? 'Selected' : 'Select'}
+                      {!isSAvailable ? 'Không khả dụng' : selectedSize === 'S' ? 'Selected' : 'Select'}
                     </button>
                   </div>
                 </div>
@@ -826,7 +781,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                         <Package className="w-6 h-6" />
                       </div>
                       <span className={`text-xs font-bold px-2 py-1 rounded ${isMAvailable ? 'text-amber-700 bg-amber-50 border border-amber-200' : 'text-rose-700 bg-rose-50 border border-rose-200'}`}>
-                        {isMAvailable ? `${availM}/${totalM} left` : 'Full'}
+                        {isMAvailable ? `${availM}/${totalM} left` : 'Không khả dụng'}
                       </span>
                     </div>
                     <h3 className={`text-lg font-bold ${!isMAvailable ? 'text-slate-400' : 'text-[#0F172A]'}`}>Medium (M)</h3>
@@ -838,7 +793,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   <div className={`p-4 border-t relative z-0 ${!isMAvailable ? 'border-slate-200 bg-slate-100' : selectedSize === 'M' ? 'border-blue-200 bg-blue-50/50' : 'border-slate-100 bg-slate-50/50'}`}>
                     <div className="flex items-baseline justify-between">
                       <span className={`text-lg font-bold ${!isMAvailable ? 'text-slate-400' : 'text-blue-600'}`}>{formatCurrency(basePrices.M)}</span>
-                      <span className={`text-xs font-medium ${!isMAvailable ? 'text-slate-400' : 'text-slate-500'}`}>/ hr</span>
+                      <span className={`text-xs font-medium ${!isMAvailable ? 'text-slate-400' : 'text-slate-500'}`}>/ {stationDetail?.sizePricing?.find(p => p.size === 'M')?.blockHours ?? '—'} giờ</span>
                     </div>
                     <button 
                       disabled={!isMAvailable} 
@@ -850,7 +805,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                         !isMAvailable ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : selectedSize === 'M' ? 'bg-blue-600 text-white cursor-pointer shadow-sm shadow-blue-500/30' : 'bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 cursor-pointer'
                       }`}
                     >
-                      {!isMAvailable ? 'Unavailable (Full)' : selectedSize === 'M' ? 'Selected' : 'Select'}
+                      {!isMAvailable ? 'Không khả dụng' : selectedSize === 'M' ? 'Selected' : 'Select'}
                     </button>
                   </div>
                 </div>
@@ -880,7 +835,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                         <Package className="w-6 h-6" />
                       </div>
                       <span className={`text-xs font-bold px-2 py-1 rounded ${isLAvailable ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' : 'text-rose-700 bg-rose-50 border border-rose-200'}`}>
-                        {isLAvailable ? `${availL}/${totalL} left` : 'Full'}
+                        {isLAvailable ? `${availL}/${totalL} left` : 'Không khả dụng'}
                       </span>
                     </div>
                     <h3 className={`text-lg font-bold ${!isLAvailable ? 'text-slate-400' : 'text-[#0F172A]'}`}>Large (L)</h3>
@@ -892,7 +847,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   <div className={`p-4 border-t relative z-0 ${!isLAvailable ? 'border-slate-200 bg-slate-100' : selectedSize === 'L' ? 'border-blue-200 bg-blue-50/50' : 'border-slate-100 bg-slate-50/50'}`}>
                     <div className="flex items-baseline justify-between">
                       <span className={`text-lg font-bold ${!isLAvailable ? 'text-slate-400' : 'text-blue-600'}`}>{formatCurrency(basePrices.L)}</span>
-                      <span className={`text-xs font-medium ${!isLAvailable ? 'text-slate-400' : 'text-slate-500'}`}>/ hr</span>
+                      <span className={`text-xs font-medium ${!isLAvailable ? 'text-slate-400' : 'text-slate-500'}`}>/ {stationDetail?.sizePricing?.find(p => p.size === 'L')?.blockHours ?? '—'} giờ</span>
                     </div>
                     <button 
                       disabled={!isLAvailable} 
@@ -904,198 +859,26 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                         !isLAvailable ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : selectedSize === 'L' ? 'bg-blue-600 text-white cursor-pointer shadow-sm shadow-blue-500/30' : 'bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 cursor-pointer'
                       }`}
                     >
-                      {!isLAvailable ? 'Unavailable (Full)' : selectedSize === 'L' ? 'Selected' : 'Select'}
+                      {!isLAvailable ? 'Không khả dụng' : selectedSize === 'L' ? 'Selected' : 'Select'}
                     </button>
                   </div>
                 </div>
               </div>
             </section>
 
-            {/* Section C: Locker Bank Schematic - CHUẨN NGHIỆP VỤ HỆ THỐNG: TỰ ĐỘNG GÁN THEO TẦNG TỐI ƯU */}
-            <section className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200/80">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-2">
-                <div className="flex items-center">
-                  <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold mr-3 border border-blue-200">3</div>
-                  <div>
-                    <h2 className="text-xl font-bold text-[#0F172A]">Locker Vault Layout &amp; Tier Preview</h2>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Visual schematic reflects <strong>{totalS + totalM + totalL} physical compartments</strong> at this hub
-                    </p>
+            <section className="bg-white p-6 rounded-2xl border border-slate-200">
+              <h2 className="text-xl font-bold">Các ngăn tủ tại trạm</h2>
+              <p className="text-sm text-slate-500 my-3">Chọn kích thước S, M hoặc L. Hệ thống gán ngăn đúng kích thước khi check-in, sau khi kiểm tra vé và thiết bị.</p>
+              <div className="grid gap-3 sm:grid-cols-3">
+                {(stationDetail?.lockers ?? []).map(locker => (
+                  <div key={locker.lockerId} className="rounded-xl border border-slate-200 p-4">
+                    <strong>{locker.lockerCode} · {locker.size}</strong>
+                    <p className="text-sm">{locker.businessStatus} · {locker.healthStatus}</p>
+                    <p className="text-sm">Cửa: {locker.doorState} · {locker.connectivityStatus}</p>
                   </div>
-                </div>
-                <div className="text-xs bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-lg text-blue-800 font-semibold flex items-center">
-                  <span className="w-2 h-2 rounded-full bg-blue-600 animate-ping mr-2"></span>
-                  Assigned Tier: {selectedSize === 'S' ? 'Upper Level (Eye Level)' : selectedSize === 'M' ? 'Middle Level (Waist Level)' : selectedSize === 'L' ? 'Lower Level (Ground Level)' : 'None'}
-                </div>
+                ))}
               </div>
-              
-              <div className="bg-[#0F172A] rounded-2xl p-6 sm:p-8 overflow-x-auto shadow-inner">
-                <div className="min-w-[550px] space-y-6">
-                  {/* Front Entry Indicator */}
-                  <div className="flex justify-center">
-                    <div className="bg-slate-800 border border-slate-700 px-4 py-1.5 rounded-full text-xs text-slate-300 font-semibold flex items-center shadow-xs">
-                      <Navigation className="w-3.5 h-3.5 mr-1.5 text-blue-400 rotate-180" /> Front Locker Bank Face
-                    </div>
-                  </div>
-                  
-                  {/* TIER 1: UPPER LEVEL (S - Eye Level) */}
-                  <div 
-                    onClick={() => { if (isSAvailable) setSelectedSize('S'); }}
-                    className={`p-3 rounded-xl transition-all cursor-pointer border ${
-                      selectedSize === 'S' 
-                        ? 'bg-blue-950/40 border-blue-500/80 shadow-[0_0_20px_rgba(37,99,235,0.2)]' 
-                        : 'bg-transparent border-transparent hover:border-slate-700'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider flex items-center">
-                        <span className={`w-2.5 h-2.5 rounded-full mr-2 ${selectedSize === 'S' ? 'bg-blue-500 animate-pulse' : 'bg-slate-500'}`}></span>
-                        Upper Tier • Small Compartments ({totalS} Units)
-                        {selectedSize === 'S' && (
-                          <span className="ml-2.5 bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">
-                            Selected Tier
-                          </span>
-                        )}
-                      </span>
-                      <span className="text-[11px] text-emerald-400 font-semibold">{availS} Available</span>
-                    </div>
-                    <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
-                      {sLockers.map((locker, idx) => {
-                        const isRepRepresentative = selectedSize === 'S' && idx === 0;
-                        return (
-                          <div
-                            key={locker.code}
-                            className={`h-11 rounded-lg flex flex-col items-center justify-center text-xs font-bold transition-all ${
-                              isRepRepresentative
-                                ? 'bg-blue-600 border-2 border-white text-white shadow-[0_0_15px_rgba(37,99,235,0.8)] scale-105 z-10'
-                                : selectedSize === 'S' && locker.isAvail
-                                  ? 'bg-blue-500/20 border border-blue-400/50 text-blue-300'
-                                  : locker.isAvail
-                                    ? 'bg-emerald-500/15 border border-emerald-500/40 text-emerald-400'
-                                    : 'bg-slate-800/60 border border-slate-700/60 text-slate-500'
-                            }`}
-                          >
-                            <span>{locker.code}</span>
-                            {isRepRepresentative && <span className="text-[8px] uppercase tracking-tighter">Assigned</span>}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* TIER 2: MIDDLE LEVEL (M - Waist Level) */}
-                  <div 
-                    onClick={() => { if (isMAvailable) setSelectedSize('M'); }}
-                    className={`p-3 rounded-xl transition-all cursor-pointer border ${
-                      selectedSize === 'M' 
-                        ? 'bg-blue-950/40 border-blue-500/80 shadow-[0_0_20px_rgba(37,99,235,0.2)]' 
-                        : 'bg-transparent border-transparent hover:border-slate-700'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider flex items-center">
-                        <span className={`w-2.5 h-2.5 rounded-full mr-2 ${selectedSize === 'M' ? 'bg-blue-500 animate-pulse' : 'bg-slate-500'}`}></span>
-                        Middle Tier • Medium Compartments ({totalM} Units)
-                        {selectedSize === 'M' && (
-                          <span className="ml-2.5 bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">
-                            Selected Tier (Waist Level)
-                          </span>
-                        )}
-                      </span>
-                      <span className="text-[11px] text-emerald-400 font-semibold">{availM} Available</span>
-                    </div>
-                    <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
-                      {mLockers.map((locker, idx) => {
-                        const isRepRepresentative = selectedSize === 'M' && idx === 0;
-                        return (
-                          <div
-                            key={locker.code}
-                            className={`h-14 rounded-lg flex flex-col items-center justify-center text-xs font-bold transition-all ${
-                              isRepRepresentative
-                                ? 'bg-blue-600 border-2 border-white text-white shadow-[0_0_15px_rgba(37,99,235,0.8)] scale-105 z-10'
-                                : selectedSize === 'M' && locker.isAvail
-                                  ? 'bg-blue-500/20 border border-blue-400/50 text-blue-300'
-                                  : locker.isAvail
-                                    ? 'bg-emerald-500/15 border border-emerald-500/40 text-emerald-400'
-                                    : 'bg-slate-800/60 border border-slate-700/60 text-slate-500'
-                            }`}
-                          >
-                            <span>{locker.code}</span>
-                            {isRepRepresentative && <span className="text-[9px] uppercase tracking-tighter">Assigned</span>}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* TIER 3: LOWER LEVEL (L - Ground Level) */}
-                  <div 
-                    onClick={() => { if (isLAvailable) setSelectedSize('L'); }}
-                    className={`p-3 rounded-xl transition-all cursor-pointer border ${
-                      selectedSize === 'L' 
-                        ? 'bg-blue-950/40 border-blue-500/80 shadow-[0_0_20px_rgba(37,99,235,0.2)]' 
-                        : 'bg-transparent border-transparent hover:border-slate-700'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider flex items-center">
-                        <span className={`w-2.5 h-2.5 rounded-full mr-2 ${selectedSize === 'L' ? 'bg-blue-500 animate-pulse' : 'bg-slate-500'}`}></span>
-                        Lower Tier • Large Heavy Units ({totalL} Units)
-                        {selectedSize === 'L' && (
-                          <span className="ml-2.5 bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">
-                            Selected Tier
-                          </span>
-                        )}
-                      </span>
-                      <span className="text-[11px] text-emerald-400 font-semibold">{availL} Available</span>
-                    </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                      {lLockers.map((locker, idx) => {
-                        const isRepRepresentative = selectedSize === 'L' && idx === 0;
-                        return (
-                          <div
-                            key={locker.code}
-                            className={`h-20 rounded-lg flex flex-col items-center justify-center text-xs font-bold transition-all ${
-                              isRepRepresentative
-                                ? 'bg-blue-600 border-2 border-white text-white shadow-[0_0_15px_rgba(37,99,235,0.8)] scale-105 z-10'
-                                : selectedSize === 'L' && locker.isAvail
-                                  ? 'bg-blue-500/20 border border-blue-400/50 text-blue-300'
-                                  : locker.isAvail
-                                    ? 'bg-emerald-500/15 border border-emerald-500/40 text-emerald-400'
-                                    : 'bg-slate-800/60 border border-slate-700/60 text-slate-500'
-                            }`}
-                          >
-                            <span>{locker.code}</span>
-                            {isRepRepresentative && <span className="text-[9px] uppercase tracking-tighter">Assigned</span>}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Legend */}
-                  <div className="flex flex-wrap items-center justify-center gap-6 pt-3 border-t border-slate-800/80">
-                    <div className="flex items-center text-xs text-slate-300">
-                      <div className="w-3.5 h-3.5 bg-blue-600 border border-white rounded-xs mr-2 shadow-[0_0_8px_rgba(37,99,235,0.8)]"></div>
-                      Assigned Tier ({selectedSize === 'S' ? 'Upper' : selectedSize === 'M' ? 'Middle' : selectedSize === 'L' ? 'Lower' : 'None'})
-                    </div>
-                    <div className="flex items-center text-xs text-slate-300">
-                      <div className="w-3.5 h-3.5 bg-emerald-500/20 border border-emerald-500/50 rounded-xs mr-2"></div>
-                      Available ({availS + availM + availL} slots)
-                    </div>
-                    <div className="flex items-center text-xs text-slate-300">
-                      <div className="w-3.5 h-3.5 bg-slate-800 border border-slate-700 rounded-xs mr-2"></div>
-                      Occupied / In Use
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <p className="text-xs text-slate-500 mt-4 flex items-start">
-                <Info className="w-4 h-4 mr-1.5 mt-0.5 shrink-0 text-blue-600" />
-                <span>
-                  <strong>Smart Auto-Assignment:</strong> The system automatically assigns the optimal compartment for you in the selected tier to ensure effortless luggage check-in. Your specific compartment code and digital unlock QR key will be unlocked immediately upon payment confirmation.
-                </span>
-              </p>
+              {!stationDetail?.lockers?.length && <p>Trạm chưa có ngăn tủ được kết nối.</p>}
             </section>
           </div>
 
@@ -1122,18 +905,9 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
 
                   <div className="flex justify-between items-start pb-3 border-b border-slate-100">
                     <div>
-                      <p className="text-xs text-slate-400 mb-0.5">Assigned Unit Tier</p>
+                      <p className="text-xs text-slate-400 mb-0.5">Kích thước đã chọn</p>
                       <p className="text-sm font-bold text-blue-600 flex items-center">
                         {selectedSize === 'S' ? 'Small Unit (S)' : selectedSize === 'M' ? 'Medium Unit (M)' : selectedSize === 'L' ? 'Large Unit (L)' : 'None Selected'}
-                        <span className="ml-2 bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full font-extrabold">
-                          {selectedSize === 'S' ? 'Upper' : selectedSize === 'M' ? 'Waist' : 'Lower'}
-                        </span>
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xs text-slate-400 mb-0.5">Level Tier</p>
-                      <p className="text-xs font-semibold text-slate-600">
-                        {selectedSize === 'S' ? 'Eye Level' : selectedSize === 'M' ? 'Waist Level' : 'Ground Level'}
                       </p>
                     </div>
                   </div>
@@ -1154,7 +928,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
 
                   <div className="flex justify-between items-center pt-1 text-sm">
                     <p className="text-slate-500">
-                      Rate ({formatCurrency(selectedSize ? basePrices[selectedSize] : 0)}/hr × {selectedDuration}h)
+                      Chi phí theo chính sách giá ({selectedDuration} giờ)
                     </p>
                     <p className="font-semibold text-[#0F172A]">{formatCurrency(currentPrice)}</p>
                   </div>
@@ -1299,9 +1073,9 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
 
                   {apiError && <div className="text-rose-600 text-xs font-semibold mb-3 text-center bg-rose-50 p-2.5 rounded-lg border border-rose-200">{apiError}</div>}
                   <button 
-                    disabled={!selectedSize || isSubmitting}
+                    disabled={!canBook}
                     onClick={async () => {
-                      if (!selectedSize || !currentStation.id) return;
+                      if (!canBook || !selectedSize || !currentStation.id) return;
                       setIsSubmitting(true);
                       setApiError(null);
                       try {
@@ -1327,7 +1101,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                               dropOffDate: dropOffDate,
                               dropOffTime: dropOffTime,
                               storageDate: bookingMode === 'NOW' ? 'Right Now' : displayStorageDate,
-                              amount: res.data.amount || finalPayableAmount,
+                              amount: res.data.amount,
                               originalAmount: res.data.originalAmount ?? currentPrice,
                               discountAmount: res.data.discountAmount ?? discountAmount,
                               appliedVoucherCode: res.data.appliedVoucherCode ?? appliedVoucher?.code,
@@ -1366,7 +1140,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                       }
                     }}
                     className={`w-full py-3.5 rounded-xl text-white font-bold text-base flex items-center justify-center transition-all cursor-pointer ${
-                      (selectedSize && !isSubmitting) ? 'bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/25 active:scale-[0.98]' : 'bg-slate-300 cursor-not-allowed'
+                      canBook ? 'bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/25 active:scale-[0.98]' : 'bg-slate-300 cursor-not-allowed'
                     }`}
                   >
                     {isSubmitting ? (

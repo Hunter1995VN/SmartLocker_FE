@@ -47,6 +47,8 @@ export interface StationDetail extends Station {
     refundCutoffHours?: number;
     refundRateEarly?: number;
     refundRateLate?: number;
+    sizePricing?: Array<{ size: 'S' | 'M' | 'L'; pricePerBlock: number; blockHours: number; minHours: number; maxHours: number }>;
+    lockers?: Array<{ lockerId: string; lockerCode: string; size: string; businessStatus: string; healthStatus: string; doorState: string; connectivityStatus: string; lastDoorEventAt?: string }>;
 }
 
 /** Đơn đặt tủ đang hoạt động (dùng cho Dashboard / Map sidebar) */
