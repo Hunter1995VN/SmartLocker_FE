@@ -135,15 +135,6 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
 
                     {/* 2. Trailing System Status & User Profile */}
                     <div className="flex items-center gap-3">
-                        {/* Live System Status Pill */}
-                        <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-[#eff4ff] rounded-full border border-[#dce9ff]">
-                            <span className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
-                            </span>
-                            <span className="text-xs text-[#0b1c30] font-semibold">IoT Trực tuyến</span>
-                        </div>
-
                         {/* User Dropdown */}
                         <div className="relative" ref={dropdownRef}>
                             <button

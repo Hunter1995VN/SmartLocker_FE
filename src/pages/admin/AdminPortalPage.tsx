@@ -10,6 +10,7 @@
  * - Quản lý Tài khoản Nội bộ & Phân quyền Vai trò Admin / Staff RBAC (UC-A05)
  * - Quản lý Khách hàng & Kiểm soát Nợ xấu (UC-A06)
  * - Đối soát tài chính định kỳ PayOS & CSDL (UC-A12)
+ * - Xuất Báo cáo Doanh thu Tài chính & Lưu lượng Giao dịch Thanh toán (UC-A10)
  * - Tra cứu Nhật ký Truy vết An ninh toàn hệ thống Audit Logs (UC-A08)
  */
 import { useState, useEffect, useCallback } from 'react';
@@ -39,6 +40,7 @@ import RealtimeLockerGridView from '../../components/admin/lockers/RealtimeLocke
 import AbandonedPropertyView from '../../components/admin/abandoned/AbandonedPropertyView';
 import EmergencyIncidentListView from '../../components/admin/incidents/EmergencyIncidentListView';
 import FinancialReconciliationView from '../../components/admin/finance/FinancialReconciliationView';
+import FinancialRevenueReportView from '../../components/admin/finance/FinancialRevenueReportView';
 import ManualRefundManagementView from '../../components/admin/refunds/ManualRefundManagementView';
 import AuditLogView from '../../components/admin/audit/AuditLogView';
 
@@ -183,7 +185,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
     };
 
     return (
-        <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex font-sans select-none antialiased">
+        <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex font-sans select-none antialiased print:bg-white">
             {/* Left Fixed Navigation Sidebar */}
             <AdminSidebar
                 user={user}
@@ -196,7 +198,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
 
             {/* Right Main Viewport */}
             <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-                <main className="p-4 sm:p-6 lg:p-7 space-y-5 max-w-7xl w-full mx-auto">
+                <main className="p-4 sm:p-6 lg:p-7 space-y-5 max-w-7xl w-full mx-auto print:p-0 print:max-w-none">
                     {activeMenu === 'abandoned' ? (
                         <AbandonedPropertyView userRole={role} currentUser={user} />
                     ) : activeMenu === 'incidents' ? (
@@ -225,6 +227,14 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                     ) : activeMenu === 'reconciliation' ? (
                         <FinancialReconciliationView
                             onNavigateManualRefunds={() => setActiveMenu('refunds')}
+                            onNavigateReports={() => setActiveMenu('reports')}
+                        />
+                    ) : activeMenu === 'reports' ? (
+                        <FinancialRevenueReportView
+                            userRole={role}
+                            onNavigateReconciliation={() => setActiveMenu('reconciliation')}
+                            onNavigateManualRefunds={() => setActiveMenu('refunds')}
+                            onNavigateAudit={() => setActiveMenu('audit')}
                         />
                     ) : activeMenu === 'refunds' ? (
                         <ManualRefundManagementView
@@ -298,7 +308,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                 </main>
 
                 {/* Footer */}
-                <footer className="w-full py-4 text-center text-xs text-slate-400 border-t border-slate-200/80 bg-white mt-auto">
+                <footer className="w-full py-4 text-center text-xs text-slate-400 border-t border-slate-200/80 bg-white mt-auto print:hidden">
                     <span>SmartLocker Management System (SLMS) · Operations & Fleet Control</span>
                 </footer>
             </div>
