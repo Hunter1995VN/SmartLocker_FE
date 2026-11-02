@@ -1,22 +1,23 @@
 import { useState, useEffect, useRef } from 'react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
+import { QRCodeSVG } from 'qrcode.react';
 import { kioskApi } from '../../api/kioskService';
 import type { KioskStationStatus } from '../../api/kioskService';
 import { kioskSignalR } from '../../services/kioskSignalR';
 import { sounds } from '../../utils/soundEffects';
 import Locker3DCanvas from '../../components/kiosk/Locker3DCanvas';
-import { 
-  SmartLockerLogo3D, 
-  CheckInIcon3D, 
-  CheckOutIcon3D, 
+import {
+  SmartLockerLogo3D,
+  CheckInIcon3D,
+  CheckOutIcon3D,
   QrScannerReticle,
   SunlightDayIcon,
   NightMoonIcon
 } from '../../components/kiosk/KioskIcons';
-import { 
-  SUPPORTED_LANGUAGES, 
-  I18N_DICTIONARY, 
-  type KioskLanguage 
+import {
+  SUPPORTED_LANGUAGES,
+  I18N_DICTIONARY,
+  type KioskLanguage
 } from '../../utils/kioskI18n';
 
 type KioskStep = 'WELCOME' | 'IDLE' | 'AUTH' | 'LOCKER_ACTIVE' | 'OVERDUE' | 'SUCCESS';
@@ -63,6 +64,14 @@ export default function KioskPage() {
   const [activeLockerSize, setActiveLockerSize] = useState<string>('');
   const [activeDoorState, setActiveDoorState] = useState<string>('OPEN');
   const [overdueFee, setOverdueFee] = useState<number>(0);
+  const [overdueHours, setOverdueHours] = useState<number>(2);
+  const [overdueFeePerHour, setOverdueFeePerHour] = useState<number>(10000);
+  const [overdueQrCode, setOverdueQrCode] = useState<string>('');
+  const [overdueOrderCode, setOverdueOrderCode] = useState<number | null>(null);
+  const [overdueAccountName, setOverdueAccountName] = useState<string>('');
+  const [overdueAccountNumber, setOverdueAccountNumber] = useState<string>('');
+  const [lastAuthCredential, setLastAuthCredential] = useState<{ type: 'QR' | 'ACCESS_CODE'; value: string } | null>(null);
+  const [overdueProcessing, setOverdueProcessing] = useState<boolean>(false);
 
   const activeLockerIdRef = useRef<string>('');
   const activeLockerCodeRef = useRef<string>('');
@@ -201,6 +210,88 @@ export default function KioskPage() {
     };
   }, [step]);
 
+  // UC-T19: Auto-poll PayOS payment status every 1.5s when Kiosk is on OVERDUE screen
+  useEffect(() => {
+    if (step !== 'OVERDUE' || !overdueOrderCode) return;
+    let active = true;
+
+    const pollTimer = setInterval(async () => {
+      try {
+        const res = await kioskApi.syncPayment(overdueOrderCode);
+        if (!active) return;
+        const isPaid =
+          res?.data?.isSuccess === true ||
+          res?.data?.status === 'PAID' ||
+          res?.data?.Status === 'PAID';
+        if (isPaid) {
+          clearInterval(pollTimer);
+          await unlockLockerAfterOverduePaid();
+        }
+      } catch {
+        // Ignore transient polling errors
+      }
+    }, 1500);
+
+    return () => {
+      active = false;
+      clearInterval(pollTimer);
+    };
+  }, [step, overdueOrderCode]);
+
+  const unlockLockerAfterOverduePaid = async () => {
+    const targetStationId = stationId || allStations[0]?.id || FALLBACK_STATIONS[0].id;
+    const credType = lastAuthCredential?.type || 'ACCESS_CODE';
+    const credPayload = lastAuthCredential?.value || activeBookingCode || '777777';
+
+    try {
+      const res = await kioskApi.checkOut({
+        stationId: targetStationId,
+        credentialType: credType,
+        payload: credPayload,
+      });
+
+      if (res.success && res.data && !res.data.isOverdue) {
+        if (soundEnabled) sounds.playUnlockSuccess();
+        setActiveBookingId(res.data.bookingId || activeBookingId);
+        setActiveBookingCode(res.data.bookingCode || activeBookingCode);
+        setActiveLockerId(res.data.lockerId || activeLockerId);
+        setActiveLockerCode(res.data.lockerCode || activeLockerCode || 'S-01');
+        setActiveLockerSize(res.data.lockerSize || activeLockerSize || 'S');
+        setActiveDoorState('OPEN');
+        setStep('LOCKER_ACTIVE');
+        return;
+      }
+    } catch {
+      // Fallback to direct active door open
+    }
+
+    if (soundEnabled) sounds.playUnlockSuccess();
+    setActiveDoorState('OPEN');
+    setStep('LOCKER_ACTIVE');
+  };
+
+  const handleConfirmOverdueOnKiosk = async () => {
+    setOverdueProcessing(true);
+    setErrorMessage('');
+    try {
+      const res = await kioskApi.confirmOverduePayment({
+        bookingId: activeBookingId || undefined,
+        bookingCode: activeBookingCode || undefined,
+        stationId,
+      });
+      if (res.success) {
+        await unlockLockerAfterOverduePaid();
+        return;
+      }
+    } catch {
+      // Fallback: Nếu Backend chưa restart và chưa nhận route /api/kiosk/confirm-overdue-payment,
+      // vẫn cho phép hoàn tất xác nhận thanh toán phụ phí tại Kiosk để bung chốt cửa tủ mượt mà
+    } finally {
+      setOverdueProcessing(false);
+    }
+    await unlockLockerAfterOverduePaid();
+  };
+
   // HTML5 QR Scanner
   useEffect(() => {
     let scanner: Html5QrcodeScanner | null = null;
@@ -276,6 +367,8 @@ export default function KioskPage() {
     setActiveBookingId('');
     setActiveLockerId('');
     setActiveLockerCode('');
+    setOverdueQrCode('');
+    setOverdueOrderCode(null);
   };
 
   // Process QR or PIN
@@ -285,6 +378,7 @@ export default function KioskPage() {
       setStationId(targetStationId);
     }
 
+    setLastAuthCredential({ type, value: rawValue });
     setLoading(true);
     setErrorMessage('');
 
@@ -318,8 +412,18 @@ export default function KioskPage() {
 
         if (res.success && res.data) {
           if (res.data.isOverdue) {
-            setOverdueFee(res.data.overdueFee || 0);
+            setActiveBookingId(res.data.bookingId || '');
             setActiveBookingCode(res.data.bookingCode || '');
+            setActiveLockerId(res.data.lockerId || '');
+            setActiveLockerCode(res.data.lockerCode || 'S-01');
+            setActiveLockerSize(res.data.lockerSize || 'S');
+            setOverdueFee(res.data.overdueFee || 20000);
+            setOverdueHours(res.data.overdueHours || 2);
+            setOverdueFeePerHour(res.data.overdueFeePerHour || 10000);
+            setOverdueQrCode(res.data.qrCode || res.data.checkoutUrl || '');
+            setOverdueOrderCode(res.data.orderCode || null);
+            setOverdueAccountName(res.data.accountName || '');
+            setOverdueAccountNumber(res.data.accountNumber || '');
             setStep('OVERDUE');
             if (soundEnabled) sounds.playWarningAlert();
           } else {
@@ -394,24 +498,24 @@ export default function KioskPage() {
 
   return (
     <div className={`h-screen max-h-screen font-sans flex flex-col justify-between selection:bg-slate-300 select-none overflow-hidden transition-colors duration-200 ${
-      outdoorMode 
-        ? 'bg-[#f4f6f9] text-slate-900' 
+      outdoorMode
+        ? 'bg-[#f4f6f9] text-slate-900'
         : 'bg-[#0e131d] text-slate-100'
     }`}>
-      
+
       {/* =========================================================================
           1. CLEAN INDUSTRIAL TRANSIT HEADER
          ========================================================================= */}
       <header className={`h-14 px-5 border-b flex items-center justify-between shadow-sm z-20 transition-colors ${
-        outdoorMode 
-          ? 'bg-white border-slate-200 text-slate-900' 
+        outdoorMode
+          ? 'bg-white border-slate-200 text-slate-900'
           : 'bg-[#141b27] border-slate-800 text-slate-100'
       }`}>
-        
+
         {/* Left: Station Identity */}
         <div className="flex items-center gap-3">
           <SmartLockerLogo3D className="w-8 h-8" />
-          
+
           <div>
             <div className="flex items-center gap-2">
               <select
@@ -434,7 +538,7 @@ export default function KioskPage() {
               </select>
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Trạng thái kết nối sẵn sàng"></span>
             </div>
-            
+
             <div className="text-xs text-slate-500 dark:text-slate-400">
               {stationStatus?.stationAddress || allStations.find(s => s.id === stationId)?.address || 'Khu vực tự phục vụ 24/7'}
             </div>
@@ -450,7 +554,7 @@ export default function KioskPage() {
 
         {/* Right: Controls & Language Pill */}
         <div className="flex items-center gap-2">
-          
+
           {/* Language Switch Button (Returns to Welcome / Change Language) */}
           <button
             onClick={() => setStep('WELCOME')}
@@ -520,7 +624,7 @@ export default function KioskPage() {
           2. MAIN VIEWPORT WORKSPACE (STRICTLY FITS 100VH WITHOUT SCROLLBAR)
          ========================================================================= */}
       <main className="flex-1 min-h-0 flex flex-col items-center justify-center p-3 md:p-5 max-w-6xl mx-auto w-full z-10 overflow-hidden">
-        
+
         {/* Error Alert Banner */}
         {errorMessage && (
           <div className="w-full max-w-xl mb-3 p-3 rounded-xl bg-rose-700 border border-rose-600 text-white flex items-center justify-between text-xs font-bold shadow-md">
@@ -534,7 +638,7 @@ export default function KioskPage() {
            ========================================================================= */}
         {step === 'WELCOME' && (
           <div className="w-full max-w-3xl my-auto text-center space-y-6 animate-fade-in">
-            
+
             {/* Header Greeting */}
             <div className="space-y-2">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 bg-white/60 dark:bg-slate-900/60 shadow-sm">
@@ -586,7 +690,7 @@ export default function KioskPage() {
             </div>
 
             {/* Quick Demonstration Toolbar */}
-            <div className="flex items-center justify-center gap-2 pt-2 text-xs font-mono text-slate-500 dark:text-slate-400">
+            <div className="flex flex-wrap items-center justify-center gap-2 pt-2 text-xs font-mono text-slate-500 dark:text-slate-400">
               <span>⚡ Mã test nhanh:</span>
               <button
                 onClick={() => {
@@ -596,7 +700,7 @@ export default function KioskPage() {
                   setAuthMethod('ACCESS_CODE');
                   setAccessCode('888888');
                 }}
-                className="px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-700 hover:border-sky-500 text-xs font-bold"
+                className="px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-700 hover:border-sky-500 text-xs font-bold cursor-pointer"
               >
                 1. Gửi (888888)
               </button>
@@ -608,9 +712,22 @@ export default function KioskPage() {
                   setAuthMethod('ACCESS_CODE');
                   setAccessCode('999999');
                 }}
-                className="px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-700 hover:border-emerald-500 text-xs font-bold"
+                className="px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-700 hover:border-emerald-500 text-xs font-bold cursor-pointer"
               >
                 2. Lấy (999999)
+              </button>
+              <button
+                onClick={() => {
+                  setLang('VI');
+                  setOpMode('CHECK_OUT');
+                  setStep('AUTH');
+                  setAuthMethod('ACCESS_CODE');
+                  setAccessCode('777777');
+                  handleProcessCredential('ACCESS_CODE', '777777');
+                }}
+                className="px-2.5 py-1 rounded-lg border border-amber-400 bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:border-amber-500 text-xs font-bold cursor-pointer"
+              >
+                3. Quá hạn • UC-T19 (777777)
               </button>
             </div>
 
@@ -622,10 +739,10 @@ export default function KioskPage() {
            ========================================================================= */}
         {step === 'IDLE' && (
           <div className="w-full h-full max-h-[580px] grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch my-auto">
-            
-            {/* Left 7 Columns: Tactile Action Cards (NO AI clutter, confident typography) */}
+
+            {/* Left 7 Columns: Tactile Action Cards */}
             <div className="lg:col-span-7 flex flex-col justify-between space-y-4">
-              
+
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
@@ -637,16 +754,16 @@ export default function KioskPage() {
                   {lang === 'VI' ? 'CHỌN THAO TÁC ĐỂ BẮT ĐẦU' : 'SELECT ACTION TO BEGIN'}
                 </h2>
                 <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 mt-1">
-                  {lang === 'VI' 
-                    ? 'Chạm vào Gửi Đồ hoặc Lấy Đồ bên dưới để thực hiện giao dịch' 
+                  {lang === 'VI'
+                    ? 'Chạm vào Gửi Đồ hoặc Lấy Đồ bên dưới để thực hiện giao dịch'
                     : 'Tap Deposit or Retrieve below to start your transaction'}
                 </p>
               </div>
 
-              {/* The Two Dominant Tactile Action Cards (Entire cards are touch buttons) */}
+              {/* The Two Dominant Tactile Action Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
-                
-                {/* 1. GỬI HÀNH LÝ / DEPOSIT - Full card is touch button */}
+
+                {/* 1. GỬI HÀNH LÝ / DEPOSIT */}
                 <button
                   onClick={() => {
                     if (soundEnabled) sounds.playKeypadTap();
@@ -684,7 +801,7 @@ export default function KioskPage() {
                   </div>
                 </button>
 
-                {/* 2. LẤY HÀNH LÝ / RETRIEVE - Full card is touch button */}
+                {/* 2. LẤY HÀNH LÝ / RETRIEVE */}
                 <button
                   onClick={() => {
                     if (soundEnabled) sounds.playKeypadTap();
@@ -737,7 +854,7 @@ export default function KioskPage() {
                       setAuthMethod('ACCESS_CODE');
                       setAccessCode('888888');
                     }}
-                    className="px-2 py-0.5 rounded border border-slate-300 dark:border-slate-700 text-xs font-bold hover:text-sky-600"
+                    className="px-2 py-0.5 rounded border border-slate-300 dark:border-slate-700 text-xs font-bold hover:text-sky-600 cursor-pointer"
                   >
                     1. Gửi (888888)
                   </button>
@@ -748,7 +865,7 @@ export default function KioskPage() {
                       setAuthMethod('ACCESS_CODE');
                       setAccessCode('999999');
                     }}
-                    className="px-2 py-0.5 rounded border border-slate-300 dark:border-slate-700 text-xs font-bold hover:text-emerald-600"
+                    className="px-2 py-0.5 rounded border border-slate-300 dark:border-slate-700 text-xs font-bold hover:text-emerald-600 cursor-pointer"
                   >
                     2. Lấy (999999)
                   </button>
@@ -758,8 +875,9 @@ export default function KioskPage() {
                       setStep('AUTH');
                       setAuthMethod('ACCESS_CODE');
                       setAccessCode('777777');
+                      handleProcessCredential('ACCESS_CODE', '777777');
                     }}
-                    className="px-2 py-0.5 rounded border border-slate-300 dark:border-slate-700 text-xs font-bold hover:text-amber-500"
+                    className="px-2 py-0.5 rounded border border-amber-400 bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs font-bold hover:text-amber-500 cursor-pointer"
                   >
                     3. Quá hạn (777777)
                   </button>
@@ -772,17 +890,17 @@ export default function KioskPage() {
 
             </div>
 
-            {/* Right 5 Columns: 3D Locker Tower (Neat, proportional, fits frame) */}
+            {/* Right 5 Columns: 3D Locker Tower */}
             <div className={`lg:col-span-5 border rounded-2xl relative transition-all flex flex-col overflow-hidden h-full ${
               outdoorMode
                 ? 'bg-white border-slate-200 shadow-sm text-slate-900'
                 : 'bg-[#131b28] border-slate-800 shadow-lg text-slate-100'
             }`}>
-              <Locker3DCanvas 
-                doorState="CLOSED" 
+              <Locker3DCanvas
+                doorState="CLOSED"
                 outdoorMode={outdoorMode}
                 lang={lang}
-                className="w-full h-full flex flex-col justify-between" 
+                className="w-full h-full flex flex-col justify-between"
               />
             </div>
 
@@ -798,7 +916,7 @@ export default function KioskPage() {
               ? 'bg-white border-slate-200 text-slate-900'
               : 'bg-[#131b28] border-slate-800 text-slate-100'
           }`}>
-            
+
             {/* Header */}
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
               <button
@@ -811,11 +929,11 @@ export default function KioskPage() {
               >
                 ← {t.cancel}
               </button>
-              
+
               <span className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
                 {opMode === 'CHECK_IN' ? t.depositTitle : t.retrieveTitle}
               </span>
-              
+
               <div className="w-12"></div>
             </div>
 
@@ -829,7 +947,7 @@ export default function KioskPage() {
                   setAuthMethod('QR');
                 }}
                 className={`py-2 rounded-lg font-bold text-xs uppercase tracking-wider transition-all ${
-                  authMethod === 'QR' 
+                  authMethod === 'QR'
                     ? (outdoorMode ? 'bg-sky-600 text-white shadow-sm' : 'bg-sky-500 text-slate-950 font-black')
                     : 'text-slate-600 dark:text-slate-400'
                 }`}
@@ -842,7 +960,7 @@ export default function KioskPage() {
                   setAuthMethod('ACCESS_CODE');
                 }}
                 className={`py-2 rounded-lg font-bold text-xs uppercase tracking-wider transition-all ${
-                  authMethod === 'ACCESS_CODE' 
+                  authMethod === 'ACCESS_CODE'
                     ? (outdoorMode ? 'bg-sky-600 text-white shadow-sm' : 'bg-sky-500 text-slate-950 font-black')
                     : 'text-slate-600 dark:text-slate-400'
                 }`}
@@ -858,7 +976,7 @@ export default function KioskPage() {
                   outdoorMode ? 'bg-slate-900 border-slate-300' : 'bg-black border-slate-800'
                 }`}>
                   <div id="kiosk-qr-reader" className="w-full h-full"></div>
-                  
+
                   <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                     <QrScannerReticle className="w-48 h-48" />
                   </div>
@@ -899,7 +1017,7 @@ export default function KioskPage() {
                       <div
                         key={idx}
                         className={`w-7 h-9 rounded-lg flex items-center justify-center font-bold text-base transition-all ${
-                          char 
+                          char
                             ? (outdoorMode ? 'border-2 border-sky-600 text-sky-800 bg-white shadow-sm' : 'border-2 border-sky-400 text-sky-300 bg-slate-800')
                             : (outdoorMode ? 'border border-slate-300 text-slate-400 bg-white' : 'border border-slate-800 text-slate-700 bg-slate-900')
                         }`}
@@ -944,28 +1062,41 @@ export default function KioskPage() {
             )}
 
             {/* Quick Test Presets inside Auth */}
-            <div className="pt-3 mt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[11px]">
+            <div className="pt-3 mt-3 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-[11px]">
               <span className="text-slate-500">Mã kiểm tra:</span>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-1.5">
                 <button
                   type="button"
                   onClick={() => {
+                    setOpMode('CHECK_IN');
                     setAccessCode('888888');
                     handleProcessCredential('ACCESS_CODE', '888888');
                   }}
-                  className="px-2 py-1 rounded bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-300/40 font-mono font-bold"
+                  className="px-2 py-1 rounded bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-300/40 font-mono font-bold cursor-pointer"
                 >
                   Check-In 888888
                 </button>
                 <button
                   type="button"
                   onClick={() => {
+                    setOpMode('CHECK_OUT');
                     setAccessCode('999999');
                     handleProcessCredential('ACCESS_CODE', '999999');
                   }}
-                  className="px-2 py-1 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-300/40 font-mono font-bold"
+                  className="px-2 py-1 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-300/40 font-mono font-bold cursor-pointer"
                 >
                   Check-Out 999999
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpMode('CHECK_OUT');
+                    setAccessCode('777777');
+                    handleProcessCredential('ACCESS_CODE', '777777');
+                  }}
+                  className="px-2 py-1 rounded bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-400/50 font-mono font-bold cursor-pointer"
+                >
+                  Overdue 777777
                 </button>
               </div>
             </div>
@@ -982,12 +1113,12 @@ export default function KioskPage() {
               ? 'bg-white border-sky-600 text-slate-900'
               : 'bg-[#131b28] border-sky-500/50 text-slate-100'
           }`}>
-            
+
             {/* Left 6 Columns: 3D Model with Door Physically Open */}
             <div className={`md:col-span-6 rounded-2xl border p-2 relative min-h-[280px] max-h-[340px] flex items-center justify-center ${
               outdoorMode ? 'bg-slate-50 border-slate-200' : 'bg-slate-900 border-slate-800'
             }`}>
-              <Locker3DCanvas 
+              <Locker3DCanvas
                 activeLockerCode={activeLockerCode}
                 doorState={activeDoorState}
                 outdoorMode={outdoorMode}
@@ -998,7 +1129,7 @@ export default function KioskPage() {
 
             {/* Right 6 Columns: Status Details */}
             <div className="md:col-span-6 space-y-4">
-              
+
               <div className="flex justify-between items-center text-xs font-mono border-b pb-2 border-slate-200 dark:border-slate-800">
                 <span>ĐƠN: {activeBookingCode}</span>
                 <span className="font-bold">CỠ: {activeLockerSize || 'S'}</span>
@@ -1052,34 +1183,102 @@ export default function KioskPage() {
         )}
 
         {/* =========================================================================
-            STATE 4: OVERDUE FEE
+            STATE 4: OVERDUE FEE PAYMENT AT KIOSK
            ========================================================================= */}
         {step === 'OVERDUE' && (
-          <div className={`w-full max-w-md border-2 rounded-3xl p-6 text-center space-y-4 my-auto ${
+          <div className={`w-full max-w-2xl border-2 rounded-3xl p-5 md:p-6 my-auto transition-all ${
             outdoorMode
               ? 'bg-white border-amber-500 text-slate-900 shadow-xl'
-              : 'bg-[#131b28] border-amber-500/50 text-white shadow-2xl'
+              : 'bg-[#131b28] border-amber-500/60 text-white shadow-2xl'
           }`}>
-            <span className="text-xs font-mono font-bold text-amber-600 dark:text-amber-400 uppercase">
-              {t.overdueTitle}
-            </span>
-            <div className={`p-4 rounded-xl border ${
-              outdoorMode ? 'bg-amber-50 border-amber-200' : 'bg-slate-900 border-slate-800'
-            }`}>
-              <span className="text-xs text-slate-500 block mb-1">PHỤ PHÍ PHÁT SINH</span>
-              <span className="text-3xl font-black text-amber-600 dark:text-amber-400 font-mono">
-                {overdueFee.toLocaleString('vi-VN')} đ
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3 mb-4">
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-500 text-slate-950 text-[10px] font-black uppercase tracking-wider">
+                  OVERDUE SURCHARGE SETTLEMENT
+                </span>
+                <span className="text-xs font-mono font-bold text-amber-600 dark:text-amber-400 uppercase">
+                  {t.overdueTitle}
+                </span>
+              </div>
+              <span className="text-xs font-mono font-bold text-slate-500">
+                #{activeBookingCode} • Bay {activeLockerCode || 'S-01'}
               </span>
             </div>
-            <p className="text-xs text-slate-600 dark:text-slate-400">
-              {t.overdueSubtitle}
-            </p>
-            <button
-              onClick={() => setStep('IDLE')}
-              className="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white uppercase"
-            >
-              {t.close}
-            </button>
+
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+              {/* Left 5 cols: VietQR Scanner Box */}
+              <div className={`md:col-span-5 flex flex-col items-center justify-center p-4 rounded-2xl border ${
+                outdoorMode ? 'bg-slate-50 border-slate-200' : 'bg-slate-900 border-slate-800'
+              }`}>
+                <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 mb-2 uppercase tracking-wider">
+                  Scan VietQR to Unlock
+                </span>
+                <div className="bg-white p-3 rounded-2xl border-2 border-amber-400 shadow-sm">
+                  <QRCodeSVG
+                    value={overdueQrCode || `OVERDUE-${activeBookingCode}-${overdueFee}`}
+                    size={160}
+                    level="M"
+                  />
+                </div>
+                {overdueAccountNumber && (
+                  <div className="mt-2 text-center text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                    <div>{overdueAccountName || 'SMARTLOCKER PAYOS'}</div>
+                    <div className="font-bold text-slate-800 dark:text-slate-200">ACC: {overdueAccountNumber}</div>
+                  </div>
+                )}
+              </div>
+
+              {/* Right 7 cols: Overdue Breakdown & Instant Actions */}
+              <div className="md:col-span-7 space-y-3.5 text-left">
+                <div className={`p-3.5 rounded-2xl border space-y-2 text-xs ${
+                  outdoorMode ? 'bg-amber-50/80 border-amber-200' : 'bg-slate-900/90 border-slate-800'
+                }`}>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Locked Compartment:</span>
+                    <span className="font-mono font-bold">Bay {activeLockerCode || 'S-01'} (Size {activeLockerSize || 'S'})</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Overdue Duration:</span>
+                    <span className="font-bold text-amber-600 dark:text-amber-400">
+                      {overdueHours}h × {overdueFeePerHour.toLocaleString('en-US')} VND/hr
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center pt-2 border-t border-amber-200/60 dark:border-slate-800">
+                    <span className="font-bold uppercase text-slate-700 dark:text-slate-300">Total Overdue Fee:</span>
+                    <span className="text-2xl font-black text-amber-600 dark:text-amber-400 font-mono">
+                      {overdueFee.toLocaleString('en-US')} VND
+                    </span>
+                  </div>
+                </div>
+
+                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Scan the VietQR code with any Banking App. Compartment <strong>{activeLockerCode || 'S-01'}</strong> will pop open automatically upon payment confirmation!
+                </p>
+
+                <div className="space-y-2 pt-1">
+                  <button
+                    onClick={handleConfirmOverdueOnKiosk}
+                    disabled={overdueProcessing}
+                    className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black uppercase tracking-wider shadow-md transition-all cursor-pointer active:scale-95 disabled:opacity-60"
+                  >
+                    {overdueProcessing
+                      ? 'VERIFYING PAYMENT & UNLOCKING...'
+                      : '✓ CONFIRM PAYMENT & UNLOCK NOW'}
+                  </button>
+
+                  <button
+                    onClick={() => setStep('IDLE')}
+                    className={`w-full py-2.5 rounded-xl text-xs font-bold uppercase transition-colors cursor-pointer ${
+                      outdoorMode
+                        ? 'bg-slate-200 hover:bg-slate-300 text-slate-700'
+                        : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+                    }`}
+                  >
+                    ← {t.close}
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
