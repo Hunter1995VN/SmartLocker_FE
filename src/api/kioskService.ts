@@ -51,6 +51,9 @@ export interface KioskOverduePaymentRequest {
   bookingId?: string;
   bookingCode?: string;
   stationId?: string;
+  credentialType?: 'QR' | 'ACCESS_CODE';
+  payload?: string;
+  sessionToken?: string;
 }
 
 export interface KioskOverduePaymentResponse {
