@@ -311,13 +311,12 @@ export default function KioskPage() {
     operationStartedRef.current = Date.now();
     credentialRef.current = { credentialType: type, payload: rawValue };
     const targetStationId = stationId;
-    if (!allStations.some(station => station.id === targetStationId)) {
+    // The discovery list loads independently. It is not an authorization source;
+    // the kiosk API verifies the exact station, booking and live device mapping.
+    if (!targetStationId) {
       submittingRef.current = false;
       setErrorMessage(x('networkError'));
       return;
-    }
-    if (!stationId) {
-      setStationId(targetStationId);
     }
 
     setLoading(true);
