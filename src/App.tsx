@@ -20,7 +20,23 @@ import AdminPortalPage from './pages/admin/AdminPortalPage';
 import KioskPage from './pages/kiosk/KioskPage';
 
 /** Các trang có trong hệ thống */
-type Page = 'home' | 'login' | 'register' | 'verify-otp' | 'forgot-password' | 'dashboard' | 'map' | 'find-station' | 'station-booking' | 'booking-payment' | 'booking-detail' | 'my-bookings' | 'admin-login' | 'admin' | 'kiosk';
+type Page =
+    | 'home'
+    | 'login'
+    | 'register'
+    | 'verify-otp'
+    | 'forgot-password'
+    | 'dashboard'
+    | 'map'
+    | 'find-station'
+    | 'station-detail'
+    | 'station-booking'
+    | 'booking-payment'
+    | 'booking-detail'
+    | 'my-bookings'
+    | 'admin-login'
+    | 'admin'
+    | 'kiosk';
 
 /** Dữ liệu truyền giữa các trang (ví dụ email khi chuyển register → verify-otp) */
 interface PageData {
@@ -52,6 +68,7 @@ const pathToPage = (pathname: string): Page => {
         case 'dashboard': return 'dashboard';
         case 'map': return 'map';
         case 'find-station': return 'find-station';
+        case 'station-detail': return 'station-booking';
         case 'station-booking': return 'station-booking';
         case 'booking-payment': return 'booking-payment';
         case 'booking-detail': return 'booking-detail';
@@ -259,10 +276,10 @@ function App() {
                 />
             )}
 
-            {currentPage === 'station-booking' && (
+            {(currentPage === 'station-booking' || currentPage === 'station-detail') && (
                 <StationBookingPage
                     onNavigate={(mode, data) => navigateTo(mode as Page, data)}
-                    stationId={pageData.stationId || pageData.bookingData?.stationId}
+                    stationId={pageData.stationId || pageData.bookingData?.stationId || pageData.bookingData?.station?.id}
                     initialBookingData={pageData.bookingData}
                 />
             )}
@@ -307,7 +324,12 @@ function App() {
                     onLogout={handleLogout}
                     onNavigateDashboard={() => navigateTo('dashboard')}
                     onNavigateHistory={() => navigateTo('my-bookings')}
-                    onNavigateBooking={(stationId, initialData) => navigateTo('station-booking', { stationId, bookingData: initialData })}
+                    onNavigateStationDetail={(stationId, station) =>
+                        navigateTo('station-booking', { stationId, bookingData: { stationId, station } })
+                    }
+                    onNavigateBooking={(stationId, initialData) =>
+                        navigateTo('station-booking', { stationId, bookingData: { ...initialData, stationId } })
+                    }
                 />
             )}
 
@@ -319,4 +341,3 @@ function App() {
 }
 
 export default App;
-

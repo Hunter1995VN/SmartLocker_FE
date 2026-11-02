@@ -35,6 +35,9 @@ interface BookingPaymentPageProps {
     dropOffDate?: string;
     dropOffTime?: string;
     storageDate?: string;
+    originalAmount?: number;
+    discountAmount?: number;
+    voucherCode?: string;
     amount?: number;
     paymentUrl?: string;
     bookingId?: string;
@@ -51,12 +54,19 @@ interface BookingPaymentPageProps {
 const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, bookingData }) => {
   // Lấy thông tin user đăng nhập nếu có
   const savedUser = JSON.parse(localStorage.getItem('smartlocker_user') || '{}');
+  const [liveBooking, setLiveBooking] = useState<any>(null);
 
-  const stationName = bookingData?.stationName || 'Trạm Sân Bay Đà Nẵng (Ga T1)';
-  const stationAddress = bookingData?.stationAddress || 'Cửa 3, Sảnh đến A2, Sân bay Quốc tế Đà Nẵng (DAD)';
-  const size = bookingData?.size || 'M';
-  const duration = bookingData?.duration || 3;
-  const amount = bookingData?.amount || 75000;
+  const searchParamsInit = new URLSearchParams(window.location.search);
+  const effectiveBookingId = bookingData?.bookingId || searchParamsInit.get('bookingId') || undefined;
+
+  const stationName = bookingData?.stationName || liveBooking?.stationName || 'SmartLocker Station';
+  const stationAddress = bookingData?.stationAddress || liveBooking?.stationAddress || '';
+  const size = bookingData?.size || liveBooking?.size || 'M';
+  const duration = bookingData?.duration || liveBooking?.durationHours || 3;
+  const amount = bookingData?.amount || liveBooking?.baseAmount || 45000;
+  const discountAmount = bookingData?.discountAmount || 0;
+  const originalAmount = bookingData?.originalAmount || (discountAmount > 0 ? amount + discountAmount : amount);
+  const voucherCode = bookingData?.voucherCode;
   const storageDate = bookingData?.storageDate || 'Hôm nay';
   const dropOffTime = bookingData?.dropOffTime || '14:00';
 
@@ -161,32 +171,40 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
   // Trạng thái kiểm tra thủ công
   const [isCheckingStatus, setIsCheckingStatus] = useState<boolean>(false);
 
-  // Polling tự động kiểm tra trạng thái thanh toán mỗi 5 giây
+  // Polling tự động kiểm tra trạng thái thanh toán mỗi 1.5 giây
   useEffect(() => {
-    if (!bookingData?.bookingId) return;
+    if (!effectiveBookingId) return;
 
-    const interval = setInterval(async () => {
+    const checkOnce = async () => {
       try {
-        const res = await getBookingById(bookingData.bookingId!);
+        const res = await getBookingById(effectiveBookingId);
         if (res.success && res.data) {
+          setLiveBooking(res.data);
           if (res.data.status === 'CONFIRMED' || res.data.status === 'STORED' || res.data.status === 'CHECKED_IN') {
-            clearInterval(interval);
             setSuccessData({
               lockerCode: res.data.lockerCode || null,
               accessCode: res.data.accessCode || res.data.passcode || ''
             });
             setShowSuccessModal(true);
+            return true;
           } else if (res.data.status !== 'PENDING_PAYMENT') {
-            clearInterval(interval);
+            return true;
           }
         }
       } catch (error) {
         console.error('Polling payment error:', error);
       }
+      return false;
+    };
+
+    checkOnce();
+    const interval = setInterval(async () => {
+      const done = await checkOnce();
+      if (done) clearInterval(interval);
     }, 1500);
 
     return () => clearInterval(interval);
-  }, [bookingData?.bookingId]);
+  }, [effectiveBookingId]);
 
   // Lấy orderCode dạng số từ bookingData hoặc URL param nếu có
   const searchParams = new URLSearchParams(window.location.search);
@@ -404,8 +422,25 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                 <div className="pt-2 border-t border-slate-100 space-y-2">
                   <div className="flex justify-between items-center text-xs text-slate-600">
                     <span>Phí thuê tủ ({duration} giờ)</span>
-                    <span className="font-mono font-medium text-slate-900">{formatCurrency(amount)} ₫</span>
+                    <span className="font-mono font-medium text-slate-900">
+                      {formatCurrency(originalAmount)} ₫
+                    </span>
                   </div>
+                  {discountAmount > 0 && (
+                    <div className="flex justify-between items-center text-xs text-emerald-700 font-semibold">
+                      <span className="flex items-center gap-1.5">
+                        Voucher giảm giá
+                        {voucherCode && (
+                          <span className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-1.5 py-0.5 rounded font-mono text-[10px] font-bold">
+                            {voucherCode}
+                          </span>
+                        )}
+                      </span>
+                      <span className="font-mono font-bold text-emerald-600">
+                        -{formatCurrency(discountAmount)} ₫
+                      </span>
+                    </div>
+                  )}
                   <div className="flex justify-between items-center text-xs text-slate-600">
                     <span className="flex items-center gap-1.5">
                       Bảo hiểm an toàn hành lý
