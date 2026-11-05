@@ -3,6 +3,7 @@ import KioskQrScanner from '../../components/kiosk/KioskQrScanner';
 import { kioskApi } from '../../api/kioskService';
 import type { KioskStationStatus } from '../../api/kioskService';
 import { kioskSignalR } from '../../services/kioskSignalR';
+import WalkInBooking from '../../components/kiosk/WalkInBooking';
 import SensorPhotoConfirmation from '../../components/kiosk/SensorPhotoConfirmation';
 import KioskLockerStatus from '../../components/kiosk/KioskLockerStatus';
 import { sounds } from '../../utils/soundEffects';
@@ -22,7 +23,7 @@ import {
   type KioskLanguage
 } from '../../utils/kioskI18n';
 
-type KioskStep = 'WELCOME' | 'IDLE' | 'AUTH' | 'LOCKER_ACTIVE' | 'OVERDUE' | 'SUCCESS' | 'REVIEW_PENDING';
+type KioskStep = 'WELCOME' | 'IDLE' | 'AUTH' | 'LOCKER_ACTIVE' | 'OVERDUE' | 'SUCCESS' | 'REVIEW_PENDING' | 'WALK_IN';
 type OperationMode = 'CHECK_IN' | 'CHECK_OUT';
 type AuthMethod = 'QR' | 'ACCESS_CODE';
 
@@ -33,6 +34,7 @@ export default function KioskPage() {
   const [authMethod, setAuthMethod] = useState<AuthMethod>('QR');
   const [accessCode, setAccessCode] = useState<string>('');
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
+  const [walkInPin, setWalkInPin] = useState('');
   const [lang, setLang] = useState<KioskLanguage>('VI');
   const x = kioskText(lang);
 
@@ -251,6 +253,7 @@ export default function KioskPage() {
     observedOpenRef.current = false;
     activeLockerIdRef.current = '';
     activeLockerCodeRef.current = '';
+    setWalkInPin('');
     setLang('VI');
     setStep('WELCOME');
     setAccessCode('');
@@ -525,6 +528,10 @@ export default function KioskPage() {
           2. MAIN VIEWPORT WORKSPACE (STRICTLY FITS 100VH WITHOUT SCROLLBAR)
          ========================================================================= */}
       <main className="flex-1 min-h-0 flex flex-col items-center justify-center p-3 md:p-5 max-w-6xl mx-auto w-full z-10 overflow-hidden">
+        {step === 'IDLE' && <button type="button" className="mb-4 rounded-xl bg-blue-700 px-8 py-4 font-bold text-white" disabled={!stationStatus || loading} onClick={() => { setOpMode('CHECK_IN'); setStep('WALK_IN'); }}>{x('book')}</button>}
+        {step === 'WALK_IN' && <div className="w-full overflow-y-auto"><WalkInBooking lang={lang} stationId={stationId} onCancel={handleReturnToWelcome} onReady={async pin => { setWalkInPin(pin); await handleProcessCredential('ACCESS_CODE', pin); }}/></div>}
+        {walkInPin && step === 'LOCKER_ACTIVE' && <section className="rounded-xl bg-blue-50 p-3 text-center text-slate-900"><p>{x('savePin')}</p><strong className="text-2xl font-mono">{walkInPin.slice(0,4)} {walkInPin.slice(4)}</strong></section>}
+
 
         {/* Error Alert Banner */}
         {errorMessage && (
@@ -1086,7 +1093,7 @@ export default function KioskPage() {
          ========================================================================= */}
       {showSensorModal && opMode === 'CHECK_OUT' && sessionTokenRef.current && <SensorPhotoConfirmation
         lang={lang} stationId={stationId} bookingId={activeBookingId} lockerId={activeLockerId} sessionToken={sessionTokenRef.current}
-        onClose={() => setShowSensorModal(false)} onSubmitted={() => { setShowSensorModal(false); setStep('REVIEW_PENDING'); }}/>} 
+        onClose={() => setShowSensorModal(false)} onSubmitted={() => { setShowSensorModal(false); setStep('REVIEW_PENDING'); }}/>}
 
       {/* Attendant Help Modal */}
       {showHelpModal && (

@@ -1,6 +1,8 @@
 import type { KioskLanguage } from './kioskI18n';
 
 const messages = {
+  quoteLabel: ['Tiền thuê dự kiến', 'Estimated rental price', '利用料金の見積もり', '예상 이용 요금', '预计租金'],
+  sizeUnavailable: ['Size đã chọn chưa có ngăn đủ điều kiện sử dụng.', 'No eligible compartment for the selected size.', '選択したサイズは利用できません。', '선택한 크기의 이용 가능한 칸이 없습니다.', '所选尺寸暂无可用柜位。'],
   capturePhoto: ['Chụp ảnh', 'Take photo', '撮影', '사진 촬영', '拍照'],
   retakePhoto: ['Chụp lại', 'Retake', '撮り直す', '다시 촬영', '重拍'],
   photoPreview: ['Ảnh ngăn tủ để staff xác minh', 'Locker photo for staff verification', '確認用ロッカー写真', '직원 확인용 보관함 사진', '供工作人员核实的柜位照片'],
