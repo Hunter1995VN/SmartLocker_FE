@@ -523,8 +523,7 @@ export default function KioskPage() {
           2. MAIN VIEWPORT WORKSPACE (STRICTLY FITS 100VH WITHOUT SCROLLBAR)
          ========================================================================= */}
       <main className="flex-1 min-h-0 flex flex-col items-center justify-center p-3 md:p-5 max-w-6xl mx-auto w-full z-10 overflow-hidden">
-        {step === 'IDLE' && <button type="button" className="mb-4 rounded-xl bg-blue-700 px-8 py-4 font-bold text-white" disabled={!stationStatus || loading} onClick={() => { setOpMode('CHECK_IN'); setStep('WALK_IN'); }}>{x('book')}</button>}
-        {step === 'WALK_IN' && <div className="w-full overflow-y-auto"><WalkInBooking lang={lang} stationId={stationId} onCancel={handleReturnToWelcome} onReady={async pin => { setWalkInPin(pin); await handleProcessCredential('ACCESS_CODE', pin); }}/></div>}
+                {step === 'WALK_IN' && <div className="w-full overflow-y-auto"><WalkInBooking lang={lang} stationId={stationId} onCancel={handleReturnToWelcome} onReady={async pin => { setWalkInPin(pin); await handleProcessCredential('ACCESS_CODE', pin); }}/></div>}
         {walkInPin && step === 'LOCKER_ACTIVE' && <section className="rounded-xl bg-blue-50 p-3 text-center text-slate-900"><p>{x('savePin')}</p><strong className="text-2xl font-mono">{walkInPin.slice(0,4)} {walkInPin.slice(4)}</strong></section>}
 
 
@@ -549,7 +548,7 @@ export default function KioskPage() {
                 <span>•</span>
                 <span className="text-emerald-600 dark:text-emerald-400 font-bold">{x('selfService')}</span>
               </div>
-              <h1 className="text-3xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
+              <h1 className={`text-3xl md:text-5xl font-black tracking-tight ${outdoorMode ? 'text-slate-900' : 'text-white'}`}>
                 {t.welcomeTitle}
               </h1>
               <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
@@ -580,7 +579,7 @@ export default function KioskPage() {
                       {item.flag}
                     </span>
                     <div>
-                      <div className="text-sm font-black text-slate-900 dark:text-white">
+                      <div className={`text-sm font-black ${outdoorMode ? 'text-slate-900' : 'text-white'}`}>
                         {item.nativeName}
                       </div>
                       <div className="text-[11px] text-slate-500 dark:text-slate-400">
@@ -618,7 +617,7 @@ export default function KioskPage() {
                     {stationStatus?.stationName || x('stationUnavailable')}
                   </span>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 dark:text-white uppercase leading-tight">
+                <h2 className={`text-2xl md:text-3xl font-black tracking-tight uppercase leading-tight ${outdoorMode ? 'text-slate-900' : 'text-white'}`}>
                   {x('chooseAction')}
                 </h2>
                 <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 mt-1">
@@ -654,7 +653,7 @@ export default function KioskPage() {
                   </div>
 
                   <div className="my-auto py-3">
-                    <h3 className="text-2xl md:text-3xl font-black text-slate-950 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors uppercase tracking-tight">
+                    <h3 className={`text-2xl md:text-3xl font-black group-hover:text-sky-600 transition-colors uppercase tracking-tight ${outdoorMode ? 'text-slate-950' : 'text-white'}`}>
                       {t.depositTitle}
                     </h3>
                     <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
@@ -693,7 +692,7 @@ export default function KioskPage() {
                   </div>
 
                   <div className="my-auto py-3">
-                    <h3 className="text-2xl md:text-3xl font-black text-slate-950 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors uppercase tracking-tight">
+                    <h3 className={`text-2xl md:text-3xl font-black group-hover:text-emerald-600 transition-colors uppercase tracking-tight ${outdoorMode ? 'text-slate-950' : 'text-white'}`}>
                       {t.retrieveTitle}
                     </h3>
                     <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">

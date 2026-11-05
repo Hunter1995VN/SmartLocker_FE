@@ -18,6 +18,7 @@ import ProfilePage from './pages/ProfilePage';
 import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminPortalPage from './pages/admin/AdminPortalPage';
 import KioskPage from './pages/kiosk/KioskPage';
+import WalkInTabletPage from './pages/kiosk/WalkInTabletPage';
 
 /** Các trang có trong hệ thống */
 type Page =
@@ -37,7 +38,8 @@ type Page =
     | 'profile'
     | 'admin-login'
     | 'admin'
-    | 'kiosk';
+    | 'kiosk'
+    | 'walk-in';
 
 /** Dữ liệu truyền giữa các trang (ví dụ email khi chuyển register → verify-otp) */
 interface PageData {
@@ -77,6 +79,8 @@ const pathToPage = (pathname: string): Page => {
         case 'my-bookings': return 'my-bookings';
         case 'profile': return 'profile';
         case 'kiosk': return 'kiosk';
+        case 'walk-in': return 'walk-in';
+        case 'tablet': return 'walk-in';
         default: return 'home';
     }
 };
@@ -343,6 +347,10 @@ function App() {
 
             {currentPage === 'kiosk' && (
                 <KioskPage />
+            )}
+
+            {currentPage === 'walk-in' && (
+                <WalkInTabletPage />
             )}
         </>
     );
