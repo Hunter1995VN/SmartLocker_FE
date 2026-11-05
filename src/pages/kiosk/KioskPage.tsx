@@ -542,9 +542,9 @@ export default function KioskPage() {
 
         {/* Error Alert Banner */}
         {errorMessage && (
-          <div className="w-full max-w-xl mb-3 p-3 rounded-xl bg-rose-700 border border-rose-600 text-white flex items-center justify-between text-xs font-bold shadow-md">
-            <span>{errorMessage}</span>
-            <button onClick={() => setErrorMessage('')} className="px-2.5 py-1 bg-rose-900 rounded-lg text-xs">OK</button>
+          <div key={errorMessage} role="alert" className="kiosk-shake w-full max-w-xl mb-3 p-3 pl-4 rounded-2xl bg-rose-700 text-white flex items-center justify-between gap-3 text-sm font-semibold shadow-lg">
+            <span className="flex items-center gap-2"><span aria-hidden="true" className="grid place-items-center w-6 h-6 shrink-0 rounded-full bg-white/20 font-black">!</span>{errorMessage}</span>
+            <button onClick={() => setErrorMessage('')} className="px-3 py-1.5 bg-rose-900/70 hover:bg-rose-900 rounded-lg text-xs font-bold">OK</button>
           </div>
         )}
 
@@ -552,202 +552,83 @@ export default function KioskPage() {
             STATE 0: WELCOME & LANGUAGE SELECTION (BẮT BUỘC CHỌN NGÔN NGỮ ĐẦU TIÊN)
            ========================================================================= */}
         {step === 'WELCOME' && (
-          <div className="w-full max-w-3xl my-auto text-center space-y-6 animate-fade-in">
-
-            {/* Header Greeting */}
-            <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 bg-white/60 dark:bg-slate-900/60 shadow-sm">
-                <span>{stationStatus?.stationName || x('stationUnavailable')}</span>
-                <span>•</span>
-                <span className="text-emerald-600 dark:text-emerald-400 font-bold">{x('selfService')}</span>
-              </div>
-              <h1 className={`text-3xl md:text-5xl font-black tracking-tight ${outdoorMode ? 'text-slate-900' : 'text-white'}`}>
+          <div className="kiosk-enter w-full max-w-3xl my-auto text-center space-y-8">
+            <div className="space-y-3">
+              <h1 className={`text-4xl md:text-6xl font-black tracking-tight ${outdoorMode ? 'text-slate-900' : 'text-white'}`}>
                 {t.welcomeTitle}
               </h1>
-              <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
-                Welcome • 환영합니다 • 欢迎 • ようこそ
+              <p className="text-base md:text-lg text-slate-500 dark:text-slate-400" aria-hidden="true">
+                Welcome&ensp;환영합니다&ensp;欢迎&ensp;ようこそ
               </p>
             </div>
 
-            {/* Language Selection Grid */}
-            <div className={`p-6 rounded-3xl border shadow-lg ${
-              outdoorMode ? 'bg-white border-slate-200' : 'bg-[#131b28] border-slate-800'
-            }`}>
-              <div className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">
-                {t.selectLanguagePrompt}
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-                {SUPPORTED_LANGUAGES.map((item) => (
-                  <button
-                    key={item.code}
-                    onClick={() => handleSelectLanguage(item.code)}
-                    className={`group p-4 rounded-2xl border-2 transition-all flex flex-col items-center justify-center space-y-2 active:scale-95 text-center cursor-pointer ${
-                      outdoorMode
-                        ? 'bg-slate-50 hover:bg-sky-50 border-slate-200 hover:border-sky-500 shadow-sm'
-                        : 'bg-slate-900/80 hover:bg-slate-800 border-slate-800 hover:border-sky-400 shadow-md'
-                    }`}
-                  >
-                    <span className="text-3xl group-hover:scale-110 transition-transform">
-                      {item.flag}
-                    </span>
-                    <div>
-                      <div className={`text-sm font-black ${outdoorMode ? 'text-slate-900' : 'text-white'}`}>
-                        {item.nativeName}
-                      </div>
-                      <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                        {item.name}
-                      </div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Quick Demonstration Toolbar */}
-            <div className="flex items-center justify-center gap-2 pt-2 text-xs font-mono text-slate-500 dark:text-slate-400">
-
-
-
-            </div>
-
+            <nav aria-label={x('chooseLanguage')} className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+              {SUPPORTED_LANGUAGES.map((item, index) => (
+                <button
+                  key={item.code}
+                  lang={item.code.toLowerCase()}
+                  onClick={() => handleSelectLanguage(item.code)}
+                  style={{ animationDelay: `${120 + index * 50}ms` }}
+                  className={`kiosk-enter group h-24 md:h-28 rounded-2xl border-2 transition-all duration-200 flex items-center justify-center text-center cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-400/60 ${
+                    outdoorMode
+                      ? 'bg-white hover:bg-sky-50 border-slate-200 hover:border-sky-500 shadow-sm hover:shadow-md'
+                      : 'bg-slate-900/80 hover:bg-slate-800 border-slate-800 hover:border-sky-400'
+                  }`}
+                >
+                  <span className={`text-xl md:text-2xl font-black group-hover:scale-105 transition-transform ${outdoorMode ? 'text-slate-900' : 'text-white'}`}>
+                    {item.nativeName}
+                  </span>
+                </button>
+              ))}
+            </nav>
           </div>
         )}
 
-        {/* =========================================================================
-            STATE 1: IDLE WELCOME (HERO ACTIONS + NEAT 3D LOCKER TOWER)
-           ========================================================================= */}
         {step === 'IDLE' && (
-          <div className="w-full h-full max-h-[580px] grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch my-auto">
-
-            {/* Left 7 Columns: Tactile Action Cards (NO AI clutter, confident typography) */}
-            <div className="lg:col-span-7 flex flex-col justify-between space-y-4">
-
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className={`w-2 h-2 rounded-full ${stationStatus?.connectivityStatus === 'ONLINE' ? 'bg-emerald-500' : 'bg-amber-500'}`}></span>
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    {stationStatus?.stationName || x('stationUnavailable')}
+          <div className="kiosk-enter w-full h-full max-h-[580px] grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch my-auto">
+            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {([
+                { mode: 'CHECK_IN', title: t.depositTitle, Icon: CheckInIcon3D, tone: 'sky' },
+                { mode: 'CHECK_OUT', title: t.retrieveTitle, Icon: CheckOutIcon3D, tone: 'emerald' },
+              ] as const).map(({ mode, title, Icon, tone }, index) => (
+                <button
+                  key={mode}
+                  onClick={() => {
+                    if (soundEnabled) sounds.playKeypadTap();
+                    setOpMode(mode);
+                    setStep('AUTH');
+                    setErrorMessage('');
+                    setAuthMethod('QR');
+                  }}
+                  style={{ animationDelay: `${index * 80}ms` }}
+                  className={`kiosk-enter group relative overflow-hidden p-7 rounded-[28px] border-2 transition-all duration-200 flex flex-col items-start justify-center gap-8 text-left cursor-pointer max-h-[440px] active:scale-[0.98] hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-4 ${
+                    tone === 'sky'
+                      ? (outdoorMode ? 'bg-white border-slate-200 hover:border-sky-500 shadow-md hover:shadow-xl focus-visible:ring-sky-400/60' : 'bg-[#131b28] border-slate-800 hover:border-sky-500 focus-visible:ring-sky-400/40')
+                      : (outdoorMode ? 'bg-white border-slate-200 hover:border-emerald-500 shadow-md hover:shadow-xl focus-visible:ring-emerald-400/60' : 'bg-[#131b28] border-slate-800 hover:border-emerald-500 focus-visible:ring-emerald-400/40')
+                  }`}
+                >
+                  {/* Door seam: a thin handle bar that slides on hover, like pulling a locker door */}
+                  <span aria-hidden="true" className={`absolute right-6 top-1/2 -translate-y-1/2 h-16 w-1.5 rounded-full transition-transform duration-300 group-hover:translate-x-1 ${tone === 'sky' ? 'bg-sky-500/70' : 'bg-emerald-500/70'}`} />
+                  <span className={`p-3 rounded-2xl transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3 ${tone === 'sky' ? 'bg-sky-500/10' : 'bg-emerald-500/10'}`}>
+                    <Icon className="w-16 h-16" />
                   </span>
-                </div>
-                <h2 className={`text-2xl md:text-3xl font-black tracking-tight uppercase leading-tight ${outdoorMode ? 'text-slate-900' : 'text-white'}`}>
-                  {x('chooseAction')}
-                </h2>
-                <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 mt-1">
-                  {x('chooseHint')}
-                </p>
-              </div>
-
-              {/* The Two Dominant Tactile Action Cards (Entire cards are touch buttons) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
-
-                {/* 1. GỬI HÀNH LÝ / DEPOSIT - Full card is touch button */}
-                <button
-                  onClick={() => {
-                    if (soundEnabled) sounds.playKeypadTap();
-                    setOpMode('CHECK_IN');
-                    setStep('AUTH');
-                    setErrorMessage('');
-                  setAuthMethod('QR');
-                  }}
-                  className={`group relative p-6 rounded-3xl border-2 transition-all duration-200 flex flex-col justify-between active:scale-[0.98] text-left cursor-pointer shadow-lg hover:shadow-xl ${
-                    outdoorMode
-                      ? 'bg-white hover:bg-sky-50/60 border-slate-300 hover:border-sky-500 text-slate-900 ring-sky-500/10 hover:ring-4'
-                      : 'bg-[#131b28] hover:bg-[#162132] border-slate-800 hover:border-sky-500 text-white hover:ring-4 ring-sky-500/20'
-                  }`}
-                >
-                  <div className="flex justify-between items-start w-full">
-                    <div className="p-3 rounded-2xl bg-sky-500/10 border border-sky-500/20 group-hover:scale-105 transition-transform">
-                      <CheckInIcon3D className="w-14 h-14" />
-                    </div>
-                    <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-sky-500/10 text-sky-700 dark:text-sky-400 border border-sky-300/40">
-                      {t.depositTitle}
+                  <span className="space-y-1.5 pr-8">
+                    <span className={`block text-3xl md:text-4xl font-black tracking-tight transition-colors ${outdoorMode ? 'text-slate-950' : 'text-white'} ${tone === 'sky' ? 'group-hover:text-sky-600' : 'group-hover:text-emerald-600'}`}>
+                      {title}
                     </span>
-                  </div>
-
-                  <div className="my-auto py-3">
-                    <h3 className={`text-2xl md:text-3xl font-black group-hover:text-sky-600 transition-colors uppercase tracking-tight ${outdoorMode ? 'text-slate-950' : 'text-white'}`}>
-                      {t.depositTitle}
-                    </h3>
-                    <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-                      {t.depositDesc}
-                    </p>
-                  </div>
-
-                  <div className="pt-2 flex items-center justify-between border-t border-slate-200 dark:border-slate-800/80 w-full text-xs font-bold text-sky-600 dark:text-sky-400">
-                    <span>{x('depositTap')}</span>
-                    <span className="text-base group-hover:translate-x-1 transition-transform">→</span>
-                  </div>
+                    <span className="block text-sm text-slate-500 dark:text-slate-400">{x('authHint')}</span>
+                  </span>
                 </button>
-
-                {/* 2. LẤY HÀNH LÝ / RETRIEVE - Full card is touch button */}
-                <button
-                  onClick={() => {
-                    if (soundEnabled) sounds.playKeypadTap();
-                    setOpMode('CHECK_OUT');
-                    setStep('AUTH');
-                    setErrorMessage('');
-                  setAuthMethod('QR');
-                  }}
-                  className={`group relative p-6 rounded-3xl border-2 transition-all duration-200 flex flex-col justify-between active:scale-[0.98] text-left cursor-pointer shadow-lg hover:shadow-xl ${
-                    outdoorMode
-                      ? 'bg-white hover:bg-emerald-50/60 border-slate-300 hover:border-emerald-500 text-slate-900 ring-emerald-500/10 hover:ring-4'
-                      : 'bg-[#131b28] hover:bg-[#15232a] border-slate-800 hover:border-emerald-500 text-white hover:ring-4 ring-emerald-500/20'
-                  }`}
-                >
-                  <div className="flex justify-between items-start w-full">
-                    <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 group-hover:scale-105 transition-transform">
-                      <CheckOutIcon3D className="w-14 h-14" />
-                    </div>
-                    <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-300/40">
-                      {t.retrieveTitle}
-                    </span>
-                  </div>
-
-                  <div className="my-auto py-3">
-                    <h3 className={`text-2xl md:text-3xl font-black group-hover:text-emerald-600 transition-colors uppercase tracking-tight ${outdoorMode ? 'text-slate-950' : 'text-white'}`}>
-                      {t.retrieveTitle}
-                    </h3>
-                    <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-                      {t.retrieveDesc}
-                    </p>
-                  </div>
-
-                  <div className="pt-2 flex items-center justify-between border-t border-slate-200 dark:border-slate-800/80 w-full text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                    <span>{x('retrieveTap')}</span>
-                    <span className="text-base group-hover:translate-x-1 transition-transform">→</span>
-                  </div>
-                </button>
-
-              </div>
-
-              {/* Bottom Quick Presets & Status */}
-              <div className={`p-3 rounded-2xl border flex items-center justify-between text-xs ${
-                outdoorMode ? 'bg-white border-slate-200 text-slate-600' : 'bg-slate-900/60 border-slate-800 text-slate-400'
-              }`}>
-                <div className="flex items-center gap-2">
-
-
-
-
-                </div>
-
-                <div className="text-slate-500 text-xs font-mono">
-
-                </div>
-              </div>
-
+              ))}
             </div>
 
-            {/* Right 5 Columns: 3D Locker Tower (Neat, proportional, fits frame) */}
-            <div className={`lg:col-span-5 border rounded-2xl relative transition-all flex flex-col overflow-y-auto min-h-0 h-full ${
+            <div className={`kiosk-enter lg:col-span-5 border rounded-2xl relative flex flex-col overflow-y-auto min-h-0 h-full ${
               outdoorMode
                 ? 'bg-white border-slate-200 shadow-sm text-slate-900'
                 : 'bg-[#131b28] border-slate-800 shadow-lg text-slate-100'
-            }`}>
+            }`} style={{ animationDelay: '160ms' }}>
               <KioskLockerStatus status={stationStatus} lang={lang} activeLockerId={activeLockerId} />
             </div>
-
           </div>
         )}
 
@@ -755,75 +636,61 @@ export default function KioskPage() {
             STATE 2: AUTHENTICATION (SCANNER & VAULT KEYPAD)
            ========================================================================= */}
         {step === 'AUTH' && (
-          <div className={`w-full max-w-lg border-2 rounded-3xl p-6 shadow-xl relative transition-all my-auto ${
+          <div className={`kiosk-enter w-full max-w-lg border rounded-[28px] p-5 shadow-xl relative my-auto max-h-full overflow-y-auto ${
             outdoorMode
               ? 'bg-white border-slate-200 text-slate-900'
               : 'bg-[#131b28] border-slate-800 text-slate-100'
           }`}>
-
-            {/* Header */}
-            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
+            <div className="flex items-center gap-3 mb-5">
               <button
                 disabled={loading}
                 onClick={() => setStep('IDLE')}
-                className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition-colors ${
-                  outdoorMode
-                    ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700'
-                    : 'bg-slate-900 hover:bg-slate-800 border-slate-800 text-slate-300'
+                aria-label={t.cancel}
+                className={`w-10 h-10 grid place-items-center rounded-full text-lg font-bold transition-colors disabled:opacity-40 ${
+                  outdoorMode ? 'bg-slate-100 hover:bg-slate-200 text-slate-700' : 'bg-slate-900 hover:bg-slate-800 text-slate-300'
                 }`}
               >
-                ← {t.cancel}
+                ←
               </button>
-
-              <span className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
+              <h2 className={`text-xl font-black tracking-tight ${opMode === 'CHECK_IN' ? 'text-sky-700 dark:text-sky-400' : 'text-emerald-700 dark:text-emerald-400'}`}>
                 {opMode === 'CHECK_IN' ? t.depositTitle : t.retrieveTitle}
-              </span>
-
-              <div className="w-12"></div>
+              </h2>
             </div>
 
-            {/* Mode Switcher: QR or PIN */}
-            <div className={`grid grid-cols-2 gap-2 mb-4 p-1 rounded-xl border ${
-              outdoorMode ? 'bg-slate-100 border-slate-200' : 'bg-slate-900 border-slate-800'
-            }`}>
-              <button
-                onClick={() => {
-                  if (submittingRef.current) return;
-                  if (soundEnabled) sounds.playKeypadTap();
-                  setErrorMessage('');
-                  setAuthMethod('QR');
-                }}
-                className={`py-2 rounded-lg font-bold text-xs uppercase tracking-wider transition-all ${
-                  authMethod === 'QR'
-                    ? (outdoorMode ? 'bg-sky-600 text-white shadow-sm' : 'bg-sky-500 text-slate-950 font-black')
-                    : 'text-slate-600 dark:text-slate-400'
-                }`}
-              >
-                {t.scanQr}
-              </button>
-              <button
-                onClick={() => {
-                  if (submittingRef.current) return;
-                  if (soundEnabled) sounds.playKeypadTap();
-                  setErrorMessage('');
-                  setAuthMethod('ACCESS_CODE');
-                }}
-                className={`py-2 rounded-lg font-bold text-xs uppercase tracking-wider transition-all ${
-                  authMethod === 'ACCESS_CODE'
-                    ? (outdoorMode ? 'bg-sky-600 text-white shadow-sm' : 'bg-sky-500 text-slate-950 font-black')
-                    : 'text-slate-600 dark:text-slate-400'
-                }`}
-              >
-                {t.enterPin}
-              </button>
+            {/* QR / PIN switch with a sliding indicator */}
+            <div role="tablist" className={`relative grid grid-cols-2 mb-5 p-1 rounded-2xl ${outdoorMode ? 'bg-slate-100' : 'bg-slate-900'}`}>
+              <span aria-hidden="true" className={`absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-xl shadow-sm transition-transform duration-300 ease-out ${
+                outdoorMode ? 'bg-white' : 'bg-slate-700'
+              } ${authMethod === 'ACCESS_CODE' ? 'translate-x-full' : ''}`} />
+              {([['QR', t.scanQr], ['ACCESS_CODE', t.enterPin]] as const).map(([method, label]) => (
+                <button
+                  key={method}
+                  role="tab"
+                  aria-selected={authMethod === method}
+                  onClick={() => {
+                    if (submittingRef.current) return;
+                    if (soundEnabled) sounds.playKeypadTap();
+                    setErrorMessage('');
+                    setAuthMethod(method);
+                  }}
+                  className={`relative z-10 py-2.5 rounded-xl font-bold text-sm transition-colors ${
+                    authMethod === method ? (outdoorMode ? 'text-sky-700' : 'text-white') : 'text-slate-500 dark:text-slate-400'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
 
-            {/* TAB 1: SCANNER */}
             {authMethod === 'QR' && (
-              <div className="flex flex-col items-center space-y-3">
+              <div key="qr" className="kiosk-enter flex flex-col items-center gap-3">
                 <KioskQrScanner lang={lang} busy={loading} onDecoded={async value => { if (soundEnabled) sounds.playScanChime(); await handleProcessCredential('QR', value); }} />
 
-                <div className="w-full pt-2">
+                {/* Manual entry is for USB scanners and staff; kept out of the way */}
+                <details className="w-full group">
+                  <summary className="cursor-pointer list-none text-center text-xs font-semibold text-slate-500 hover:text-sky-600 select-none">
+                    {x('manualEntry')}
+                  </summary>
                   <input
                     type="text"
                     placeholder={t.qrPlaceholder}
@@ -831,10 +698,10 @@ export default function KioskPage() {
                     disabled={loading}
                     autoComplete="off"
                     spellCheck={false}
-                    className={`w-full rounded-xl px-4 py-2 text-xs font-mono focus:outline-none border ${
+                    className={`mt-2 w-full rounded-xl px-4 py-2 text-xs font-mono focus:outline-none border ${
                       outdoorMode
-                        ? 'bg-slate-50 border-slate-300 text-slate-900 focus:ring-1 focus:ring-sky-500'
-                        : 'bg-slate-900 border-slate-800 text-slate-200 focus:ring-1 focus:ring-sky-500'
+                        ? 'bg-slate-50 border-slate-300 text-slate-900 focus:ring-2 focus:ring-sky-500'
+                        : 'bg-slate-900 border-slate-800 text-slate-200 focus:ring-2 focus:ring-sky-500'
                     }`}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
@@ -847,49 +714,43 @@ export default function KioskPage() {
                       }
                     }}
                   />
-                </div>
+                </details>
               </div>
             )}
 
-            {/* TAB 2: NUMPAD */}
             {authMethod === 'ACCESS_CODE' && (
-              <div className="space-y-3">
-                {/* 8-Digit Display */}
-                <div className={`border rounded-xl py-2.5 px-4 flex items-center justify-center gap-1.5 font-mono ${
-                  outdoorMode ? 'bg-slate-50 border-slate-200' : 'bg-slate-900 border-slate-800'
-                }`}>
+              <div key="pin" className="kiosk-enter space-y-4">
+                <div className="flex items-center justify-center gap-1.5 font-mono" aria-live="polite" aria-label={`${accessCode.length}/8`}>
                   {Array.from({ length: 8 }).map((_, idx) => {
                     const char = accessCode[idx];
                     return (
                       <div
-                        key={idx}
-                        className={`w-7 h-9 rounded-lg flex items-center justify-center font-bold text-base transition-all ${
+                        key={`${idx}-${char ?? ''}`}
+                        className={`w-9 h-11 rounded-xl flex items-center justify-center font-black text-xl ${idx === 4 ? 'ml-2' : ''} ${
                           char
-                            ? (outdoorMode ? 'border-2 border-sky-600 text-sky-800 bg-white shadow-sm' : 'border-2 border-sky-400 text-sky-300 bg-slate-800')
-                            : (outdoorMode ? 'border border-slate-300 text-slate-400 bg-white' : 'border border-slate-800 text-slate-700 bg-slate-900')
+                            ? `kiosk-pop ${outdoorMode ? 'bg-sky-600 text-white' : 'bg-sky-500 text-slate-950'}`
+                            : (outdoorMode ? 'bg-slate-100 text-slate-300' : 'bg-slate-900 text-slate-700')
                         }`}
                       >
-                        {char || '•'}
+                        {char || '·'}
                       </div>
                     );
                   })}
                 </div>
 
-                {/* Tactile Keypad */}
                 <div className="grid grid-cols-3 gap-2 max-w-xs mx-auto">
                   {['1', '2', '3', '4', '5', '6', '7', '8', '9', 'CLEAR', '0', 'BACK'].map((key) => (
                     <button
                       key={key}
                       onClick={() => handleKeypadPress(key)}
-                      className={`h-12 rounded-xl font-mono font-bold text-lg active:translate-y-0.5 transition-all ${
-                        key === 'CLEAR'
-                          ? (outdoorMode ? 'bg-rose-100 border border-rose-300 text-rose-700 text-xs' : 'bg-rose-950/50 border border-rose-800 text-rose-300 text-xs')
-                          : key === 'BACK'
-                          ? (outdoorMode ? 'bg-amber-100 border border-amber-300 text-amber-800 text-sm' : 'bg-amber-950/50 border border-amber-800 text-amber-300 text-sm')
-                          : (outdoorMode ? 'bg-white border border-slate-300 text-slate-900 shadow-sm' : 'bg-slate-900 border border-slate-800 text-white shadow-sm')
+                      aria-label={key === 'CLEAR' ? 'Clear' : key === 'BACK' ? 'Backspace' : key}
+                      className={`h-14 rounded-2xl font-bold text-xl transition-all duration-100 active:scale-90 ${
+                        key === 'CLEAR' || key === 'BACK'
+                          ? (outdoorMode ? 'bg-slate-100 text-slate-500 text-base' : 'bg-slate-900 text-slate-400 text-base')
+                          : (outdoorMode ? 'bg-white border border-slate-200 text-slate-900 shadow-sm hover:bg-sky-50' : 'bg-slate-800 text-white hover:bg-slate-700')
                       }`}
                     >
-                      {key === 'CLEAR' ? 'CLR' : key === 'BACK' ? '⌫' : key}
+                      {key === 'CLEAR' ? 'C' : key === 'BACK' ? '⌫' : key}
                     </button>
                   ))}
                 </div>
@@ -897,9 +758,9 @@ export default function KioskPage() {
                 <button
                   disabled={accessCode.length !== 8 || loading}
                   onClick={() => handleProcessCredential('ACCESS_CODE', accessCode)}
-                  className={`w-full py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all ${
-                    accessCode.length >= 4 && !loading
-                      ? (outdoorMode ? 'bg-sky-600 hover:bg-sky-500 text-white shadow-sm' : 'bg-sky-500 hover:bg-sky-400 text-slate-950 font-black')
+                  className={`w-full py-4 rounded-2xl font-bold text-base transition-all ${
+                    accessCode.length === 8 && !loading
+                      ? (outdoorMode ? 'bg-sky-600 hover:bg-sky-500 text-white shadow-md' : 'bg-sky-500 hover:bg-sky-400 text-slate-950')
                       : 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
                   }`}
                 >
@@ -907,75 +768,57 @@ export default function KioskPage() {
                 </button>
               </div>
             )}
-
-            {/* Quick Test Presets inside Auth */}
-            <div className="pt-3 mt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[11px]">
-
-              <div className="flex gap-2">
-
-
-              </div>
-            </div>
-
           </div>
         )}
 
-        {/* =========================================================================
-            STATE 3: LOCKER ACTIVE (DOOR UNLOCKED)
-           ========================================================================= */}
         {step === 'LOCKER_ACTIVE' && (
-          <div className={`w-full max-w-3xl border-2 rounded-3xl p-6 shadow-xl grid grid-cols-1 md:grid-cols-12 gap-5 items-center my-auto ${
+          <div className={`kiosk-enter w-full max-w-3xl border rounded-[28px] p-6 shadow-xl grid grid-cols-1 md:grid-cols-2 gap-6 items-center my-auto ${
             outdoorMode
-              ? 'bg-white border-sky-600 text-slate-900'
-              : 'bg-[#131b28] border-sky-500/50 text-slate-100'
+              ? 'bg-white border-slate-200 text-slate-900'
+              : 'bg-[#131b28] border-slate-800 text-slate-100'
           }`}>
-
-            {/* Left 6 Columns: 3D Model with Door Physically Open */}
-            <div className={`md:col-span-6 rounded-2xl border p-2 relative min-h-[280px] max-h-[340px] flex items-center justify-center ${
-              outdoorMode ? 'bg-slate-50 border-slate-200' : 'bg-slate-900 border-slate-800'
+            {/* The door drawing follows the real sensor state only: it swings open on OPEN, shut otherwise */}
+            <div role="status" aria-label={x('status')} className={`relative rounded-3xl p-6 min-h-[260px] flex items-center justify-center overflow-hidden ${
+              outdoorMode ? 'bg-slate-100' : 'bg-slate-900'
             }`}>
-              <div role="status" aria-label={x('status')} className="text-center space-y-5">
-                <strong className="text-4xl">{activeLockerCode || '—'}</strong>
-                <p className="text-2xl">{activeDoorState}</p><p>{activeDoorState === 'OPEN' ? t.doorCloseInstruction : x('waitingDoor')}</p>
-              </div>
-            </div>
-
-            {/* Right 6 Columns: Status Details */}
-            <div className="md:col-span-6 space-y-4">
-
-              <div className="flex justify-between items-center text-xs font-mono border-b pb-2 border-slate-200 dark:border-slate-800">
-                <span>{x('order')}: {activeBookingCode}</span>
-                <span className="font-bold">{x('sizeLabel')}: {activeLockerSize || '—'}</span>
-              </div>
-
-              <div>
-                <span className="text-xs text-slate-500 uppercase tracking-wider block">
-                  {x('yourLocker')}
-                </span>
-                <span className="text-4xl md:text-5xl font-black font-mono text-sky-600 dark:text-sky-400">
-                  {activeLockerCode || '—'}
-                </span>
-              </div>
-
-              <div className={`p-3 rounded-xl border text-xs leading-relaxed ${
-                outdoorMode ? 'bg-slate-50 border-slate-200 text-slate-700' : 'bg-slate-900 border-slate-800 text-slate-300'
-              }`}>
-                {opMode === 'CHECK_IN' ? t.doorOpenedDepositDesc : t.doorOpenedRetrieveDesc}
-                <div className="font-bold text-emerald-600 dark:text-emerald-400 mt-1">
-                  {t.doorCloseInstruction}
+              <div className={`relative w-44 h-56 rounded-2xl border-4 ${outdoorMode ? 'border-slate-300 bg-slate-800' : 'border-slate-700 bg-black'}`}>
+                <div className="absolute inset-0 grid place-items-center">
+                  <span aria-hidden="true" className="w-24 h-24 rounded-full bg-sky-300/25 blur-2xl" />
+                </div>
+                <div className={`absolute inset-0 rounded-xl ${activeDoorState === 'OPEN' ? 'kiosk-door' : 'kiosk-door-closed'} ${
+                  opMode === 'CHECK_IN' ? 'bg-sky-600' : 'bg-emerald-600'
+                } shadow-2xl flex items-center justify-end pr-3`}>
+                  <span className="h-14 w-1.5 rounded-full bg-white/70" />
+                  <span className="absolute top-4 left-4 text-lg font-black font-mono text-white/90">{activeLockerCode || '—'}</span>
                 </div>
               </div>
+              <span className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold ${
+                activeDoorState === 'OPEN' ? 'bg-emerald-100 text-emerald-800' : activeDoorState === 'CLOSED' ? 'bg-slate-200 text-slate-700' : 'bg-amber-100 text-amber-800'
+              }`}>
+                {activeDoorState}
+              </span>
+            </div>
 
-              {/* Timer & Exception */}
-              <div className="flex justify-between items-center text-xs pt-1">
-                <span className="text-slate-500">
-                  {x('elapsed')}: <strong className="text-slate-900 dark:text-white font-mono">{doorTimerSeconds}s</strong>
-                </span>
+            <div className="space-y-5">
+              <div>
+                <span className="text-sm text-slate-500">{x('yourLocker')}</span>
+                <div className="flex items-baseline gap-3">
+                  <span className={`text-6xl font-black font-mono ${opMode === 'CHECK_IN' ? 'text-sky-600 dark:text-sky-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                    {activeLockerCode || '—'}
+                  </span>
+                  <span className="text-sm font-bold text-slate-500">{x('sizeLabel')} {activeLockerSize || '—'}</span>
+                </div>
+                <span className="text-xs font-mono text-slate-400">{activeBookingCode}</span>
+              </div>
+
+              <p className="text-lg font-bold leading-snug">
+                {activeDoorState === 'OPEN' ? t.doorCloseInstruction : x('waitingDoor')}
+              </p>
+
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-slate-500 font-mono tabular-nums">{doorTimerSeconds}s</span>
                 {doorTimerSeconds >= 30 && opMode === 'CHECK_OUT' && (
-                  <button
-                    onClick={() => setShowSensorModal(true)}
-                    className="text-amber-600 dark:text-amber-400 underline font-bold"
-                  >
+                  <button onClick={() => setShowSensorModal(true)} className="text-amber-600 dark:text-amber-400 underline font-bold">
                     {t.sensorAlertButton}
                   </button>
                 )}
@@ -983,45 +826,31 @@ export default function KioskPage() {
 
               <button
                 onClick={() => setShowHelpModal(true)}
-                className={`w-full py-3 rounded-xl text-xs font-bold uppercase transition-colors ${
-                  outdoorMode ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-slate-700 hover:bg-slate-600 text-white'
+                className={`w-full py-3 rounded-2xl text-sm font-bold transition-colors ${
+                  outdoorMode ? 'bg-slate-100 hover:bg-slate-200 text-slate-700' : 'bg-slate-800 hover:bg-slate-700 text-white'
                 }`}
               >
                 {x('staff')}
               </button>
-
             </div>
-
           </div>
         )}
 
-        {/* =========================================================================
-            STATE 4: OVERDUE FEE
-           ========================================================================= */}
         {step === 'OVERDUE' && (
-          <div className={`w-full max-w-md border-2 rounded-3xl p-6 text-center space-y-4 my-auto ${
-            outdoorMode
-              ? 'bg-white border-amber-500 text-slate-900 shadow-xl'
-              : 'bg-[#131b28] border-amber-500/50 text-white shadow-2xl'
+          <div className={`kiosk-enter w-full max-w-md border rounded-[28px] p-7 text-center space-y-5 my-auto shadow-xl ${
+            outdoorMode ? 'bg-white border-amber-300 text-slate-900' : 'bg-[#131b28] border-amber-500/50 text-white'
           }`}>
-            <span className="text-xs font-mono font-bold text-amber-600 dark:text-amber-400 uppercase">
-              {t.overdueTitle}
-            </span>
-            <div className={`p-4 rounded-xl border ${
-              outdoorMode ? 'bg-amber-50 border-amber-200' : 'bg-slate-900 border-slate-800'
-            }`}>
-              <span className="text-xs text-slate-500 block mb-1">{x('fee')}</span>
-              <span className="text-3xl font-black text-amber-600 dark:text-amber-400 font-mono">
-                {overdueFee.toLocaleString(kioskLocales[lang])} đ
-              </span>
+            <div>
+              <h2 className="text-lg font-black text-amber-700 dark:text-amber-400">{t.overdueTitle}</h2>
+              <p className="kiosk-pop mt-2 text-5xl font-black font-mono tabular-nums">
+                {overdueFee.toLocaleString(kioskLocales[lang])}<span className="text-2xl ml-1">đ</span>
+              </p>
             </div>
-            <p className="text-xs text-slate-600 dark:text-slate-400">
-              {t.overdueSubtitle}
-            </p>
-            {overduePayment ? <div className="space-y-3 flex flex-col items-center">
-              <QRCodeSVG value={overduePayment.qrCode || overduePayment.paymentUrl} size={210} />
-              <p className="text-xs">{overduePayment.qrCode ? x('scanPay') : x('paymentPageQr')}</p>
-            </div> : <button disabled={loading} className="rounded-xl bg-blue-700 text-white px-6 py-3" onClick={async () => {
+            <p className="text-sm text-slate-500 dark:text-slate-400">{t.overdueSubtitle}</p>
+            {overduePayment ? <div className="kiosk-enter space-y-3 flex flex-col items-center">
+              <div className="p-3 bg-white rounded-2xl border border-slate-200"><QRCodeSVG value={overduePayment.qrCode || overduePayment.paymentUrl} size={210} /></div>
+              <p className="text-sm">{overduePayment.qrCode ? x('scanPay') : x('paymentPageQr')}</p>
+            </div> : <button disabled={loading} className="w-full rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-4 disabled:opacity-60" onClick={async () => {
               if (loading || !activeBookingId) return; setLoading(true); setErrorMessage('');
               try {
                 const result = await kioskApi.payOverdue({ stationId, bookingId: activeBookingId, ...credentialRef.current, sessionToken: sessionTokenRef.current });
@@ -1033,57 +862,49 @@ export default function KioskPage() {
             }}>{loading ? x('sending') : x('payFee')}</button>}
             <button
               onClick={handleReturnToWelcome}
-              className="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white uppercase"
+              className="w-full py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-sm font-bold text-slate-700 dark:text-white"
             >
               {t.close}
             </button>
           </div>
         )}
 
-        {/* =========================================================================
-            STATE 5: SUCCESS (AUTO RESETS TO WELCOME / LANGUAGE SELECT SCREEN)
-           ========================================================================= */}
-        {step === 'REVIEW_PENDING' && <section className="rounded-2xl bg-white p-8 text-center text-slate-900"><h2 className="text-2xl font-bold">{x('pending')}</h2><p className="my-4">{x('pendingHint')}</p><button type="button" onClick={handleReturnToWelcome}>{x('home')}</button></section>}
+        {step === 'REVIEW_PENDING' && (
+          <section className={`kiosk-enter w-full max-w-md rounded-[28px] p-8 text-center space-y-4 my-auto shadow-xl ${outdoorMode ? 'bg-white text-slate-900' : 'bg-[#131b28] text-white'}`}>
+            <div className="mx-auto w-14 h-14 rounded-full border-4 border-amber-200 border-t-amber-500 animate-spin motion-reduce:animate-none" aria-hidden="true" />
+            <h2 className="text-2xl font-black">{x('pending')}</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{x('pendingHint')}</p>
+            <button type="button" onClick={handleReturnToWelcome} className="w-full py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-sm font-bold">{x('home')}</button>
+          </section>
+        )}
+
         {step === 'SUCCESS' && (
-          <div className={`w-full max-w-md border-2 rounded-3xl p-8 text-center space-y-5 my-auto animate-fade-in shadow-xl ${
-            outdoorMode
-              ? 'bg-white border-emerald-600 text-slate-900'
-              : 'bg-[#131b28] border-emerald-500/50 text-white'
+          <div className={`kiosk-enter w-full max-w-md rounded-[28px] p-8 text-center space-y-6 my-auto shadow-xl overflow-hidden relative ${
+            outdoorMode ? 'bg-white text-slate-900' : 'bg-[#131b28] text-white'
           }`}>
-            <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/50 border-2 border-emerald-600 text-emerald-700 dark:text-emerald-400 flex items-center justify-center mx-auto text-3xl font-black">
-              ✓
-            </div>
+            <svg viewBox="0 0 64 64" className="kiosk-pop mx-auto w-24 h-24" aria-hidden="true">
+              <circle cx="32" cy="32" r="30" className="fill-emerald-500" />
+              <path d="M19 33 l9 9 l17 -19" fill="none" stroke="white" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" className="kiosk-tick" />
+            </svg>
 
             <div>
-              <h3 className="text-2xl font-black uppercase text-slate-900 dark:text-white">
-                {t.successTitle}
-              </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
+              <h2 className="text-3xl font-black">{t.successTitle}</h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
                 {opMode === 'CHECK_IN' ? t.successDepositDesc : t.successRetrieveDesc}
               </p>
             </div>
 
-            {/* Countdown Banner */}
-            <div className={`p-3 rounded-xl border text-xs font-mono ${
-              outdoorMode ? 'bg-slate-50 border-slate-200 text-slate-700' : 'bg-slate-900 border-slate-800 text-slate-300'
-            }`}>
-              <span>{t.autoReturnPrompt} </span>
-              <strong className="text-emerald-600 dark:text-emerald-400 font-black text-sm">
-                {successCountdown} {t.secondsSuffix}
-              </strong>
-            </div>
-
-            {/* Finish Button */}
             <button
               onClick={handleReturnToWelcome}
-              className={`w-full py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all shadow-sm ${
-                outdoorMode
-                  ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
-                  : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black'
+              className={`w-full py-4 rounded-2xl font-bold text-base transition-all ${
+                outdoorMode ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950'
               }`}
             >
-              {t.finishButton}
+              {t.finishButton} <span className="font-mono tabular-nums opacity-80">({successCountdown})</span>
             </button>
+
+            {/* Auto-return countdown as a draining bar */}
+            <span aria-hidden="true" className="kiosk-drain absolute left-0 bottom-0 h-1.5 w-full bg-emerald-500" />
           </div>
         )}
 

@@ -346,6 +346,9 @@ const messages = {
   cancelled: ['Đã hủy đơn và kết thúc phiên.', 'Booking cancelled and session ended.', '予約をキャンセルし、セッションを終了しました。', '예약이 취소되고 세션이 종료되었습니다.', '订单已取消，会话已结束。']
   , qrWrongStation: ['Vé này thuộc trạm {station}, không phải trạm của Kiosk này. Hãy dùng Kiosk đúng trạm (hoặc chọn lại trạm ở màn hình đầu).', 'This ticket belongs to {station}, not this kiosk\'s station. Use the kiosk at that station (or reselect the station on the start screen).', 'このチケットは{station}用です。このキオスクのステーションではありません。正しいステーションのキオスクをご利用ください。', '이 티켓은 {station}용이며 이 키오스크의 보관소가 아닙니다. 해당 보관소의 키오스크를 이용하세요.', '此票券属于{station}，不是本自助机所在站点。请在对应站点的自助机使用。'],
   qrExpired: ['Mã QR đã hết hạn hoặc đã được làm mới. Mở lại vé trên điện thoại để lấy mã mới rồi quét lại.', 'This QR code has expired or was refreshed. Reopen the ticket on your phone for a new code and scan again.', 'QRコードの有効期限が切れたか更新されました。スマホでチケットを開き直し、新しいコードで再スキャンしてください。', 'QR 코드가 만료되었거나 갱신되었습니다. 휴대폰에서 티켓을 다시 열어 새 코드로 스캔하세요.', '二维码已过期或已刷新。请在手机上重新打开票券获取新码后再扫描。'],
+  authHint: ['Quét QR hoặc nhập PIN', 'Scan QR or enter PIN', 'QRスキャンまたはPIN入力', 'QR 스캔 또는 PIN 입력', '扫码或输入PIN'],
+  manualEntry: ['Nhập mã thủ công', 'Enter code manually', 'コードを手入力', '코드 직접 입력', '手动输入代码'],
+  chooseLanguage: ['Chọn ngôn ngữ', 'Choose language', '言語を選択', '언어 선택', '选择语言'],
   otherStation: ['trạm khác', 'another station', '別のステーション', '다른 보관소', '其他站点']
   , payFee: ['Thanh toán phụ phí', 'Pay overdue fee', '超過料金を支払う', '초과 요금 결제', '支付超时费用'],
   paymentPageQr: ['Quét mã để mở trang thanh toán. Chờ hệ thống xác minh trước khi lấy đồ.', 'Scan to open the payment page. Wait for server confirmation before pickup.', '読み取って支払いページを開き、確認が完了するまでお待ちください。', '스캔하여 결제 페이지를 여세요. 서버 확인 후 찾을 수 있습니다.', '扫码打开付款页面，等待系统确认后再取件。']
