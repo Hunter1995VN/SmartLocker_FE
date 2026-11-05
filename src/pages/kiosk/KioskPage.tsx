@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import KioskQrScanner from '../../components/kiosk/KioskQrScanner';
 import { kioskApi } from '../../api/kioskService';
 import type { KioskStationStatus } from '../../api/kioskService';
 import { kioskSignalR } from '../../services/kioskSignalR';
@@ -12,7 +12,6 @@ import {
   SmartLockerLogo3D,
   CheckInIcon3D,
   CheckOutIcon3D,
-  QrScannerReticle,
   SunlightDayIcon,
   NightMoonIcon
 } from '../../components/kiosk/KioskIcons';
@@ -211,42 +210,6 @@ export default function KioskPage() {
       if (timer) clearInterval(timer);
     };
   }, [step]);
-
-  // HTML5 QR Scanner
-  useEffect(() => {
-    let scanner: Html5QrcodeScanner | null = null;
-    if (step === 'AUTH' && authMethod === 'QR') {
-      const scannerId = 'kiosk-qr-reader';
-      const el = document.getElementById(scannerId);
-      if (el) {
-        scanner = new Html5QrcodeScanner(
-          scannerId,
-          {
-            fps: 10,
-            qrbox: { width: 240, height: 240 },
-            rememberLastUsedCamera: true,
-            aspectRatio: 1.0,
-          },
-          false
-        );
-
-        scanner.render(
-          (decodedText: string) => {
-            if (soundEnabled) sounds.playScanChime();
-            scanner?.clear().catch(console.error);
-            handleProcessCredential('QR', decodedText);
-          },
-          () => {}
-        );
-      }
-    }
-
-    return () => {
-      if (scanner) {
-        scanner.clear().catch(console.error);
-      }
-    };
-  }, [step, authMethod, soundEnabled]);
 
   // Handle Keypad
   const handleKeypadPress = (val: string) => {
@@ -454,6 +417,7 @@ export default function KioskPage() {
             <div className="flex items-center gap-2">
               <select
                 value={stationId}
+                disabled={loading || step === 'LOCKER_ACTIVE' || step === 'OVERDUE'}
                 onChange={(e) => {
                   const newId = e.target.value;
                   setStationId(newId);
@@ -491,6 +455,7 @@ export default function KioskPage() {
 
           {/* Language Switch Button (Returns to Welcome / Change Language) */}
           <button
+            disabled={loading || step === 'LOCKER_ACTIVE' || step === 'OVERDUE'}
             onClick={() => setStep('WELCOME')}
             className={`px-3 py-1.5 rounded-lg border text-xs font-bold transition-all flex items-center gap-1.5 ${
               outdoorMode
@@ -668,7 +633,8 @@ export default function KioskPage() {
                     if (soundEnabled) sounds.playKeypadTap();
                     setOpMode('CHECK_IN');
                     setStep('AUTH');
-                    setAuthMethod('QR');
+                    setErrorMessage('');
+                  setAuthMethod('QR');
                   }}
                   className={`group relative p-6 rounded-3xl border-2 transition-all duration-200 flex flex-col justify-between active:scale-[0.98] text-left cursor-pointer shadow-lg hover:shadow-xl ${
                     outdoorMode
@@ -706,7 +672,8 @@ export default function KioskPage() {
                     if (soundEnabled) sounds.playKeypadTap();
                     setOpMode('CHECK_OUT');
                     setStep('AUTH');
-                    setAuthMethod('QR');
+                    setErrorMessage('');
+                  setAuthMethod('QR');
                   }}
                   className={`group relative p-6 rounded-3xl border-2 transition-all duration-200 flex flex-col justify-between active:scale-[0.98] text-left cursor-pointer shadow-lg hover:shadow-xl ${
                     outdoorMode
@@ -783,6 +750,7 @@ export default function KioskPage() {
             {/* Header */}
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
               <button
+                disabled={loading}
                 onClick={() => setStep('IDLE')}
                 className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition-colors ${
                   outdoorMode
@@ -806,7 +774,9 @@ export default function KioskPage() {
             }`}>
               <button
                 onClick={() => {
+                  if (submittingRef.current) return;
                   if (soundEnabled) sounds.playKeypadTap();
+                  setErrorMessage('');
                   setAuthMethod('QR');
                 }}
                 className={`py-2 rounded-lg font-bold text-xs uppercase tracking-wider transition-all ${
@@ -819,7 +789,9 @@ export default function KioskPage() {
               </button>
               <button
                 onClick={() => {
+                  if (submittingRef.current) return;
                   if (soundEnabled) sounds.playKeypadTap();
+                  setErrorMessage('');
                   setAuthMethod('ACCESS_CODE');
                 }}
                 className={`py-2 rounded-lg font-bold text-xs uppercase tracking-wider transition-all ${
@@ -835,20 +807,20 @@ export default function KioskPage() {
             {/* TAB 1: SCANNER */}
             {authMethod === 'QR' && (
               <div className="flex flex-col items-center space-y-3">
-                <div className={`relative w-64 h-64 rounded-2xl overflow-hidden border-2 flex items-center justify-center ${
-                  outdoorMode ? 'bg-slate-900 border-slate-300' : 'bg-black border-slate-800'
-                }`}>
-                  <div id="kiosk-qr-reader" className="w-full h-full"></div>
-
-                  <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                    <QrScannerReticle className="w-48 h-48" />
-                  </div>
-                </div>
+                <KioskQrScanner key={`${stationId}-${opMode}`} lang={lang} busy={loading}
+                  onDecoded={async value => {
+                    if (soundEnabled) sounds.playScanChime();
+                    await handleProcessCredential('QR', value);
+                  }} />
 
                 <div className="w-full pt-2">
                   <input
                     type="text"
                     placeholder={t.qrPlaceholder}
+                    aria-label={t.qrPlaceholder}
+                    disabled={loading}
+                    autoComplete="off"
+                    spellCheck={false}
                     className={`w-full rounded-xl px-4 py-2 text-xs font-mono focus:outline-none border ${
                       outdoorMode
                         ? 'bg-slate-50 border-slate-300 text-slate-900 focus:ring-1 focus:ring-sky-500'
@@ -858,7 +830,9 @@ export default function KioskPage() {
                       if (e.key === 'Enter') {
                         const target = e.target as HTMLInputElement;
                         if (target.value.trim()) {
-                          handleProcessCredential('QR', target.value.trim());
+                          const value = target.value.trim();
+                          target.value = '';
+                          void handleProcessCredential('QR', value);
                         }
                       }
                     }}
