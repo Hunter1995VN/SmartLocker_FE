@@ -18,6 +18,7 @@ type SizeFilter = 'ALL' | 'S' | 'M' | 'L';
 
 interface Props {
     onLogout: () => void;
+    initialStationId?: string;
     onNavigateDashboard?: () => void;
     onNavigateHistory?: () => void;
     onNavigateStationDetail?: (stationId: string, station?: Station) => void;
@@ -48,6 +49,7 @@ function isDaNangStation(s: Station): boolean {
 
 export default function FindStationPage({
     onLogout,
+    initialStationId,
     onNavigateDashboard,
     onNavigateHistory,
     onNavigateStationDetail,
@@ -85,7 +87,16 @@ export default function FindStationPage({
                 userLat: userLocation.lat,
                 userLng: userLocation.lng,
             });
-            setStations(applyDistanceAndSort(rawData, userLocation));
+            const sorted = applyDistanceAndSort(rawData, userLocation);
+            setStations(sorted);
+            if (initialStationId) {
+                const target = sorted.find(s => s.id === initialStationId);
+                if (target) {
+                    setSelectedStation(target);
+                    setMapCenter({ lat: Number(target.latitude), lng: Number(target.longitude) });
+                    setMapZoom(16);
+                }
+            }
         } catch (err) {
             console.error('Lỗi tải danh sách trạm:', err);
             setStations([]);
@@ -93,7 +104,7 @@ export default function FindStationPage({
         } finally {
             setIsLoading(false);
         }
-    }, [userLocation, applyDistanceAndSort]);
+    }, [userLocation, applyDistanceAndSort, initialStationId]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -108,13 +119,15 @@ export default function FindStationPage({
             (pos) => {
                 const rawLoc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
                 setUserLocation(rawLoc);
-                setMapCenter(rawLoc);
-                setMapZoom(14);
+                if (!initialStationId) {
+                    setMapCenter(rawLoc);
+                    setMapZoom(14);
+                }
             },
             () => {},
             { enableHighAccuracy: true, timeout: 10000 }
         );
-    }, []);
+    }, [initialStationId]);
 
     useEffect(() => {
         fetchUserLocation();

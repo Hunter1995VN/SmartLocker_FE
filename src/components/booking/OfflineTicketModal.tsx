@@ -44,6 +44,9 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
 
   const formatPin = (pin: string) => {
     const clean = pin.replace(/\s+/g, '');
+    if (clean.length === 8) {
+      return `${clean.substring(0, 4)} ${clean.substring(4, 8)}`;
+    }
     if (clean.length === 6) {
       return `${clean.substring(0, 3)} ${clean.substring(3, 6)}`;
     }
@@ -169,7 +172,7 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
 
         ctx.fillStyle = '#1e40af';
         ctx.font = 'bold 14px sans-serif';
-        ctx.fillText('HOẶC NHẬP MÃ PIN 6 SỐ TRÊN MÀN HÌNH KIOSK', width / 2, 825);
+        ctx.fillText('HOẶC NHẬP MÃ PIN 8 SỐ TRÊN MÀN HÌNH KIOSK', width / 2, 825);
 
         ctx.fillStyle = '#0f172a';
         ctx.font = 'bold 36px monospace';
@@ -289,7 +292,7 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
               {/* Monospace 6-Digit PIN */}
               <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200/80 space-y-2 text-center">
                 <span className="text-[11px] font-bold text-blue-800 uppercase tracking-wider">
-                  HOẶC NHẬP MÃ PIN 6 SỐ TRÊN MÀN HÌNH KIOSK
+                  HOẶC NHẬP MÃ PIN 8 SỐ TRÊN MÀN HÌNH KIOSK
                 </span>
 
                 <div className="flex items-center justify-center gap-3">
