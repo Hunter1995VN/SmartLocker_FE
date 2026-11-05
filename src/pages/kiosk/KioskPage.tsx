@@ -3,6 +3,7 @@ import KioskQrScanner from '../../components/kiosk/KioskQrScanner';
 import { kioskApi } from '../../api/kioskService';
 import type { KioskStationStatus } from '../../api/kioskService';
 import { kioskSignalR } from '../../services/kioskSignalR';
+import SensorPhotoConfirmation from '../../components/kiosk/SensorPhotoConfirmation';
 import KioskLockerStatus from '../../components/kiosk/KioskLockerStatus';
 import { sounds } from '../../utils/soundEffects';
 import { QRCodeSVG } from 'qrcode.react';
@@ -21,7 +22,7 @@ import {
   type KioskLanguage
 } from '../../utils/kioskI18n';
 
-type KioskStep = 'WELCOME' | 'IDLE' | 'AUTH' | 'LOCKER_ACTIVE' | 'OVERDUE' | 'SUCCESS';
+type KioskStep = 'WELCOME' | 'IDLE' | 'AUTH' | 'LOCKER_ACTIVE' | 'OVERDUE' | 'SUCCESS' | 'REVIEW_PENDING';
 type OperationMode = 'CHECK_IN' | 'CHECK_OUT';
 type AuthMethod = 'QR' | 'ACCESS_CODE';
 
@@ -178,9 +179,9 @@ export default function KioskPage() {
   // Door timer for active locker
   useEffect(() => {
     let interval: any = null;
-    if (step === 'LOCKER_ACTIVE' && activeDoorState === 'OPEN') {
+    if (step === 'LOCKER_ACTIVE') {
       interval = setInterval(() => {
-        setDoorTimerSeconds((prev) => prev + 1);
+        setDoorTimerSeconds(Math.max(0, Math.floor((Date.now() - operationStartedRef.current) / 1000)));
       }, 1000);
     } else {
       setDoorTimerSeconds(0);
@@ -356,7 +357,7 @@ export default function KioskPage() {
   };
 
   useEffect(() => {
-    if (step !== 'LOCKER_ACTIVE' || !activeBookingId || !sessionTokenRef.current) return;
+    if (!['LOCKER_ACTIVE', 'REVIEW_PENDING'].includes(step) || !activeBookingId || !sessionTokenRef.current) return;
     let disposed = false;
     let pending = false;
     const poll = async () => {
@@ -367,6 +368,7 @@ export default function KioskPage() {
         setActiveDoorState(result.data.doorState);
         if (result.data.doorState === 'OPEN') observedOpenRef.current = true;
         if (result.data.complete) { accessGrantedRef.current = false; setStep('SUCCESS'); }
+        else if (result.data.manualReviewPending) setStep('REVIEW_PENDING');
       } catch { /* Keep the operation pending; connection loss cannot complete it. */ }
       finally { pending = false; }
     };
@@ -391,7 +393,7 @@ export default function KioskPage() {
     return () => { disposed = true; window.clearInterval(timer); };
   }, [step, overduePayment]);
 
-  const handleManualConfirm = async () => { setShowSensorModal(false); setShowHelpModal(true); };
+
 
   return (
     <div className={`h-screen max-h-screen font-sans flex flex-col justify-between selection:bg-slate-300 select-none overflow-hidden transition-colors duration-200 ${
@@ -959,9 +961,9 @@ export default function KioskPage() {
               {/* Timer & Exception */}
               <div className="flex justify-between items-center text-xs pt-1">
                 <span className="text-slate-500">
-                  Thời gian mở: <strong className="text-slate-900 dark:text-white font-mono">{doorTimerSeconds}s</strong>
+                  {x('elapsed')}: <strong className="text-slate-900 dark:text-white font-mono">{doorTimerSeconds}s</strong>
                 </span>
-                {doorTimerSeconds >= 30 && activeDoorState === 'OPEN' && (
+                {doorTimerSeconds >= 30 && opMode === 'CHECK_OUT' && (
                   <button
                     onClick={() => setShowSensorModal(true)}
                     className="text-amber-600 dark:text-amber-400 underline font-bold"
@@ -1033,6 +1035,7 @@ export default function KioskPage() {
         {/* =========================================================================
             STATE 5: SUCCESS (AUTO RESETS TO WELCOME / LANGUAGE SELECT SCREEN)
            ========================================================================= */}
+        {step === 'REVIEW_PENDING' && <section className="rounded-2xl bg-white p-8 text-center text-slate-900"><h2 className="text-2xl font-bold">{x('pending')}</h2><p className="my-4">{x('pendingHint')}</p><button type="button" onClick={handleReturnToWelcome}>{x('home')}</button></section>}
         {step === 'SUCCESS' && (
           <div className={`w-full max-w-md border-2 rounded-3xl p-8 text-center space-y-5 my-auto animate-fade-in shadow-xl ${
             outdoorMode
@@ -1081,34 +1084,9 @@ export default function KioskPage() {
       {/* =========================================================================
           3. SENSOR & ATTENDANT MODALS
          ========================================================================= */}
-      {/* Sensor Degraded Modal */}
-      {showSensorModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-          <div className="bg-[#141b27] border border-amber-500 rounded-2xl p-6 max-w-sm w-full text-center space-y-4 text-white">
-            <span className="text-xs font-bold text-amber-400 uppercase">
-              CHỜ XÁC NHẬN CẢM BIẾN
-            </span>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              Cảm biến ô tủ <strong>{activeLockerCode}</strong> chưa nhận đủ tín hiệu cửa. Vui lòng liên hệ nhân viên; thao tác trên màn hình không thay thế cảm biến.
-            </p>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setShowSensorModal(false)}
-                className="flex-1 py-2.5 rounded-lg bg-slate-800 text-xs font-bold"
-              >
-                Hủy
-              </button>
-              <button
-                onClick={handleManualConfirm}
-                disabled={loading}
-                className="flex-1 py-2.5 rounded-lg bg-amber-500 text-slate-950 text-xs font-bold"
-              >
-                {x('staff')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {showSensorModal && opMode === 'CHECK_OUT' && sessionTokenRef.current && <SensorPhotoConfirmation
+        lang={lang} stationId={stationId} bookingId={activeBookingId} lockerId={activeLockerId} sessionToken={sessionTokenRef.current}
+        onClose={() => setShowSensorModal(false)} onSubmitted={() => { setShowSensorModal(false); setStep('REVIEW_PENDING'); }}/>} 
 
       {/* Attendant Help Modal */}
       {showHelpModal && (

@@ -72,6 +72,7 @@ export interface KioskOverduePaymentResponse {
 }
 
 export interface KioskManualConfirmRequest {
+  sessionToken: string;
   stationId: string;
   bookingId: string;
   lockerId: string;
