@@ -270,10 +270,10 @@ export default function CampaignFormModal({
                         <div className="flex items-center justify-between">
                             <label className="font-bold text-slate-800 flex items-center gap-1.5">
                                 <Wallet className="w-4 h-4 text-blue-600" />
-                                <span>Hạn mức Ngân sách Chiết khấu Phân bổ (VND)</span>
+                                <span>Ngân sách tối đa cho chiến dịch này (VND)</span>
                             </label>
                             <span className="text-[11px] font-semibold text-slate-500">
-                                Dư địa trần tháng còn:{' '}
+                                Quỹ toàn hệ thống còn:{' '}
                                 <strong className="text-emerald-600">{formatVnd(globalBudgetRemaining)}</strong>
                             </span>
                         </div>
@@ -281,8 +281,8 @@ export default function CampaignFormModal({
                         <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
                             <input
                                 type="number"
-                                min={50000}
-                                step={100000}
+                                min={editingCampaign ? Math.max(1000, editingCampaign.spentBudget) : 50000}
+                                step={1000}
                                 value={allocatedBudget}
                                 onChange={(e) => setAllocatedBudget(Math.max(0, Number(e.target.value)))}
                                 className="flex-1 px-3 py-2 rounded-xl border border-slate-200 bg-white font-extrabold text-sm text-blue-700 focus:border-blue-500 focus:outline-none"
@@ -305,6 +305,10 @@ export default function CampaignFormModal({
                                 ))}
                             </div>
                         </div>
+
+                        <p className="text-[11px] text-slate-500 italic">
+                            * Chiến dịch sẽ tự động dừng áp dụng mã khi tổng tiền giảm giá cho khách chạm mức này.
+                        </p>
 
                         {editingCampaign && (
                             <p className="text-[11px] text-slate-500">
