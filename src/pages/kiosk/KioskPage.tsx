@@ -427,6 +427,7 @@ export default function KioskPage() {
             <div className="flex items-center gap-2">
               <select
                 value={stationId}
+                disabled={loading || step === 'LOCKER_ACTIVE' || step === 'OVERDUE'}
                 onChange={(e) => {
                   const newId = e.target.value;
                   setStationId(newId);
