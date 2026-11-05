@@ -134,6 +134,7 @@ export interface BookingDto {
 export interface BookingListItemDto {
   id: string;
   bookingCode: string;
+  stationId?: string;
   stationName: string;
   stationAddress?: string;
   lockerCode?: string;

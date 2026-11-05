@@ -9,7 +9,6 @@ import RegisterPage from './pages/auth/RegisterPage';
 import VerifyOtpPage from './pages/auth/VerifyOtpPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import DashboardPage from './pages/DashboardPage';
-import TravelerHomePage from './pages/TravelerHomePage';
 import FindStationPage from './pages/FindStationPage';
 import StationBookingPage from './pages/StationBookingPage';
 import BookingPaymentPage from './pages/BookingPaymentPage';

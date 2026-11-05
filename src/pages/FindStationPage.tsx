@@ -90,7 +90,7 @@ export default function FindStationPage({
             const sorted = applyDistanceAndSort(rawData, userLocation);
             setStations(sorted);
             if (initialStationId) {
-                const target = sorted.find(s => s.id === initialStationId);
+                const target = sorted.find(s => s.id === initialStationId || s.name.trim().toLowerCase() === initialStationId.trim().toLowerCase());
                 if (target) {
                     setSelectedStation(target);
                     setMapCenter({ lat: Number(target.latitude), lng: Number(target.longitude) });
