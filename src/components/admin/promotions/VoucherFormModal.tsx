@@ -440,7 +440,7 @@ export default function VoucherFormModal({
                                 <input
                                     type="number"
                                     min={0}
-                                    step={5000}
+                                    step="any"
                                     value={minOrderAmount}
                                     onChange={(e) => setMinOrderAmount(Math.max(0, Number(e.target.value)))}
                                     className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white font-bold text-slate-800 focus:border-blue-500 focus:outline-none"
@@ -473,7 +473,7 @@ export default function VoucherFormModal({
                                 <input
                                     type="number"
                                     min={editingVoucher ? Math.max(1, editingVoucher.usedCount) : 1}
-                                    step={1}
+                                    step="any"
                                     value={usageLimit}
                                     onChange={(e) => setUsageLimit(Math.max(1, Number(e.target.value)))}
                                     className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white font-bold text-slate-800"
@@ -487,6 +487,7 @@ export default function VoucherFormModal({
                                     type="number"
                                     min={1}
                                     max={50}
+                                    step="any"
                                     value={perUserLimit}
                                     onChange={(e) => setPerUserLimit(Math.max(1, Number(e.target.value)))}
                                     className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white font-bold text-slate-800"
@@ -501,7 +502,7 @@ export default function VoucherFormModal({
                                 <input
                                     type="number"
                                     min={editingVoucher ? Math.max(1000, editingVoucher.budgetSpent) : 10000}
-                                    step={1000}
+                                    step="any"
                                     value={budgetCap}
                                     onChange={(e) => setBudgetCap(Math.max(0, Number(e.target.value)))}
                                     className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white font-extrabold text-emerald-700"

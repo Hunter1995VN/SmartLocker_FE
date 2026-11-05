@@ -282,7 +282,7 @@ export default function CampaignFormModal({
                             <input
                                 type="number"
                                 min={editingCampaign ? Math.max(1000, editingCampaign.spentBudget) : 50000}
-                                step={1000}
+                                step="any"
                                 value={allocatedBudget}
                                 onChange={(e) => setAllocatedBudget(Math.max(0, Number(e.target.value)))}
                                 className="flex-1 px-3 py-2 rounded-xl border border-slate-200 bg-white font-extrabold text-sm text-blue-700 focus:border-blue-500 focus:outline-none"
