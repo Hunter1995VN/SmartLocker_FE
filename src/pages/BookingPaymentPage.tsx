@@ -185,7 +185,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
               lockerCode: res.data.lockerCode || null,
               accessCode: res.data.accessCode || res.data.passcode || ''
             });
-            setShowSuccessModal(true);
+            onNavigate('booking-detail', { bookingId: effectiveBookingId });
             return true;
           } else if (res.data.status !== 'PENDING_PAYMENT') {
             return true;
@@ -236,7 +236,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
             lockerCode: res.data.lockerCode || null,
             accessCode: res.data.accessCode || res.data.passcode || ''
           });
-          setShowSuccessModal(true);
+          onNavigate('booking-detail', { bookingId: effectiveBookingId });
         } else if (res.data.status === 'NO_SHOW') {
           showToast('Đơn đã bị huỷ do quá hạn đến nhận tủ (No Show). Vui lòng kiểm tra Lịch sử đơn.');
         } else if (res.data.status === 'CANCELLED') {
