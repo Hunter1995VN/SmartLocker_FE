@@ -3,11 +3,11 @@ import jsQR from 'jsqr';
 import type { KioskLanguage } from '../../utils/kioskI18n';
 
 const labels = {
-  VI: ['Bật camera / Quét lại', 'Tắt camera', 'Đang mở camera…', 'Đưa QR vé điện tử vào camera. Nếu mã hết hạn, mở vé mới trên điện thoại rồi quét lại.', 'Chọn camera', 'Đang xác thực vé…', 'Cho phép camera trong trình duyệt rồi thử lại, hoặc dùng PIN 8 số.', 'Không tìm thấy camera. Kết nối camera hoặc dùng PIN 8 số.', 'Không mở được camera. Đóng ứng dụng khác đang dùng camera rồi thử lại.', 'Camera cần HTTPS hoặc localhost. Hãy mở địa chỉ Kiosk HTTPS hoặc dùng PIN.', 'Đã đọc mã. Có thể bật camera để quét lại.'],
-  EN: ['Start camera / Scan again', 'Stop camera', 'Starting camera…', 'Show your ticket QR to the camera. If expired, open a fresh ticket on your phone and scan again.', 'Select camera', 'Verifying ticket…', 'Allow camera access in your browser and retry, or use your 8-digit PIN.', 'No camera found. Connect a camera or use your 8-digit PIN.', 'Cannot open camera. Close other camera apps and retry.', 'Camera requires HTTPS or localhost. Open the HTTPS Kiosk or use your PIN.', 'Code read. Start the camera to scan again.'],
-  JA: ['カメラ起動 / 再スキャン', 'カメラ停止', 'カメラ起動中…', 'チケットのQRをカメラに向けてください。期限切れの場合は新しいチケットで再試行してください。', 'カメラを選択', 'チケット確認中…', 'ブラウザでカメラを許可するか、8桁のPINを使ってください。', 'カメラがありません。接続するかPINを使ってください。', '他のカメラアプリを閉じて再試行してください。', 'HTTPSまたはlocalhostが必要です。HTTPSのKioskまたはPINを使ってください。', '読み取り済み。再スキャンにはカメラを起動してください。'],
-  KO: ['카메라 시작 / 다시 스캔', '카메라 중지', '카메라 시작 중…', '티켓 QR을 카메라에 보여 주세요. 만료되면 새 티켓을 열고 다시 스캔하세요.', '카메라 선택', '티켓 확인 중…', '브라우저에서 카메라를 허용하거나 8자리 PIN을 사용하세요.', '카메라가 없습니다. 연결하거나 PIN을 사용하세요.', '다른 카메라 앱을 닫고 다시 시도하세요.', 'HTTPS 또는 localhost가 필요합니다. HTTPS Kiosk 또는 PIN을 사용하세요.', '코드를 읽었습니다. 다시 스캔하려면 카메라를 시작하세요.'],
-  ZH: ['开启摄像头 / 重新扫描', '关闭摄像头', '正在开启摄像头…', '请将票券二维码对准摄像头。若已过期，请在手机上打开新票券后重试。', '选择摄像头', '正在验证票券…', '请允许浏览器使用摄像头，或使用8位PIN。', '未找到摄像头。请连接摄像头或使用PIN。', '请关闭其他使用摄像头的应用后重试。', '摄像头需要HTTPS或localhost。请打开HTTPS Kiosk或使用PIN。', '已读取。可开启摄像头重新扫描。'],
+  VI: ['Bật camera', 'Tắt camera', 'Đang mở camera…', 'Đưa mã QR vào khung', 'Chọn camera', 'Đang xác thực vé…', 'Cho phép camera trong trình duyệt rồi thử lại, hoặc dùng PIN 8 số.', 'Không tìm thấy camera. Kết nối camera hoặc dùng PIN 8 số.', 'Không mở được camera. Đóng ứng dụng khác đang dùng camera rồi thử lại.', 'Camera cần HTTPS hoặc localhost. Hãy mở địa chỉ Kiosk HTTPS hoặc dùng PIN.', 'Đã đọc mã. Có thể bật camera để quét lại.'],
+  EN: ['Start camera', 'Stop camera', 'Starting camera…', 'Hold the QR code inside the frame', 'Select camera', 'Verifying ticket…', 'Allow camera access in your browser and retry, or use your 8-digit PIN.', 'No camera found. Connect a camera or use your 8-digit PIN.', 'Cannot open camera. Close other camera apps and retry.', 'Camera requires HTTPS or localhost. Open the HTTPS Kiosk or use your PIN.', 'Code read. Start the camera to scan again.'],
+  JA: ['カメラを起動', 'カメラ停止', 'カメラ起動中…', 'QRコードを枠内にかざしてください', 'カメラを選択', 'チケット確認中…', 'ブラウザでカメラを許可するか、8桁のPINを使ってください。', 'カメラがありません。接続するかPINを使ってください。', '他のカメラアプリを閉じて再試行してください。', 'HTTPSまたはlocalhostが必要です。HTTPSのKioskまたはPINを使ってください。', '読み取り済み。再スキャンにはカメラを起動してください。'],
+  KO: ['카메라 시작', '카메라 중지', '카메라 시작 중…', 'QR 코드를 프레임 안에 맞춰 주세요', '카메라 선택', '티켓 확인 중…', '브라우저에서 카메라를 허용하거나 8자리 PIN을 사용하세요.', '카메라가 없습니다. 연결하거나 PIN을 사용하세요.', '다른 카메라 앱을 닫고 다시 시도하세요.', 'HTTPS 또는 localhost가 필요합니다. HTTPS Kiosk 또는 PIN을 사용하세요.', '코드를 읽었습니다. 다시 스캔하려면 카메라를 시작하세요.'],
+  ZH: ['开启摄像头', '关闭摄像头', '正在开启摄像头…', '请将二维码放入框内', '选择摄像头', '正在验证票券…', '请允许浏览器使用摄像头，或使用8位PIN。', '未找到摄像头。请连接摄像头或使用PIN。', '请关闭其他使用摄像头的应用后重试。', '摄像头需要HTTPS或localhost。请打开HTTPS Kiosk或使用PIN。', '已读取。可开启摄像头重新扫描。'],
 } satisfies Record<KioskLanguage, string[]>;
 
 type Run = { stream?: MediaStream; cancelled: boolean; timer?: number };
@@ -195,20 +195,39 @@ export default function KioskQrScanner({ lang, busy = false, onDecoded }: {
   }
 
   const transitioning = state === 'starting' || state === 'stopping';
-  return <section className="w-full space-y-2 text-sm" aria-label={t[4]}>
-    <p>{t[3]}</p>
-    <video ref={videoRef} muted playsInline aria-label={t[4]} className="w-full max-w-sm max-h-64 mx-auto rounded-xl bg-slate-950" />
-    {cameras.length > 1 && <label className="block">{t[4]}
-      <select className="block w-full rounded border p-2 text-slate-900 bg-white" value={cameraId}
-        disabled={busy || transitioning || state === 'scanning'} onChange={event => setCameraId(event.target.value)}>
+  const live = state === 'scanning';
+  const corner = 'absolute w-9 h-9 border-white border-[5px]';
+  return <section className="w-full space-y-3 text-sm" aria-label={t[4]}>
+    {/* Viewfinder: the video fills a square frame; corner marks show where to hold the code */}
+    <div className="relative mx-auto w-[min(18rem,34vh)] aspect-square rounded-3xl overflow-hidden bg-slate-900">
+      <video ref={videoRef} muted playsInline aria-label={t[4]} className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${live ? 'opacity-100' : 'opacity-0'}`} />
+      {!live && <div className="absolute inset-0 grid place-items-center text-slate-500" aria-hidden="true">
+        <svg viewBox="0 0 48 48" className={`w-20 h-20 ${state === 'starting' || busy ? 'animate-pulse motion-reduce:animate-none' : ''}`} fill="none" stroke="currentColor" strokeWidth="3">
+          <rect x="6" y="6" width="14" height="14" rx="2" /><rect x="28" y="6" width="14" height="14" rx="2" /><rect x="6" y="28" width="14" height="14" rx="2" />
+          <path d="M28 28h6v6h-6zM38 38h4v4M28 40h4" />
+        </svg>
+      </div>}
+      <div className={`absolute inset-[14%] ${live ? 'kiosk-corners' : ''}`} aria-hidden="true">
+        <span className={`${corner} top-0 left-0 border-r-0 border-b-0 rounded-tl-2xl ${live ? '' : 'opacity-40'}`} />
+        <span className={`${corner} top-0 right-0 border-l-0 border-b-0 rounded-tr-2xl ${live ? '' : 'opacity-40'}`} />
+        <span className={`${corner} bottom-0 left-0 border-r-0 border-t-0 rounded-bl-2xl ${live ? '' : 'opacity-40'}`} />
+        <span className={`${corner} bottom-0 right-0 border-l-0 border-t-0 rounded-br-2xl ${live ? '' : 'opacity-40'}`} />
+      </div>
+      {live && <span aria-hidden="true" className="kiosk-sweep absolute left-[16%] right-[16%] h-0.5 rounded-full bg-sky-400 shadow-[0_0_12px_3px_rgba(56,189,248,0.7)]" />}
+      {busy && <div className="absolute inset-0 grid place-items-center bg-slate-950/60 text-white font-bold">{t[5]}</div>}
+    </div>
+    <p className="text-center text-slate-500 dark:text-slate-400">{t[3]}</p>
+    {cameras.length > 1 && <label className="block text-xs text-slate-500">{t[4]}
+      <select className="mt-1 block w-full rounded-xl border p-2 text-slate-900 bg-white" value={cameraId}
+        disabled={busy || transitioning || live} onChange={event => setCameraId(event.target.value)}>
         {cameras.map((camera, index) => <option key={camera.deviceId} value={camera.deviceId}>{camera.label || `${t[4]} ${index + 1}`}</option>)}
       </select>
     </label>}
-    {error !== null && <p role="alert">{t[error]}</p>}
-    <p role="status">{busy ? t[5] : state === 'starting' ? t[2] : state === 'read' ? t[10] : ''}</p>
-    <button type="button" className="rounded-xl bg-sky-700 px-4 py-2 text-white disabled:opacity-50"
-      disabled={busy || transitioning} onClick={() => void (state === 'scanning' ? stop() : start())}>
-      {state === 'scanning' ? t[1] : t[0]}
+    {error !== null && <p role="alert" className="kiosk-shake text-center font-semibold text-rose-600">{t[error]}</p>}
+    <p role="status" className="sr-only">{busy ? t[5] : state === 'starting' ? t[2] : state === 'read' ? t[10] : ''}</p>
+    <button type="button" className={`w-full rounded-2xl py-3.5 font-bold text-base transition-colors disabled:opacity-50 ${live ? 'bg-slate-100 hover:bg-slate-200 text-slate-700' : 'bg-sky-600 hover:bg-sky-500 text-white'}`}
+      disabled={busy || transitioning} onClick={() => void (live ? stop() : start())}>
+      {state === 'starting' ? t[2] : live ? t[1] : t[0]}
     </button>
   </section>;
 }
