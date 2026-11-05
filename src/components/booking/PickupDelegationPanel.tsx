@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../../api/client';
 interface Grant { id: string; contact: string; expiresAt: string; usedAt?: string; revokedAt?: string }
+// Older backends may answer without a delegations array; never let that crash the ticket page.
+const listOf=(data?:{delegations?:Grant[]})=>Array.isArray(data?.delegations)?data!.delegations!:[];
 const expiry=(date:string)=>Date.parse(/Z|[+-]\d\d:\d\d$/.test(date)?date:date+'Z');
 export default function PickupDelegationPanel({ bookingId, status }: {bookingId:string;status:string}) {
     const [grants,setGrants]=useState<Grant[]>([]);const [contact,setContact]=useState('');const [minutes,setMinutes]=useState(60);
     const [issued,setIssued]=useState<{id:string;pin:string;expiresAt:string}>();const [busy,setBusy]=useState(false);const [message,setMessage]=useState('');const [now,setNow]=useState(Date.now);
     const base=`/api/bookings/${bookingId}/support`;
-    useEffect(()=>{let disposed=false;let pending=false;async function load(){if(pending)return;pending=true;try{const res=await apiClient.get<{delegations:Grant[]}>(base);if(!disposed)setGrants(res.data.delegations);}catch{if(!disposed){setIssued(undefined);setMessage('Không đọc được trạng thái ủy quyền. Hãy tải lại trước khi chia sẻ mã.');}}finally{pending=false;}}
+    useEffect(()=>{let disposed=false;let pending=false;async function load(){if(pending)return;pending=true;try{const res=await apiClient.get<{delegations:Grant[]}>(base);if(!disposed)setGrants(Array.isArray(res.data?.delegations)?res.data.delegations:[]);}catch{if(!disposed){setIssued(undefined);setMessage('Không đọc được trạng thái ủy quyền. Hãy tải lại trước khi chia sẻ mã.');}}finally{pending=false;}}
         void load();const timer=window.setInterval(()=>void load(),5000);const clock=window.setInterval(()=>setNow(Date.now()),1000);return()=>{disposed=true;clearInterval(timer);clearInterval(clock);};},[base]);
     if(status!=='STORED')return null;
     const validPin=issued && expiry(issued.expiresAt)>now && grants.some(g=>g.id===issued.id && !g.revokedAt && !g.usedAt && expiry(g.expiresAt)>now);
-    async function create(){if(busy)return;setBusy(true);setIssued(undefined);setMessage('');try{const res=await apiClient.post<{id:string;pin:string;expiresAt:string}>(base+'/delegations',{contact,validMinutes:minutes});if(!/^\d{8}$/.test(res.data.pin))throw new Error('Invalid credential');setIssued(res.data);setGrants((await apiClient.get<{delegations:Grant[]}>(base)).data.delegations);setMessage('Mã chỉ hiển thị lần này. Mã trước đó đã bị thu hồi.');}catch{setMessage('Không tạo được mã. Kiểm tra thời hạn đơn, người nhận và thử lại.');}finally{setBusy(false);}}
-    async function revoke(id:string){if(busy)return;setBusy(true);try{await apiClient.delete(base+'/delegations/'+id);setIssued(undefined);setGrants((await apiClient.get<{delegations:Grant[]}>(base)).data.delegations);setMessage('Đã thu hồi mã.');}catch{setMessage('Không thu hồi được; mã có thể đã sử dụng. Tải lại trạng thái.');}finally{setBusy(false);}}
+    async function create(){if(busy)return;setBusy(true);setIssued(undefined);setMessage('');try{const res=await apiClient.post<{id:string;pin:string;expiresAt:string}>(base+'/delegations',{contact,validMinutes:minutes});if(!/^\d{8}$/.test(res.data.pin))throw new Error('Invalid credential');setIssued(res.data);setGrants(listOf((await apiClient.get<{delegations?:Grant[]}>(base)).data));setMessage('Mã chỉ hiển thị lần này. Mã trước đó đã bị thu hồi.');}catch{setMessage('Không tạo được mã. Kiểm tra thời hạn đơn, người nhận và thử lại.');}finally{setBusy(false);}}
+    async function revoke(id:string){if(busy)return;setBusy(true);try{await apiClient.delete(base+'/delegations/'+id);setIssued(undefined);setGrants(listOf((await apiClient.get<{delegations?:Grant[]}>(base)).data));setMessage('Đã thu hồi mã.');}catch{setMessage('Không thu hồi được; mã có thể đã sử dụng. Tải lại trạng thái.');}finally{setBusy(false);}}
     return <section className="my-5 space-y-4 rounded-2xl border bg-white p-5"><h2 className="font-bold">Ủy quyền lấy đồ</h2>
         <p className="text-sm">Người nhận dùng PIN một lần tại đúng trạm để lấy đúng ngăn của đơn. Phụ phí còn nợ vẫn phải thanh toán. Hãy tự gửi PIN cho người nhận; hệ thống chưa gửi SMS.</p>
         {message && <p role="status">{message}</p>}
