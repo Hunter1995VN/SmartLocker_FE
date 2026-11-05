@@ -69,7 +69,7 @@ const pathToPage = (pathname: string): Page => {
         case 'verify-otp': return 'verify-otp';
         case 'forgot-password': return 'forgot-password';
         case 'dashboard': return 'dashboard';
-        case 'map': return 'map';
+        case 'map': return 'find-station';
         case 'find-station': return 'find-station';
         case 'station-detail': return 'station-booking';
         case 'station-booking': return 'station-booking';
@@ -274,15 +274,7 @@ function App() {
                 />
             )}
 
-            {currentPage === 'map' && (
-                <TravelerHomePage
-                    onLogout={handleLogout}
-                    onNavigateLogin={() => navigateTo('login')}
-                    onNavigateRegister={() => navigateTo('register')}
-                    onNavigateDashboard={() => navigateTo('dashboard')}
-                    onNavigateBooking={(stationId) => navigateTo('station-booking', { stationId })}
-                />
-            )}
+            
 
             {(currentPage === 'station-booking' || currentPage === 'station-detail') && (
                 <StationBookingPage
@@ -335,9 +327,10 @@ function App() {
                 />
             )}
 
-            {currentPage === 'find-station' && (
+            {(currentPage === 'find-station' || currentPage === 'map') && (
                 <FindStationPage
                     onLogout={handleLogout}
+                    initialStationId={pageData.stationId}
                     onNavigateDashboard={() => navigateTo('dashboard')}
                     onNavigateHistory={() => navigateTo('my-bookings')}
                     onNavigateStationDetail={(stationId, station) =>

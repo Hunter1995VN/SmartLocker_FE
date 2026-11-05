@@ -179,7 +179,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
           setOfflineTicket(res.data);
         }
       } catch (err) {
-        console.warn('Lá»—i táº£i vÃ© ngoáº¡i tuyáº¿n:', err);
+        console.warn('Lỗi tải vé ngoại tuyến:', err);
       } finally {
         setIsLoadingOfflineTicket(false);
       }
@@ -634,7 +634,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                   <span>Gia hạn thời gian</span>
                 </button>
                 <button
-                  onClick={() => onNavigate('map')}
+                  onClick={() => onNavigate('find-station', { stationId: booking?.stationId })}
                   className="h-11 px-3 bg-white hover:bg-[#eff4ff] border border-outline-variant rounded-xl text-xs text-[#0b1c30] font-medium flex items-center justify-center gap-1.5 transition-colors shadow-xs cursor-pointer"
                 >
                   <Navigation className="w-4 h-4 text-primary" />
@@ -655,7 +655,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
           <div className="lg:col-span-5 space-y-6">
             <div className="bg-white rounded-2xl border p-5 space-y-2">
               <h3 className="font-bold">{stationName}</h3><p className="text-sm">{stationAddress}</p>
-              <button className="text-primary" onClick={() => onNavigate('map')}>Xem bản đồ trạm</button>
+              <button className="text-primary" onClick={() => onNavigate('find-station', { stationId: booking?.stationId })}>Xem bản đồ trạm</button>
             </div>
 
             {/* Locker Compartment Schematic Matrix */}

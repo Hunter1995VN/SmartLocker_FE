@@ -65,7 +65,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
         setOfflineTicket(res.data);
       }
     } catch (err) {
-      console.warn('Lá»—i táº£i vÃ© ngoáº¡i tuyáº¿n:', err);
+      console.warn('Lỗi tải vé ngoại tuyến:', err);
     } finally {
       setIsLoadingOfflineTicket(false);
     }
@@ -131,7 +131,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
             {/* Action Button */}
             <div className="flex items-center gap-3">
               <button
-                onClick={() => onNavigate('map')}
+                onClick={() => onNavigate('find-station')}
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-container text-white text-sm font-bold rounded-xl shadow-sm hover:bg-primary transition-all active:scale-[0.98] cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
@@ -364,7 +364,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                         <div className="overflow-hidden">
                           <p className="text-xs text-slate-900 font-bold truncate">Quick Scan at Kiosk</p>
                           <p className="text-[11px] text-secondary truncate font-mono">
-                            PIN: {booking.status === 'PENDING_PAYMENT' ? 'Chờ thanh toán' : (booking.accessCode ? (booking.accessCode.replace(/\s+/g, '').length === 6 ? `${booking.accessCode.replace(/\s+/g, '').slice(0, 3)} ${booking.accessCode.replace(/\s+/g, '').slice(3)}` : booking.accessCode) : 'Chưa cấp')}
+                            PIN: {booking.status === 'PENDING_PAYMENT' ? 'Chờ thanh toán' : (booking.accessCode ? (booking.accessCode.replace(/\s+/g, '').length === 8 ? `${booking.accessCode.replace(/\s+/g, '').slice(0, 4)} ${booking.accessCode.replace(/\s+/g, '').slice(4)}` : booking.accessCode) : 'Chưa cấp')}
                           </p>
                         </div>
                       </div>
@@ -386,10 +386,10 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                       <button
                         onClick={() => handleOpenOfflineModal(booking.id)}
                         className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-blue-50 hover:bg-blue-100/80 border border-blue-200 text-blue-900 text-sm font-semibold rounded-xl transition-all cursor-pointer active:scale-95"
-                        title="Má»Ÿ vÃ© ngoáº¡i tuyáº¿n (ká»ƒ cáº£ khi máº¥t sÃ³ng 4G/Wifi)"
+                        title="Mở vé ngoại tuyến (kể cả khi mất sóng 4G/Wifi)"
                       >
                         <WifiOff className="w-4 h-4 text-blue-700" />
-                        <span>VÃ© Offline</span>
+                        <span>Vé Offline</span>
                       </button>
                       {/* Outline Action: Extend Time */}
                       <button
@@ -405,7 +405,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                       </button>
                       {/* Directions Link */}
                       <button
-                        onClick={() => onNavigate('map')}
+                        onClick={() => onNavigate('find-station', { stationId: booking.stationId })}
                         className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 text-sm font-semibold rounded-xl transition-colors cursor-pointer active:scale-95"
                       >
                         <Navigation className="w-4 h-4 text-slate-500" />
@@ -441,7 +441,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
             <h3 className="text-base font-bold text-slate-900">No Active Lockers</h3>
             <p className="text-xs text-secondary max-w-sm mx-auto">You currently have no ongoing locker storage sessions.</p>
             <button
-              onClick={() => onNavigate('map')}
+              onClick={() => onNavigate('find-station')}
               className="mt-2 px-5 py-2.5 bg-primary-container text-white text-xs font-bold rounded-xl shadow-xs hover:bg-primary cursor-pointer"
             >
               Find Stations &amp; Book Now
@@ -528,7 +528,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                               View Receipt / VAT
                             </button>
                             <button
-                              onClick={() => onNavigate('map')}
+                              onClick={() => onNavigate('find-station')}
                               className="px-3.5 py-2 bg-[#eff4ff] text-primary-container hover:bg-blue-100 text-xs font-bold rounded-xl transition-colors cursor-pointer"
                             >
                               Book Again
