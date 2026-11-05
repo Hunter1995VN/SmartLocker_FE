@@ -244,3 +244,57 @@
   animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+
+/* ---------- Kiosk motion (all disabled under prefers-reduced-motion) ---------- */
+@keyframes kiosk-enter {
+  from { opacity: 0; transform: translateY(10px) scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
+.kiosk-enter { animation: kiosk-enter 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
+@keyframes kiosk-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+.kiosk-shake { animation: kiosk-shake 380ms ease-in-out both; }
+
+/* Scanner viewfinder: corner brackets breathe, a line sweeps while the camera is live */
+@keyframes kiosk-corners {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(0.96); opacity: 1; }
+}
+.kiosk-corners { animation: kiosk-corners 1.8s ease-in-out infinite; }
+@keyframes kiosk-sweep {
+  0% { top: 12%; }
+  50% { top: 86%; }
+  100% { top: 12%; }
+}
+.kiosk-sweep { animation: kiosk-sweep 2.2s ease-in-out infinite; }
+
+/* Locker door swings open on the active screen */
+@keyframes kiosk-door-open {
+  0% { transform: perspective(700px) rotateY(0deg); }
+  100% { transform: perspective(700px) rotateY(-58deg); }
+}
+.kiosk-door { transform-origin: left center; animation: kiosk-door-open 900ms cubic-bezier(0.3, 1.25, 0.5, 1) 200ms both; }
+.kiosk-door-closed { transform-origin: left center; transform: perspective(700px) rotateY(0deg); transition: transform 600ms ease-in-out; }
+
+/* Success tick draws itself; countdown bar drains */
+@keyframes kiosk-draw { to { stroke-dashoffset: 0; } }
+.kiosk-tick { stroke-dasharray: 60; stroke-dashoffset: 60; animation: kiosk-draw 520ms ease-out 180ms forwards; }
+@keyframes kiosk-pop {
+  0% { transform: scale(0.6); opacity: 0; }
+  70% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); }
+}
+.kiosk-pop { animation: kiosk-pop 420ms cubic-bezier(0.3, 1.4, 0.5, 1) both; }
+@keyframes kiosk-drain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+.kiosk-drain { transform-origin: left; animation: kiosk-drain 6s linear forwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  .kiosk-enter, .kiosk-shake, .kiosk-corners, .kiosk-sweep, .kiosk-door, .kiosk-pop, .kiosk-drain { animation: none !important; }
+  .kiosk-door { transform: perspective(700px) rotateY(-58deg); }
+  .kiosk-tick { animation: none !important; stroke-dashoffset: 0; }
+  .kiosk-door-closed { transition: none; }
+}
