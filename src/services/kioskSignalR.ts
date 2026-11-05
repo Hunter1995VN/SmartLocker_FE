@@ -52,6 +52,7 @@ export class KioskSignalRService {
       this.onUnlockedCallback?.(event);
     });
     connection.on('StationStatusChanged', () => this.onStationChanged?.());
+    connection.on('LockerStatusChanged', () => this.onStationChanged?.());
 
     try {
       await connection.start();

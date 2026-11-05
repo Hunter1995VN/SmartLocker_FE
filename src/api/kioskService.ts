@@ -51,6 +51,9 @@ export interface KioskOverduePaymentRequest {
   bookingId?: string;
   bookingCode?: string;
   stationId?: string;
+  credentialType?: 'QR' | 'ACCESS_CODE';
+  payload?: string;
+  sessionToken?: string;
 }
 
 export interface KioskOverduePaymentResponse {
@@ -83,9 +86,15 @@ export interface KioskLockerItem {
   businessStatus: string;
   healthStatus: string;
   doorState: string;
+  connectivityStatus?: string;
+  lastDoorEventAt?: string;
 }
 
+export interface SizeReservationCounts {
+  size: string; pendingPayment: number; awaitingDeposit: number; unassignedReservations: number; stored: number;
+}
 export interface KioskStationStatus {
+  reservations?: SizeReservationCounts[];
   stationId: string;
   stationName: string;
   stationAddress: string;

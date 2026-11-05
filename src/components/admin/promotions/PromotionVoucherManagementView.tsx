@@ -840,7 +840,7 @@ export default function PromotionVoucherManagementView({
                                 <input
                                     type="number"
                                     min={500000}
-                                    step={500000}
+                                    step={1000}
                                     disabled={!isAdmin}
                                     value={monthlyCap}
                                     onChange={(e) => setMonthlyCap(Math.max(0, Number(e.target.value)))}

@@ -473,7 +473,7 @@ export default function VoucherFormModal({
                                 <input
                                     type="number"
                                     min={editingVoucher ? Math.max(1, editingVoucher.usedCount) : 1}
-                                    step={10}
+                                    step={1}
                                     value={usageLimit}
                                     onChange={(e) => setUsageLimit(Math.max(1, Number(e.target.value)))}
                                     className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white font-bold text-slate-800"
@@ -500,8 +500,8 @@ export default function VoucherFormModal({
                                 </label>
                                 <input
                                     type="number"
-                                    min={10000}
-                                    step={50000}
+                                    min={editingVoucher ? Math.max(1000, editingVoucher.budgetSpent) : 10000}
+                                    step={1000}
                                     value={budgetCap}
                                     onChange={(e) => setBudgetCap(Math.max(0, Number(e.target.value)))}
                                     className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white font-extrabold text-emerald-700"

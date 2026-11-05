@@ -5,6 +5,7 @@
  * - AdminLockersController (/api/admin/lockers)
  */
 import apiClient from './client';
+import type { SizeReservationCounts } from './kioskService';
 
 // ─── DTO Interfaces (đồng bộ 1:1 với Backend C# DTOs) ───────────────────────
 
@@ -101,16 +102,21 @@ export interface LockerGridItemDto {
     lockerCode: string;
     size: 'S' | 'M' | 'L';
     gpioPin?: number | null;
-    businessStatus: 'AVAILABLE' | 'RESERVED' | 'OCCUPIED' | 'MAINTENANCE' | 'DISABLED';
+    businessStatus: 'AVAILABLE' | 'RESERVED' | 'OCCUPIED' | 'MAINTENANCE' | 'DISABLED' | 'BLOCKED';
     healthStatus: 'HEALTHY' | 'WARNING' | 'CRITICAL';
     doorState: 'OPEN' | 'CLOSED' | 'UNKNOWN';
     lastDoorEventAt?: string | null;
+    ioTDeviceId?: string | null;
+    deviceCode?: string | null;
+    connectivityStatus?: string;
+    lastSeenAt?: string | null;
+    firmwareVersion?: string | null;
     notes?: string | null;
     currentBooking?: ActiveBookingBriefDto | null;
 }
 
 export interface UpdateLockerStatusRequest {
-    businessStatus: 'AVAILABLE' | 'RESERVED' | 'OCCUPIED' | 'MAINTENANCE' | 'DISABLED';
+    businessStatus: 'AVAILABLE' | 'RESERVED' | 'OCCUPIED' | 'MAINTENANCE' | 'DISABLED' | 'BLOCKED';
     healthStatus: 'HEALTHY' | 'WARNING' | 'CRITICAL';
     reason?: string;
 }
@@ -125,6 +131,9 @@ interface ApiResponse<T> {
 // ─── Service Methods ─────────────────────────────────────────────────────────
 
 export const adminStationService = {
+    async getReservations(stationId: string): Promise<SizeReservationCounts[]> {
+        return (await apiClient.get<SizeReservationCounts[]>(`/api/admin/lockers/station/${stationId}/reservations`)).data;
+    },
     /**
      * UC-A03: Lấy danh sách tất cả trạm (hỗ trợ tìm kiếm theo tên hoặc địa chỉ)
      * GET /api/admin/stations?search=...

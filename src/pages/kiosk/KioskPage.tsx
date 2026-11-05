@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import KioskQrScanner from '../../components/kiosk/KioskQrScanner';
 import { kioskApi } from '../../api/kioskService';
 import type { KioskStationStatus } from '../../api/kioskService';
 import { kioskSignalR } from '../../services/kioskSignalR';
+import KioskLockerStatus from '../../components/kiosk/KioskLockerStatus';
 import { sounds } from '../../utils/soundEffects';
 import { QRCodeSVG } from 'qrcode.react';
 import type { CreateBookingResponse } from '../../api/bookingService';
@@ -11,7 +12,6 @@ import {
   SmartLockerLogo3D,
   CheckInIcon3D,
   CheckOutIcon3D,
-  QrScannerReticle,
   SunlightDayIcon,
   NightMoonIcon
 } from '../../components/kiosk/KioskIcons';
@@ -134,16 +134,22 @@ export default function KioskPage() {
   useEffect(() => {
     if (!stationId) return;
 
-    kioskApi.getStationStatus(stationId).then((res) => {
-      if (res.success && res.data) {
-        setStationStatus(res.data);
-      }
-    }).catch(console.error);
+    let cancelled = false;
+    setStationStatus(null);
+    const refreshStatus = async () => {
+      try {
+        const res = await kioskApi.getStationStatus(stationId);
+        if (!cancelled) setStationStatus(res.success ? res.data : null);
+      } catch { if (!cancelled) setStationStatus(null); }
+    };
+    void refreshStatus();
+    const statusTimer = setInterval(refreshStatus, 5000);
 
     // Connect SignalR
     kioskSignalR.connect(
       stationId,
       (event) => {
+        if (event.stationId === stationId) void refreshStatus();
         const curId = activeLockerIdRef.current || activeLockerId;
         const occurredAt = Date.parse(event.occurredAt);
         if (!accessGrantedRef.current || !operationStartedRef.current || !Number.isFinite(occurredAt)
@@ -163,6 +169,8 @@ export default function KioskPage() {
     );
 
     return () => {
+      cancelled = true;
+      clearInterval(statusTimer);
       kioskSignalR.disconnect();
     };
   }, [stationId, activeLockerId, activeLockerCode, soundEnabled]);
@@ -202,42 +210,6 @@ export default function KioskPage() {
       if (timer) clearInterval(timer);
     };
   }, [step]);
-
-  // HTML5 QR Scanner
-  useEffect(() => {
-    let scanner: Html5QrcodeScanner | null = null;
-    if (step === 'AUTH' && authMethod === 'QR') {
-      const scannerId = 'kiosk-qr-reader';
-      const el = document.getElementById(scannerId);
-      if (el) {
-        scanner = new Html5QrcodeScanner(
-          scannerId,
-          {
-            fps: 10,
-            qrbox: { width: 240, height: 240 },
-            rememberLastUsedCamera: true,
-            aspectRatio: 1.0,
-          },
-          false
-        );
-
-        scanner.render(
-          (decodedText: string) => {
-            if (soundEnabled) sounds.playScanChime();
-            scanner?.clear().catch(console.error);
-            handleProcessCredential('QR', decodedText);
-          },
-          () => {}
-        );
-      }
-    }
-
-    return () => {
-      if (scanner) {
-        scanner.clear().catch(console.error);
-      }
-    };
-  }, [step, authMethod, soundEnabled]);
 
   // Handle Keypad
   const handleKeypadPress = (val: string) => {
@@ -302,13 +274,12 @@ export default function KioskPage() {
     operationStartedRef.current = Date.now();
     credentialRef.current = { credentialType: type, payload: rawValue };
     const targetStationId = stationId;
-    if (!allStations.some(station => station.id === targetStationId)) {
+    // The discovery list loads independently. It is not an authorization source;
+    // the kiosk API verifies the exact station, booking and live device mapping.
+    if (!targetStationId) {
       submittingRef.current = false;
       setErrorMessage(x('networkError'));
       return;
-    }
-    if (!stationId) {
-      setStationId(targetStationId);
     }
 
     setLoading(true);
@@ -446,6 +417,7 @@ export default function KioskPage() {
             <div className="flex items-center gap-2">
               <select
                 value={stationId}
+                disabled={loading || step === 'LOCKER_ACTIVE' || step === 'OVERDUE'}
                 onChange={(e) => {
                   const newId = e.target.value;
                   setStationId(newId);
@@ -462,7 +434,7 @@ export default function KioskPage() {
                   </option>
                 ))}
               </select>
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Trạng thái kết nối sẵn sàng"></span>
+              <span className={`w-2 h-2 rounded-full ${stationStatus?.connectivityStatus === 'ONLINE' ? 'bg-emerald-500' : 'bg-amber-500'}`} title={stationStatus?.connectivityStatus || 'UNKNOWN'}></span>
             </div>
 
             <div className="text-xs text-slate-500 dark:text-slate-400">
@@ -483,6 +455,7 @@ export default function KioskPage() {
 
           {/* Language Switch Button (Returns to Welcome / Change Language) */}
           <button
+            disabled={loading || step === 'LOCKER_ACTIVE' || step === 'OVERDUE'}
             onClick={() => setStep('WELCOME')}
             className={`px-3 py-1.5 rounded-lg border text-xs font-bold transition-all flex items-center gap-1.5 ${
               outdoorMode
@@ -636,7 +609,7 @@ export default function KioskPage() {
 
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  <span className={`w-2 h-2 rounded-full ${stationStatus?.connectivityStatus === 'ONLINE' ? 'bg-emerald-500' : 'bg-amber-500'}`}></span>
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     {stationStatus?.stationName || 'Chưa tải được thông tin trạm'} • 24/7
                   </span>
@@ -660,7 +633,8 @@ export default function KioskPage() {
                     if (soundEnabled) sounds.playKeypadTap();
                     setOpMode('CHECK_IN');
                     setStep('AUTH');
-                    setAuthMethod('QR');
+                    setErrorMessage('');
+                  setAuthMethod('QR');
                   }}
                   className={`group relative p-6 rounded-3xl border-2 transition-all duration-200 flex flex-col justify-between active:scale-[0.98] text-left cursor-pointer shadow-lg hover:shadow-xl ${
                     outdoorMode
@@ -698,7 +672,8 @@ export default function KioskPage() {
                     if (soundEnabled) sounds.playKeypadTap();
                     setOpMode('CHECK_OUT');
                     setStep('AUTH');
-                    setAuthMethod('QR');
+                    setErrorMessage('');
+                  setAuthMethod('QR');
                   }}
                   className={`group relative p-6 rounded-3xl border-2 transition-all duration-200 flex flex-col justify-between active:scale-[0.98] text-left cursor-pointer shadow-lg hover:shadow-xl ${
                     outdoorMode
@@ -751,16 +726,12 @@ export default function KioskPage() {
             </div>
 
             {/* Right 5 Columns: 3D Locker Tower (Neat, proportional, fits frame) */}
-            <div className={`lg:col-span-5 border rounded-2xl relative transition-all flex flex-col overflow-hidden h-full ${
+            <div className={`lg:col-span-5 border rounded-2xl relative transition-all flex flex-col overflow-y-auto min-h-0 h-full ${
               outdoorMode
                 ? 'bg-white border-slate-200 shadow-sm text-slate-900'
                 : 'bg-[#131b28] border-slate-800 shadow-lg text-slate-100'
             }`}>
-              <div className="w-full h-full flex flex-col justify-center items-center p-6 text-center gap-4">
-                <strong>{stationStatus?.stationName || x('networkError')}</strong>
-                <p>{stationStatus?.connectivityStatus || 'UNKNOWN'}</p>
-                <p>{t.depositDesc}</p><p>{t.retrieveDesc}</p>
-              </div>
+              <KioskLockerStatus status={stationStatus} lang={lang} activeLockerId={activeLockerId} />
             </div>
 
           </div>
@@ -779,6 +750,7 @@ export default function KioskPage() {
             {/* Header */}
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
               <button
+                disabled={loading}
                 onClick={() => setStep('IDLE')}
                 className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition-colors ${
                   outdoorMode
@@ -802,7 +774,9 @@ export default function KioskPage() {
             }`}>
               <button
                 onClick={() => {
+                  if (submittingRef.current) return;
                   if (soundEnabled) sounds.playKeypadTap();
+                  setErrorMessage('');
                   setAuthMethod('QR');
                 }}
                 className={`py-2 rounded-lg font-bold text-xs uppercase tracking-wider transition-all ${
@@ -815,7 +789,9 @@ export default function KioskPage() {
               </button>
               <button
                 onClick={() => {
+                  if (submittingRef.current) return;
                   if (soundEnabled) sounds.playKeypadTap();
+                  setErrorMessage('');
                   setAuthMethod('ACCESS_CODE');
                 }}
                 className={`py-2 rounded-lg font-bold text-xs uppercase tracking-wider transition-all ${
@@ -831,20 +807,20 @@ export default function KioskPage() {
             {/* TAB 1: SCANNER */}
             {authMethod === 'QR' && (
               <div className="flex flex-col items-center space-y-3">
-                <div className={`relative w-64 h-64 rounded-2xl overflow-hidden border-2 flex items-center justify-center ${
-                  outdoorMode ? 'bg-slate-900 border-slate-300' : 'bg-black border-slate-800'
-                }`}>
-                  <div id="kiosk-qr-reader" className="w-full h-full"></div>
-
-                  <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                    <QrScannerReticle className="w-48 h-48" />
-                  </div>
-                </div>
+                <KioskQrScanner key={`${stationId}-${opMode}`} lang={lang} busy={loading}
+                  onDecoded={async value => {
+                    if (soundEnabled) sounds.playScanChime();
+                    await handleProcessCredential('QR', value);
+                  }} />
 
                 <div className="w-full pt-2">
                   <input
                     type="text"
                     placeholder={t.qrPlaceholder}
+                    aria-label={t.qrPlaceholder}
+                    disabled={loading}
+                    autoComplete="off"
+                    spellCheck={false}
                     className={`w-full rounded-xl px-4 py-2 text-xs font-mono focus:outline-none border ${
                       outdoorMode
                         ? 'bg-slate-50 border-slate-300 text-slate-900 focus:ring-1 focus:ring-sky-500'
@@ -854,7 +830,9 @@ export default function KioskPage() {
                       if (e.key === 'Enter') {
                         const target = e.target as HTMLInputElement;
                         if (target.value.trim()) {
-                          handleProcessCredential('QR', target.value.trim());
+                          const value = target.value.trim();
+                          target.value = '';
+                          void handleProcessCredential('QR', value);
                         }
                       }
                     }}
@@ -957,7 +935,7 @@ export default function KioskPage() {
 
               <div className="flex justify-between items-center text-xs font-mono border-b pb-2 border-slate-200 dark:border-slate-800">
                 <span>ĐƠN: {activeBookingCode}</span>
-                <span className="font-bold">CỠ: {activeLockerSize || 'S'}</span>
+                <span className="font-bold">CỠ: {activeLockerSize || '—'}</span>
               </div>
 
               <div>
