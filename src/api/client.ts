@@ -15,25 +15,38 @@ const ENV_API_URL = import.meta.env.VITE_API_URL as string | undefined;
 const API_BASE_URL = ENV_API_URL ||
     (import.meta.env.PROD ? CLOUD_API_URL : LOCAL_API_URL);
 
-let resolvedBaseUrlPromise: Promise<string> | null = null;
+let confirmedLocalBaseUrl: string | null = null;
+let pendingProbePromise: Promise<string> | null = null;
 
 export const resolveApiBaseUrl = (): Promise<string> => {
     if (ENV_API_URL || !import.meta.env.PROD) {
         return Promise.resolve(API_BASE_URL);
     }
-    if (!resolvedBaseUrlPromise) {
+    if (confirmedLocalBaseUrl) {
+        return Promise.resolve(confirmedLocalBaseUrl);
+    }
+    if (!pendingProbePromise) {
         const controller = new AbortController();
-        const timer = window.setTimeout(() => controller.abort(), 1200);
-        resolvedBaseUrlPromise = fetch(`${LOCAL_API_URL}/api/health`, {
+        const timer = window.setTimeout(() => controller.abort(), 1500);
+        pendingProbePromise = fetch(`${LOCAL_API_URL}/api/health`, {
             method: 'GET',
             mode: 'cors',
             signal: controller.signal,
         })
-            .then((res) => (res.ok ? LOCAL_API_URL : CLOUD_API_URL))
+            .then((res) => {
+                if (res.ok) {
+                    confirmedLocalBaseUrl = LOCAL_API_URL;
+                    return LOCAL_API_URL;
+                }
+                return CLOUD_API_URL;
+            })
             .catch(() => CLOUD_API_URL)
-            .finally(() => window.clearTimeout(timer));
+            .finally(() => {
+                window.clearTimeout(timer);
+                pendingProbePromise = null;
+            });
     }
-    return resolvedBaseUrlPromise;
+    return pendingProbePromise;
 };
 
 const apiClient: AxiosInstance = axios.create({
@@ -78,7 +91,7 @@ apiClient.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
-// Interceptor response: Nếu lỗi 401 → xóa token + redirect login
+// Interceptor response: Nếu Cloud báo không gửi được lệnh MQTT → tự động chuyển tiếp qua Local Backend
 apiClient.interceptors.response.use(
     async (response) => {
         const data = response.data as { success?: boolean; message?: string } | undefined;
@@ -89,7 +102,7 @@ apiClient.interceptors.response.use(
             response.config.baseURL !== LOCAL_API_URL
         ) {
             try {
-                resolvedBaseUrlPromise = Promise.resolve(LOCAL_API_URL);
+                confirmedLocalBaseUrl = LOCAL_API_URL;
                 return await apiClient.request({
                     ...response.config,
                     baseURL: LOCAL_API_URL,
@@ -100,7 +113,25 @@ apiClient.interceptors.response.use(
         }
         return response;
     },
-    (error: AxiosError) => {
+    async (error: AxiosError) => {
+        const errData = error.response?.data as { message?: string } | undefined;
+        if (
+            error.config &&
+            error.config.baseURL !== LOCAL_API_URL &&
+            typeof errData?.message === 'string' &&
+            errData.message.includes('Không gửi được lệnh mở tủ')
+        ) {
+            try {
+                confirmedLocalBaseUrl = LOCAL_API_URL;
+                return await apiClient.request({
+                    ...error.config,
+                    baseURL: LOCAL_API_URL,
+                });
+            } catch (retryErr) {
+                return Promise.reject(retryErr);
+            }
+        }
+
         if (error.response?.status === 401) {
             tokenStore.clear();
             // Redirect về login nếu không phải trang login
