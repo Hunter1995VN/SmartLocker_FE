@@ -15,38 +15,60 @@ const ENV_API_URL = import.meta.env.VITE_API_URL as string | undefined;
 const API_BASE_URL = ENV_API_URL ||
     (import.meta.env.PROD ? CLOUD_API_URL : LOCAL_API_URL);
 
-let confirmedLocalBaseUrl: string | null = null;
+// Kết quả dò nguồn API được ghi nhớ để mọi request (REST, SignalR) dùng cùng một backend.
+// Cloud được nhớ 60 giây rồi dò lại (kiosk có thể bật backend cục bộ sau); local được nhớ
+// cho tới khi request tới local bị lỗi mạng.
+const CLOUD_CACHE_MS = 60_000;
+let resolvedBaseUrl: { url: string; at: number } | null = null;
 let pendingProbePromise: Promise<string> | null = null;
+
+const probeLocalBackend = (): Promise<boolean> => {
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => controller.abort(), 1500);
+    return fetch(`${LOCAL_API_URL}/api/health`, { method: 'GET', mode: 'cors', signal: controller.signal })
+        .then((res) => res.ok)
+        .catch(() => false)
+        .finally(() => window.clearTimeout(timer));
+};
 
 export const resolveApiBaseUrl = (): Promise<string> => {
     if (ENV_API_URL || !import.meta.env.PROD) {
         return Promise.resolve(API_BASE_URL);
     }
-    if (confirmedLocalBaseUrl) {
-        return Promise.resolve(confirmedLocalBaseUrl);
+    if (resolvedBaseUrl && (resolvedBaseUrl.url === LOCAL_API_URL || Date.now() - resolvedBaseUrl.at < CLOUD_CACHE_MS)) {
+        return Promise.resolve(resolvedBaseUrl.url);
     }
     if (!pendingProbePromise) {
-        const controller = new AbortController();
-        const timer = window.setTimeout(() => controller.abort(), 1500);
-        pendingProbePromise = fetch(`${LOCAL_API_URL}/api/health`, {
-            method: 'GET',
-            mode: 'cors',
-            signal: controller.signal,
-        })
-            .then((res) => {
-                if (res.ok) {
-                    confirmedLocalBaseUrl = LOCAL_API_URL;
-                    return LOCAL_API_URL;
-                }
-                return CLOUD_API_URL;
+        pendingProbePromise = probeLocalBackend()
+            .then((ok) => {
+                const url = ok ? LOCAL_API_URL : CLOUD_API_URL;
+                resolvedBaseUrl = { url, at: Date.now() };
+                return url;
             })
-            .catch(() => CLOUD_API_URL)
-            .finally(() => {
-                window.clearTimeout(timer);
-                pendingProbePromise = null;
-            });
+            .finally(() => { pendingProbePromise = null; });
     }
     return pendingProbePromise;
+};
+
+/** Backend đang được dùng cho REST (để SignalR kết nối cùng nơi). */
+export const getActiveApiBaseUrl = (): string => resolvedBaseUrl?.url ?? API_BASE_URL;
+
+const MQTT_DISPATCH_FAILED = 'Không gửi được lệnh mở tủ';
+type RetryableConfig = InternalAxiosRequestConfig & { _localMqttRetry?: boolean };
+
+/**
+ * Cloud trả lỗi gửi MQTT (BE đã hoàn tác check-in, không có lệnh mở nào được phát).
+ * Chỉ thử lại một lần qua backend cục bộ khi backend đó thực sự đang chạy; không đánh dấu
+ * local là nguồn mặc định nếu chưa xác nhận health, để các request sau không bị chuyển nhầm
+ * sang localhost không tồn tại.
+ */
+const retryKioskViaLocal = async (config: RetryableConfig | undefined, message: unknown) => {
+    if (!config || config._localMqttRetry || ENV_API_URL || !import.meta.env.PROD) return null;
+    if (config.baseURL === LOCAL_API_URL || typeof message !== 'string' || !message.includes(MQTT_DISPATCH_FAILED)) return null;
+    if (!String(config.url ?? '').toLowerCase().startsWith('/api/kiosk/')) return null;
+    if (!(await probeLocalBackend())) return null;
+    resolvedBaseUrl = { url: LOCAL_API_URL, at: Date.now() };
+    return apiClient.request({ ...config, baseURL: LOCAL_API_URL, _localMqttRetry: true } as RetryableConfig);
 };
 
 const apiClient: AxiosInstance = axios.create({
@@ -95,41 +117,24 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
     async (response) => {
         const data = response.data as { success?: boolean; message?: string } | undefined;
-        if (
-            data?.success === false &&
-            typeof data.message === 'string' &&
-            data.message.includes('Không gửi được lệnh mở tủ') &&
-            response.config.baseURL !== LOCAL_API_URL
-        ) {
+        if (data?.success === false) {
             try {
-                confirmedLocalBaseUrl = LOCAL_API_URL;
-                return await apiClient.request({
-                    ...response.config,
-                    baseURL: LOCAL_API_URL,
-                });
-            } catch {
-                return response;
+                const retried = await retryKioskViaLocal(response.config, data.message);
+                if (retried) return retried;
+            } catch (retryErr) {
+                return Promise.reject(retryErr);
             }
         }
         return response;
     },
     async (error: AxiosError) => {
         const errData = error.response?.data as { message?: string } | undefined;
-        if (
-            error.config &&
-            error.config.baseURL !== LOCAL_API_URL &&
-            typeof errData?.message === 'string' &&
-            errData.message.includes('Không gửi được lệnh mở tủ')
-        ) {
-            try {
-                confirmedLocalBaseUrl = LOCAL_API_URL;
-                return await apiClient.request({
-                    ...error.config,
-                    baseURL: LOCAL_API_URL,
-                });
-            } catch (retryErr) {
-                return Promise.reject(retryErr);
-            }
+        const retried = await retryKioskViaLocal(error.config, errData?.message);
+        if (retried) return retried;
+
+        // Backend cục bộ đã tắt: lần sau dò lại nguồn API. Không tự gửi lại request này.
+        if (!error.response && error.config?.baseURL === LOCAL_API_URL && resolvedBaseUrl?.url === LOCAL_API_URL) {
+            resolvedBaseUrl = null;
         }
 
         if (error.response?.status === 401) {

@@ -29,10 +29,19 @@ export default function KioskQrScanner({ lang, busy = false, onDecoded }: {
   const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
   const [cameraId, setCameraId] = useState('');
   const t = labels[lang];
+  const lastSubmitted = useRef<{ value: string; at: number } | null>(null);
   useEffect(() => { callback.current = onDecoded; }, [onDecoded]);
   useEffect(() => {
     mounted.current = true;
-    return () => { mounted.current = false; if (active.current) void close(active.current); };
+    // Leaving the tab or minimising the kiosk must release the camera and never submit a late frame.
+    const onVisibility = () => { if (document.hidden && active.current) stop(); };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      mounted.current = false;
+      document.removeEventListener('visibilitychange', onVisibility);
+      if (active.current) close(active.current);
+      active.current = null;
+    };
   }, []);
 
   function stop() {
@@ -150,12 +159,24 @@ export default function KioskQrScanner({ lang, busy = false, onDecoded }: {
             value = tryDecodeJsQr(cx, cy, cw, ch, cw, ch, true, 'grayscale(100%) brightness(85%) contrast(200%)');
           }
 
+          // The same code seen again right after a submit is the phone still in front of the camera, not a new request.
+          const previous = lastSubmitted.current;
+          if (value && previous?.value === value && Date.now() - previous.at < 4000) value = undefined;
+
+          // Decoding is async: the user may have stopped the camera, switched tab or left meanwhile.
+          if (run.cancelled || !mounted.current || document.hidden) return;
+
           if (value) {
             // No more frames or live tracks before any API request is submitted.
             close(run); video.srcObject = null; setState('read');
+            lastSubmitted.current = { value, at: Date.now() };
+            // Ticket/API errors are reported by the caller; they are not camera errors.
             try { await callback.current(value); }
-            catch { if (mounted.current) setError(8); }
-            finally { if (active.current === run) active.current = null; }
+            catch { /* Caller already shows the verification error. */ }
+            finally {
+              if (active.current === run) active.current = null;
+              if (lastSubmitted.current?.value === value) lastSubmitted.current = { value, at: Date.now() };
+            }
             return;
           }
         }

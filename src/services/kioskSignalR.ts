@@ -1,7 +1,5 @@
-import apiClient from '../api/client';
+import { resolveApiBaseUrl } from '../api/client';
 import * as signalR from '@microsoft/signalr';
-
-const API_BASE_URL = apiClient.defaults.baseURL;
 
 export class KioskSignalRService {
   private connection: signalR.HubConnection | null = null;
@@ -29,9 +27,12 @@ export class KioskSignalRService {
     }
 
     this.currentStationId = stationId;
+    // Same backend as the REST check-in requests, so door events come from the server that sent the command.
+    const baseUrl = await resolveApiBaseUrl();
+    if (this.currentStationId !== stationId || this.connection) return;
 
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl(`${API_BASE_URL}/hubs/locker`, {
+      .withUrl(`${baseUrl}/hubs/locker`, {
         skipNegotiation: false,
         transport: signalR.HttpTransportType.WebSockets | signalR.HttpTransportType.LongPolling
       })

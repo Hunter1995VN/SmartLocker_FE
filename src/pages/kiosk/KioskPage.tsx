@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import KioskQrScanner from '../../components/kiosk/KioskQrScanner';
+import { readTicketQrHint } from '../../utils/kioskTicketQr';
 import { kioskApi } from '../../api/kioskService';
 import type { KioskStationStatus } from '../../api/kioskService';
 import { kioskSignalR } from '../../services/kioskSignalR';
@@ -290,6 +291,18 @@ export default function KioskPage() {
       setErrorMessage(x('networkError'));
       return;
     }
+    // Explain the most common rejections precisely; the API remains the only authority.
+    const qrHint = type === 'QR' ? readTicketQrHint(rawValue) : null;
+    if (qrHint?.stationId && qrHint.stationId !== targetStationId.toLowerCase()) {
+      submittingRef.current = false;
+      const stationName = allStations.find(s => s.id.toLowerCase() === qrHint.stationId)?.name || x('otherStation');
+      setErrorMessage(x('qrWrongStation').replace('{station}', stationName));
+      if (soundEnabled) sounds.playWarningAlert();
+      return;
+    }
+    const rejection = (serverMessage?: string) =>
+      qrHint?.expiresAt !== undefined && qrHint.expiresAt <= Date.now() ? x('qrExpired')
+        : lang === 'VI' ? (serverMessage || x('authError')) : x('authError');
 
     setLoading(true);
     setErrorMessage('');
@@ -314,7 +327,7 @@ export default function KioskPage() {
           setActiveDoorState(res.data.doorState || 'UNKNOWN');
           setStep('LOCKER_ACTIVE');
         } else {
-          setErrorMessage(lang === 'VI' ? (res.message || x('authError')) : x('authError'));
+          setErrorMessage(rejection(res.message));
           if (soundEnabled) sounds.playWarningAlert();
         }
       } else {
@@ -347,7 +360,7 @@ export default function KioskPage() {
             setStep('LOCKER_ACTIVE');
           }
         } else {
-          setErrorMessage(lang === 'VI' ? (res.message || x('authError')) : x('authError'));
+          setErrorMessage(rejection(res.message));
           if (soundEnabled) sounds.playWarningAlert();
         }
       }
@@ -355,7 +368,7 @@ export default function KioskPage() {
       if (err.code === 'ERR_NETWORK' || !err.response) {
         setErrorMessage(x('networkError'));
       } else {
-        setErrorMessage(lang === 'VI' ? (err.response?.data?.message || x('authError')) : x('authError'));
+        setErrorMessage(rejection(err.response?.data?.message));
       }
       if (soundEnabled) sounds.playWarningAlert();
     } finally {
