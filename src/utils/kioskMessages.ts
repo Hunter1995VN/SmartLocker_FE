@@ -1,6 +1,9 @@
 import type { KioskLanguage } from './kioskI18n';
 
 const messages = {
+  capturePhoto: ['Chụp ảnh', 'Take photo', '撮影', '사진 촬영', '拍照'],
+  retakePhoto: ['Chụp lại', 'Retake', '撮り直す', '다시 촬영', '重拍'],
+  photoPreview: ['Ảnh ngăn tủ để staff xác minh', 'Locker photo for staff verification', '確認用ロッカー写真', '직원 확인용 보관함 사진', '供工作人员核实的柜位照片'],
   "help": [
     "Trợ giúp",
     "Help",
