@@ -20,6 +20,7 @@ export default function LockerBayGrid({ lockers, selectedLocker, onSelectLocker,
                             <span className={`flex items-center gap-1 text-sm ${status.badgeText}`}><Icon size={14}/>{status.label}</span>
                             <span className="block text-xs">Cửa: {locker.doorState} · {locker.connectivityStatus || 'UNKNOWN'}</span>
                             {locker.currentBooking && <span className="block text-xs">{locker.currentBooking.bookingCode}</span>}
+                            {!locker.currentBooking && ['OCCUPIED','RESERVED'].includes(locker.businessStatus) && <span className="block text-xs text-amber-800">Cần đối soát đơn sử dụng</span>}
                         </button>;
                     })}</div>
                 </div>;

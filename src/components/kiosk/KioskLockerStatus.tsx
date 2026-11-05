@@ -14,6 +14,7 @@ export default function KioskLockerStatus({ status, lang, activeLockerId }: {
 }) {
   const t = words[lang];
   const label = (value: string) => t[value as keyof typeof t] || value;
+  if (!status) return <section aria-label={t.title} className="w-full p-5"><h2 className="text-lg font-bold">{t.title}</h2><p role="status">{t.UNKNOWN}</p></section>;
   return <section aria-label={t.title} className="w-full p-5 space-y-3">
     <h2 className="text-lg font-bold">{t.title}</h2>
     <p className="text-sm">{status?.stationName || t.UNKNOWN} · {label(status?.connectivityStatus || 'UNKNOWN')}</p>
@@ -24,7 +25,7 @@ export default function KioskLockerStatus({ status, lang, activeLockerId }: {
         <p>{t.unassigned}: {r.unassignedReservations} · {t.storedOrders}: {r.stored}</p>
       </div>)}
       {status?.lockers.filter(l => l.size === size).map(locker => <div key={locker.lockerId}
-        className={`rounded-lg p-3 mb-2 border ${activeLockerId === locker.lockerId ? 'border-blue-500 bg-blue-500/10' : 'border-slate-400/30'}`}>
+        className={`rounded-lg p-3 mb-2 border text-slate-900 ${locker.businessStatus === 'AVAILABLE' ? 'border-emerald-300 bg-emerald-50' : locker.businessStatus === 'RESERVED' ? 'border-amber-300 bg-amber-50' : locker.businessStatus === 'OCCUPIED' ? 'border-rose-300 bg-rose-50' : 'border-slate-300 bg-slate-100'} ${activeLockerId === locker.lockerId ? 'ring-2 ring-blue-500' : ''}`}>
         <strong>{locker.lockerCode}</strong>
         <p className="text-sm">{label(locker.businessStatus)} · {label(locker.healthStatus)}</p>
         <p className="text-sm">{t.door}: {label(locker.doorState)} · {label(locker.connectivityStatus || 'UNKNOWN')}</p>

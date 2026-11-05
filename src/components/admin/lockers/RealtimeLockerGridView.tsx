@@ -18,7 +18,7 @@ export default function RealtimeLockerGridView() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
     const [lastRead, setLastRead] = useState<Date | null>(null);
-    const [pending, setPending] = useState<UpdateLockerStatusRequest | null>(null);
+    const [pending, setPending] = useState<{ lockerId: string; request: UpdateLockerStatusRequest } | null>(null);
     const [updating, setUpdating] = useState(false);
     const [message, setMessage] = useState('');
     const [refreshKey, refresh] = useState(0);
@@ -31,7 +31,7 @@ export default function RealtimeLockerGridView() {
             if (!res.success) throw new Error(res.message);
             setStations(res.data);
             setStationId(previous => res.data.some(s => s.id === previous) ? previous : res.data[0]?.id || '');
-            if (!res.data.length) { setError('Chưa có trạm để hiển thị.'); setLoading(false); }
+            if (!res.data.length) { setLockers([]); setReservations([]); setSelectedId(null); setPending(null); setLastRead(null); setError('Chưa có trạm để hiển thị.'); setLoading(false); }
         }).catch(() => { if (!cancelled) { setError('Không tải được danh sách trạm.'); setLoading(false); } });
         return () => { cancelled = true; };
     }, [stationKey]);
@@ -39,7 +39,6 @@ export default function RealtimeLockerGridView() {
         let cancelled = false;
         let busy = false;
         let queued = false;
-        setLockers([]); setReservations([]); setSelectedId(null); setPending(null); setLastRead(null); setLoading(!!stationId);
         if (!stationId) return;
         async function read() {
             if (cancelled) return;
@@ -70,21 +69,22 @@ export default function RealtimeLockerGridView() {
     const selectedStation = stations.find(s => s.id === stationId);
     const selected = lockers.find(l => l.id === selectedId) || null;
     const filtered = useMemo(() => lockers.filter(l => (statusFilter === 'all' || normalizeLockerStatus(l.businessStatus) === statusFilter) && (sizeFilter === 'all' || l.size === sizeFilter)), [lockers, statusFilter, sizeFilter]);
+    const pendingLocker = lockers.find(l => l.id === pending?.lockerId) || null;
     async function confirm() {
-        if (!selected || !pending || updating) return;
-        const id = selected.id;
+        if (!pendingLocker || !pending || updating) return;
+        const id = pending.lockerId;
         setUpdating(true); setMessage('');
         try {
-            const res = await adminStationService.updateLockerStatus(id, pending);
+            const res = await adminStationService.updateLockerStatus(id, pending.request);
             setMessage(res.message);
-            if (res.success) { setPending(null); refreshNow.current(); }
-        } catch { setMessage('Không cập nhật được trạng thái. Kiểm tra lại dữ liệu.'); }
+            setPending(null); refreshNow.current();
+        } catch { setPending(null); setMessage('Không cập nhật được trạng thái. Kiểm tra lại dữ liệu.'); refreshNow.current(); }
         finally { setUpdating(false); }
     }
     return <div className="space-y-4">
         <header className="flex flex-wrap items-center justify-between gap-3">
             <div><h2 className="text-xl font-bold">Sơ đồ tủ thời gian thực</h2><p className="text-sm text-slate-500">Đọc trạng thái trạm và từng ngăn S/M/L. Tự đồng bộ khi có sự kiện và mỗi 5 giây.</p></div>
-            <label>Trạm<select aria-label="Trạm điều khiển" className="ml-2 rounded border p-2" value={stationId} onChange={e => { setStationId(e.target.value); setStatusFilter('all'); setSizeFilter('all'); }}>
+            <label>Trạm<select aria-label="Trạm điều khiển" className="ml-2 rounded border p-2" value={stationId} onChange={e => { setLockers([]); setReservations([]); setSelectedId(null); setPending(null); setLastRead(null); setLoading(true); setMessage(''); setStationId(e.target.value); setStatusFilter('all'); setSizeFilter('all'); }}>
                 {!stations.length && <option value="">Chưa có trạm</option>}
                 {stations.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select></label>
@@ -107,9 +107,9 @@ export default function RealtimeLockerGridView() {
         <div className="flex gap-3" aria-label="Lọc kích thước">{['all', 'S', 'M', 'L'].map(size => <button type="button" key={size} aria-pressed={sizeFilter === size} onClick={() => setSizeFilter(size)} className={`rounded border px-3 py-1 ${sizeFilter === size ? 'bg-blue-700 text-white' : ''}`}>{size === 'all' ? 'Mọi kích thước' : `Size ${size}`}</button>)}</div>
         <div className="grid gap-5 lg:grid-cols-2">
             <LockerBayGrid lockers={filtered} selectedLocker={selected} onSelectLocker={l => setSelectedId(l.id)} isLoading={loading} stationName={selectedStation?.name} stationAddress={selectedStation?.address}/>
-            <LockerDetailControlPanel key={selected?.id} locker={selected} stationName={selectedStation?.name} onUpdateStatusRequest={setPending} isUpdating={updating} onRefreshLockerTelemetry={() => refreshNow.current()}/>
+            <LockerDetailControlPanel key={selected?.id} locker={selected} stationName={selectedStation?.name} onUpdateStatusRequest={request => { if (selected) setPending({lockerId:selected.id,request}); }} isUpdating={updating} onRefreshLockerTelemetry={() => refreshNow.current()}/>
         </div>
         <p className="text-xs text-slate-500">Lần đọc thành công gần nhất: {lastRead?.toLocaleString('vi-VN') || 'Chưa có'}. Trống không đồng nghĩa với đủ điều kiện đặt: còn phụ thuộc sức khỏe, cửa và kết nối thiết bị.</p>
-        <LockerStatusConfirmModal locker={selected} pendingRequest={pending} isOpen={!!pending} onClose={() => setPending(null)} onConfirm={confirm} isUpdating={updating}/>
+        <LockerStatusConfirmModal locker={pendingLocker} pendingRequest={pending?.request || null} isOpen={!!pending} onClose={() => setPending(null)} onConfirm={confirm} isUpdating={updating}/>
     </div>;
 }
