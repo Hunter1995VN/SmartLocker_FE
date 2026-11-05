@@ -1,3 +1,4 @@
+import { kioskStateLabel } from '../../utils/kioskStateLabels';
 import type { KioskStationStatus } from '../../api/kioskService';
 import type { KioskLanguage } from '../../utils/kioskI18n';
 
@@ -13,8 +14,7 @@ export default function KioskLockerStatus({ status, lang, activeLockerId }: {
   status: KioskStationStatus | null; lang: KioskLanguage; activeLockerId?: string;
 }) {
   const t = words[lang];
-  const label = (value: string) => t[value as keyof typeof t] || value;
-  if (!status) return <section aria-label={t.title} className="w-full p-5"><h2 className="text-lg font-bold">{t.title}</h2><p role="status">{t.UNKNOWN}</p></section>;
+  const label = (value: string) => kioskStateLabel(lang,value);
   return <section aria-label={t.title} className="w-full p-5 space-y-3">
     <h2 className="text-lg font-bold">{t.title}</h2>
     <p className="text-sm">{status?.stationName || t.UNKNOWN} · {label(status?.connectivityStatus || 'UNKNOWN')}</p>

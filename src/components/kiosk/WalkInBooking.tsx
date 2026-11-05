@@ -1,3 +1,4 @@
+import { kioskStateLabel } from '../../utils/kioskStateLabels';
 import { kioskText } from '../../utils/kioskMessages';
 import type { KioskLanguage } from '../../utils/kioskI18n';
 import { useEffect, useRef, useState } from 'react';
@@ -78,12 +79,12 @@ export default function WalkInBooking({ stationId, onReady, onCancel, lang }: {
       <h3 className="font-bold">{x('paid')}</h3><p>{x('savePin')}</p>
       <p className="text-4xl font-mono tracking-widest">{ticket.accessCode.slice(0,4)} {ticket.accessCode.slice(4)}</p>
       <button className="bg-blue-700 text-white p-4 rounded-xl" disabled={busy} onClick={async () => {if(busy)return;setBusy(true);try{await onReady(ticket.accessCode!);}finally{setBusy(false);}}}>{x('ready')}</button>
-    </div> : ticket && !['PENDING_PAYMENT','PENDING_CONFIRM'].includes(ticket.status) ? <p>{x('status')}: {ticket.status}</p>
+    </div> : ticket && !['PENDING_PAYMENT','PENDING_CONFIRM'].includes(ticket.status) ? <p>{x('status')}: {kioskStateLabel(lang,ticket.status)}</p>
     : <div className="space-y-3">
       <p>{x('order')} {session.payment.bookingCode} · {session.payment.amount.toLocaleString('vi-VN')} VND</p>
       <p>{x('scanPay')}</p>
       {session.payment.qrCode ? <QRCodeSVG value={session.payment.qrCode} size={240} /> : <p>{x('noQr')}</p>}
-      <p>{x('status')}: {ticket?.status || 'PENDING_PAYMENT'}</p>
+      <p>{x('status')}: {kioskStateLabel(lang,ticket?.status || 'PENDING_PAYMENT')}</p>
     </div>}
     {session && !expired && !cancelled && (!ticket || ticket.status === 'PENDING_PAYMENT') && <button disabled={busy} className="block text-red-700 underline" onClick={async () => {
       if (busy) return; setBusy(true);
