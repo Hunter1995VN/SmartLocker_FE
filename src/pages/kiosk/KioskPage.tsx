@@ -3,6 +3,8 @@ import KioskQrScanner from '../../components/kiosk/KioskQrScanner';
 import { kioskApi } from '../../api/kioskService';
 import type { KioskStationStatus } from '../../api/kioskService';
 import { kioskSignalR } from '../../services/kioskSignalR';
+import WalkInBooking from '../../components/kiosk/WalkInBooking';
+import SensorPhotoConfirmation from '../../components/kiosk/SensorPhotoConfirmation';
 import KioskLockerStatus from '../../components/kiosk/KioskLockerStatus';
 import { sounds } from '../../utils/soundEffects';
 import { QRCodeSVG } from 'qrcode.react';
@@ -21,7 +23,7 @@ import {
   type KioskLanguage
 } from '../../utils/kioskI18n';
 
-type KioskStep = 'WELCOME' | 'IDLE' | 'AUTH' | 'LOCKER_ACTIVE' | 'OVERDUE' | 'SUCCESS';
+type KioskStep = 'WELCOME' | 'IDLE' | 'AUTH' | 'LOCKER_ACTIVE' | 'OVERDUE' | 'SUCCESS' | 'REVIEW_PENDING' | 'WALK_IN';
 type OperationMode = 'CHECK_IN' | 'CHECK_OUT';
 type AuthMethod = 'QR' | 'ACCESS_CODE';
 
@@ -32,6 +34,7 @@ export default function KioskPage() {
   const [authMethod, setAuthMethod] = useState<AuthMethod>('QR');
   const [accessCode, setAccessCode] = useState<string>('');
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
+  const [walkInPin, setWalkInPin] = useState('');
   const [lang, setLang] = useState<KioskLanguage>('VI');
   const x = kioskText(lang);
 
@@ -95,12 +98,12 @@ export default function KioskPage() {
   useEffect(() => {
     const updateClock = () => {
       const now = new Date();
-      setCurrentTime(now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+      setCurrentTime(now.toLocaleTimeString(kioskLocales[lang], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
     };
     updateClock();
     const interval = setInterval(updateClock, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [lang]);
 
   // Fetch stations on mount
   useEffect(() => {
@@ -178,9 +181,9 @@ export default function KioskPage() {
   // Door timer for active locker
   useEffect(() => {
     let interval: any = null;
-    if (step === 'LOCKER_ACTIVE' && activeDoorState === 'OPEN') {
+    if (step === 'LOCKER_ACTIVE') {
       interval = setInterval(() => {
-        setDoorTimerSeconds((prev) => prev + 1);
+        setDoorTimerSeconds(Math.max(0, Math.floor((Date.now() - operationStartedRef.current) / 1000)));
       }, 1000);
     } else {
       setDoorTimerSeconds(0);
@@ -250,11 +253,17 @@ export default function KioskPage() {
     observedOpenRef.current = false;
     activeLockerIdRef.current = '';
     activeLockerCodeRef.current = '';
+    setWalkInPin('');
     setLang('VI');
     setStep('WELCOME');
     setAccessCode('');
     setErrorMessage('');
     setShowSensorModal(false);
+    setShowHelpModal(false);
+    setAccessCode('');
+    setOverdueFee(0);
+    setActiveDoorState('UNKNOWN');
+    setActiveLockerSize('');
     setActiveBookingCode('');
     setActiveBookingId('');
     setActiveLockerId('');
@@ -356,7 +365,7 @@ export default function KioskPage() {
   };
 
   useEffect(() => {
-    if (step !== 'LOCKER_ACTIVE' || !activeBookingId || !sessionTokenRef.current) return;
+    if (!['LOCKER_ACTIVE', 'REVIEW_PENDING'].includes(step) || !activeBookingId || !sessionTokenRef.current) return;
     let disposed = false;
     let pending = false;
     const poll = async () => {
@@ -367,6 +376,7 @@ export default function KioskPage() {
         setActiveDoorState(result.data.doorState);
         if (result.data.doorState === 'OPEN') observedOpenRef.current = true;
         if (result.data.complete) { accessGrantedRef.current = false; setStep('SUCCESS'); }
+        else if (result.data.manualReviewPending) setStep('REVIEW_PENDING');
       } catch { /* Keep the operation pending; connection loss cannot complete it. */ }
       finally { pending = false; }
     };
@@ -391,7 +401,7 @@ export default function KioskPage() {
     return () => { disposed = true; window.clearInterval(timer); };
   }, [step, overduePayment]);
 
-  const handleManualConfirm = async () => { setShowSensorModal(false); setShowHelpModal(true); };
+
 
   return (
     <div className={`h-screen max-h-screen font-sans flex flex-col justify-between selection:bg-slate-300 select-none overflow-hidden transition-colors duration-200 ${
@@ -417,7 +427,6 @@ export default function KioskPage() {
             <div className="flex items-center gap-2">
               <select
                 value={stationId}
-                disabled={loading || step === 'LOCKER_ACTIVE' || step === 'OVERDUE'}
                 onChange={(e) => {
                   const newId = e.target.value;
                   setStationId(newId);
@@ -426,7 +435,7 @@ export default function KioskPage() {
                 className={`text-sm font-black tracking-tight uppercase bg-transparent border-0 outline-none cursor-pointer max-w-[240px] md:max-w-[320px] truncate ${
                   outdoorMode ? 'text-slate-900' : 'text-slate-100'
                 }`}
-                title="Nhấn để chọn trạm phục vụ"
+                title={x('selectStation')} disabled={!['WELCOME','IDLE'].includes(step)}
               >
                 {allStations.map((st) => (
                   <option key={st.id} value={st.id} className="text-slate-900 bg-white">
@@ -438,7 +447,7 @@ export default function KioskPage() {
             </div>
 
             <div className="text-xs text-slate-500 dark:text-slate-400">
-              {stationStatus?.stationAddress || allStations.find(s => s.id === stationId)?.address || 'Chưa tải được thông tin trạm'}
+              {stationStatus?.stationAddress || allStations.find(s => s.id === stationId)?.address || x('stationUnavailable')}
             </div>
           </div>
         </div>
@@ -453,20 +462,11 @@ export default function KioskPage() {
         {/* Right: Controls & Language Pill */}
         <div className="flex items-center gap-2">
 
-          {/* Language Switch Button (Returns to Welcome / Change Language) */}
-          <button
-            disabled={loading || step === 'LOCKER_ACTIVE' || step === 'OVERDUE'}
-            onClick={() => setStep('WELCOME')}
-            className={`px-3 py-1.5 rounded-lg border text-xs font-bold transition-all flex items-center gap-1.5 ${
-              outdoorMode
-                ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800'
-                : 'bg-slate-900 hover:bg-slate-800 border-slate-700 text-slate-200'
-            }`}
-            title="Đổi ngôn ngữ"
-          >
-            <span>{SUPPORTED_LANGUAGES.find(l => l.code === lang)?.flag || '🌐'}</span>
-            <span>{SUPPORTED_LANGUAGES.find(l => l.code === lang)?.name || 'Language'}</span>
-          </button>
+          <label className="text-xs"><span className="sr-only">{x('language')}</span>
+            <select aria-label={x('language')} data-testid="kiosk-language" className="max-w-[140px] rounded-lg border bg-transparent p-2" value={lang} onChange={e=>setLang(e.target.value as KioskLanguage)}>
+              {SUPPORTED_LANGUAGES.map(item=><option key={item.code} value={item.code} className="bg-white text-slate-900">{item.flag} {item.nativeName}</option>)}
+            </select>
+          </label>
 
           {/* Sunlight Contrast Mode Toggle */}
           <button
@@ -476,17 +476,17 @@ export default function KioskPage() {
                 ? 'bg-amber-100/70 hover:bg-amber-100 border-amber-300 text-amber-900'
                 : 'bg-slate-900 hover:bg-slate-800 border-slate-700 text-slate-300'
             }`}
-            title="Chuyển chế độ ngoài trời / ban đêm"
+            title={outdoorMode?x('glare'):x('night')}
           >
             {outdoorMode ? (
               <>
                 <SunlightDayIcon className="w-4 h-4 text-amber-600" />
-                <span className="hidden sm:inline">Chống chói</span>
+                <span className="hidden sm:inline">{x('glare')}</span>
               </>
             ) : (
               <>
                 <NightMoonIcon className="w-4 h-4 text-sky-400" />
-                <span className="hidden sm:inline">Ban đêm</span>
+                <span className="hidden sm:inline">{x('night')}</span>
               </>
             )}
           </button>
@@ -499,7 +499,7 @@ export default function KioskPage() {
                 ? 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
                 : 'bg-slate-900 hover:bg-slate-800 border-slate-700 text-slate-400'
             }`}
-            title="Bật/Tắt âm thanh"
+            title={x('sound')}
           >
             {soundEnabled ? '🔊' : '🔇'}
           </button>
@@ -513,7 +513,7 @@ export default function KioskPage() {
                 : 'bg-sky-950/40 hover:bg-sky-900/60 border-sky-800 text-sky-300'
             }`}
           >
-            Trợ giúp
+            {x('help')}
           </button>
 
         </div>
@@ -523,6 +523,10 @@ export default function KioskPage() {
           2. MAIN VIEWPORT WORKSPACE (STRICTLY FITS 100VH WITHOUT SCROLLBAR)
          ========================================================================= */}
       <main className="flex-1 min-h-0 flex flex-col items-center justify-center p-3 md:p-5 max-w-6xl mx-auto w-full z-10 overflow-hidden">
+        {step === 'IDLE' && <button type="button" className="mb-4 rounded-xl bg-blue-700 px-8 py-4 font-bold text-white" disabled={!stationStatus || loading} onClick={() => { setOpMode('CHECK_IN'); setStep('WALK_IN'); }}>{x('book')}</button>}
+        {step === 'WALK_IN' && <div className="w-full overflow-y-auto"><WalkInBooking lang={lang} stationId={stationId} onCancel={handleReturnToWelcome} onReady={async pin => { setWalkInPin(pin); await handleProcessCredential('ACCESS_CODE', pin); }}/></div>}
+        {walkInPin && step === 'LOCKER_ACTIVE' && <section className="rounded-xl bg-blue-50 p-3 text-center text-slate-900"><p>{x('savePin')}</p><strong className="text-2xl font-mono">{walkInPin.slice(0,4)} {walkInPin.slice(4)}</strong></section>}
+
 
         {/* Error Alert Banner */}
         {errorMessage && (
@@ -541,12 +545,12 @@ export default function KioskPage() {
             {/* Header Greeting */}
             <div className="space-y-2">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 bg-white/60 dark:bg-slate-900/60 shadow-sm">
-                <span>{stationStatus?.stationName || 'Chưa tải được thông tin trạm'}</span>
+                <span>{stationStatus?.stationName || x('stationUnavailable')}</span>
                 <span>•</span>
-                <span className="text-emerald-600 dark:text-emerald-400 font-bold">24/7 TỰ PHỤC VỤ</span>
+                <span className="text-emerald-600 dark:text-emerald-400 font-bold">{x('selfService')}</span>
               </div>
               <h1 className="text-3xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
-                Chào Mừng Quý Khách
+                {t.welcomeTitle}
               </h1>
               <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
                 Welcome • 환영합니다 • 欢迎 • ようこそ
@@ -558,7 +562,7 @@ export default function KioskPage() {
               outdoorMode ? 'bg-white border-slate-200' : 'bg-[#131b28] border-slate-800'
             }`}>
               <div className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">
-                Vui lòng chạm để chọn ngôn ngữ • Please select language
+                {t.selectLanguagePrompt}
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
@@ -611,16 +615,14 @@ export default function KioskPage() {
                 <div className="flex items-center gap-2 mb-1">
                   <span className={`w-2 h-2 rounded-full ${stationStatus?.connectivityStatus === 'ONLINE' ? 'bg-emerald-500' : 'bg-amber-500'}`}></span>
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    {stationStatus?.stationName || 'Chưa tải được thông tin trạm'} • 24/7
+                    {stationStatus?.stationName || x('stationUnavailable')}
                   </span>
                 </div>
                 <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 dark:text-white uppercase leading-tight">
-                  {lang === 'VI' ? 'CHỌN THAO TÁC ĐỂ BẮT ĐẦU' : 'SELECT ACTION TO BEGIN'}
+                  {x('chooseAction')}
                 </h2>
                 <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 mt-1">
-                  {lang === 'VI'
-                    ? 'Chạm vào Gửi Đồ hoặc Lấy Đồ bên dưới để thực hiện giao dịch'
-                    : 'Tap Deposit or Retrieve below to start your transaction'}
+                  {x('chooseHint')}
                 </p>
               </div>
 
@@ -647,7 +649,7 @@ export default function KioskPage() {
                       <CheckInIcon3D className="w-14 h-14" />
                     </div>
                     <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-sky-500/10 text-sky-700 dark:text-sky-400 border border-sky-300/40">
-                      GỬI MỚI
+                      {t.depositTitle}
                     </span>
                   </div>
 
@@ -661,7 +663,7 @@ export default function KioskPage() {
                   </div>
 
                   <div className="pt-2 flex items-center justify-between border-t border-slate-200 dark:border-slate-800/80 w-full text-xs font-bold text-sky-600 dark:text-sky-400">
-                    <span>{lang === 'VI' ? 'Chạm bất kỳ đâu để gửi đồ' : 'Tap anywhere to deposit'}</span>
+                    <span>{x('depositTap')}</span>
                     <span className="text-base group-hover:translate-x-1 transition-transform">→</span>
                   </div>
                 </button>
@@ -686,7 +688,7 @@ export default function KioskPage() {
                       <CheckOutIcon3D className="w-14 h-14" />
                     </div>
                     <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-300/40">
-                      LẤY ĐỒ
+                      {t.retrieveTitle}
                     </span>
                   </div>
 
@@ -700,7 +702,7 @@ export default function KioskPage() {
                   </div>
 
                   <div className="pt-2 flex items-center justify-between border-t border-slate-200 dark:border-slate-800/80 w-full text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                    <span>{lang === 'VI' ? 'Chạm bất kỳ đâu để lấy đồ' : 'Tap anywhere to retrieve'}</span>
+                    <span>{x('retrieveTap')}</span>
                     <span className="text-base group-hover:translate-x-1 transition-transform">→</span>
                   </div>
                 </button>
@@ -807,11 +809,7 @@ export default function KioskPage() {
             {/* TAB 1: SCANNER */}
             {authMethod === 'QR' && (
               <div className="flex flex-col items-center space-y-3">
-                <KioskQrScanner key={`${stationId}-${opMode}`} lang={lang} busy={loading}
-                  onDecoded={async value => {
-                    if (soundEnabled) sounds.playScanChime();
-                    await handleProcessCredential('QR', value);
-                  }} />
+                <KioskQrScanner lang={lang} busy={loading} onDecoded={async value => { if (soundEnabled) sounds.playScanChime(); await handleProcessCredential('QR', value); }} />
 
                 <div className="w-full pt-2">
                   <input
@@ -924,7 +922,7 @@ export default function KioskPage() {
             <div className={`md:col-span-6 rounded-2xl border p-2 relative min-h-[280px] max-h-[340px] flex items-center justify-center ${
               outdoorMode ? 'bg-slate-50 border-slate-200' : 'bg-slate-900 border-slate-800'
             }`}>
-              <div role="status" aria-label="Cảm biến cửa tủ" className="text-center space-y-5">
+              <div role="status" aria-label={x('status')} className="text-center space-y-5">
                 <strong className="text-4xl">{activeLockerCode || '—'}</strong>
                 <p className="text-2xl">{activeDoorState}</p><p>{activeDoorState === 'OPEN' ? t.doorCloseInstruction : x('waitingDoor')}</p>
               </div>
@@ -934,13 +932,13 @@ export default function KioskPage() {
             <div className="md:col-span-6 space-y-4">
 
               <div className="flex justify-between items-center text-xs font-mono border-b pb-2 border-slate-200 dark:border-slate-800">
-                <span>ĐƠN: {activeBookingCode}</span>
-                <span className="font-bold">CỠ: {activeLockerSize || '—'}</span>
+                <span>{x('order')}: {activeBookingCode}</span>
+                <span className="font-bold">{x('sizeLabel')}: {activeLockerSize || '—'}</span>
               </div>
 
               <div>
                 <span className="text-xs text-slate-500 uppercase tracking-wider block">
-                  Vị trí ngăn tủ của bạn
+                  {x('yourLocker')}
                 </span>
                 <span className="text-4xl md:text-5xl font-black font-mono text-sky-600 dark:text-sky-400">
                   {activeLockerCode || '—'}
@@ -959,9 +957,9 @@ export default function KioskPage() {
               {/* Timer & Exception */}
               <div className="flex justify-between items-center text-xs pt-1">
                 <span className="text-slate-500">
-                  Thời gian mở: <strong className="text-slate-900 dark:text-white font-mono">{doorTimerSeconds}s</strong>
+                  {x('elapsed')}: <strong className="text-slate-900 dark:text-white font-mono">{doorTimerSeconds}s</strong>
                 </span>
-                {doorTimerSeconds >= 30 && activeDoorState === 'OPEN' && (
+                {doorTimerSeconds >= 30 && opMode === 'CHECK_OUT' && (
                   <button
                     onClick={() => setShowSensorModal(true)}
                     className="text-amber-600 dark:text-amber-400 underline font-bold"
@@ -977,7 +975,7 @@ export default function KioskPage() {
                   outdoorMode ? 'bg-slate-800 hover:bg-slate-900 text-white' : 'bg-slate-700 hover:bg-slate-600 text-white'
                 }`}
               >
-                ĐÃ ĐÓNG CỬA TỦ • HOÀN TẤT
+                {x('staff')}
               </button>
 
             </div>
@@ -1033,6 +1031,7 @@ export default function KioskPage() {
         {/* =========================================================================
             STATE 5: SUCCESS (AUTO RESETS TO WELCOME / LANGUAGE SELECT SCREEN)
            ========================================================================= */}
+        {step === 'REVIEW_PENDING' && <section className="rounded-2xl bg-white p-8 text-center text-slate-900"><h2 className="text-2xl font-bold">{x('pending')}</h2><p className="my-4">{x('pendingHint')}</p><button type="button" onClick={handleReturnToWelcome}>{x('home')}</button></section>}
         {step === 'SUCCESS' && (
           <div className={`w-full max-w-md border-2 rounded-3xl p-8 text-center space-y-5 my-auto animate-fade-in shadow-xl ${
             outdoorMode
@@ -1081,52 +1080,27 @@ export default function KioskPage() {
       {/* =========================================================================
           3. SENSOR & ATTENDANT MODALS
          ========================================================================= */}
-      {/* Sensor Degraded Modal */}
-      {showSensorModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-          <div className="bg-[#141b27] border border-amber-500 rounded-2xl p-6 max-w-sm w-full text-center space-y-4 text-white">
-            <span className="text-xs font-bold text-amber-400 uppercase">
-              CHỜ XÁC NHẬN CẢM BIẾN
-            </span>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              Cảm biến ô tủ <strong>{activeLockerCode}</strong> chưa nhận đủ tín hiệu cửa. Vui lòng liên hệ nhân viên; thao tác trên màn hình không thay thế cảm biến.
-            </p>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setShowSensorModal(false)}
-                className="flex-1 py-2.5 rounded-lg bg-slate-800 text-xs font-bold"
-              >
-                Hủy
-              </button>
-              <button
-                onClick={handleManualConfirm}
-                disabled={loading}
-                className="flex-1 py-2.5 rounded-lg bg-amber-500 text-slate-950 text-xs font-bold"
-              >
-                {x('staff')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {showSensorModal && opMode === 'CHECK_OUT' && sessionTokenRef.current && <SensorPhotoConfirmation
+        lang={lang} stationId={stationId} bookingId={activeBookingId} lockerId={activeLockerId} sessionToken={sessionTokenRef.current}
+        onClose={() => setShowSensorModal(false)} onSubmitted={() => { setShowSensorModal(false); setStep('REVIEW_PENDING'); }}/>}
 
       {/* Attendant Help Modal */}
       {showHelpModal && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
           <div className="bg-[#141b27] border border-slate-700 rounded-2xl p-6 max-w-sm w-full text-center space-y-3 text-white">
             <span className="text-sm font-bold text-sky-400 uppercase">
-              HỖ TRỢ TRẠM 24/7
+              {x('help')}
             </span>
             <div className="p-3 bg-slate-900 rounded-xl text-left text-xs space-y-1.5 text-slate-300">
-              <div>Hotline khẩn cấp: <strong className="text-sky-400 font-mono">1900 6868</strong></div>
-              <div>Trạm: <strong className="text-white">{stationStatus?.stationName || 'Chưa tải được thông tin trạm'}</strong></div>
-              <div className="text-[11px] text-slate-400">Nhân viên trạm luôn trực hỗ trợ khách hàng 24/24.</div>
+              {stationStatus?.contactPhone && <div>{x('hotline')}: <strong className="text-sky-400 font-mono">{stationStatus.contactPhone}</strong></div>}
+              <div>{t.stationLabel}: <strong className="text-white">{stationStatus?.stationName || x('stationUnavailable')}</strong></div>
+              <div className="text-[11px] text-slate-400">{x('supportHint')}</div>
             </div>
             <button
               onClick={() => setShowHelpModal(false)}
               className="w-full py-2.5 bg-sky-600 rounded-lg text-xs font-bold text-white uppercase"
             >
-              Đóng
+              {t.close}
             </button>
           </div>
         </div>
@@ -1141,7 +1115,7 @@ export default function KioskPage() {
           : 'bg-[#101622] border-slate-800/80 text-slate-500'
       }`}>
         <span>SmartLocker</span>
-        <span>Hỗ trợ: 1900 6868</span>
+        <span>{stationStatus?.contactPhone?`${x('hotline')}: ${stationStatus.contactPhone}`:x('staff')}</span>
       </footer>
 
     </div>

@@ -72,6 +72,7 @@ export interface KioskOverduePaymentResponse {
 }
 
 export interface KioskManualConfirmRequest {
+  sessionToken: string;
   stationId: string;
   bookingId: string;
   lockerId: string;
@@ -94,6 +95,7 @@ export interface SizeReservationCounts {
   size: string; pendingPayment: number; awaitingDeposit: number; unassignedReservations: number; stored: number;
 }
 export interface KioskStationStatus {
+  contactPhone?: string | null;
   reservations?: SizeReservationCounts[];
   stationId: string;
   stationName: string;

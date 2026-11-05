@@ -39,6 +39,7 @@ import InternalRbacManagementView from '../../components/admin/rbac/InternalRbac
 import RealtimeLockerGridView from '../../components/admin/lockers/RealtimeLockerGridView';
 import OccupancyTurnoverAnalyticsView from '../../components/admin/analytics/OccupancyTurnoverAnalyticsView';
 import AbandonedPropertyView from '../../components/admin/abandoned/AbandonedPropertyView';
+import ManualConfirmQueue from '../../components/admin/incidents/ManualConfirmQueue';
 import EmergencyIncidentListView from '../../components/admin/incidents/EmergencyIncidentListView';
 import FinancialReconciliationView from '../../components/admin/finance/FinancialReconciliationView';
 import FinancialRevenueReportView from '../../components/admin/finance/FinancialRevenueReportView';
@@ -203,7 +204,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                     {activeMenu === 'abandoned' ? (
                         <AbandonedPropertyView userRole={role} currentUser={user} />
                     ) : activeMenu === 'incidents' ? (
-                        <EmergencyIncidentListView userRole={role} onOpenCountChange={(count) => setOpenIncidentsBadge(count)} onIncidentsChanged={() => { void fetchStats(); }} />
+                        <><ManualConfirmQueue/><EmergencyIncidentListView userRole={role} onOpenCountChange={(count) => setOpenIncidentsBadge(count)} onIncidentsChanged={() => { void fetchStats(); }} /></>
                     ) : activeMenu === 'lockers' ? (
                         <RealtimeLockerGridView />
                     ) : activeMenu === 'occupancy' ? (

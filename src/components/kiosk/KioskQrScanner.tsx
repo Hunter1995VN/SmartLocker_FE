@@ -17,8 +17,8 @@ function close(run: Run) {
   run.stream?.getTracks().forEach(track => track.stop());
 }
 
-export default function KioskQrScanner({ lang, busy, onDecoded }: {
-  lang: KioskLanguage; busy: boolean; onDecoded: (value: string) => Promise<void>;
+export default function KioskQrScanner({ lang, busy = false, onDecoded }: {
+  lang: KioskLanguage; busy?: boolean; onDecoded: (value: string) => Promise<void>;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const active = useRef<Run | null>(null);

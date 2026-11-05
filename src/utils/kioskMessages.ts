@@ -1,6 +1,21 @@
 import type { KioskLanguage } from './kioskI18n';
 
 const messages = {
+  language: ['Ngôn ngữ', 'Language', '言語', '언어', '语言'],
+  glare: ['Chống chói', 'Day mode', '昼間モード', '주간 모드', '日间模式'],
+  selfService: ['Tủ tự phục vụ', 'Self-service lockers', 'セルフサービスロッカー', '셀프 보관함', '自助储物柜'],
+  stationUnavailable: ['Chưa tải được thông tin trạm', 'Station information unavailable', 'ステーション情報を取得できません', '보관소 정보를 불러올 수 없습니다', '暂无站点信息'],
+  yourLocker: ['Ngăn tủ được cấp', 'Your assigned compartment', '割り当てられたロッカー', '배정된 보관함', '分配给您的柜位'],
+  startCamera: ['Bật camera quét QR', 'Start QR camera', 'QRカメラを開始', 'QR 카메라 시작', '开启扫码摄像头'],
+  stopCamera: ['Tắt camera', 'Stop camera', 'カメラを停止', '카메라 중지', '关闭摄像头'],
+  startingCamera: ['Đang bật camera…', 'Starting camera…', 'カメラ起動中…', '카메라 시작 중…', '正在开启摄像头…'],
+  qrCamera: ['Camera quét vé', 'Ticket scanner camera', 'チケット読み取りカメラ', '티켓 스캔 카메라', '票据扫描摄像头'],
+  sizeLabel: ['Kích cỡ', 'Size', 'サイズ', '크기', '尺寸'],
+  quoteLabel: ['Tiền thuê dự kiến', 'Estimated rental price', '利用料金の見積もり', '예상 이용 요금', '预计租金'],
+  sizeUnavailable: ['Size đã chọn chưa có ngăn đủ điều kiện sử dụng.', 'No eligible compartment for the selected size.', '選択したサイズは利用できません。', '선택한 크기의 이용 가능한 칸이 없습니다.', '所选尺寸暂无可用柜位。'],
+  capturePhoto: ['Chụp ảnh', 'Take photo', '撮影', '사진 촬영', '拍照'],
+  retakePhoto: ['Chụp lại', 'Retake', '撮り直す', '다시 촬영', '重拍'],
+  photoPreview: ['Ảnh ngăn tủ để staff xác minh', 'Locker photo for staff verification', '確認用ロッカー写真', '직원 확인용 보관함 사진', '供工作人员核实的柜位照片'],
   "help": [
     "Trợ giúp",
     "Help",
