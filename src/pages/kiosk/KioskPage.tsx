@@ -601,7 +601,7 @@ export default function KioskPage() {
                     setAuthMethod('QR');
                   }}
                   style={{ animationDelay: `${index * 80}ms` }}
-                  className={`kiosk-enter group relative overflow-hidden p-7 rounded-[28px] border-2 transition-all duration-200 flex flex-col items-start justify-between gap-6 text-left cursor-pointer active:scale-[0.98] hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-4 ${
+                  className={`kiosk-enter group relative overflow-hidden p-7 rounded-[28px] border-2 transition-all duration-200 flex flex-col items-start justify-center gap-8 text-left cursor-pointer max-h-[440px] active:scale-[0.98] hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-4 ${
                     tone === 'sky'
                       ? (outdoorMode ? 'bg-white border-slate-200 hover:border-sky-500 shadow-md hover:shadow-xl focus-visible:ring-sky-400/60' : 'bg-[#131b28] border-slate-800 hover:border-sky-500 focus-visible:ring-sky-400/40')
                       : (outdoorMode ? 'bg-white border-slate-200 hover:border-emerald-500 shadow-md hover:shadow-xl focus-visible:ring-emerald-400/60' : 'bg-[#131b28] border-slate-800 hover:border-emerald-500 focus-visible:ring-emerald-400/40')
