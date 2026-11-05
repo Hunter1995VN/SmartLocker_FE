@@ -48,7 +48,24 @@ export const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
   };
 
   useEffect(() => {
-    if (!isOpen || !bookingId) return;
+    if (!isOpen) return;
+    if (!bookingId) {
+      setPreview({
+        bookingId: '',
+        bookingCode,
+        status: 'CONFIRMED',
+        canCancel: true,
+        paidAmount: paidAmount || 0,
+        refundRate: 1.0,
+        refundAmount: paidAmount || 0,
+        dailyCancellationCount: 0,
+        isDailyLimitExceeded: false,
+        policyTier: 'FULL',
+        policyDescription: 'Eligible for 100% full refund. Refund request will be sent to Admin for approval.',
+      });
+      setIsLoadingPreview(false);
+      return;
+    }
 
     let isMounted = true;
     setIsLoadingPreview(true);
@@ -118,7 +135,8 @@ export const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
       if (onConfirm) await onConfirm(finalReason);
       else if (onSuccess) await onSuccess(finalReason, preview?.refundAmount);
     } catch (err: any) {
-      setErrorMsg(err.response?.data?.message || 'Failed to cancel booking. Please try again.');
+      setErrorMsg(err?.response?.data?.message || err?.message || 'Failed to cancel booking. Please try again.');
+    } finally {
       setIsSubmitting(false);
     }
   };
