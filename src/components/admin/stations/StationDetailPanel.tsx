@@ -12,6 +12,7 @@ import {
     Layers,
     Tag,
     SlidersHorizontal,
+    Cpu,
 } from 'lucide-react';
 import type {
     StationAdminDetailDto,
@@ -20,6 +21,7 @@ import type {
 import StationInfoTab from './StationInfoTab';
 import StationCompartmentsTab from './StationCompartmentsTab';
 import StationPricingTab from './StationPricingTab';
+import StationHardwareTab from './StationHardwareTab';
 
 interface StationDetailPanelProps {
     station: StationAdminDetailDto | null;
@@ -40,7 +42,7 @@ export default function StationDetailPanel({
     isUpdating,
     onShowToast,
 }: StationDetailPanelProps) {
-    const [activeTab, setActiveTab] = useState<'info' | 'lockers' | 'pricing'>('info');
+    const [activeTab, setActiveTab] = useState<'info' | 'lockers' | 'pricing' | 'hardware'>('info');
 
     if (isLoading) {
         return (
@@ -140,6 +142,19 @@ export default function StationDetailPanel({
                     <Tag className="w-4 h-4" />
                     <span>3. Pricing Matrix</span>
                 </button>
+
+                <button
+                    type="button"
+                    onClick={() => setActiveTab('hardware')}
+                    className={`flex items-center gap-2 px-4 py-2.5 border-b-2 text-xs font-bold transition whitespace-nowrap cursor-pointer ${
+                        activeTab === 'hardware'
+                            ? 'border-blue-600 text-blue-600 bg-white rounded-t-xl shadow-xs'
+                            : 'border-transparent text-slate-500 hover:text-slate-800'
+                    }`}
+                >
+                    <Cpu className="w-4 h-4" />
+                    <span>4. IoT & Hardware</span>
+                </button>
             </div>
 
             {/* Tab Body */}
@@ -167,6 +182,14 @@ export default function StationDetailPanel({
                         key={station.id}
                         station={station}
                         onPricingUpdated={onRefreshStation}
+                        onShowToast={onShowToast}
+                    />
+                )}
+
+                {activeTab === 'hardware' && (
+                    <StationHardwareTab
+                        key={station.id}
+                        station={station}
                         onShowToast={onShowToast}
                     />
                 )}

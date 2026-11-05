@@ -83,6 +83,10 @@ export default function KioskPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
 
+  // UC-T13: Offline Retreival State (HMAC-SHA256 Token)
+  const [isOfflineMode, setIsOfflineMode] = useState<boolean>(false);
+  const [offlineNotice, setOfflineNotice] = useState<string>('');
+
   // UC-C27: Sensor anomaly modal
   const [showSensorModal, setShowSensorModal] = useState<boolean>(false);
   const [showHelpModal, setShowHelpModal] = useState<boolean>(false);
@@ -331,12 +335,25 @@ export default function KioskPage() {
           if (soundEnabled) sounds.playWarningAlert();
         }
       } else {
-        const res = await kioskApi.checkOut({
-          sessionToken: sessionTokenRef.current,
-          stationId: targetStationId,
-          credentialType: type,
-          payload: rawValue,
-        });
+        // UC-T13: Kiểm tra chế độ ngoại tuyến hoặc mã vé HMAC-SHA256
+        let res: any;
+        if (isOfflineMode || rawValue.includes('.')) {
+          res = await kioskApi.offlineCheckOut({
+            stationId: targetStationId,
+            credentialType: type,
+            payload: rawValue,
+          });
+          if (res.success && res.data) {
+            setOfflineNotice(res.data.message || '[XÁC THỰC NGOẠI TUYẾN] HMAC-SHA256 hợp lệ.');
+          }
+        } else {
+          res = await kioskApi.checkOut({
+            sessionToken: sessionTokenRef.current,
+            stationId: targetStationId,
+            credentialType: type,
+            payload: rawValue,
+          });
+        }
 
         if (res.success && res.data) {
           if (res.data.isOverdue) {
@@ -351,12 +368,12 @@ export default function KioskPage() {
             accessGrantedRef.current = true;
             if (soundEnabled) sounds.playUnlockSuccess();
             sessionTokenRef.current = res.data.sessionToken;
-          setActiveBookingId(res.data.bookingId || '');
+            setActiveBookingId(res.data.bookingId || '');
             setActiveBookingCode(res.data.bookingCode || '');
             setActiveLockerId(res.data.lockerId || '');
             setActiveLockerCode(res.data.lockerCode || '');
             setActiveLockerSize(res.data.lockerSize || '');
-            setActiveDoorState(res.data.doorState || 'UNKNOWN');
+            setActiveDoorState(res.data.doorState || 'OPEN');
             setStep('LOCKER_ACTIVE');
           }
         } else {
@@ -365,6 +382,33 @@ export default function KioskPage() {
         }
       }
     } catch (err: any) {
+      // UC-T13: Nếu gặp lỗi mạng khi CHECK_OUT hoặc quét vé có chữ ký số HMAC, tự động fallback sang xác thực ngoại tuyến
+      if (opMode === 'CHECK_OUT' && (err.code === 'ERR_NETWORK' || !err.response || rawValue.includes('.'))) {
+        try {
+          const offlineRes = await kioskApi.offlineCheckOut({
+            stationId: targetStationId,
+            credentialType: type,
+            payload: rawValue,
+          });
+          if (offlineRes.success && offlineRes.data) {
+            accessGrantedRef.current = true;
+            if (soundEnabled) sounds.playUnlockSuccess();
+            setOfflineNotice(offlineRes.data.message || '[XÁC THỰC NGOẠI TUYẾN] HMAC-SHA256 hợp lệ. Chốt tủ đã mở.');
+            setActiveBookingId(offlineRes.data.bookingId || '');
+            setActiveBookingCode(offlineRes.data.bookingCode || '');
+            setActiveLockerId(offlineRes.data.lockerId || '');
+            setActiveLockerCode(offlineRes.data.lockerCode || '');
+            setActiveLockerSize(offlineRes.data.lockerSize || '');
+            setActiveDoorState(offlineRes.data.doorState || 'OPEN');
+            setStep('LOCKER_ACTIVE');
+            return;
+          }
+        } catch (offlineErr: any) {
+          setErrorMessage(offlineErr.response?.data?.message || 'Mất kết nối mạng và xác thực ngoại tuyến không thành công.');
+          if (soundEnabled) sounds.playWarningAlert();
+          return;
+        }
+      }
       if (err.code === 'ERR_NETWORK' || !err.response) {
         setErrorMessage(x('networkError'));
       } else {
@@ -481,6 +525,26 @@ export default function KioskPage() {
             </select>
           </label>
 
+          {/* UC-T13: Nút Chế độ Ngoại tuyến (Offline Mode) */}
+          <button
+            type="button"
+            onClick={() => {
+              setIsOfflineMode(prev => !prev);
+              setErrorMessage('');
+            }}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all ${
+              isOfflineMode
+                ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm animate-pulse'
+                : outdoorMode
+                  ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700'
+                  : 'bg-slate-900 hover:bg-slate-800 border-slate-700 text-slate-300'
+            }`}
+            title="Bật/Tắt chế độ Ngoại Tuyến (UC-T13: Lấy hành lý khi mất Internet)"
+          >
+            <span className={`w-2 h-2 rounded-full ${isOfflineMode ? 'bg-amber-400' : 'bg-emerald-500'}`} />
+            <span>{isOfflineMode ? 'Ngoại tuyến (Offline)' : 'Trực tuyến (Online)'}</span>
+          </button>
+
           {/* Sunlight Contrast Mode Toggle */}
           <button
             onClick={handleToggleOutdoorMode}
@@ -518,7 +582,28 @@ export default function KioskPage() {
           </button>
 
           {/* Attendant Help */}
-          <button
+          {offlineNotice && (
+                <div className="p-3 bg-emerald-950/70 border border-emerald-500/50 rounded-xl text-emerald-300 text-xs flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+                  <span>{offlineNotice}</span>
+                </div>
+              )}
+
+              {(offlineNotice || isOfflineMode) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    accessGrantedRef.current = false;
+                    setStep('SUCCESS');
+                  }}
+                  className="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>✓</span>
+                  <span>Xác nhận đã lấy hành lý (Ngoại tuyến)</span>
+                </button>
+              )}
+
+              <button
             onClick={() => setShowHelpModal(true)}
             className={`px-3 py-1.5 rounded-lg border text-xs font-bold transition-colors ${
               outdoorMode

@@ -117,6 +117,11 @@ export const kioskApi = {
     return res.data;
   },
 
+  offlineCheckOut: async (data: KioskCheckOutRequest) => {
+    const res = await apiClient.post<{ success: boolean; data: KioskCheckOutResponse; message?: string }>('/api/kiosk/offline-checkout', data);
+    return res.data;
+  },
+
   checkOut: async (data: KioskCheckOutRequest) => {
     const res = await apiClient.post<{ success: boolean; data: KioskCheckOutResponse; message?: string }>('/api/kiosk/check-out', data);
     return res.data;

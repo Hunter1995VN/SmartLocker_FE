@@ -32,6 +32,7 @@ export type AdminMenuKey =
     | 'users'
     | 'debt'
     | 'lockers'
+    | 'devices'
     | 'occupancy'
     | 'incidents'
     | 'abandoned'
@@ -165,17 +166,21 @@ export default function AdminSidebar({
 
                             <button
                                 type="button"
-                                onClick={() => onSelectMenu?.('lockers')}
-                                className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-pointer text-left"
+                                onClick={() => onSelectMenu?.('devices')}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition cursor-pointer text-left ${
+                                    activeMenu === 'devices'
+                                        ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-600/30'
+                                        : 'text-slate-600 hover:bg-slate-50'
+                                }`}
                             >
                                 <span className="flex items-center gap-2.5">
-                                    <Cpu className="w-4 h-4 text-slate-400" />
+                                    <Cpu className={`w-4 h-4 ${activeMenu === 'devices' ? 'text-white' : 'text-slate-400'}`} />
                                     <span>Thiết bị IoT</span>
                                 </span>
                                 {offlineDevicesCount > 0 ? (
                                     <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" title={`${offlineDevicesCount} thiết bị offline`} />
                                 ) : (
-                                    <span className="w-2 h-2 rounded-full bg-emerald-500" title="IoT online" />
+                                    <span className={`w-2 h-2 rounded-full ${activeMenu === 'devices' ? 'bg-emerald-300' : 'bg-emerald-500'}`} title="IoT online" />
                                 )}
                             </button>
 
