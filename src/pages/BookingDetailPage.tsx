@@ -1,3 +1,4 @@
+import PickupDelegationPanel from '../components/booking/PickupDelegationPanel';
 import StationReviewPanel from '../components/booking/StationReviewPanel';
 import LostItemPanel from '../components/booking/LostItemPanel';
 import { parseServerTime } from '../utils/serverTime';
@@ -725,6 +726,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
       />
 
       {/* EXTEND BOOKING MODAL (UC-T07) */}
+      {booking && <PickupDelegationPanel key={booking.id} bookingId={booking.id} status={booking.status} />}
       {booking && <StationReviewPanel bookingId={booking.id} status={booking.status} />}
         {booking && <LostItemPanel bookingId={booking.id} status={booking.status} checkedOutAt={booking.checkedOutAt} />}
       <ExtendBookingModal
