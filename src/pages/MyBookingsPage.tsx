@@ -644,16 +644,15 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
         <CancelBookingModal
           isOpen={showCancelModal}
           onClose={() => setShowCancelModal(false)}
+          bookingId={selectedBooking.id}
           onSuccess={async (reason, _refundAmount) => {
-            try {
-              const res = await cancelBooking(selectedBooking.id, { reason });
-              if (res.success) {
-                showToast(`Đã hủy đơn thành công.`);
-                setShowCancelModal(false);
-                fetchBookings();
-              }
-            } catch (error) {
-              showToast('Lỗi khi hủy đơn hàng.');
+            const res = await cancelBooking(selectedBooking.id, { reason });
+            if (res.success) {
+              showToast(`Đã hủy đơn ${selectedBooking.bookingCode} thành công.`);
+              setShowCancelModal(false);
+              fetchBookings();
+            } else {
+              throw new Error(res.message || 'Lỗi khi hủy đơn hàng.');
             }
           }}
           bookingCode={selectedBooking.bookingCode}
