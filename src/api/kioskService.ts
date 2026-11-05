@@ -90,7 +90,11 @@ export interface KioskLockerItem {
   lastDoorEventAt?: string;
 }
 
+export interface SizeReservationCounts {
+  size: string; pendingPayment: number; awaitingDeposit: number; unassignedReservations: number; stored: number;
+}
 export interface KioskStationStatus {
+  reservations?: SizeReservationCounts[];
   stationId: string;
   stationName: string;
   stationAddress: string;
