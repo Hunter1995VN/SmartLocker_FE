@@ -4,13 +4,37 @@ import type { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axio
 /**
  * Cấu hình Axios client gọi API Backend.
  * - Base URL tự động chuyển theo môi trường dev/prod
+ * - Tự động ưu tiên kết nối Local Backend (http://localhost:5000) khi chạy trên máy trạm có kết nối phần cứng ESP32/MQTT
  * - Tự động đính kèm JWT trong header Authorization nếu đã đăng nhập
  */
 
-// Cho dev: backend chạy trên cổng 5000 (mặc định của ASP.NET Core)
-// Cho prod (Vercel): tự động trỏ đến Backend MonsterASP
-const API_BASE_URL = (import.meta.env.VITE_API_URL as string) ||
-    (import.meta.env.PROD ? 'https://smartlocker-api.runasp.net' : 'http://localhost:5000');
+const CLOUD_API_URL = 'https://smartlocker-api.runasp.net';
+const LOCAL_API_URL = 'http://localhost:5000';
+const ENV_API_URL = import.meta.env.VITE_API_URL as string | undefined;
+
+const API_BASE_URL = ENV_API_URL ||
+    (import.meta.env.PROD ? CLOUD_API_URL : LOCAL_API_URL);
+
+let resolvedBaseUrlPromise: Promise<string> | null = null;
+
+export const resolveApiBaseUrl = (): Promise<string> => {
+    if (ENV_API_URL || !import.meta.env.PROD) {
+        return Promise.resolve(API_BASE_URL);
+    }
+    if (!resolvedBaseUrlPromise) {
+        const controller = new AbortController();
+        const timer = window.setTimeout(() => controller.abort(), 1200);
+        resolvedBaseUrlPromise = fetch(`${LOCAL_API_URL}/api/health`, {
+            method: 'GET',
+            mode: 'cors',
+            signal: controller.signal,
+        })
+            .then((res) => (res.ok ? LOCAL_API_URL : CLOUD_API_URL))
+            .catch(() => CLOUD_API_URL)
+            .finally(() => window.clearTimeout(timer));
+    }
+    return resolvedBaseUrlPromise;
+};
 
 const apiClient: AxiosInstance = axios.create({
     baseURL: API_BASE_URL,
@@ -39,9 +63,12 @@ export const tokenStore = {
     },
 };
 
-// Interceptor: Tự động đính kèm Bearer Token trên MỌI request
+// Interceptor: Tự động đính kèm Bearer Token và định tuyến tới Local Backend nếu khả dụng
 apiClient.interceptors.request.use(
-    (config: InternalAxiosRequestConfig) => {
+    async (config: InternalAxiosRequestConfig) => {
+        if (!config.baseURL || config.baseURL === CLOUD_API_URL) {
+            config.baseURL = await resolveApiBaseUrl();
+        }
         const token = tokenStore.get();
         if (token && config.headers) {
             config.headers.Authorization = `Bearer ${token}`;
@@ -53,7 +80,26 @@ apiClient.interceptors.request.use(
 
 // Interceptor response: Nếu lỗi 401 → xóa token + redirect login
 apiClient.interceptors.response.use(
-    (response) => response,
+    async (response) => {
+        const data = response.data as { success?: boolean; message?: string } | undefined;
+        if (
+            data?.success === false &&
+            typeof data.message === 'string' &&
+            data.message.includes('Không gửi được lệnh mở tủ') &&
+            response.config.baseURL !== LOCAL_API_URL
+        ) {
+            try {
+                resolvedBaseUrlPromise = Promise.resolve(LOCAL_API_URL);
+                return await apiClient.request({
+                    ...response.config,
+                    baseURL: LOCAL_API_URL,
+                });
+            } catch {
+                return response;
+            }
+        }
+        return response;
+    },
     (error: AxiosError) => {
         if (error.response?.status === 401) {
             tokenStore.clear();
