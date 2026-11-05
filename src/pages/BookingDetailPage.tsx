@@ -430,9 +430,9 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                         role="img"
                         aria-label="Mã QR mở tủ trực tuyến"
                         value={booking!.qrPayload!}
-                        size={210}
-                        level="H"
-                        includeMargin={false}
+                        size={300}
+                        level="L"
+                        includeMargin={true}
                       />
                     ) : booking?.status === 'PENDING_PAYMENT' ? (
                       <div className="p-8 text-center text-xs text-amber-700 font-medium">
