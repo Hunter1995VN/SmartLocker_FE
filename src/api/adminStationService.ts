@@ -9,6 +9,94 @@ import type { SizeReservationCounts } from './kioskService';
 
 // ─── DTO Interfaces (đồng bộ 1:1 với Backend C# DTOs) ───────────────────────
 
+export interface DeviceControlResultDto {
+    deviceCode: string;
+    command: string;
+    message: string;
+    sentAt: string;
+}
+
+export interface DiagnosticsResultDto {
+    schemaVersion: number;
+    deviceCode: string;
+    status: string;
+    durationMs: number;
+    relays: Record<string, string>;
+    doors: Record<string, string>;
+    wifiRssi: number;
+    freeHeapBytes: number;
+    uptimeSeconds: number;
+    timestamp: string;
+}
+
+export interface IoTDeviceDto {
+    id: string;
+    stationId: string;
+    stationName: string;
+    stationAddress: string;
+    deviceCode: string;
+    deviceType: string;
+    firmwareVersion: string;
+    connectivityStatus: 'ONLINE' | 'OFFLINE' | 'REBOOTING' | 'UNPROVISIONED' | string;
+    wifiRssi?: number | null;
+    uptimeSeconds?: number | null;
+    lastSeenAt?: string | null;
+    createdAt?: string;
+    isProvisioned?: boolean;
+}
+
+export interface SwapSpareLockerRequest {
+    reason: string;
+    openNewLocker?: boolean;
+}
+
+export interface SwapSpareLockerResultDto {
+    oldLockerId: string;
+    oldLockerCode: string;
+    newLockerId: string;
+    newLockerCode: string;
+    size: string;
+    bookingId?: string | null;
+    bookingCode?: string | null;
+    message: string;
+    swappedAt: string;
+}
+
+export interface StationSecurityThresholdsDto {
+    stationId: string;
+    stationName: string;
+    doorAjarTimeoutSeconds: number;
+    maxConsecutiveFailures: number;
+    vibrationSensitivityLevel: number;
+    enableBuzzerAlarm: boolean;
+    autoCreateSecurityIncident: boolean;
+    updatedAt: string;
+}
+
+export interface UpdateSecurityThresholdsRequest {
+    doorAjarTimeoutSeconds: number;
+    maxConsecutiveFailures: number;
+    vibrationSensitivityLevel: number;
+    enableBuzzerAlarm: boolean;
+    autoCreateSecurityIncident: boolean;
+}
+
+export interface UpdateLockerHardwareMappingRequest {
+    gpioPin?: number | null;
+    ioTDeviceId?: string | null;
+}
+
+export interface DoorTelemetryItemDto {
+    lockerId: string;
+    lockerCode: string;
+    size: string;
+    doorState: string;
+    lastDoorEventAt?: string | null;
+    gpioPin?: number | null;
+    healthStatus: string;
+    deviceCode: string;
+}
+
 export interface StationPricingPolicyDto {
     id?: string;
     size: 'S' | 'M' | 'L' | string;
@@ -208,6 +296,78 @@ export const adminStationService = {
      */
     async updateLockerStatus(lockerId: string, data: UpdateLockerStatusRequest): Promise<ApiResponse<boolean>> {
         const res = await apiClient.patch<ApiResponse<boolean>>(`/api/admin/lockers/${lockerId}/status`, data);
+        return res.data;
+    },
+
+    /**
+     * UC-S01: Lấy danh sách thiết bị vi điều khiển IoT ESP32 của toàn bộ trạm
+     * GET /api/admin/stations/devices
+     */
+    async getIoTDevices(): Promise<ApiResponse<IoTDeviceDto[]>> {
+        const res = await apiClient.get<ApiResponse<IoTDeviceDto[]>>('/api/admin/stations/devices');
+        return res.data;
+    },
+
+    /**
+     * UC-S09: Khởi động lại vi điều khiển ESP32 từ xa qua lệnh MQTT Reboot
+     * POST /api/admin/stations/{stationId}/reboot
+     */
+    async rebootDevice(stationId: string): Promise<ApiResponse<DeviceControlResultDto>> {
+        const res = await apiClient.post<ApiResponse<DeviceControlResultDto>>(`/api/admin/stations/${stationId}/reboot`);
+        return res.data;
+    },
+
+    /**
+     * UC-S07: Kích hoạt chu trình chẩn đoán tự động phần cứng (Self-Test Relay/Sensor)
+     * POST /api/admin/stations/{stationId}/self-test
+     */
+    async triggerSelfTest(stationId: string): Promise<ApiResponse<DeviceControlResultDto>> {
+        const res = await apiClient.post<ApiResponse<DeviceControlResultDto>>(`/api/admin/stations/${stationId}/self-test`);
+        return res.data;
+    },
+
+    /**
+     * UC-S12: Đổi sang hộc tủ dự phòng khi ô tủ được gán bị kẹt cơ học
+     * POST /api/admin/lockers/{lockerId}/swap-spare
+     */
+    async swapSpareLocker(lockerId: string, data: SwapSpareLockerRequest): Promise<ApiResponse<SwapSpareLockerResultDto>> {
+        const res = await apiClient.post<ApiResponse<SwapSpareLockerResultDto>>(`/api/admin/lockers/${lockerId}/swap-spare`, data);
+        return res.data;
+    },
+
+    /**
+     * UC-A11: Lấy cấu hình ngưỡng an ninh & timeout cửa mở (Door Ajar)
+     * GET /api/admin/stations/{stationId}/security-thresholds
+     */
+    async getSecurityThresholds(stationId: string): Promise<ApiResponse<StationSecurityThresholdsDto>> {
+        const res = await apiClient.get<ApiResponse<StationSecurityThresholdsDto>>(`/api/admin/stations/${stationId}/security-thresholds`);
+        return res.data;
+    },
+
+    /**
+     * UC-A11: Cập nhật cấu hình ngưỡng an ninh & timeout cửa mở
+     * PUT /api/admin/stations/{stationId}/security-thresholds
+     */
+    async updateSecurityThresholds(stationId: string, data: UpdateSecurityThresholdsRequest): Promise<ApiResponse<StationSecurityThresholdsDto>> {
+        const res = await apiClient.put<ApiResponse<StationSecurityThresholdsDto>>(`/api/admin/stations/${stationId}/security-thresholds`, data);
+        return res.data;
+    },
+
+    /**
+     * UC-A02: Cấu hình mã chân GPIO và bo mạch IoT cho ô tủ
+     * PATCH /api/admin/lockers/{lockerId}/hardware-mapping
+     */
+    async updateLockerHardwareMapping(lockerId: string, data: UpdateLockerHardwareMappingRequest): Promise<ApiResponse<boolean>> {
+        const res = await apiClient.patch<ApiResponse<boolean>>(`/api/admin/lockers/${lockerId}/hardware-mapping`, data);
+        return res.data;
+    },
+
+    /**
+     * UC-S03: Giám sát trạng thái cảm biến cửa và Telemetry
+     * GET /api/admin/stations/{stationId}/door-telemetry
+     */
+    async getDoorTelemetry(stationId: string): Promise<ApiResponse<DoorTelemetryItemDto[]>> {
+        const res = await apiClient.get<ApiResponse<DoorTelemetryItemDto[]>>(`/api/admin/stations/${stationId}/door-telemetry`);
         return res.data;
     },
 };

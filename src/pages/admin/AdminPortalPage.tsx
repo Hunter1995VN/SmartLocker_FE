@@ -37,6 +37,7 @@ import InternalUsersManagementView from '../../components/admin/users/InternalUs
 import CustomerDebtManagementView from '../../components/admin/users/CustomerDebtManagementView';
 import InternalRbacManagementView from '../../components/admin/rbac/InternalRbacManagementView';
 import RealtimeLockerGridView from '../../components/admin/lockers/RealtimeLockerGridView';
+import IoTDeviceFleetManagementView from '../../components/admin/devices/IoTDeviceFleetManagementView';
 import OccupancyTurnoverAnalyticsView from '../../components/admin/analytics/OccupancyTurnoverAnalyticsView';
 import AbandonedPropertyView from '../../components/admin/abandoned/AbandonedPropertyView';
 import ManualConfirmQueue from '../../components/admin/incidents/ManualConfirmQueue';
@@ -91,6 +92,12 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
     const [selectedDays, setSelectedDays] = useState<number>(30);
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
     const [activeMenu, setActiveMenu] = useState<AdminMenuKey>('dashboard');
+    const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+    const showToast = useCallback((message: string, type: 'success' | 'error' = 'success') => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 4000);
+    }, []);
 
     // 4. API Fetch Functions
     const fetchStats = useCallback(async () => {
@@ -199,7 +206,16 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
             />
 
             {/* Right Main Viewport */}
-            <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+            <div className="flex-1 flex flex-col min-w-0 overflow-y-auto relative">
+                {toast && (
+                    <div className={`fixed top-5 right-5 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-xl border text-sm font-semibold transition-all duration-200 ${
+                        toast.type === 'error'
+                            ? 'bg-rose-50 text-rose-800 border-rose-200 shadow-rose-500/10'
+                            : 'bg-emerald-50 text-emerald-800 border-emerald-200 shadow-emerald-500/10'
+                    }`}>
+                        <span>{toast.message}</span>
+                    </div>
+                )}
                 <main className="p-4 sm:p-6 lg:p-7 space-y-5 max-w-7xl w-full mx-auto print:p-0 print:max-w-none">
                     {activeMenu === 'abandoned' ? (
                         <AbandonedPropertyView userRole={role} currentUser={user} />
@@ -207,6 +223,8 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                         <><ManualConfirmQueue/><EmergencyIncidentListView userRole={role} onOpenCountChange={(count) => setOpenIncidentsBadge(count)} onIncidentsChanged={() => { void fetchStats(); }} /></>
                     ) : activeMenu === 'lockers' ? (
                         <RealtimeLockerGridView />
+                    ) : activeMenu === 'devices' ? (
+                        <IoTDeviceFleetManagementView onShowToast={showToast} />
                     ) : activeMenu === 'occupancy' ? (
                         <OccupancyTurnoverAnalyticsView
                             userRole={role}
@@ -294,11 +312,17 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                                         onRetry={() => fetchChart(selectedDays)}
                                     />
 
-                                    <IoTTelemetryCard
-                                        offlineDevicesCount={stats?.offlineIoTDevices ?? 0}
-                                        totalStations={stats?.totalStations ?? 0}
-                                        isLoading={isLoadingStats}
-                                    />
+                                    <div
+                                        onClick={() => setActiveMenu('devices')}
+                                        className="cursor-pointer transition hover:opacity-95"
+                                        title="Bấm để mở trang Quản lý Thiết bị IoT"
+                                    >
+                                        <IoTTelemetryCard
+                                            offlineDevicesCount={stats?.offlineIoTDevices ?? 0}
+                                            totalStations={stats?.totalStations ?? 0}
+                                            isLoading={isLoadingStats}
+                                        />
+                                    </div>
                                 </div>
 
                                 {/* Right Column: Real-time Critical Triage (Incidents & Anomalies) */}
