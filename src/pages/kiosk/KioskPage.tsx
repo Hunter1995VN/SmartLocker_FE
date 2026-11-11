@@ -11,6 +11,7 @@ import { sounds } from '../../utils/soundEffects';
 import { QRCodeSVG } from 'qrcode.react';
 import type { CreateBookingResponse } from '../../api/bookingService';
 import { kioskText, kioskLocales } from '../../utils/kioskMessages';
+import { speakKiosk, stopKioskSpeech } from '../../utils/kioskSpeech';
 import {
   SmartLockerLogo3D,
   CheckInIcon3D,
@@ -35,6 +36,8 @@ export default function KioskPage() {
   const [authMethod, setAuthMethod] = useState<AuthMethod>('QR');
   const [accessCode, setAccessCode] = useState<string>('');
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
+  // UC-T23: true khi thiết bị chưa có giọng đọc cho ngôn ngữ đang chọn
+  const [voiceUnavailable, setVoiceUnavailable] = useState<boolean>(false);
   const [walkInPin, setWalkInPin] = useState('');
   const [lang, setLang] = useState<KioskLanguage>('VI');
   const x = kioskText(lang);
@@ -99,6 +102,36 @@ export default function KioskPage() {
   const [currentTime, setCurrentTime] = useState<string>('');
 
   const t = I18N_DICTIONARY[lang] || I18N_DICTIONARY.VI;
+
+  // UC-T23: đọc hướng dẫn của bước hiện tại bằng ngôn ngữ đang chọn (cùng nút bật/tắt âm thanh).
+  // Chrome nạp danh sách giọng muộn nên nghe thêm "voiceschanged"; chỉ đọc một lần cho mỗi bước.
+  useEffect(() => {
+    if (!soundEnabled || step === 'WELCOME') {
+      stopKioskSpeech();
+      setVoiceUnavailable(false);
+      return;
+    }
+    const dictionary = I18N_DICTIONARY[lang] || I18N_DICTIONARY.VI;
+    const message = step === 'IDLE' ? dictionary.welcomeSubtitle
+      : step === 'AUTH' ? `${dictionary.scanQr}. ${dictionary.enterPin}`
+      : step === 'LOCKER_ACTIVE' ? (activeDoorState === 'OPEN' ? dictionary.doorCloseInstruction : kioskText(lang)('waitingDoor'))
+      : step === 'SUCCESS' ? (opMode === 'CHECK_IN' ? dictionary.successDepositDesc : dictionary.successRetrieveDesc)
+      : step === 'OVERDUE' ? dictionary.overdueSubtitle : '';
+    if (!message) { stopKioskSpeech(); setVoiceUnavailable(false); return; }
+    let spoken = false;
+    const speak = () => {
+      if (spoken) return;
+      spoken = speakKiosk(message, lang);
+      setVoiceUnavailable(!spoken);
+    };
+    speak();
+    const synth = typeof window !== 'undefined' && 'speechSynthesis' in window ? window.speechSynthesis : null;
+    synth?.addEventListener('voiceschanged', speak);
+    return () => {
+      synth?.removeEventListener('voiceschanged', speak);
+      stopKioskSpeech();
+    };
+  }, [step, lang, soundEnabled, activeDoorState, opMode]);
 
   useEffect(() => {
     const updateClock = () => {
@@ -599,7 +632,7 @@ export default function KioskPage() {
                   className="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg transition-colors flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <span>✓</span>
-                  <span>Xác nhận đã lấy hành lý (Ngoại tuyến)</span>
+                  <span>{x('confirmPickupOffline')}</span>
                 </button>
               )}
 
@@ -626,6 +659,7 @@ export default function KioskPage() {
 
 
         {/* Error Alert Banner */}
+        {voiceUnavailable && <p role="status" className="text-xs mb-2 opacity-80">{x('voiceUnavailable')}</p>}
         {errorMessage && (
           <div key={errorMessage} role="alert" className="kiosk-shake w-full max-w-xl mb-3 p-3 pl-4 rounded-2xl bg-rose-700 text-white flex items-center justify-between gap-3 text-sm font-semibold shadow-lg">
             <span className="flex items-center gap-2"><span aria-hidden="true" className="grid place-items-center w-6 h-6 shrink-0 rounded-full bg-white/20 font-black">!</span>{errorMessage}</span>

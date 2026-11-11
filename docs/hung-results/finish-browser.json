@@ -1,0 +1,66 @@
+{
+  "level": "Production React components in Edge headless; API and Web Speech mocked; no real payment, email, MQTT or hardware",
+  "ranAt": "2026-11-11T06:10:55.767Z",
+  "results": [
+    {
+      "name": "T16 email sent: tells the owner the PIN was emailed and still shows it",
+      "status": "PASS"
+    },
+    {
+      "name": "T16 email not sent: shows reason and asks owner to share the PIN",
+      "status": "PASS"
+    },
+    {
+      "name": "T16 email send failure: generic reason, PIN still available",
+      "status": "PASS"
+    },
+    {
+      "name": "T16 phone: explains there is no SMS channel",
+      "status": "PASS"
+    },
+    {
+      "name": "T16 older backend without delivery field still works",
+      "status": "PASS"
+    },
+    {
+      "name": "T15 unpaid session can be cancelled once and the kiosk says so",
+      "status": "PASS"
+    },
+    {
+      "name": "T15 paid ticket shows the PIN and hands off only after the customer taps ready",
+      "status": "PASS"
+    },
+    {
+      "name": "T15 paid but PIN unreadable asks to contact staff and never offers handoff",
+      "status": "PASS"
+    },
+    {
+      "name": "T15 expired session shows the notice and hides cancel",
+      "status": "PASS"
+    },
+    {
+      "name": "T15 walk-in screen translates in five languages",
+      "status": "PASS"
+    },
+    {
+      "name": "T23 each language speaks the welcome instruction with its own voice",
+      "status": "PASS"
+    },
+    {
+      "name": "T23 missing voice for the chosen language shows a written notice instead of failing",
+      "status": "PASS"
+    },
+    {
+      "name": "T23 turning sound off stops speech and does not speak again",
+      "status": "PASS"
+    },
+    {
+      "name": "T23 browser without Web Speech still works and shows the notice",
+      "status": "PASS"
+    },
+    {
+      "name": "T23 offline pickup button is translated in all languages (no hard-coded Vietnamese)",
+      "status": "PASS"
+    }
+  ]
+}

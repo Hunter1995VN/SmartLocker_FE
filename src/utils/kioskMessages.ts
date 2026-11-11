@@ -351,7 +351,9 @@ const messages = {
   chooseLanguage: ['Chọn ngôn ngữ', 'Choose language', '言語を選択', '언어 선택', '选择语言'],
   otherStation: ['trạm khác', 'another station', '別のステーション', '다른 보관소', '其他站点']
   , payFee: ['Thanh toán phụ phí', 'Pay overdue fee', '超過料金を支払う', '초과 요금 결제', '支付超时费用'],
-  paymentPageQr: ['Quét mã để mở trang thanh toán. Chờ hệ thống xác minh trước khi lấy đồ.', 'Scan to open the payment page. Wait for server confirmation before pickup.', '読み取って支払いページを開き、確認が完了するまでお待ちください。', '스캔하여 결제 페이지를 여세요. 서버 확인 후 찾을 수 있습니다.', '扫码打开付款页面，等待系统确认后再取件。']
+  paymentPageQr: ['Quét mã để mở trang thanh toán. Chờ hệ thống xác minh trước khi lấy đồ.', 'Scan to open the payment page. Wait for server confirmation before pickup.', '読み取って支払いページを開き、確認が完了するまでお待ちください。', '스캔하여 결제 페이지를 여세요. 서버 확인 후 찾을 수 있습니다.', '扫码打开付款页面，等待系统确认后再取件。'],
+  confirmPickupOffline: ['Xác nhận đã lấy hành lý (Ngoại tuyến)', 'Confirm luggage collected (offline)', '荷物の受け取りを確認（オフライン）', '짐 수령 확인 (오프라인)', '确认已取行李（离线）'],
+  tabletTitle: ['Máy tính bảng đặt tủ tại trạm', 'Station booking tablet', 'ステーション予約タブレット', '보관소 예약 태블릿', '站点预订平板']
 } as const;
 
 export const kioskLocales: Record<KioskLanguage, string> = { VI: 'vi-VN', EN: 'en-US', JA: 'ja-JP', KO: 'ko-KR', ZH: 'zh-CN' };

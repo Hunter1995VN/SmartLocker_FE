@@ -103,8 +103,8 @@ export default function WalkInTabletPage() {
       </main>
 
       <footer className="h-10 px-6 bg-white border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
-        <span>SmartLocker Walk-in Tablet Terminal (UC-T15)</span>
-        <span>Hotline: 1900 6868</span>
+        <span>SmartLocker · {x('tabletTitle')}</span>
+        <span>{x('hotline')}: 1900 6868</span>
       </footer>
     </div>
   );
