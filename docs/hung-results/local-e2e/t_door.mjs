@@ -1,0 +1,18 @@
+import { execFileSync } from "node:child_process";
+import { sql, check, results } from "./lib.mjs";
+const DOOR = "C:/Users/ASUS/AppData/Local/Temp/claude/d6917a5a20185aaa/89936f5c-2ced-4f9c-935a-2adad1076d19/scratchpad/doortool/bin/Debug/net8.0/DoorTool.dll";
+const door = (dev, locker, state, ago = 0) => execFileSync("dotnet", [DOOR, dev, locker, state, String(ago)], { encoding: "utf8" }).trim();
+sql("UPDATE Lockers SET BusinessStatus='AVAILABLE', HealthStatus='HEALTHY', DoorState='CLOSED', LastDoorEventAt=NULL");
+const row = sql("SELECT TOP 1 CAST(l.Id AS varchar(36)), d.DeviceCode FROM Lockers l JOIN IoTDevices d ON d.Id=l.IoTDeviceId WHERE l.Size='S' ORDER BY l.LockerCode").split("|");
+const [locker, device] = [row[0].trim(), row[1].trim()];
+const state = () => sql(`SELECT BusinessStatus+'/'+DoorState FROM Lockers WHERE Id='${locker}'`);
+door(device, locker, "OPEN", 5);
+check("T11-D1", "OPEN event on an idle AVAILABLE locker does not flip it to OPEN (ESP32 reboot noise)", state().startsWith("AVAILABLE"), state());
+door(device, locker, "CLOSED", 3);
+check("T11-D2", "CLOSED event keeps an idle locker AVAILABLE", state().startsWith("AVAILABLE"), state());
+const before = sql(`SELECT CONVERT(varchar(30), LastDoorEventAt, 121) FROM Lockers WHERE Id='${locker}'`);
+door(device, locker, "OPEN", 600);
+check("T11-D3", "stale door event (older than the last one) is ignored", sql(`SELECT CONVERT(varchar(30), LastDoorEventAt, 121) FROM Lockers WHERE Id='${locker}'`) === before);
+const out = door("WRONG-DEVICE", locker, "OPEN", 1);
+check("T11-D4", "event from a device that does not own the locker is ignored", out.includes("ignored") || out.includes("mismatched"), out.split("\n").pop());
+console.log("SUMMARY", results.filter((r) => r.ok).length + "/" + results.length);

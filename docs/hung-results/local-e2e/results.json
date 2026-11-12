@@ -1,0 +1,368 @@
+[
+ {
+  "id": "ENV",
+  "name": "tokens obtained (traveler A, traveler B, admin)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "id": "T09-01",
+  "name": "payment webhook confirms booking and issues credential",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "id": "T09-02",
+  "name": "owner sees 8-digit PIN and QR for a paid booking",
+  "ok": true,
+  "detail": "pin=23642106 qr=true"
+ },
+ {
+  "id": "T09-03",
+  "name": "PIN is stored hashed (not plain text)",
+  "ok": true,
+  "detail": "44|1"
+ },
+ {
+  "id": "T09-04",
+  "name": "another customer cannot read the ticket",
+  "ok": true,
+  "detail": "status 404"
+ },
+ {
+  "id": "T09-05",
+  "name": "unauthenticated request is rejected (401)",
+  "ok": true,
+  "detail": "status 401"
+ },
+ {
+  "id": "T09-06",
+  "name": "unpaid (PENDING_PAYMENT) booking exposes no PIN/QR",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "id": "T09-07",
+  "name": "CANCELLED booking exposes no PIN/QR",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "id": "T09-08",
+  "name": "QR payload is stable between two reads inside its validity window",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "id": "T16-01",
+  "name": "delegate by e-mail returns 8-digit PIN + delivery result",
+  "ok": true,
+  "detail": "{\"delegations\":[{\"id\":\"0c4b235a-5b70-49ae-aed9-7cac5dc98329\",\"contact\":\"friend@example.com\",\"expiresAt\":\"2026-11-12T17:51:13.4288383\"}],\"id\":\"0c4b235a-5b70-49ae-aed9-7cac5dc98329\",\"pin\":\"********\",\"expiresAt\":\"2026-11-12T17:51:13.4288383Z\",\"delivery\""
+ },
+ {
+  "id": "T16-02",
+  "name": "SMTP not configured -> delivery reported as not sent (EMAIL / SMTP_NOT_CONFIGURED), request still succeeds",
+  "ok": true,
+  "detail": "{\"channel\":\"EMAIL\",\"sent\":false,\"reason\":\"SMTP_NOT_CONFIGURED\"}"
+ },
+ {
+  "id": "T16-04",
+  "name": "delegate by phone -> MANUAL / NO_SMS_PROVIDER (owner shares PIN)",
+  "ok": true,
+  "detail": "{\"channel\":\"MANUAL\",\"sent\":false,\"reason\":\"NO_SMS_PROVIDER\"}"
+ },
+ {
+  "id": "T16-05",
+  "name": "a new delegation revokes the previous one (exactly 1 active)",
+  "ok": true,
+  "detail": "active=1"
+ },
+ {
+  "id": "T16-06.1",
+  "name": "invalid input rejected (contact='', minutes=60)",
+  "ok": true,
+  "detail": "status 400"
+ },
+ {
+  "id": "T16-06.2",
+  "name": "invalid input rejected (contact='not a contact', minutes=60)",
+  "ok": true,
+  "detail": "status 400"
+ },
+ {
+  "id": "T16-06.3",
+  "name": "invalid input rejected (contact='abc@', minutes=60)",
+  "ok": true,
+  "detail": "status 400"
+ },
+ {
+  "id": "T16-06.4",
+  "name": "invalid input rejected (contact='0912345678', minutes=0)",
+  "ok": true,
+  "detail": "status 400"
+ },
+ {
+  "id": "T16-06.5",
+  "name": "invalid input rejected (contact='0912345678', minutes=1441)",
+  "ok": true,
+  "detail": "status 400"
+ },
+ {
+  "id": "T16-07",
+  "name": "another customer cannot delegate someone else's booking",
+  "ok": true,
+  "detail": "status 404"
+ },
+ {
+  "id": "T16-08",
+  "name": "delegation refused for a booking that is not STORED",
+  "ok": true,
+  "detail": "status 400"
+ },
+ {
+  "id": "T16-09",
+  "name": "owner can revoke a delegation",
+  "ok": true,
+  "detail": "status 204"
+ },
+ {
+  "id": "T16-10",
+  "name": "PIN is not stored in plain text in PickupDelegations",
+  "ok": true,
+  "detail": "Id,BookingId,Contact,PinHash,ExpiresAt,UsedAt,RevokedAt"
+ },
+ {
+  "id": "T17-01",
+  "name": "report a lost item after completed pickup",
+  "ok": true,
+  "detail": "{\"id\":\"a36e6d11-613d-444d-b221-5beb208e3222\",\"status\":\"OPEN\"}"
+ },
+ {
+  "id": "T17-02",
+  "name": "second open report for the same booking is rejected (409)",
+  "ok": true,
+  "detail": "status 409"
+ },
+ {
+  "id": "T17-03",
+  "name": "another customer cannot report on this booking",
+  "ok": true,
+  "detail": "status 404"
+ },
+ {
+  "id": "T17-04",
+  "name": "report refused while the booking is not completed",
+  "ok": true,
+  "detail": "status 400"
+ },
+ {
+  "id": "T17-05",
+  "name": "non-JPEG photo is rejected",
+  "ok": true,
+  "detail": "status 400"
+ },
+ {
+  "id": "T17-06",
+  "name": "description over 2000 characters is rejected",
+  "ok": true,
+  "detail": "status 400"
+ },
+ {
+  "id": "T17-07",
+  "name": "report outside the 7-day window is rejected",
+  "ok": true,
+  "detail": "status 400"
+ },
+ {
+  "id": "T17-08",
+  "name": "traveler cannot open the staff queue (403)",
+  "ok": true,
+  "detail": "status 403"
+ },
+ {
+  "id": "T17-09",
+  "name": "staff queue lists the report",
+  "ok": true,
+  "detail": "status 200"
+ },
+ {
+  "id": "T17-10",
+  "name": "staff marks the item FOUND with a response",
+  "ok": true,
+  "detail": "status 200 {\"status\":\"FOUND\"}"
+ },
+ {
+  "id": "T17-11",
+  "name": "owner is notified about the response",
+  "ok": true,
+  "detail": "notifications=5"
+ },
+ {
+  "id": "T17-12",
+  "name": "invalid staff status is rejected",
+  "ok": true,
+  "detail": "status 400"
+ },
+ {
+  "id": "T21-01",
+  "name": "review a completed booking (5 stars, 2 criteria)",
+  "ok": true,
+  "detail": "status 200"
+ },
+ {
+  "id": "T21-02",
+  "name": "second review for the same booking is rejected (409)",
+  "ok": true,
+  "detail": "status 409"
+ },
+ {
+  "id": "T21-03.1",
+  "name": "invalid review rejected (0 stars)",
+  "ok": true,
+  "detail": "status 400"
+ },
+ {
+  "id": "T21-03.2",
+  "name": "invalid review rejected (6 stars)",
+  "ok": true,
+  "detail": "status 400"
+ },
+ {
+  "id": "T21-03.3",
+  "name": "invalid review rejected (unknown criterion)",
+  "ok": true,
+  "detail": "status 400"
+ },
+ {
+  "id": "T21-03.4",
+  "name": "invalid review rejected (comment > 1000)",
+  "ok": true,
+  "detail": "status 400"
+ },
+ {
+  "id": "T21-03.5",
+  "name": "invalid review rejected (more than 3 criteria)",
+  "ok": true,
+  "detail": "status 400"
+ },
+ {
+  "id": "T21-04",
+  "name": "review refused before pickup is completed",
+  "ok": true,
+  "detail": "status 400"
+ },
+ {
+  "id": "T21-05",
+  "name": "another customer cannot review this booking",
+  "ok": true,
+  "detail": "status 404"
+ },
+ {
+  "id": "T21-06",
+  "name": "station list shows the new rating (ratingCount>=1, average 5)",
+  "ok": true,
+  "detail": "{\"c\":5}"
+ },
+ {
+  "id": "T21-07",
+  "name": "admin ratings view aggregates the reviews per station (count >= 1)",
+  "ok": true,
+  "detail": "{\"stationId\":\"fb847bfd-499b-48d4-a8ed-a9ffd2e5428e\",\"stationName\":\"E2E Station A\",\"count\":5,\"average\":5}"
+ },
+ {
+  "id": "S08-01",
+  "name": "traveler cannot open the manual-confirm queue (403)",
+  "ok": true,
+  "detail": "status 403"
+ },
+ {
+  "id": "S08-02",
+  "name": "staff queue lists the pending photo confirmation",
+  "ok": true,
+  "detail": "status 200"
+ },
+ {
+  "id": "S08-03",
+  "name": "approval without a reason is rejected",
+  "ok": true,
+  "detail": "status 400"
+ },
+ {
+  "id": "S08-04",
+  "name": "approval completes the booking (COMPLETED_MANUAL) and puts the locker into MAINTENANCE for sensor repair",
+  "ok": true,
+  "detail": "status 200 booking=COMPLETED_MANUAL locker=MAINTENANCE"
+ },
+ {
+  "id": "S08-05",
+  "name": "approving the same request twice is rejected",
+  "ok": true,
+  "detail": "status 400"
+ },
+ {
+  "id": "S08-06",
+  "name": "approving an unknown request is rejected",
+  "ok": true,
+  "detail": "status 400"
+ },
+ {
+  "id": "S02-01",
+  "name": "traveler cannot open the admin locker grid (403)",
+  "ok": true,
+  "detail": "status 403"
+ },
+ {
+  "id": "S02-02",
+  "name": "admin grid returns all 6 lockers of the station",
+  "ok": true,
+  "detail": "status 200 codes=6"
+ },
+ {
+  "id": "S02-03",
+  "name": "reservations endpoint answers for staff",
+  "ok": true,
+  "detail": "status 200"
+ },
+ {
+  "id": "S02-04",
+  "name": "admin can put a free locker into MAINTENANCE",
+  "ok": true,
+  "detail": "status 200 db=MAINTENANCE {\"success\":true,\"message\":\"Cập nhật trạng thái tủ thành công\",\"data\":true,\"errors\":[]}"
+ },
+ {
+  "id": "S02-05",
+  "name": "maintenance locker is no longer counted as available (availableS 2 -> 1)",
+  "ok": true,
+  "detail": "availableS=1"
+ },
+ {
+  "id": "T11-01",
+  "name": "kiosk rejects a wrong PIN",
+  "ok": true,
+  "detail": "status 400 {\"success\":false,\"message\":\"Không tìm thấy thông tin đơn đặt chỗ tương ứng. Vui lòng kiểm tra lại mã PIN hoặc mã đặt chỗ"
+ },
+ {
+  "id": "T11-02",
+  "name": "kiosk rejects a valid PIN used at a different station",
+  "ok": true,
+  "detail": "status 400 {\"success\":false,\"message\":\"Không tìm thấy thông tin đơn đặt chỗ tương ứng. Vui lòng kiểm tra lại mã PIN hoặc mã đặt chỗ"
+ },
+ {
+  "id": "T15-01",
+  "name": "walk-in with an invalid phone number is rejected",
+  "ok": true,
+  "detail": "status 400"
+ },
+ {
+  "id": "T15-02",
+  "name": "walk-in over the maximum hours is rejected",
+  "ok": true,
+  "detail": "status 400 {\"message\":\"Chọn kích cỡ, 1–72 giờ và số điện thoại liên hệ hợp lệ.\"}"
+ },
+ {
+  "id": "T15-03",
+  "name": "walk-in with an unknown size is rejected",
+  "ok": true,
+  "detail": "status 400"
+ }
+]
