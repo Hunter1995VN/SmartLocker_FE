@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
     Search, MapPin, Navigation, Zap,
     Shield, User, Clock, RefreshCw, ChevronRight,
@@ -12,6 +12,7 @@ import { getApiErrorMessage, resolveAssetUrl } from '../api/client';
 import CustomerHeader from '../components/layout/CustomerHeader';
 import { CONTACT, openLegal, openSupport } from '../utils/contact';
 import { parseServerTime } from '../utils/serverTime';
+import { classifyGeoError, watchGeoAvailability, GEO_OS_BLOCKED_HINT } from '../utils/geolocation';
 
 // ─── Types ───────────────────────────────────────────────
 interface AuthUser {
@@ -30,7 +31,7 @@ interface DashboardPageProps {
     onNavigate?: (page: string, data?: any) => void;
 }
 
-type LocationState = 'locating' | 'granted' | 'denied' | 'unavailable' | 'timeout' | 'unsupported';
+type LocationState = 'locating' | 'granted' | 'denied' | 'os-blocked' | 'unavailable' | 'timeout' | 'unsupported';
 
 const STATUS_LABEL: Record<string, { label: string; className: string }> = {
     PENDING_PAYMENT: { label: 'CHỜ THANH TOÁN', className: 'bg-[#fff1c2] text-[#6b4a00]' },
@@ -146,11 +147,17 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
         setLocState('locating');
         navigator.geolocation.getCurrentPosition(
             (pos) => { setUserLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude }); setLocState('granted'); },
-            (err) => setLocState(err.code === 1 ? 'denied' : err.code === 2 ? 'unavailable' : 'timeout'),
+            (err) => { void classifyGeoError(err).then(setLocState); },
             { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 },
         );
     }, []);
     useEffect(() => { locate(); }, [locate]);
+    // Allowing location in the address bar or switching on OS location services takes effect without a reload.
+    const locStateRef = useRef(locState);
+    useEffect(() => { locStateRef.current = locState; }, [locState]);
+    useEffect(() => watchGeoAvailability(() => {
+        if (['denied', 'os-blocked', 'unavailable', 'timeout'].includes(locStateRef.current)) locate();
+    }), [locate]);
 
     // Đơn đang hoạt động thật: ưu tiên đơn đang gửi đồ, sau đó đơn đã thanh toán chờ gửi
     const activeBooking = useMemo(
@@ -215,6 +222,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
         if (locState === 'locating') return 'Đang xác định vị trí...';
         if (locState === 'granted') return nearestStation ? `Trạm gần bạn: ${nearestStation.name} (${formatDistance(nearestStation.distanceKm ?? 0)})` : 'Đã xác định vị trí của bạn';
         if (locState === 'denied') return 'Vị trí đang bị chặn. Cho phép vị trí để thấy trạm gần bạn.';
+        if (locState === 'os-blocked') return GEO_OS_BLOCKED_HINT;
         if (locState === 'unsupported') return 'Trình duyệt không hỗ trợ định vị.';
         return 'Chưa xác định được vị trí của bạn.';
     })();
@@ -311,7 +319,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                         >
                                             {locationText}
                                         </span>
-                                        {(locState === 'denied' || locState === 'unavailable' || locState === 'timeout') && (
+                                        {(locState === 'denied' || locState === 'os-blocked' || locState === 'unavailable' || locState === 'timeout') && (
                                             <button type="button" onClick={locate} className="text-xs font-bold text-[#004ac6] underline cursor-pointer">Thử lại</button>
                                         )}
                                     </p>
