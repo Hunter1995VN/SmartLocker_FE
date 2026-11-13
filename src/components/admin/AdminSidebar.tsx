@@ -11,6 +11,7 @@ import {
     Layers,
     Cpu,
     ShieldAlert,
+    MessageSquareText,
     DollarSign,
     Users,
     Ticket,
@@ -35,6 +36,7 @@ export type AdminMenuKey =
     | 'devices'
     | 'occupancy'
     | 'incidents'
+    | 'reviews'
     | 'abandoned'
     | 'reconciliation'
     | 'refunds'
@@ -110,6 +112,18 @@ export default function AdminSidebar({
                             Vận hành trạm
                         </p>
                         <div className="space-y-0.5 text-slate-600">
+                            {isAdmin && (
+                                <button type="button" onClick={() => onSelectMenu?.('reviews')}
+                                    aria-current={activeMenu === 'reviews' ? 'page' : undefined}
+                                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition cursor-pointer text-left ${
+                                        activeMenu === 'reviews'
+                                            ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-600/30'
+                                            : 'text-slate-600 hover:bg-slate-50'
+                                    }`}>
+                                    <MessageSquareText className="w-4 h-4" aria-hidden="true" />
+                                    <span>Quản lý đánh giá</span>
+                                </button>
+                            )}
                             <button
                                 type="button"
                                 onClick={() => onSelectMenu?.('stations')}

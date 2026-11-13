@@ -683,6 +683,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                 <footer className="border-t border-[#e5eeff] mt-4 px-4 md:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
                     <p className="text-xs text-[#737686]">© {new Date().getFullYear()} SmartLocker. Bản quyền thuộc về SmartLocker.</p>
                     <div className="flex items-center gap-4 text-xs text-[#434655]">
+                        <a href="/?view=reviews" className="hover:text-[#004ac6] transition-colors">Đánh giá khách hàng</a>
                         <button type="button" onClick={() => openLegal('privacy')} className="hover:text-[#004ac6] transition-colors cursor-pointer">Chính sách bảo mật</button>
                         <button type="button" onClick={() => openLegal('terms')} className="hover:text-[#004ac6] transition-colors cursor-pointer">Điều khoản dịch vụ</button>
                         <button type="button" onClick={openSupport} className="hover:text-[#004ac6] transition-colors cursor-pointer">Trợ giúp khẩn cấp 24/7</button>
