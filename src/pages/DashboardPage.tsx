@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
     Search, MapPin, Navigation, Zap,
     Shield, User, Clock, RefreshCw, ChevronRight,
-    ArrowRight, Phone, Package, ReceiptText, Lock, CheckCircle,
+    ArrowRight, Phone, Package, ReceiptText, Lock, CheckCircle, Star,
 } from 'lucide-react';
 import { getStations, calcDistance } from '../api/stationService';
 import type { Station } from '../api/stationService';
@@ -736,6 +736,12 @@ function BookingRow({ booking, onOpen }: { booking: BookingListItemDto; onOpen: 
                 <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide ${status.className}`}>
                     {status.label}
                 </span>
+                {(booking.status === 'COMPLETED' || booking.status === 'COMPLETED_MANUAL') && (
+                    <button type="button" onClick={onOpen} title="Đánh giá trạm sau khi lấy đồ"
+                        className="text-xs font-semibold text-amber-700 hover:text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full flex items-center gap-1 transition-colors cursor-pointer">
+                        <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />Đánh giá
+                    </button>
+                )}
                 <button type="button" onClick={onOpen} className="text-xs font-semibold text-[#2563eb] hover:text-[#004ac6] flex items-center gap-0.5 transition-colors cursor-pointer">
                     {booking.status === 'COMPLETED' ? <>Biên lai <ReceiptText className="w-4 h-4" /></> : <>Chi tiết <ChevronRight className="w-4 h-4" /></>}
                 </button>
