@@ -1,3 +1,4 @@
+import { openLegal } from '../../utils/contact';
 import { Lock, Eye, EyeOff, ChevronLeft, ArrowRight, AlertCircle, Check, X, Package, Zap } from 'lucide-react';
 import { useState } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
@@ -412,9 +413,9 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                                 />
                                 <label htmlFor="agreeTerms" className="text-xs text-gray-500 cursor-pointer leading-relaxed">
                                     Tôi đồng ý với{' '}
-                                    <a href="#" className="text-blue-600 font-semibold hover:underline">Điều khoản dịch vụ</a>
+                                    <a href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }} className="text-blue-600 font-semibold hover:underline">Điều khoản dịch vụ</a>
                                     {' '}và{' '}
-                                    <a href="#" className="text-blue-600 font-semibold hover:underline">Chính sách bảo mật</a>
+                                    <a href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }} className="text-blue-600 font-semibold hover:underline">Chính sách bảo mật</a>
                                     {' '}của SmartLocker.
                                 </label>
                             </div>
@@ -449,7 +450,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
 
                         <p className="mt-5 text-center text-xs text-gray-400">
                             Quản lý thông tin theo{' '}
-                            <a href="#" className="text-blue-600 font-semibold hover:underline">Chính sách bảo mật</a>
+                            <a href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }} className="text-blue-600 font-semibold hover:underline">Chính sách bảo mật</a>
                         </p>
                     </div>
                 </div>

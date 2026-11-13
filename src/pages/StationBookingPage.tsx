@@ -1,3 +1,4 @@
+import { openLegal, openSupport } from '../utils/contact';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Calendar,
@@ -1195,11 +1196,11 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
               </p>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-500">
-              <a className="hover:text-blue-600 transition-colors" href="#">Privacy Policy</a>
+              <a className="hover:text-blue-600 transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>Privacy Policy</a>
               <span>•</span>
-              <a className="hover:text-blue-600 transition-colors" href="#">Terms of Service</a>
+              <a className="hover:text-blue-600 transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }}>Terms of Service</a>
               <span>•</span>
-              <a className="hover:text-blue-600 transition-colors" href="#">Customer Support</a>
+              <a className="hover:text-blue-600 transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}>Customer Support</a>
             </div>
           </div>
         </div>

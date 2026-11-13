@@ -1,4 +1,4 @@
-import { openSupport } from '../utils/contact';
+import { openLegal, openSupport } from '../utils/contact';
 import React, { useState, useEffect } from 'react';
 import {
   ShieldCheck,
@@ -799,10 +799,10 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-xs text-[#434655]">
-            <a className="hover:text-primary transition-colors" href="#">Security Architecture</a>
-            <a className="hover:text-primary transition-colors" href="#">Compliance &amp; SOC2</a>
-            <a className="hover:text-primary transition-colors" href="#">Terms of Service</a>
-            <a className="hover:text-primary transition-colors" href="#">Support Telemetry</a>
+            <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>Security Architecture</a>
+            <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>Compliance &amp; SOC2</a>
+            <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }}>Terms of Service</a>
+            <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}>Support Telemetry</a>
             <span className="text-primary font-bold hidden md:inline">Hotline: 1900 1234</span>
           </div>
         </div>

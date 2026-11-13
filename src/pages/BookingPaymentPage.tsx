@@ -1,3 +1,4 @@
+import { openLegal, openSupport } from '../utils/contact';
 import React, { useState, useEffect } from 'react';
 import {
   Check,
@@ -810,11 +811,11 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
               </p>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-500">
-              <a className="hover:text-blue-600 transition-colors" href="#">Chính sách bảo mật</a>
+              <a className="hover:text-blue-600 transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>Chính sách bảo mật</a>
               <span>•</span>
-              <a className="hover:text-blue-600 transition-colors" href="#">Điều khoản sử dụng</a>
+              <a className="hover:text-blue-600 transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }}>Điều khoản sử dụng</a>
               <span>•</span>
-              <a className="hover:text-blue-600 transition-colors" href="#">Hỗ trợ khách hàng</a>
+              <a className="hover:text-blue-600 transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}>Hỗ trợ khách hàng</a>
             </div>
           </div>
         </div>

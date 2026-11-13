@@ -1,4 +1,4 @@
-import { openSupport } from '../utils/contact';
+import { openLegal, openSupport } from '../utils/contact';
 import PickupDelegationPanel from '../components/booking/PickupDelegationPanel';
 import StationReviewPanel from '../components/booking/StationReviewPanel';
 import LostItemPanel from '../components/booking/LostItemPanel';
@@ -782,9 +782,9 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
             </p>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-[#434655]">
-            <a className="hover:text-primary transition-colors" href="#">Security Architecture</a>
-            <a className="hover:text-primary transition-colors" href="#">Terms of Service</a>
-            <a className="hover:text-primary transition-colors" href="#">Support Telemetry</a>
+            <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>Security Architecture</a>
+            <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }}>Terms of Service</a>
+            <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}>Support Telemetry</a>
           </div>
         </div>
       </footer>

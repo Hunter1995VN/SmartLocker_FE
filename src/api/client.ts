@@ -169,7 +169,9 @@ apiClient.interceptors.response.use(
         const retryConfig = error.config as RetryCounterConfig | undefined;
         if (retryConfig && isTransientReadFailure(error)) {
             const attempt = retryConfig._transientRetries ?? 0;
-            if (attempt < RETRY_DELAYS_MS.length) {
+            // Timeout đã chờ 30s: chỉ thử lại một lần để người dùng không phải đợi hơn ~1 phút; lỗi mạng/5xx thử tối đa 2 lần.
+            const maxRetries = isTimeoutError(error) ? 1 : RETRY_DELAYS_MS.length;
+            if (attempt < maxRetries) {
                 retryConfig._transientRetries = attempt + 1;
                 await new Promise((resolve) => setTimeout(resolve, RETRY_DELAYS_MS[attempt]));
                 return apiClient.request(retryConfig);

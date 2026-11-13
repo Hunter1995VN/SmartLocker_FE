@@ -1,3 +1,4 @@
+import { openLegal } from '../../utils/contact';
 import { Lock, Eye, EyeOff, ArrowRight, ChevronLeft, AlertCircle, Shield, Sparkles, Package } from 'lucide-react';
 import { useState } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
@@ -341,9 +342,9 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                         {/* Trust Footer */}
                         <p className="mt-6 text-center text-xs text-gray-400 leading-relaxed">
                             Bằng việc đăng nhập, bạn đồng ý với{' '}
-                            <a href="#" className="text-blue-600 font-semibold hover:underline">Điều khoản dịch vụ</a>
+                            <a href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }} className="text-blue-600 font-semibold hover:underline">Điều khoản dịch vụ</a>
                             {' '}và{' '}
-                            <a href="#" className="text-blue-600 font-semibold hover:underline">Chính sách bảo mật</a>
+                            <a href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }} className="text-blue-600 font-semibold hover:underline">Chính sách bảo mật</a>
                         </p>
                     </div>
                 </div>
