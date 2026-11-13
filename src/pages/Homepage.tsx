@@ -8,6 +8,7 @@ import Stations from '../components/home/Stations';
 import HowItWorks from '../components/home/HowItWorks';
 import Pricing from '../components/home/Pricing';
 import Security from '../components/home/Security';
+import CustomerReviews from '../components/home/CustomerReviews';
 import CTABanner from '../components/home/CTABanner';
 import Footer from '../components/layout/Footer';
 
@@ -15,9 +16,11 @@ type ViewMode = 'login' | 'register' | 'verify-otp' | 'forgot-password';
 
 interface HomepageProps {
     onNavigate: (mode: ViewMode) => void;
+    onReviewLogin: (page: number) => void;
+    initialReviewPage?: number;
 }
 
-const Homepage = ({ onNavigate }: HomepageProps) => {
+const Homepage = ({ onNavigate, onReviewLogin, initialReviewPage }: HomepageProps) => {
   return (
     <div className="min-h-screen bg-background text-on-surface antialiased flex flex-col">
       {/* Header Navigation */}
@@ -39,6 +42,8 @@ const Homepage = ({ onNavigate }: HomepageProps) => {
         
         {/* Security Features */}
         <Security />
+
+        <CustomerReviews initialPage={initialReviewPage} onLogin={onReviewLogin} />
         
         {/* CTA Banner */}
         <CTABanner onNavigate={onNavigate} />

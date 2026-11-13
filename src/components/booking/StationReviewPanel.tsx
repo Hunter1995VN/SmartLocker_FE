@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Star, Sparkles, Zap, MapPin, CheckCircle2, AlertCircle, MessageSquareText } from 'lucide-react';
 import apiClient from '../../api/client';
+import Stars from './ReviewStars';
 
 interface Review { stars: number; comment: string; criteria: string }
 
@@ -11,12 +12,6 @@ const CRITERIA = [
 ] as const;
 const STAR_LABELS = ['', 'Rất tệ', 'Chưa tốt', 'Bình thường', 'Tốt', 'Tuyệt vời'];
 const MAX_COMMENT = 1000;
-
-function Stars({ value, size = 'w-5 h-5' }: { value: number; size?: string }) {
-  return <span className="inline-flex gap-0.5" aria-label={`${value}/5 sao`}>
-    {[1, 2, 3, 4, 5].map(n => <Star key={n} className={`${size} ${n <= value ? 'fill-amber-400 text-amber-400' : 'text-slate-200'}`} />)}
-  </span>;
-}
 
 /**
  * UC: rate the station after pickup. Only COMPLETED / COMPLETED_MANUAL bookings can be rated, once.
@@ -144,6 +139,7 @@ export default function StationReviewPanel({ bookingId, status, stationName }: {
           className="block w-full rounded-xl border border-outline-variant/50 bg-white p-3 text-sm text-[#0b1c30] placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
       </label>
 
+      <p className="text-xs text-[#434655]">Đánh giá sẽ hiển thị công khai dưới dạng ẩn danh. Vui lòng tránh ghi thông tin cá nhân trong góp ý.</p>
       {submitError && <p role="alert" className="flex items-start gap-2 p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-700"><AlertCircle className="w-4 h-4 shrink-0" />{submitError}</p>}
 
       <div className="flex items-center justify-end gap-3">
