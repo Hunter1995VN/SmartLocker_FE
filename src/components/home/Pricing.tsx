@@ -1,4 +1,5 @@
 import { Check, Star, Ruler, Shield, Battery, ShieldCheck, Award, Tag } from 'lucide-react';
+import { SELECT_SIZE_EVENT } from './Hero';
 
 /**
  * Pricing Component - Phần hiển thị kích cỡ tủ và bảng giá
@@ -199,7 +200,13 @@ const Pricing = () => {
 
                 {/* CTA Button */}
                 <div className="p-7 pt-0">
-                  <button 
+                  <button
+                    type="button"
+                    onClick={() => {
+                      // Chọn sẵn cỡ tủ trong widget tìm trạm rồi cuộn tới đó.
+                      window.dispatchEvent(new CustomEvent(SELECT_SIZE_EVENT, { detail: size.code }));
+                      document.getElementById('booking-widget')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }}
                     className={`w-full py-4 rounded-xl text-base font-bold transition-all flex items-center justify-center gap-2 ${
                       size.popular 
                         ? 'bg-primary-container hover:bg-primary text-white shadow-elevation-2 hover:shadow-elevation-3' 

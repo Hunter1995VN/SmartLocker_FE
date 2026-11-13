@@ -1,3 +1,5 @@
+import { openSupport } from '../../utils/contact';
+import { resolveAssetUrl } from '../../api/client';
 import React, { useState, useRef, useEffect } from 'react';
 import {
     Lock, LayoutDashboard, Compass, Clock, Headphones,
@@ -20,9 +22,17 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
     const [notifPrefsOpen, setNotifPrefsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
+    // Đọc lại người dùng khi hồ sơ/ảnh đại diện vừa được cập nhật ở trang Hồ sơ
+    const [, setProfileVersion] = useState(0);
+    useEffect(() => {
+        const refresh = () => setProfileVersion((v) => v + 1);
+        window.addEventListener('smartlocker:profile-updated', refresh);
+        return () => window.removeEventListener('smartlocker:profile-updated', refresh);
+    }, []);
+
     // Read logged-in user from localStorage
     const savedUser = localStorage.getItem('smartlocker_user');
-    let user: { fullName?: string; email?: string; role?: string } = {};
+    let user: { fullName?: string; email?: string; role?: string; avatarUrl?: string } = {};
     try {
         if (savedUser) user = JSON.parse(savedUser);
     } catch {
@@ -124,7 +134,7 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                             </button>
 
                             <a
-                                href="tel:19001234"
+                                href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}
                                 className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-sm font-semibold text-[#434655] hover:text-[#0b1c30] hover:bg-[#f0f4ff] transition-all"
                             >
                                 <Headphones className="w-4 h-4" />
@@ -141,8 +151,15 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                                 onClick={() => setUserMenuOpen(prev => !prev)}
                                 className="flex items-center gap-2.5 p-1.5 pl-2.5 rounded-xl hover:bg-[#eff4ff] transition-colors border border-transparent hover:border-[#e5eeff] cursor-pointer"
                             >
-                                <div className="w-8 h-8 rounded-full bg-[#004ac6] text-white flex items-center justify-center font-bold text-xs shadow-xs">
-                                    {initials}
+                                <div className="w-8 h-8 rounded-full bg-[#004ac6] text-white flex items-center justify-center font-bold text-xs shadow-xs overflow-hidden">
+                                    {user.avatarUrl ? (
+                                        <img
+                                            src={resolveAssetUrl(user.avatarUrl)}
+                                            alt={userName}
+                                            className="w-full h-full object-cover"
+                                            onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
+                                        />
+                                    ) : initials}
                                 </div>
                                 <div className="hidden lg:flex flex-col text-left">
                                     <span className="text-xs font-bold text-[#0b1c30] truncate max-w-[140px] leading-tight">

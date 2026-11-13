@@ -63,14 +63,20 @@ export default function FindStationPage({
     const [radiusKm, setRadiusKm] = useState<number | null>(null);
     const [showExtraFilters, setShowExtraFilters] = useState(false);
 
-    const [userLocation, setUserLocation] = useState<{ lat: number; lng: number }>(MAP_CENTER_DANANG);
-    const [mapCenter, setMapCenter] = useState(MAP_CENTER_DANANG);
+    // Vị trí thật của người dùng: null cho tới khi trình duyệt trả về (hoặc người dùng tự ghim).
+    // Không dùng tọa độ mặc định làm "vị trí của bạn" vì sẽ hiển thị sai chỗ.
+    const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+    const [locationStatus, setLocationStatus] = useState<'locating' | 'granted' | 'manual' | 'denied' | 'unavailable' | 'timeout' | 'unsupported'>('locating');
+    const [locationAccuracyM, setLocationAccuracyM] = useState<number | null>(null);
+    const [mapCenter, setMapCenter] = useState(MAP_CENTER_HCMC);
     const [mapZoom, setMapZoom] = useState(13);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [apiError, setApiError] = useState<string | null>(null);
 
-    const applyDistanceAndSort = useCallback((list: Station[], loc: { lat: number; lng: number }) => {
-        return deduplicateStations(list)
+    const applyDistanceAndSort = useCallback((list: Station[], loc: { lat: number; lng: number } | null) => {
+        const unique = deduplicateStations(list);
+        if (!loc) return unique.map(s => ({ ...s, distanceKm: undefined })).sort((a, b) => a.name.localeCompare(b.name, 'vi'));
+        return unique
             .map(s => ({
                 ...s,
                 distanceKm: calcDistance(loc.lat, loc.lng, Number(s.latitude), Number(s.longitude)),
@@ -84,11 +90,17 @@ export default function FindStationPage({
         try {
             const rawData = await getStations({
                 search: query || undefined,
-                userLat: userLocation.lat,
-                userLng: userLocation.lng,
+                userLat: userLocation?.lat,
+                userLng: userLocation?.lng,
             });
             const sorted = applyDistanceAndSort(rawData, userLocation);
             setStations(sorted);
+            if (!userLocation && !initialStationId && sorted.length > 0) {
+                // Chưa có vị trí: đưa bản đồ về vùng có trạm thay vì một thành phố cố định.
+                const lat = sorted.reduce((sum, s) => sum + Number(s.latitude), 0) / sorted.length;
+                const lng = sorted.reduce((sum, s) => sum + Number(s.longitude), 0) / sorted.length;
+                setMapCenter({ lat, lng });
+            }
             if (initialStationId) {
                 const target = sorted.find(s => s.id === initialStationId || s.name.trim().toLowerCase() === initialStationId.trim().toLowerCase());
                 if (target) {
@@ -114,18 +126,32 @@ export default function FindStationPage({
     }, [searchQuery, fetchStationsData]);
 
     const fetchUserLocation = useCallback(() => {
-        if (!navigator.geolocation) return;
+        if (!navigator.geolocation) {
+            setLocationStatus('unsupported');
+            return;
+        }
+        setLocationStatus('locating');
+        const onSuccess = (pos: GeolocationPosition) => {
+            const rawLoc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+            setUserLocation(rawLoc);
+            setLocationAccuracyM(Math.round(pos.coords.accuracy));
+            setLocationStatus('granted');
+            if (!initialStationId) {
+                setMapCenter(rawLoc);
+                setMapZoom(14);
+            }
+        };
+        const onFail = (err: GeolocationPositionError) => {
+            setLocationStatus(err.code === 1 ? 'denied' : err.code === 2 ? 'unavailable' : 'timeout');
+        };
+        // Máy tính thường không có GPS: thử độ chính xác cao trước, hết thời gian thì dùng vị trí theo mạng/Wi-Fi.
         navigator.geolocation.getCurrentPosition(
-            (pos) => {
-                const rawLoc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                setUserLocation(rawLoc);
-                if (!initialStationId) {
-                    setMapCenter(rawLoc);
-                    setMapZoom(14);
-                }
+            onSuccess,
+            (err) => {
+                if (err.code === 1) return onFail(err);
+                navigator.geolocation.getCurrentPosition(onSuccess, onFail, { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 });
             },
-            () => {},
-            { enableHighAccuracy: true, timeout: 10000 }
+            { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
         );
     }, [initialStationId]);
 
@@ -135,6 +161,8 @@ export default function FindStationPage({
 
     const handleManualLocationChange = (newLoc: { lat: number; lng: number }) => {
         setUserLocation(newLoc);
+        setLocationStatus('manual');
+        setLocationAccuracyM(null);
         setMapCenter(newLoc);
         setStations(prev => {
             const updated = applyDistanceAndSort(prev, newLoc);
@@ -259,6 +287,30 @@ export default function FindStationPage({
                                 <SlidersHorizontal className="w-4 h-4" />
                             </button>
                         </div>
+
+                        {/* Trạng thái vị trí: nói rõ khi chưa có vị trí thật thay vì hiển thị một điểm giả */}
+                        <p
+                            role="status"
+                            className={`text-[11px] leading-snug rounded-lg px-2.5 py-1.5 border ${
+                                locationStatus === 'granted' || locationStatus === 'manual'
+                                    ? (locationAccuracyM != null && locationAccuracyM > 3000
+                                        ? 'bg-amber-50 text-amber-800 border-amber-200'
+                                        : 'bg-emerald-50 text-emerald-800 border-emerald-200')
+                                    : locationStatus === 'locating'
+                                        ? 'bg-slate-50 text-slate-600 border-slate-200'
+                                        : 'bg-amber-50 text-amber-800 border-amber-200'
+                            }`}
+                        >
+                            {locationStatus === 'locating' && 'Đang xác định vị trí của bạn...'}
+                            {locationStatus === 'granted' && (locationAccuracyM != null && locationAccuracyM > 3000
+                                ? `Vị trí chỉ chính xác khoảng ${(locationAccuracyM / 1000).toFixed(1)} km (định vị theo mạng). Kéo ghim đỏ trên bản đồ để chỉnh lại.`
+                                : `Đã xác định vị trí của bạn${locationAccuracyM != null ? ` (±${locationAccuracyM} m)` : ''}.`)}
+                            {locationStatus === 'manual' && 'Đang dùng vị trí bạn tự ghim trên bản đồ.'}
+                            {locationStatus === 'denied' && 'Trình duyệt đang chặn quyền vị trí. Hãy cho phép vị trí cho trang này rồi bấm nút định vị, hoặc bấm vào bản đồ để tự ghim.'}
+                            {locationStatus === 'unavailable' && 'Thiết bị chưa xác định được vị trí. Bấm nút định vị để thử lại hoặc tự ghim trên bản đồ.'}
+                            {locationStatus === 'timeout' && 'Định vị quá thời gian. Bấm nút định vị để thử lại hoặc tự ghim trên bản đồ.'}
+                            {locationStatus === 'unsupported' && 'Trình duyệt không hỗ trợ định vị. Hãy tự ghim vị trí trên bản đồ.'}
+                        </p>
 
                         {/* Clean City Tabs */}
                         <div className="flex items-center justify-between gap-2">
@@ -388,6 +440,10 @@ export default function FindStationPage({
                     <button
                         id="find-station-gps-btn"
                         onClick={() => {
+                            if (!userLocation) {
+                                fetchUserLocation();
+                                return;
+                            }
                             setMapCenter({ ...userLocation });
                             setMapZoom(14);
                         }}

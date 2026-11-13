@@ -19,6 +19,7 @@ import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminPortalPage from './pages/admin/AdminPortalPage';
 import KioskPage from './pages/kiosk/KioskPage';
 import WalkInTabletPage from './pages/kiosk/WalkInTabletPage';
+import GlobalDialogs from './components/support/GlobalDialogs';
 
 /** Các trang có trong hệ thống */
 type Page =
@@ -352,6 +353,8 @@ function App() {
             {currentPage === 'walk-in' && (
                 <WalkInTabletPage />
             )}
+
+            <GlobalDialogs />
         </>
     );
 }

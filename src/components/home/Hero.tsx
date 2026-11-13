@@ -1,5 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MapPin, Clock, Package, Search, Zap, Shield, Wifi, RotateCw, ChevronDown, QrCode, Sparkles, MapPinned } from 'lucide-react';
+import { getStations } from '../../api/stationService';
+
+/** Sự kiện để các khối khác (bảng giá) chọn sẵn cỡ tủ trong widget này. */
+export const SELECT_SIZE_EVENT = 'smartlocker:select-size';
 
 /**
  * Hero Component - Phần Hero chính của trang với Booking Widget
@@ -8,16 +12,25 @@ import { MapPin, Clock, Package, Search, Zap, Shield, Wifi, RotateCw, ChevronDow
 const Hero = () => {
   const [selectedSize, setSelectedSize] = useState('M');
   const [selectedStation, setSelectedStation] = useState('');
+  const [stationOptions, setStationOptions] = useState<{ id: string; name: string }[]>([]);
 
-  const stations = [
-    'Ga Bến Thành, Sài Gòn (Metro Tuyến 1)',
-    'Sân bay Quốc tế Tân Sơn Nhất (Ga T1)',
-    'Phố Đi Bộ Nguyễn Huệ (Trạm Ngô Đức Kế)',
-    'Ga Sài Gòn (Đường Nguyễn Thông)',
-    'Chợ Bến Thành (Cửa Tây Phan Chu Trinh)',
-    'Ga Đà Nẵng (Hải Châu, Đà Nẵng)',
-    'Phố Cổ Hà Nội (Đinh Tiên Hoàng - Hồ Gươm)',
-  ];
+  // Danh sách trạm thật từ hệ thống (không còn tên trạm viết cứng).
+  useEffect(() => {
+    let alive = true;
+    getStations()
+      .then((list) => { if (alive) setStationOptions(list.filter((s) => s.status === 'ACTIVE').map((s) => ({ id: s.id, name: s.name }))); })
+      .catch(() => { /* không tải được: vẫn cho phép mở bản đồ để chọn trạm */ });
+    return () => { alive = false; };
+  }, []);
+
+  useEffect(() => {
+    const onSelectSize = (e: Event) => {
+      const size = (e as CustomEvent<string>).detail;
+      if (size === 'S' || size === 'M' || size === 'L') setSelectedSize(size);
+    };
+    window.addEventListener(SELECT_SIZE_EVENT, onSelectSize);
+    return () => window.removeEventListener(SELECT_SIZE_EVENT, onSelectSize);
+  }, []);
 
   const lockerSizes = [
     { 
@@ -52,7 +65,9 @@ const Hero = () => {
   ];
 
   const handleSearch = () => {
-    console.log('Searching for:', { station: selectedStation, size: selectedSize });
+    // Mở bản đồ trạm; nếu đã chọn trạm thì bản đồ bay tới trạm đó.
+    const target = selectedStation ? `/find-station?stationId=${encodeURIComponent(selectedStation)}` : '/find-station';
+    window.location.assign(target);
   };
 
   return (
@@ -125,8 +140,8 @@ const Hero = () => {
                     onChange={(e) => setSelectedStation(e.target.value)}
                   >
                     <option value="">📍 Chọn trạm gửi gần bạn...</option>
-                    {stations.map((station, index) => (
-                      <option key={index} value={station}>📍 {station}</option>
+                    {stationOptions.map((station) => (
+                      <option key={station.id} value={station.id}>📍 {station.name}</option>
                     ))}
                   </select>
                   <ChevronDown className="absolute inset-y-0 right-3 my-auto w-5 h-5 text-secondary pointer-events-none" />

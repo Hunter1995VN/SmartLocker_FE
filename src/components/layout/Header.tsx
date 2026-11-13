@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Menu, X, Lock, ArrowRight, Zap } from 'lucide-react';
+import { openSupport } from '../../utils/contact';
 
 type ViewMode = 'login' | 'register' | 'verify-otp' | 'forgot-password';
 
@@ -60,9 +61,10 @@ const Header = ({ onNavigate }: HeaderProps) => {
           {/* Navigation Links (Desktop) */}
           <nav className="hidden lg:flex items-center gap-1">
             {navLinks.map((link, index) => (
-              <a 
+              <a
                 key={index}
                 href={link.href}
+                onClick={link.href === '#support' ? (e) => { e.preventDefault(); openSupport(); } : undefined}
                 className="relative px-4 py-2 text-sm font-semibold text-secondary hover:text-primary transition-colors rounded-lg hover:bg-surface-container-low"
               >
                 {link.label}
@@ -80,17 +82,6 @@ const Header = ({ onNavigate }: HeaderProps) => {
               </span>
               <span>Tất cả trạm Online</span>
             </div>
-
-            {/* Language / Currency Switcher */}
-            <button 
-              className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-lg border border-outline-variant/40 text-secondary hover:text-on-surface hover:bg-surface-container-low transition-all text-xs font-bold"
-              aria-label="Đổi ngôn ngữ"
-            >
-              <span className="text-base leading-none">🇻🇳</span>
-              <span>VND</span>
-              <span className="text-outline">|</span>
-              <span className="text-secondary hover:text-primary">EN</span>
-            </button>
 
             {/* Secondary Sign In */}
             <a 
@@ -143,7 +134,10 @@ const Header = ({ onNavigate }: HeaderProps) => {
                 key={index}
                 href={link.href}
                 className="block px-4 py-3 rounded-xl font-semibold transition-colors text-secondary hover:text-on-surface hover:bg-surface-container-low"
-                onClick={() => setIsMobileMenuOpen(false)}
+                onClick={(e) => {
+                  setIsMobileMenuOpen(false);
+                  if (link.href === '#support') { e.preventDefault(); openSupport(); }
+                }}
               >
                 {link.label}
               </a>
@@ -152,8 +146,10 @@ const Header = ({ onNavigate }: HeaderProps) => {
             {/* Action Buttons */}
             <div className="pt-3 border-t border-outline-variant/30 flex gap-2">
               <a 
-                href="#login" 
+                href="#login"
                 className="flex-1 text-center py-3 rounded-xl border-2 border-outline-variant text-sm font-semibold"
+                onClick={(e) => { e.preventDefault(); setIsMobileMenuOpen(false); onNavigate?.('login'); }}
+                role="button"
               >
                 Đăng nhập
               </a>

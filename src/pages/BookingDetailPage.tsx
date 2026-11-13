@@ -1,3 +1,4 @@
+import { openSupport } from '../utils/contact';
 import PickupDelegationPanel from '../components/booking/PickupDelegationPanel';
 import StationReviewPanel from '../components/booking/StationReviewPanel';
 import LostItemPanel from '../components/booking/LostItemPanel';
@@ -641,7 +642,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                   <span>Terminal Route</span>
                 </button>
                 <a
-                  href="tel:19001234"
+                  href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}
                   className="h-11 px-3 bg-white hover:bg-[#eff4ff] border border-outline-variant rounded-xl text-xs text-[#0b1c30] font-medium flex items-center justify-center gap-1.5 transition-colors shadow-xs"
                 >
                   <Headphones className="w-4 h-4 text-secondary" />

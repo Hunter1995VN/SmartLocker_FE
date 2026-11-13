@@ -1,13 +1,30 @@
+import type { MouseEvent } from 'react';
 import { Lock, Phone, Mail, MapPin, Heart } from 'lucide-react';
+import { CONTACT, SOCIAL_LINKS, mailtoHref, openLegal, openSupport } from '../../utils/contact';
+
+type FooterLink = { label: string; href: string; onClick?: (e: MouseEvent) => void };
+
+/** Liên kết mở hộp thoại: giữ href hợp lệ (để mở tab mới/sao chép) nhưng chặn điều hướng "#". */
+const dialogLink = (label: string, open: () => void): FooterLink => ({
+  label,
+  href: '#support',
+  onClick: (e) => { e.preventDefault(); open(); },
+});
+
+/** Liên hệ hợp tác: mở mail có sẵn tiêu đề; chưa có email thì mở hộp thoại Liên hệ. */
+const partnerLink = (label: string, subject: string): FooterLink => {
+  const mail = mailtoHref(subject);
+  return mail ? { label, href: mail } : dialogLink(label, openSupport);
+};
 
 /**
  * Footer Component - Footer của trang SmartLocker
  * Cải thiện layout cân bằng
  */
 const Footer = () => {
-  const footerLinks = {
+  const footerLinks: Record<'locations' | 'services' | 'legal', FooterLink[]> = {
     locations: [
-      { label: 'Bản đồ trạm', href: '#stations' },
+      { label: 'Bản đồ trạm', href: '/find-station' },
       { label: 'Trạng thái mạng lưới', href: '#stations' },
       { label: 'Ga Bến Thành Metro', href: '#stations' },
       { label: 'Sân bay Tân Sơn Nhất', href: '#stations' },
@@ -17,15 +34,15 @@ const Footer = () => {
       { label: 'Bảo hiểm hành lý', href: '#pricing' },
       { label: 'Kích thước & Giá', href: '#pricing' },
       { label: 'Kiến trúc bảo mật', href: '#security' },
-      { label: 'Hỗ trợ khẩn cấp 24/7', href: '#support' },
-      { label: 'Quy trình xử lý quá hạn', href: '#' },
+      dialogLink('Hỗ trợ khẩn cấp 24/7', openSupport),
+      dialogLink('Quy trình xử lý quá hạn', () => openLegal('overdue')),
     ],
     legal: [
-      { label: 'API & Tích hợp', href: '#' },
-      { label: 'Đối tác doanh nghiệp', href: '#' },
-      { label: 'Chính sách bảo mật', href: '#' },
-      { label: 'Điều khoản dịch vụ', href: '#' },
-      { label: 'Hợp tác nhượng quyền', href: '#' },
+      partnerLink('API & Tích hợp', 'Hợp tác API & tích hợp SmartLocker'),
+      partnerLink('Đối tác doanh nghiệp', 'Hợp tác doanh nghiệp SmartLocker'),
+      dialogLink('Chính sách bảo mật', () => openLegal('privacy')),
+      dialogLink('Điều khoản dịch vụ', () => openLegal('terms')),
+      partnerLink('Hợp tác nhượng quyền', 'Hợp tác nhượng quyền SmartLocker'),
     ],
   };
 
@@ -57,13 +74,13 @@ const Footer = () => {
                   <div className="w-8 h-8 rounded-lg bg-primary-container/10 flex items-center justify-center">
                     <Phone className="w-4 h-4 text-primary" />
                   </div>
-                  <span>Tổng đài CSKH: <strong>1900 1234</strong> (24/7)</span>
+                  <span>Tổng đài CSKH: <a href={`tel:${CONTACT.hotlineTel}`} className="font-bold hover:text-primary">{CONTACT.hotlineLabel}</a> (24/7)</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-lg bg-primary-container/10 flex items-center justify-center">
                     <Mail className="w-4 h-4 text-primary" />
                   </div>
-                  <span>Email: <strong>support@smartlocker.vn</strong></span>
+                  <span>Email: <a href={`mailto:${CONTACT.email}`} className="font-bold hover:text-primary">{CONTACT.email}</a></span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-lg bg-primary-container/10 flex items-center justify-center">
@@ -88,10 +105,14 @@ const Footer = () => {
                     label: 'Instagram', 
                     svg: <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.053.012 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.988 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
                   },
-                ].map((social, index) => (
-                  <a 
-                    key={index}
-                    href="#" 
+                ].map((social) => ({ ...social, href: SOCIAL_LINKS.find((s) => s.label === social.label)?.href }))
+                  .filter((social) => Boolean(social.href))
+                  .map((social) => (
+                  <a
+                    key={social.label}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-9 h-9 rounded-lg bg-surface-container-low hover:bg-primary-container hover:text-white text-secondary flex items-center justify-center transition-all"
                     aria-label={social.label}
                   >
@@ -107,8 +128,9 @@ const Footer = () => {
               <ul className="space-y-2.5 text-sm">
                 {footerLinks.locations.map((link, index) => (
                   <li key={index}>
-                    <a 
+                    <a
                       href={link.href}
+                      onClick={link.onClick}
                       className="text-secondary hover:text-primary transition-colors inline-flex items-center gap-1 group"
                     >
                       {link.label}
@@ -123,8 +145,9 @@ const Footer = () => {
               <ul className="space-y-2.5 text-sm">
                 {footerLinks.services.map((link, index) => (
                   <li key={index}>
-                    <a 
+                    <a
                       href={link.href}
+                      onClick={link.onClick}
                       className="text-secondary hover:text-primary transition-colors"
                     >
                       {link.label}
@@ -139,8 +162,9 @@ const Footer = () => {
               <ul className="space-y-2.5 text-sm">
                 {footerLinks.legal.map((link, index) => (
                   <li key={index}>
-                    <a 
+                    <a
                       href={link.href}
+                      onClick={link.onClick}
                       className="text-secondary hover:text-primary transition-colors"
                     >
                       {link.label}
@@ -169,8 +193,8 @@ const Footer = () => {
                 99.98% Uptime
               </span>
               <span className="text-outline">|</span>
-              <a className="hover:text-primary transition-colors" href="#">Chính sách bảo mật</a>
-              <a className="hover:text-primary transition-colors" href="#">Điều khoản</a>
+              <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>Chính sách bảo mật</a>
+              <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }}>Điều khoản</a>
             </div>
           </div>
         </div>

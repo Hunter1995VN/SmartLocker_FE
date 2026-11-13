@@ -1,6 +1,7 @@
 import { Lock, Eye, EyeOff, ChevronLeft, ArrowRight, AlertCircle, Check, X, Package, Zap } from 'lucide-react';
 import { useState } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
+import { describeGoogleNonOAuthError, describeGoogleOAuthError } from '../../utils/googleAuthError';
 
 type ViewMode = 'login' | 'register' | 'verify-otp' | 'forgot-password';
 
@@ -42,13 +43,14 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                     setError(result.message || 'Đăng ký Google thất bại');
                 }
             } catch (err: unknown) {
-                const axiosErr = err as { response?: { data?: { message?: string } } };
-                setError(axiosErr.response?.data?.message || 'Không thể đăng nhập bằng Google');
+                const { getApiErrorMessage } = await import('../../api/client');
+                setError(getApiErrorMessage(err, 'Không thể đăng nhập bằng Google'));
             } finally {
                 setIsLoading(false);
             }
         },
-        onError: () => setError('Đăng nhập Google bị hủy'),
+        onError: (err) => setError(describeGoogleOAuthError(err)),
+        onNonOAuthError: (err) => setError(describeGoogleNonOAuthError(err)),
     });
 
     // Real-time password strength check

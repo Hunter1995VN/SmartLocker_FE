@@ -1,13 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     User, Phone, Shield, Key, AlertTriangle, CheckCircle2,
     Clock, CreditCard, ArrowLeft, Lock, Save,
     RefreshCw, AlertCircle, Calendar, DollarSign, Building,
-    ChevronRight
+    ChevronRight, Camera, Trash2
 } from 'lucide-react';
 import CustomerHeader from '../components/layout/CustomerHeader';
 import profileService from '../api/profileService';
 import type { UserProfileDto, UserOverdueDebtResponse } from '../api/profileService';
+import { getApiErrorMessage, resolveAssetUrl } from '../api/client';
+
+export const PROFILE_UPDATED_EVENT = 'smartlocker:profile-updated';
+const AVATAR_MAX_BYTES = 2 * 1024 * 1024;
+const AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+/** Ghi lại hồ sơ mới vào localStorage và báo cho header/dashboard cập nhật ngay. */
+function syncStoredUser(patch: { fullName?: string; phone?: string; avatarUrl?: string | null }) {
+    try {
+        const stored = localStorage.getItem('smartlocker_user');
+        if (!stored) return;
+        const parsed = JSON.parse(stored);
+        Object.assign(parsed, patch);
+        if (patch.avatarUrl === null) delete parsed.avatarUrl;
+        localStorage.setItem('smartlocker_user', JSON.stringify(parsed));
+        window.dispatchEvent(new Event(PROFILE_UPDATED_EVENT));
+    } catch { /* localStorage không khả dụng: bỏ qua, dữ liệu vẫn nằm trên máy chủ */ }
+}
 
 interface ProfilePageProps {
     onLogout: () => void;
@@ -44,7 +62,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
     const [profile, setProfile] = useState<UserProfileDto | null>(null);
     const [fullName, setFullName] = useState<string>('');
     const [phone, setPhone] = useState<string>('');
-    const [avatarUrl, setAvatarUrl] = useState<string>('');
+    const [uploadingAvatar, setUploadingAvatar] = useState<boolean>(false);
+    const avatarInputRef = useRef<HTMLInputElement>(null);
     const [updatingProfile, setUpdatingProfile] = useState<boolean>(false);
     const [profileSuccessMsg, setProfileSuccessMsg] = useState<string>('');
     const [profileErrorMsg, setProfileErrorMsg] = useState<string>('');
@@ -79,19 +98,13 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                 setProfile(profileRes.data);
                 setFullName(profileRes.data.fullName || '');
                 setPhone(profileRes.data.phone || '');
-                setAvatarUrl(profileRes.data.avatarUrl || '');
 
-                // Cập nhật lại localStorage để header đồng bộ
-                const stored = localStorage.getItem('smartlocker_user');
-                if (stored) {
-                    try {
-                        const parsed = JSON.parse(stored);
-                        parsed.fullName = profileRes.data.fullName;
-                        parsed.phone = profileRes.data.phone;
-                        parsed.avatarUrl = profileRes.data.avatarUrl;
-                        localStorage.setItem('smartlocker_user', JSON.stringify(parsed));
-                    } catch {}
-                }
+                // Cập nhật lại localStorage để header/dashboard đồng bộ
+                syncStoredUser({
+                    fullName: profileRes.data.fullName,
+                    phone: profileRes.data.phone,
+                    avatarUrl: profileRes.data.avatarUrl ?? null,
+                });
             }
 
             if (debtRes.success && debtRes.data) {
@@ -109,6 +122,60 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
     useEffect(() => {
         loadData();
     }, []);
+
+    // Ảnh đại diện: chọn file từ máy → kiểm tra → tải lên → lưu → cập nhật mọi nơi hiển thị
+    const handleAvatarFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        e.target.value = ''; // cho phép chọn lại cùng một file
+        if (!file) return;
+        setProfileSuccessMsg('');
+        setProfileErrorMsg('');
+        if (!AVATAR_TYPES.includes(file.type)) {
+            setProfileErrorMsg('Chỉ chấp nhận ảnh JPEG, PNG hoặc WebP.');
+            return;
+        }
+        if (file.size > AVATAR_MAX_BYTES) {
+            setProfileErrorMsg('Ảnh quá lớn. Vui lòng chọn ảnh dưới 2 MB.');
+            return;
+        }
+        setUploadingAvatar(true);
+        try {
+            const res = await profileService.uploadAvatar(file);
+            if (res.success && res.data) {
+                setProfile(res.data);
+                syncStoredUser({ avatarUrl: res.data.avatarUrl ?? null });
+                setProfileSuccessMsg('Đã cập nhật ảnh đại diện.');
+                setTimeout(() => setProfileSuccessMsg(''), 4000);
+            } else {
+                setProfileErrorMsg(res.message || 'Không tải được ảnh lên.');
+            }
+        } catch (err) {
+            setProfileErrorMsg(getApiErrorMessage(err, 'Không tải được ảnh lên. Vui lòng thử lại.'));
+        } finally {
+            setUploadingAvatar(false);
+        }
+    };
+
+    const handleRemoveAvatar = async () => {
+        setProfileSuccessMsg('');
+        setProfileErrorMsg('');
+        setUploadingAvatar(true);
+        try {
+            const res = await profileService.deleteAvatar();
+            if (res.success && res.data) {
+                setProfile(res.data);
+                syncStoredUser({ avatarUrl: null });
+                setProfileSuccessMsg('Đã xóa ảnh đại diện.');
+                setTimeout(() => setProfileSuccessMsg(''), 4000);
+            } else {
+                setProfileErrorMsg(res.message || 'Không xóa được ảnh.');
+            }
+        } catch (err) {
+            setProfileErrorMsg(getApiErrorMessage(err, 'Không xóa được ảnh. Vui lòng thử lại.'));
+        } finally {
+            setUploadingAvatar(false);
+        }
+    };
 
     // Handle Profile Update
     const handleUpdateProfile = async (e: React.FormEvent) => {
@@ -128,14 +195,15 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
 
         setUpdatingProfile(true);
         try {
+            // Không gửi avatarUrl: ảnh đại diện được đổi riêng bằng nút tải ảnh lên.
             const res = await profileService.updateProfile({
                 fullName: fullName.trim(),
                 phone: phone.trim(),
-                avatarUrl: avatarUrl.trim() || undefined
             });
 
             if (res.success && res.data) {
                 setProfile(res.data);
+                syncStoredUser({ fullName: res.data.fullName, phone: res.data.phone });
                 setProfileSuccessMsg('Cập nhật thông tin cá nhân thành công!');
                 setTimeout(() => setProfileSuccessMsg(''), 4000);
             } else {
@@ -344,7 +412,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                     <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-[#004ac6] to-[#3b82f6] text-white flex items-center justify-center font-bold text-3xl shadow-md border-4 border-white mb-4 overflow-hidden">
                                         {profile.avatarUrl ? (
                                             <img
-                                                src={profile.avatarUrl}
+                                                src={resolveAssetUrl(profile.avatarUrl)}
                                                 alt={profile.fullName}
                                                 className="w-full h-full object-cover"
                                                 onError={(e) => {
@@ -484,15 +552,39 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
 
                                     <div>
                                         <label className="block text-xs font-bold text-[#0b1c30] mb-1.5">
-                                            Đường dẫn ảnh đại diện (Avatar URL)
+                                            Ảnh đại diện
                                         </label>
                                         <input
-                                            type="url"
-                                            value={avatarUrl}
-                                            onChange={(e) => setAvatarUrl(e.target.value)}
-                                            placeholder="https://example.com/avatar.jpg"
-                                            className="w-full px-4 py-2.5 rounded-xl text-xs border border-[#dce3f1] focus:outline-hidden focus:border-[#004ac6] focus:ring-2 focus:ring-[#004ac6]/15 transition-all text-[#0b1c30]"
+                                            ref={avatarInputRef}
+                                            type="file"
+                                            accept="image/jpeg,image/png,image/webp"
+                                            onChange={handleAvatarFile}
+                                            className="hidden"
+                                            aria-label="Chọn ảnh đại diện"
                                         />
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => avatarInputRef.current?.click()}
+                                                disabled={uploadingAvatar}
+                                                className="px-4 py-2.5 rounded-xl text-xs font-bold border border-[#dce3f1] bg-white hover:bg-[#f0f4ff] text-[#0b1c30] flex items-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                                            >
+                                                <Camera className="w-3.5 h-3.5" />
+                                                {uploadingAvatar ? 'Đang tải ảnh lên...' : 'Chọn ảnh từ máy'}
+                                            </button>
+                                            {profile.avatarUrl && (
+                                                <button
+                                                    type="button"
+                                                    onClick={handleRemoveAvatar}
+                                                    disabled={uploadingAvatar}
+                                                    className="px-4 py-2.5 rounded-xl text-xs font-bold border border-rose-200 text-rose-600 hover:bg-rose-50 flex items-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                                                >
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                    Xóa ảnh
+                                                </button>
+                                            )}
+                                            <span className="text-[11px] text-[#737686]">JPEG, PNG hoặc WebP, tối đa 2 MB. Ảnh được lưu ngay khi tải lên.</span>
+                                        </div>
                                     </div>
 
                                     <div className="flex justify-end pt-2">

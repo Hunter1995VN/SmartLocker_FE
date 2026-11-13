@@ -1,3 +1,4 @@
+import { openSupport } from '../utils/contact';
 import React, { useState, useEffect } from 'react';
 import {
   ShieldCheck,
@@ -285,7 +286,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                           <h4 className="text-sm text-slate-900 font-bold">{booking.stationName}</h4>
                           <p className="text-xs text-secondary">{booking.stationAddress || 'Main Hub Location'}</p>
                           <div className="pt-1.5 flex items-center gap-3 text-xs text-primary-container font-semibold">
-                            <a className="hover:underline flex items-center gap-1" href="tel:19001234">
+                            <a className="hover:underline flex items-center gap-1" href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}>
                               <Phone className="w-3.5 h-3.5" />
                               Hotline: 1900 1234
                             </a>

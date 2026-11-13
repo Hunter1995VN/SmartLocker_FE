@@ -5,6 +5,7 @@
  */
 import { ShieldAlert, CheckCircle2, MapPin, Wrench } from 'lucide-react';
 import type { IncidentDto } from '../../api/adminDashboardService';
+import Pagination, { usePagination } from './Pagination';
 
 interface CriticalTriageCardProps {
     incidents: IncidentDto[];
@@ -12,11 +13,14 @@ interface CriticalTriageCardProps {
     isLoading: boolean;
 }
 
+const INCIDENT_PAGE_SIZE = 5;
+
 export default function CriticalTriageCard({
     incidents,
     maintenanceLockers,
     isLoading,
 }: CriticalTriageCardProps) {
+    const { page, setPage, totalPages, pageItems, from, to } = usePagination(incidents, INCIDENT_PAGE_SIZE);
     const criticalCount = incidents.filter(
         (i) => i.severity?.toUpperCase() === 'CRITICAL' || i.severity?.toUpperCase() === 'HIGH'
     ).length;
@@ -64,7 +68,7 @@ export default function CriticalTriageCard({
                 </div>
             ) : (
                 <div className="my-3 space-y-2.5 max-h-64 overflow-y-auto pr-1 scrollbar-thin">
-                    {incidents.map((item) => {
+                    {pageItems.map((item) => {
                         const isCritical =
                             item.severity?.toUpperCase() === 'CRITICAL' || item.severity?.toUpperCase() === 'HIGH';
 
@@ -119,6 +123,9 @@ export default function CriticalTriageCard({
                         </div>
                     )}
                 </div>
+            )}
+            {incidents.length > 0 && (
+                <Pagination page={page} totalPages={totalPages} total={incidents.length} from={from} to={to} onPageChange={setPage} label="sự cố" />
             )}
 
             {/* Footer Notice */}

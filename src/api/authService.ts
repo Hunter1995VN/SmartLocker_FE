@@ -50,6 +50,7 @@ export interface AuthResponse {
     accessToken: string;
     refreshToken: string;
     accessTokenExpiresAt: string;
+    avatarUrl?: string;
 }
 
 export interface OtpSentResponse {

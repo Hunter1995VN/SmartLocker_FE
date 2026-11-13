@@ -1,3 +1,4 @@
+import { openSupport } from '../../utils/contact';
 import { useState, useEffect, useRef } from 'react';
 import { Mail, ArrowRight, AlertCircle, CheckCircle, ArrowLeft } from 'lucide-react';
 import { tokenStore } from '../../api/client';
@@ -259,7 +260,7 @@ export default function VerifyOtpPage({ onNavigate, email }: VerifyOtpPageProps)
                 <div className="mt-6 text-center">
                     <p className="text-xs text-secondary">
                         Gặp vấn đề?{' '}
-                        <a href="tel:19001234" className="text-primary font-semibold hover:underline">
+                        <a href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }} className="text-primary font-semibold hover:underline">
                             Gọi 1900 1234
                         </a>
                         {' '}(24/7)

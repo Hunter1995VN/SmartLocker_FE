@@ -5,13 +5,17 @@
  */
 import { Layers, Download, CheckCircle2, Wifi } from 'lucide-react';
 import type { StationOccupancyItemDto } from '../../api/adminDashboardService';
+import Pagination, { usePagination } from './Pagination';
 
 interface StationFleetTableProps {
     stations: StationOccupancyItemDto[];
     isLoading: boolean;
 }
 
+const PAGE_SIZE = 8;
+
 export default function StationFleetTable({ stations, isLoading }: StationFleetTableProps) {
+    const { page, setPage, totalPages, pageItems, from, to } = usePagination(stations, PAGE_SIZE);
     return (
         <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs select-none">
             {/* Table Header */}
@@ -76,7 +80,7 @@ export default function StationFleetTable({ stations, isLoading }: StationFleetT
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
-                            {stations.map((st) => {
+                            {pageItems.map((st) => {
                                 const rate = st.occupancyRate ?? (st.totalLockers > 0 ? Math.round((st.occupiedLockers / st.totalLockers) * 100) : 0);
                                 const isHighOccupancy = rate >= 85;
 
@@ -144,6 +148,7 @@ export default function StationFleetTable({ stations, isLoading }: StationFleetT
                             })}
                         </tbody>
                     </table>
+                    <Pagination page={page} totalPages={totalPages} total={stations.length} from={from} to={to} onPageChange={setPage} label="trạm" />
                 </div>
             )}
         </div>

@@ -1,6 +1,7 @@
 import { Lock, Eye, EyeOff, ArrowRight, ChevronLeft, AlertCircle, Shield, Sparkles, Package } from 'lucide-react';
 import { useState } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
+import { describeGoogleNonOAuthError, describeGoogleOAuthError } from '../../utils/googleAuthError';
 
 type ViewMode = 'login' | 'register' | 'verify-otp' | 'forgot-password';
 
@@ -38,13 +39,14 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                     setError(result.message || 'Đăng nhập Google thất bại');
                 }
             } catch (err: unknown) {
-                const axiosErr = err as { response?: { data?: { message?: string } } };
-                setError(axiosErr.response?.data?.message || 'Không thể đăng nhập bằng Google');
+                const { getApiErrorMessage } = await import('../../api/client');
+                setError(getApiErrorMessage(err, 'Không thể đăng nhập bằng Google'));
             } finally {
                 setIsLoading(false);
             }
         },
-        onError: () => setError('Đăng nhập Google bị hủy'),
+        onError: (err) => setError(describeGoogleOAuthError(err)),
+        onNonOAuthError: (err) => setError(describeGoogleNonOAuthError(err)),
     });
 
     const handleSubmit = async (e: React.FormEvent) => {

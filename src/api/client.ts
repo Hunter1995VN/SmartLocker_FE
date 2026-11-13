@@ -71,14 +71,47 @@ const retryKioskViaLocal = async (config: RetryableConfig | undefined, message: 
     return apiClient.request({ ...config, baseURL: LOCAL_API_URL, _localMqttRetry: true } as RetryableConfig);
 };
 
+// Máy chủ đám mây có thể "ngủ" và mất vài chục giây để khởi động lại: 15s là quá ngắn nên gây lỗi timeout.
+// Request đọc (GET) được tự thử lại; request ghi (POST/PUT/DELETE) không thử lại để tránh thực hiện hai lần.
+const REQUEST_TIMEOUT_MS = 30000;
+const RETRY_DELAYS_MS = [800, 2500];
+
 const apiClient: AxiosInstance = axios.create({
     baseURL: API_BASE_URL,
-    timeout: 15000,
+    timeout: REQUEST_TIMEOUT_MS,
     headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
     },
 });
+
+type RetryCounterConfig = InternalAxiosRequestConfig & { _transientRetries?: number };
+
+const isTimeoutError = (error: AxiosError): boolean =>
+    error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT';
+
+const isTransientReadFailure = (error: AxiosError): boolean => {
+    const config = error.config;
+    if (!config || (config.method ?? 'get').toLowerCase() !== 'get') return false;
+    if (isTimeoutError(error)) return true;
+    if (!error.response) return error.code === 'ERR_NETWORK';
+    return [502, 503, 504].includes(error.response.status);
+};
+
+/** Ảnh do hệ thống lưu có dạng "/api/Profile/avatar/..." (đường dẫn tương đối): ghép với địa chỉ máy chủ đang dùng. */
+export const resolveAssetUrl = (url?: string | null): string => {
+    if (!url) return '';
+    return url.startsWith('/') ? `${getActiveApiBaseUrl()}${url}` : url;
+};
+
+/** Thông báo tiếng Việt dễ hiểu cho lỗi mạng/timeout; rơi về message của máy chủ nếu có. */
+export const getApiErrorMessage = (err: unknown, fallback = 'Đã có lỗi xảy ra. Vui lòng thử lại.'): string => {
+    const error = err as AxiosError<{ message?: string }>;
+    if (error?.response?.data?.message) return error.response.data.message;
+    if (error && isTimeoutError(error)) return 'Máy chủ phản hồi chậm (có thể đang khởi động). Vui lòng đợi vài giây rồi thử lại.';
+    if (error && !error.response && error.code === 'ERR_NETWORK') return 'Không kết nối được máy chủ. Hãy kiểm tra mạng và thử lại.';
+    return fallback;
+};
 
 // Token key trong localStorage (đặt ngắn gọn cho dễ)
 const TOKEN_KEY = 'smartlocker_token';
@@ -131,6 +164,17 @@ apiClient.interceptors.response.use(
         const errData = error.response?.data as { message?: string } | undefined;
         const retried = await retryKioskViaLocal(error.config, errData?.message);
         if (retried) return retried;
+
+        // Tự thử lại các lần đọc dữ liệu bị timeout / mất kết nối thoáng qua (tối đa 2 lần).
+        const retryConfig = error.config as RetryCounterConfig | undefined;
+        if (retryConfig && isTransientReadFailure(error)) {
+            const attempt = retryConfig._transientRetries ?? 0;
+            if (attempt < RETRY_DELAYS_MS.length) {
+                retryConfig._transientRetries = attempt + 1;
+                await new Promise((resolve) => setTimeout(resolve, RETRY_DELAYS_MS[attempt]));
+                return apiClient.request(retryConfig);
+            }
+        }
 
         // Backend cục bộ đã tắt: lần sau dò lại nguồn API. Không tự gửi lại request này.
         if (!error.response && error.config?.baseURL === LOCAL_API_URL && resolvedBaseUrl?.url === LOCAL_API_URL) {

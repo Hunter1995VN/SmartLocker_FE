@@ -97,6 +97,26 @@ export const profileService = {
     },
 
     /**
+     * Tải ảnh đại diện lên (multipart/form-data, field "file"). Máy chủ lưu file và trả về hồ sơ đã cập nhật.
+     */
+    async uploadAvatar(file: File): Promise<ApiResponse<UserProfileDto>> {
+        const form = new FormData();
+        form.append('file', file);
+        // Để trình duyệt tự đặt Content-Type kèm boundary; ảnh lớn cần thời gian tải lên lâu hơn mặc định.
+        const res = await apiClient.post<ApiResponse<UserProfileDto>>('/api/profile/avatar', form, {
+            headers: { 'Content-Type': undefined },
+            timeout: 60000,
+        });
+        return res.data;
+    },
+
+    /** Xóa ảnh đại diện hiện tại. */
+    async deleteAvatar(): Promise<ApiResponse<UserProfileDto>> {
+        const res = await apiClient.delete<ApiResponse<UserProfileDto>>('/api/profile/avatar');
+        return res.data;
+    },
+
+    /**
      * Đổi mật khẩu
      */
     async changePassword(data: ChangePasswordRequest): Promise<ApiResponse<boolean>> {
