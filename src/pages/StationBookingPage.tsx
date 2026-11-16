@@ -352,7 +352,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                 1
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="text-[10px] uppercase font-bold text-blue-600 tracking-wider">Step 1 (In Progress)</span>
+                <span className="text-xs uppercase font-bold text-blue-600 tracking-wider">Step 1 (In Progress)</span>
                 <span className="text-sm font-semibold text-slate-900 truncate">
                   Select Size &amp; Duration
                 </span>
@@ -361,12 +361,12 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
 
             {/* Step 2 (Upcoming) */}
             <div className="flex items-center gap-2 sm:gap-3 border-x border-slate-200 px-2 sm:px-4 text-left">
-              <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-400 border border-slate-200 flex items-center justify-center font-bold text-xs shrink-0">
+              <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 border border-slate-200 flex items-center justify-center font-bold text-xs shrink-0">
                 2
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Step 2</span>
-                <span className="text-sm font-semibold text-slate-400 truncate">
+                <span className="text-xs uppercase font-bold text-slate-500 tracking-wider">Step 2</span>
+                <span className="text-sm font-semibold text-slate-500 truncate">
                   PayOS VietQR Payment
                 </span>
               </div>
@@ -374,12 +374,12 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
 
             {/* Step 3 (Upcoming) */}
             <div className="flex items-center gap-2 sm:gap-3 text-left pl-1 sm:pl-2">
-              <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-400 border border-slate-200 flex items-center justify-center font-bold text-xs shrink-0">
+              <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 border border-slate-200 flex items-center justify-center font-bold text-xs shrink-0">
                 3
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Step 3</span>
-                <span className="text-sm font-semibold text-slate-400 truncate">
+                <span className="text-xs uppercase font-bold text-slate-500 tracking-wider">Step 3</span>
+                <span className="text-sm font-semibold text-slate-500 truncate">
                   Unlock Digital Access Key
                 </span>
               </div>
@@ -434,7 +434,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
               <div className="border-t border-slate-100 my-4"></div>
 
               <div>
-                <p className="text-xs font-medium text-slate-400 mb-3 uppercase tracking-wider">Amenities & Security Features</p>
+                <p className="text-xs font-medium text-slate-500 mb-3 uppercase tracking-wider">Amenities & Security Features</p>
                 <div className="flex flex-wrap gap-2">
                   <div className="flex items-center bg-[#F1F5F9] text-[#475569] text-xs px-3 py-1.5 rounded-full border border-slate-200">
                     <Video className="w-3.5 h-3.5 mr-1.5 text-blue-600" /> CCTV 24/7
@@ -508,7 +508,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                       <Clock className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Start Time</p>
+                      <p className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Start Time</p>
                       <p className="text-base font-extrabold text-[#0F172A]">
                         Starts Right Now <span className="text-slate-500 font-normal text-sm">({formatTimeStr(startDateObj)} Today)</span>
                       </p>
@@ -529,14 +529,14 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   >
                     <div className="flex justify-between items-center mb-1">
                       <label className="text-xs font-semibold text-slate-500 cursor-pointer">Arrival Date (Start Date)</label>
-                      <span className="text-[10px] font-medium text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">Min: Today</span>
+                      <span className="text-xs font-medium text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">Min: Today</span>
                     </div>
                     <div className="flex items-center justify-between mt-1">
                       <div className="flex items-center text-[#0F172A] font-semibold text-sm">
                         <Calendar className="w-5 h-5 mr-2 text-blue-600 shrink-0" />
                         <span>{displayStorageDate}</span>
                       </div>
-                      <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
+                      <ChevronDown className="w-4 h-4 text-slate-500 group-hover:text-blue-600 transition-colors" />
                     </div>
                     <input
                       ref={dateInputRef}
@@ -549,14 +549,14 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                       }}
                       className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                     />
-                    <span className="text-[11px] text-slate-400 block mt-2">Max allowed: 30 days in advance</span>
+                    <span className="text-xs text-slate-500 block mt-2">Max allowed: 30 days in advance</span>
                   </div>
                   
                   {/* Arrival Time Box */}
                   <div className="relative border border-slate-200 rounded-xl p-4 hover:border-blue-500 transition-colors bg-white group shadow-xs">
                     <div className="flex justify-between items-center mb-1">
                       <label className="text-xs font-semibold text-slate-500">Arrival Time (Start Hour)</label>
-                      <span className="text-[10px] font-medium text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
+                      <span className="text-xs font-medium text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
                         Open: {currentStation.opensAt || '06:00'} - {currentStation.closesAt || '23:00'}
                       </span>
                     </div>
@@ -575,9 +575,9 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                           ))}
                         </select>
                       </div>
-                      <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors pointer-events-none" />
+                      <ChevronDown className="w-4 h-4 text-slate-500 group-hover:text-blue-600 transition-colors pointer-events-none" />
                     </div>
-                    <span className="text-[11px] text-slate-400 block mt-1">Expected time you will arrive at the locker</span>
+                    <span className="text-xs text-slate-500 block mt-1">Expected time you will arrive at the locker</span>
                   </div>
                 </div>
               )}
@@ -639,7 +639,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                       }}
                       className="px-5 py-2.5 rounded-full text-sm font-semibold bg-white text-slate-600 border border-slate-200 hover:border-blue-400 hover:bg-slate-50 flex items-center cursor-pointer transition-all"
                     >
-                      Custom <ArrowRight className="w-3.5 h-3.5 ml-1 text-slate-400" />
+                      Custom <ArrowRight className="w-3.5 h-3.5 ml-1 text-slate-500" />
                     </button>
                   )}
                 </div>
@@ -651,7 +651,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   <div className="flex items-center gap-3">
                     <div className="w-3.5 h-3.5 rounded-full bg-amber-500 shrink-0 ring-4 ring-amber-100"></div>
                     <div>
-                      <p className="text-[11px] font-bold text-amber-800 uppercase tracking-wider">Free Hold Window</p>
+                      <p className="text-xs font-bold text-amber-800 uppercase tracking-wider">Free Hold Window</p>
                       <p className="text-sm font-extrabold text-[#0F172A]">
                         30 Minutes to Arrive
                       </p>
@@ -666,7 +666,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   <div className="flex items-center gap-3">
                     <div className="w-3.5 h-3.5 rounded-full bg-emerald-500 shrink-0 ring-4 ring-emerald-100"></div>
                     <div>
-                      <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Storage Count</p>
+                      <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Storage Count</p>
                       <p className="text-sm font-extrabold text-[#0F172A]">
                         Starts at Kiosk Check-in
                       </p>
@@ -728,16 +728,16 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                         {isSAvailable ? `${availS}/${totalS} left` : 'Không khả dụng'}
                       </span>
                     </div>
-                    <h3 className={`text-lg font-bold ${!isSAvailable ? 'text-slate-400' : 'text-[#0F172A]'}`}>Small (S)</h3>
-                    <div className={`flex items-center text-xs mt-1 mb-3 ${!isSAvailable ? 'text-slate-400' : 'text-slate-500'}`}>
+                    <h3 className={`text-lg font-bold ${!isSAvailable ? 'text-slate-500' : 'text-[#0F172A]'}`}>Small (S)</h3>
+                    <div className={`flex items-center text-xs mt-1 mb-3 ${!isSAvailable ? 'text-slate-500' : 'text-slate-500'}`}>
                       <Ruler className="w-3.5 h-3.5 mr-1" /> 45 x 45 x 65 cm
                     </div>
-                    <p className={`text-sm mb-4 ${!isSAvailable ? 'text-slate-400' : 'text-slate-600'}`}>Fits 1-2 standard backpacks, purses, or shopping bags.</p>
+                    <p className={`text-sm mb-4 ${!isSAvailable ? 'text-slate-500' : 'text-slate-600'}`}>Fits 1-2 standard backpacks, purses, or shopping bags.</p>
                   </div>
                   <div className={`p-4 border-t relative z-0 ${!isSAvailable ? 'border-slate-200 bg-slate-100' : selectedSize === 'S' ? 'border-blue-200 bg-blue-50/50' : 'border-slate-100 bg-slate-50/50'}`}>
                     <div className="flex items-baseline justify-between">
-                      <span className={`text-lg font-bold ${!isSAvailable ? 'text-slate-400' : 'text-blue-600'}`}>{formatCurrency(basePrices.S)}</span>
-                      <span className={`text-xs font-medium ${!isSAvailable ? 'text-slate-400' : 'text-slate-500'}`}>/ {stationDetail?.sizePricing?.find(p => p.size === 'S')?.blockHours ?? '—'} giờ</span>
+                      <span className={`text-lg font-bold ${!isSAvailable ? 'text-slate-500' : 'text-blue-600'}`}>{formatCurrency(basePrices.S)}</span>
+                      <span className={`text-xs font-medium ${!isSAvailable ? 'text-slate-500' : 'text-slate-500'}`}>/ {stationDetail?.sizePricing?.find(p => p.size === 'S')?.blockHours ?? '—'} giờ</span>
                     </div>
                     <button 
                       disabled={!isSAvailable} 
@@ -746,7 +746,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                         if (isSAvailable) setSelectedSize('S');
                       }}
                       className={`w-full mt-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                        !isSAvailable ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : selectedSize === 'S' ? 'bg-blue-600 text-white cursor-pointer shadow-sm shadow-blue-500/30' : 'bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 cursor-pointer'
+                        !isSAvailable ? 'bg-slate-200 text-slate-500 cursor-not-allowed' : selectedSize === 'S' ? 'bg-blue-600 text-white cursor-pointer shadow-sm shadow-blue-500/30' : 'bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 cursor-pointer'
                       }`}
                     >
                       {!isSAvailable ? 'Không khả dụng' : selectedSize === 'S' ? 'Selected' : 'Select'}
@@ -773,7 +773,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                       <CheckCircle className="w-4 h-4" />
                     </div>
                   )}
-                  <div className="absolute top-0 left-0 bg-amber-400 text-amber-950 text-[10px] font-bold px-2 py-0.5 rounded-br-lg uppercase z-20">
+                  <div className="absolute top-0 left-0 bg-amber-400 text-amber-950 text-xs font-bold px-2 py-0.5 rounded-br-lg uppercase z-20">
                     Most Popular
                   </div>
                   <div className="p-5 flex-grow mt-2 relative z-0">
@@ -785,16 +785,16 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                         {isMAvailable ? `${availM}/${totalM} left` : 'Không khả dụng'}
                       </span>
                     </div>
-                    <h3 className={`text-lg font-bold ${!isMAvailable ? 'text-slate-400' : 'text-[#0F172A]'}`}>Medium (M)</h3>
-                    <div className={`flex items-center text-xs mt-1 mb-3 ${!isMAvailable ? 'text-slate-400' : 'text-slate-500'}`}>
+                    <h3 className={`text-lg font-bold ${!isMAvailable ? 'text-slate-500' : 'text-[#0F172A]'}`}>Medium (M)</h3>
+                    <div className={`flex items-center text-xs mt-1 mb-3 ${!isMAvailable ? 'text-slate-500' : 'text-slate-500'}`}>
                       <Ruler className="w-3.5 h-3.5 mr-1" /> 65 x 45 x 65 cm
                     </div>
-                    <p className={`text-sm mb-4 ${!isMAvailable ? 'text-slate-400' : 'text-slate-600'}`}>Fits 1 carry-on suitcase and a backpack.</p>
+                    <p className={`text-sm mb-4 ${!isMAvailable ? 'text-slate-500' : 'text-slate-600'}`}>Fits 1 carry-on suitcase and a backpack.</p>
                   </div>
                   <div className={`p-4 border-t relative z-0 ${!isMAvailable ? 'border-slate-200 bg-slate-100' : selectedSize === 'M' ? 'border-blue-200 bg-blue-50/50' : 'border-slate-100 bg-slate-50/50'}`}>
                     <div className="flex items-baseline justify-between">
-                      <span className={`text-lg font-bold ${!isMAvailable ? 'text-slate-400' : 'text-blue-600'}`}>{formatCurrency(basePrices.M)}</span>
-                      <span className={`text-xs font-medium ${!isMAvailable ? 'text-slate-400' : 'text-slate-500'}`}>/ {stationDetail?.sizePricing?.find(p => p.size === 'M')?.blockHours ?? '—'} giờ</span>
+                      <span className={`text-lg font-bold ${!isMAvailable ? 'text-slate-500' : 'text-blue-600'}`}>{formatCurrency(basePrices.M)}</span>
+                      <span className={`text-xs font-medium ${!isMAvailable ? 'text-slate-500' : 'text-slate-500'}`}>/ {stationDetail?.sizePricing?.find(p => p.size === 'M')?.blockHours ?? '—'} giờ</span>
                     </div>
                     <button 
                       disabled={!isMAvailable} 
@@ -803,7 +803,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                         if (isMAvailable) setSelectedSize('M');
                       }}
                       className={`w-full mt-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                        !isMAvailable ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : selectedSize === 'M' ? 'bg-blue-600 text-white cursor-pointer shadow-sm shadow-blue-500/30' : 'bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 cursor-pointer'
+                        !isMAvailable ? 'bg-slate-200 text-slate-500 cursor-not-allowed' : selectedSize === 'M' ? 'bg-blue-600 text-white cursor-pointer shadow-sm shadow-blue-500/30' : 'bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 cursor-pointer'
                       }`}
                     >
                       {!isMAvailable ? 'Không khả dụng' : selectedSize === 'M' ? 'Selected' : 'Select'}
@@ -839,16 +839,16 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                         {isLAvailable ? `${availL}/${totalL} left` : 'Không khả dụng'}
                       </span>
                     </div>
-                    <h3 className={`text-lg font-bold ${!isLAvailable ? 'text-slate-400' : 'text-[#0F172A]'}`}>Large (L)</h3>
-                    <div className={`flex items-center text-xs mt-1 mb-3 ${!isLAvailable ? 'text-slate-400' : 'text-slate-500'}`}>
+                    <h3 className={`text-lg font-bold ${!isLAvailable ? 'text-slate-500' : 'text-[#0F172A]'}`}>Large (L)</h3>
+                    <div className={`flex items-center text-xs mt-1 mb-3 ${!isLAvailable ? 'text-slate-500' : 'text-slate-500'}`}>
                       <Ruler className="w-3.5 h-3.5 mr-1" /> 95 x 55 x 65 cm
                     </div>
-                    <p className={`text-sm mb-4 ${!isLAvailable ? 'text-slate-400' : 'text-slate-600'}`}>Fits full-size check-in suitcases and bulky gear.</p>
+                    <p className={`text-sm mb-4 ${!isLAvailable ? 'text-slate-500' : 'text-slate-600'}`}>Fits full-size check-in suitcases and bulky gear.</p>
                   </div>
                   <div className={`p-4 border-t relative z-0 ${!isLAvailable ? 'border-slate-200 bg-slate-100' : selectedSize === 'L' ? 'border-blue-200 bg-blue-50/50' : 'border-slate-100 bg-slate-50/50'}`}>
                     <div className="flex items-baseline justify-between">
-                      <span className={`text-lg font-bold ${!isLAvailable ? 'text-slate-400' : 'text-blue-600'}`}>{formatCurrency(basePrices.L)}</span>
-                      <span className={`text-xs font-medium ${!isLAvailable ? 'text-slate-400' : 'text-slate-500'}`}>/ {stationDetail?.sizePricing?.find(p => p.size === 'L')?.blockHours ?? '—'} giờ</span>
+                      <span className={`text-lg font-bold ${!isLAvailable ? 'text-slate-500' : 'text-blue-600'}`}>{formatCurrency(basePrices.L)}</span>
+                      <span className={`text-xs font-medium ${!isLAvailable ? 'text-slate-500' : 'text-slate-500'}`}>/ {stationDetail?.sizePricing?.find(p => p.size === 'L')?.blockHours ?? '—'} giờ</span>
                     </div>
                     <button 
                       disabled={!isLAvailable} 
@@ -857,7 +857,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                         if (isLAvailable) setSelectedSize('L');
                       }}
                       className={`w-full mt-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                        !isLAvailable ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : selectedSize === 'L' ? 'bg-blue-600 text-white cursor-pointer shadow-sm shadow-blue-500/30' : 'bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 cursor-pointer'
+                        !isLAvailable ? 'bg-slate-200 text-slate-500 cursor-not-allowed' : selectedSize === 'L' ? 'bg-blue-600 text-white cursor-pointer shadow-sm shadow-blue-500/30' : 'bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 cursor-pointer'
                       }`}
                     >
                       {!isLAvailable ? 'Không khả dụng' : selectedSize === 'L' ? 'Selected' : 'Select'}
@@ -899,14 +899,14 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   {/* Line Items */}
                   <div className="flex justify-between items-start pb-3 border-b border-slate-100">
                     <div>
-                      <p className="text-xs text-slate-400 mb-0.5">Station Location</p>
+                      <p className="text-xs text-slate-500 mb-0.5">Station Location</p>
                       <p className="text-sm font-bold text-[#0F172A]">{currentStation.name}</p>
                     </div>
                   </div>
 
                   <div className="flex justify-between items-start pb-3 border-b border-slate-100">
                     <div>
-                      <p className="text-xs text-slate-400 mb-0.5">Kích thước đã chọn</p>
+                      <p className="text-xs text-slate-500 mb-0.5">Kích thước đã chọn</p>
                       <p className="text-sm font-bold text-blue-600 flex items-center">
                         {selectedSize === 'S' ? 'Small Unit (S)' : selectedSize === 'M' ? 'Medium Unit (M)' : selectedSize === 'L' ? 'Large Unit (L)' : 'None Selected'}
                       </p>
@@ -915,14 +915,14 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
 
                   <div className="flex justify-between items-start pb-3 border-b border-slate-100">
                     <div>
-                      <p className="text-xs text-slate-400 mb-0.5">Schedule</p>
+                      <p className="text-xs text-slate-500 mb-0.5">Schedule</p>
                       <p className="text-sm font-semibold text-[#0F172A]">
                         {bookingMode === 'NOW' ? `Right Now (${formatTimeStr(startDateObj)})` : `${dropOffTime} (${displayStorageDate})`}
                       </p>
                       <p className="text-xs text-slate-500 mt-0.5">Deadline: {pickUpDisplay}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-slate-400 mb-0.5">Duration</p>
+                      <p className="text-xs text-slate-500 mb-0.5">Duration</p>
                       <p className="text-sm font-bold text-blue-600">{selectedDuration} {selectedDuration === 1 ? 'Hour' : 'Hours'}</p>
                     </div>
                   </div>
@@ -956,7 +956,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                         Promo Code / Voucher
                       </span>
                       {availableVouchers.filter(v => v.isEligibleNow).length > 0 && (
-                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                        <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                           {availableVouchers.filter(v => v.isEligibleNow).length} mã khả dụng
                         </span>
                       )}
@@ -973,7 +973,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                               -{formatCurrency(appliedVoucher.discountAmount)}
                             </span>
                           </div>
-                          <p className="text-[11px] text-emerald-700 truncate mt-0.5">{appliedVoucher.title}</p>
+                          <p className="text-xs text-emerald-700 truncate mt-0.5">{appliedVoucher.title}</p>
                         </div>
                         <button
                           type="button"
@@ -1003,7 +1003,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                           type="button"
                           disabled={!voucherInput.trim() || isApplyingVoucher}
                           onClick={() => void handleApplyVoucherCode()}
-                          className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:bg-slate-200 disabled:text-slate-400 text-white text-xs font-bold transition cursor-pointer"
+                          className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:bg-slate-200 disabled:text-slate-500 text-white text-xs font-bold transition cursor-pointer"
                         >
                           {isApplyingVoucher ? '...' : 'Áp dụng'}
                         </button>
@@ -1011,7 +1011,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                     )}
 
                     {voucherFeedback && (
-                      <p className={`text-[11px] font-medium ${voucherFeedback.type === 'success' ? 'text-emerald-700' : 'text-rose-600'}`}>
+                      <p className={`text-xs font-medium ${voucherFeedback.type === 'success' ? 'text-emerald-700' : 'text-rose-600'}`}>
                         {voucherFeedback.text}
                       </p>
                     )}
@@ -1025,17 +1025,17 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                             disabled={!v.isEligibleNow || isApplyingVoucher}
                             onClick={() => void handleApplyVoucherCode(v.code)}
                             title={v.isEligibleNow ? v.title : (v.ineligibleReason || v.title)}
-                            className={`px-2.5 py-1 rounded-lg border text-[11px] font-bold flex items-center gap-1 transition ${
+                            className={`px-2.5 py-1 rounded-lg border text-xs font-bold flex items-center gap-1 transition ${
                               v.isEligibleNow
                                 ? 'bg-blue-50/70 hover:bg-blue-100 text-blue-700 border-blue-200 cursor-pointer'
-                                : 'bg-slate-50 text-slate-400 border-slate-200 cursor-not-allowed opacity-75'
+                                : 'bg-slate-50 text-slate-500 border-slate-200 cursor-not-allowed opacity-75'
                             }`}
                           >
                             <span className="font-mono">{v.code}</span>
                             {v.isEligibleNow ? (
                               <span className="text-emerald-600">(-{(v.estimatedDiscount / 1000).toFixed(0)}K)</span>
                             ) : (
-                              <span className="text-[10px] font-normal">
+                              <span className="text-xs font-normal">
                                 (Đơn từ {(v.minOrderAmount / 1000).toFixed(0)}K)
                               </span>
                             )}
@@ -1062,7 +1062,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                       <p className="text-sm font-bold text-[#0F172A]">Total Amount</p>
                       <p className="text-2xl font-extrabold text-blue-600">{formatCurrency(finalPayableAmount)}</p>
                     </div>
-                    <p className="text-[11px] text-slate-400 text-right">Includes VAT & station facility services</p>
+                    <p className="text-xs text-slate-500 text-right">Includes VAT & station facility services</p>
                   </div>
 
                   <div className="bg-emerald-50 p-3 rounded-lg flex items-start border border-emerald-200">
@@ -1158,7 +1158,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   </button>
 
                   <div className="flex items-center justify-center text-xs text-slate-500 mt-4 space-x-4">
-                    <span className="flex items-center"><Lock className="w-3.5 h-3.5 mr-1 text-slate-400" /> Secure Payment</span>
+                    <span className="flex items-center"><Lock className="w-3.5 h-3.5 mr-1 text-slate-500" /> Secure Payment</span>
                     <span className="flex items-center"><BadgeCheck className="w-3.5 h-3.5 mr-1 text-blue-600" /> Verified Partner</span>
                   </div>
                 </div>
@@ -1191,7 +1191,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                 <span className="text-base text-blue-600 font-extrabold tracking-tight">SmartLocker</span>
                 <span className="text-xs text-slate-500 font-medium">Smart Luggage Storage Locker System</span>
               </div>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500">
                 © 2026 SmartLocker Systems. Integrated PayOS &amp; VietQR Napas 24/7.
               </p>
             </div>

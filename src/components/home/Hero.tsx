@@ -190,7 +190,7 @@ const Hero = () => {
                         }`}
                       >
                         {size.popular && !size.selected && (
-                          <span className="absolute -top-2 right-2 px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold uppercase">Hot</span>
+                          <span className="absolute -top-2 right-2 px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-xs font-bold uppercase">Hot</span>
                         )}
                         <span className={`font-bold text-sm ${size.selected ? 'text-primary' : 'text-on-surface'}`}>
                           {size.name} {size.popular && '★'}

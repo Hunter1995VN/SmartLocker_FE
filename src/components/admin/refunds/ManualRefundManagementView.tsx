@@ -280,7 +280,7 @@ export default function ManualRefundManagementView({
                     <button
                         type="button"
                         onClick={() => setToast(null)}
-                        className="text-slate-400 hover:text-slate-700 font-bold px-2 cursor-pointer"
+                        className="text-slate-500 hover:text-slate-700 font-bold px-2 cursor-pointer"
                     >
                         ✕
                     </button>
@@ -298,7 +298,7 @@ export default function ManualRefundManagementView({
                             <h1 className="text-lg font-extrabold text-slate-900">
                                 Phê Duyệt Lệnh Hoàn Tiền Thủ Công (Trường Hợp Ngoại Lệ)
                             </h1>
-                            <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full bg-purple-50 text-purple-700 border border-purple-200">
+                            <span className="px-2 py-0.5 text-xs font-bold uppercase tracking-wider rounded-full bg-purple-50 text-purple-700 border border-purple-200">
                                 DUYỆT HOÀN TIỀN NGOẠI LỆ
                             </span>
                         </div>
@@ -361,7 +361,7 @@ export default function ManualRefundManagementView({
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                 <div className="bg-white rounded-2xl border border-amber-200/90 p-4 shadow-xs">
                     <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700">
+                        <span className="text-xs font-bold uppercase tracking-wider text-amber-700">
                             Chờ Admin Phê Duyệt
                         </span>
                         <Clock className="w-4 h-4 text-amber-600" />
@@ -369,7 +369,7 @@ export default function ManualRefundManagementView({
                     <p className="text-2xl font-extrabold text-amber-700 mt-1.5">
                         {loading ? '...' : overview?.pendingApprovalCount ?? 0} lệnh
                     </p>
-                    <p className="text-[11px] text-slate-500 mt-1">
+                    <p className="text-xs text-slate-500 mt-1">
                         Tổng đề xuất chờ duyệt:{' '}
                         <strong className="text-slate-800">
                             {formatVnd(overview?.pendingApprovalAmount ?? 0)}
@@ -379,7 +379,7 @@ export default function ManualRefundManagementView({
 
                 <div className="bg-white rounded-2xl border border-blue-200/90 p-4 shadow-xs">
                     <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-blue-700">
+                        <span className="text-xs font-bold uppercase tracking-wider text-blue-700">
                             Đã Duyệt · Chờ Chuyển Khoản
                         </span>
                         <Landmark className="w-4 h-4 text-blue-600" />
@@ -387,7 +387,7 @@ export default function ManualRefundManagementView({
                     <p className="text-2xl font-extrabold text-blue-700 mt-1.5">
                         {loading ? '...' : overview?.approvedPendingPayoutCount ?? 0} lệnh
                     </p>
-                    <p className="text-[11px] text-slate-500 mt-1">
+                    <p className="text-xs text-slate-500 mt-1">
                         Giá trị chờ giải ngân:{' '}
                         <strong className="text-slate-800">
                             {formatVnd(overview?.approvedPendingPayoutAmount ?? 0)}
@@ -397,7 +397,7 @@ export default function ManualRefundManagementView({
 
                 <div className="bg-white rounded-2xl border border-emerald-200/90 p-4 shadow-xs">
                     <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">
+                        <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">
                             Đã Hoàn Tiền Ngoại Lệ
                         </span>
                         <CheckCircle2 className="w-4 h-4 text-emerald-600" />
@@ -405,7 +405,7 @@ export default function ManualRefundManagementView({
                     <p className="text-2xl font-extrabold text-emerald-700 mt-1.5">
                         {loading ? '...' : formatVnd(overview?.totalDisbursedAmount ?? 0)}
                     </p>
-                    <p className="text-[11px] text-slate-500 mt-1">
+                    <p className="text-xs text-slate-500 mt-1">
                         {overview?.disbursedCount ?? 0} lệnh hoàn tất · TB{' '}
                         <strong>{formatVnd(overview?.averageRefundAmount ?? 0)}/lệnh</strong>
                     </p>
@@ -413,7 +413,7 @@ export default function ManualRefundManagementView({
 
                 <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs">
                     <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                             Đã Từ Chối / Bảo Vệ Quỹ
                         </span>
                         <ShieldCheck className="w-4 h-4 text-purple-600" />
@@ -421,7 +421,7 @@ export default function ManualRefundManagementView({
                     <p className="text-2xl font-extrabold text-slate-900 mt-1.5">
                         {loading ? '...' : overview?.rejectedCount ?? 0} lệnh
                     </p>
-                    <p className="text-[11px] text-emerald-600 font-semibold mt-1">
+                    <p className="text-xs text-emerald-600 font-semibold mt-1">
                         Chặn 100% hoàn vượt thực thu PayOS
                     </p>
                 </div>
@@ -465,7 +465,7 @@ export default function ManualRefundManagementView({
                             <span>{tab.label}</span>
                             {typeof tab.badge === 'number' && (
                                 <span
-                                    className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${
+                                    className={`px-1.5 py-0.2 rounded-full text-xs font-extrabold ${
                                         active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
                                     }`}
                                 >
@@ -483,7 +483,7 @@ export default function ManualRefundManagementView({
                     {/* Filter Bar */}
                     <div className="p-4 border-b border-slate-100 flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
                         <div className="relative flex-1 max-w-md">
-                            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                             <input
                                 type="text"
                                 value={searchQuery}
@@ -524,7 +524,7 @@ export default function ManualRefundManagementView({
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse text-xs">
                             <thead>
-                                <tr className="bg-slate-50/90 border-b border-slate-200 text-[11px] font-bold uppercase text-slate-500">
+                                <tr className="bg-slate-50/90 border-b border-slate-200 text-xs font-bold uppercase text-slate-500">
                                     <th className="py-3 px-4">Mã Lệnh & Thời gian</th>
                                     <th className="py-3 px-4">Đơn đặt & Giao dịch Gốc</th>
                                     <th className="py-3 px-4">Nhóm Ngoại lệ & Lý do</th>
@@ -537,7 +537,7 @@ export default function ManualRefundManagementView({
                             <tbody className="divide-y divide-slate-100">
                                 {loading ? (
                                     <tr>
-                                        <td colSpan={7} className="py-12 text-center text-slate-400">
+                                        <td colSpan={7} className="py-12 text-center text-slate-500">
                                             Đang tải danh sách lệnh hoàn tiền ngoại lệ...
                                         </td>
                                     </tr>
@@ -547,7 +547,7 @@ export default function ManualRefundManagementView({
                                             <p className="text-slate-500 font-semibold">
                                                 Chưa có lệnh hoàn tiền ngoại lệ nào trong bộ lọc hiện tại.
                                             </p>
-                                            <p className="text-[11px] text-slate-400">
+                                            <p className="text-xs text-slate-500">
                                                 Nhấn nút <strong>+ Lập Lệnh Hoàn Tiền Ngoại Lệ</strong> hoặc chuyển sang
                                                 tab <strong>Tra cứu Giao dịch PAID</strong> để khởi tạo đề xuất từ giao
                                                 dịch thực tế.
@@ -570,7 +570,7 @@ export default function ManualRefundManagementView({
                                                     <span className="font-mono font-extrabold text-purple-700 bg-purple-50 border border-purple-200 px-2 py-0.5 rounded-lg">
                                                         {item.refundCode}
                                                     </span>
-                                                    <p className="text-[11px] text-slate-400 mt-1">
+                                                    <p className="text-xs text-slate-500 mt-1">
                                                         {formatDateTime(item.requestedAt)}
                                                     </p>
                                                 </td>
@@ -578,14 +578,14 @@ export default function ManualRefundManagementView({
                                                 <td className="py-3.5 px-4">
                                                     <p className="font-bold text-blue-600">{item.bookingCode}</p>
                                                     <p className="text-slate-800 font-semibold">{item.customerName}</p>
-                                                    <p className="text-[11px] text-slate-400">
+                                                    <p className="text-xs text-slate-500">
                                                         Order #{item.originalOrderCode} · {item.stationName}
                                                     </p>
                                                 </td>
 
                                                 <td className="py-3.5 px-4 max-w-xs">
                                                     <span
-                                                        className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-extrabold border ${cat.cls}`}
+                                                        className={`inline-block px-2 py-0.5 rounded-full text-xs font-extrabold border ${cat.cls}`}
                                                     >
                                                         {cat.label}
                                                     </span>
@@ -593,7 +593,7 @@ export default function ManualRefundManagementView({
                                                         {item.reasonSummary}
                                                     </p>
                                                     {item.relatedIncidentCode && (
-                                                        <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-rose-600 mt-0.5">
+                                                        <span className="inline-flex items-center gap-1 text-xs font-mono font-bold text-rose-600 mt-0.5">
                                                             <Wrench className="w-3 h-3" />
                                                             {item.relatedIncidentCode}
                                                         </span>
@@ -604,12 +604,12 @@ export default function ManualRefundManagementView({
                                                     <p className="font-mono font-extrabold text-sm text-purple-700">
                                                         {formatVnd(item.approvedAmount ?? item.requestedAmount)}
                                                     </p>
-                                                    <p className="text-[11px] text-slate-400">
+                                                    <p className="text-xs text-slate-500">
                                                         / Thu gốc {formatVnd(item.originalPaidAmount)} (
                                                         {item.refundPercentOfPaid}%)
                                                     </p>
                                                     {item.gatewayTransferRef && (
-                                                        <p className="text-[10px] font-mono text-emerald-700 font-bold">
+                                                        <p className="text-xs font-mono text-emerald-700 font-bold">
                                                             FT: {item.gatewayTransferRef}
                                                         </p>
                                                     )}
@@ -621,7 +621,7 @@ export default function ManualRefundManagementView({
                                                         {item.requestedByRole})
                                                     </p>
                                                     {item.reviewedByName && (
-                                                        <p className="text-[11px] text-emerald-700 mt-0.5">
+                                                        <p className="text-xs text-emerald-700 mt-0.5">
                                                             Duyệt: <strong>{item.reviewedByName}</strong>
                                                         </p>
                                                     )}
@@ -629,7 +629,7 @@ export default function ManualRefundManagementView({
 
                                                 <td className="py-3.5 px-4 whitespace-nowrap">
                                                     <span
-                                                        className={`inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${st.cls}`}
+                                                        className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-extrabold border ${st.cls}`}
                                                     >
                                                         {st.label}
                                                     </span>
@@ -639,7 +639,7 @@ export default function ManualRefundManagementView({
                                                     <button
                                                         type="button"
                                                         onClick={() => setReviewItem(item)}
-                                                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-[11px] transition cursor-pointer ${
+                                                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs transition cursor-pointer ${
                                                             item.status === 'PENDING_APPROVAL' && isAdmin
                                                                 ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs'
                                                                 : item.status === 'APPROVED_PENDING_PAYOUT' && isAdmin
@@ -681,7 +681,7 @@ export default function ManualRefundManagementView({
                             </p>
                         </div>
                         <div className="relative w-full sm:w-72">
-                            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                             <input
                                 type="text"
                                 value={candidateSearch}
@@ -695,7 +695,7 @@ export default function ManualRefundManagementView({
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse text-xs">
                             <thead>
-                                <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase text-slate-500">
+                                <tr className="bg-slate-50 border-b border-slate-200 text-xs font-bold uppercase text-slate-500">
                                     <th className="py-3 px-4">OrderCode PayOS</th>
                                     <th className="py-3 px-4">Đơn đặt & Trạng thái</th>
                                     <th className="py-3 px-4">Khách hàng & Trạm</th>
@@ -708,7 +708,7 @@ export default function ManualRefundManagementView({
                             <tbody className="divide-y divide-slate-100">
                                 {candidates.length === 0 ? (
                                     <tr>
-                                        <td colSpan={7} className="py-10 text-center text-slate-400">
+                                        <td colSpan={7} className="py-10 text-center text-slate-500">
                                             Không tìm thấy giao dịch PAID nào khớp từ khóa.
                                         </td>
                                     </tr>
@@ -717,20 +717,20 @@ export default function ManualRefundManagementView({
                                         <tr key={c.paymentId} className="hover:bg-slate-50/70">
                                             <td className="py-3 px-4 whitespace-nowrap">
                                                 <p className="font-mono font-bold text-slate-900">{c.orderCode}</p>
-                                                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">
+                                                <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">
                                                     {c.paymentKind}
                                                 </span>
                                             </td>
                                             <td className="py-3 px-4">
                                                 <p className="font-bold text-blue-600">{c.bookingCode}</p>
-                                                <span className="text-[11px] text-slate-500">
+                                                <span className="text-xs text-slate-500">
                                                     {c.bookingStatus}{' '}
                                                     {c.lockerCode ? `· Ô ${c.lockerCode}` : `· Size ${c.lockerSize}`}
                                                 </span>
                                             </td>
                                             <td className="py-3 px-4">
                                                 <p className="font-semibold text-slate-800">{c.customerName}</p>
-                                                <p className="text-[11px] text-slate-400">{c.stationName}</p>
+                                                <p className="text-xs text-slate-500">{c.stationName}</p>
                                             </td>
                                             <td className="py-3 px-4 font-mono font-bold text-slate-900">
                                                 {formatVnd(c.paidAmount)}
@@ -749,12 +749,12 @@ export default function ManualRefundManagementView({
                                                             setPreselectedCandidate(c);
                                                             setIsCreateOpen(true);
                                                         }}
-                                                        className="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 font-bold text-[11px] transition cursor-pointer"
+                                                        className="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 font-bold text-xs transition cursor-pointer"
                                                     >
                                                         Lập lệnh hoàn tiền →
                                                     </button>
                                                 ) : (
-                                                    <span className="inline-flex items-center gap-1 text-[11px] text-slate-400 font-semibold">
+                                                    <span className="inline-flex items-center gap-1 text-xs text-slate-500 font-semibold">
                                                         <XCircle className="w-3.5 h-3.5" />
                                                         Đã hoàn tối đa
                                                     </span>
@@ -786,7 +786,7 @@ export default function ManualRefundManagementView({
                                         <p className="text-xs font-extrabold text-slate-800">
                                             {stat.categoryLabel}
                                         </p>
-                                        <p className="text-[11px] text-slate-500">{stat.count} hồ sơ phát sinh</p>
+                                        <p className="text-xs text-slate-500">{stat.count} hồ sơ phát sinh</p>
                                     </div>
                                     <span className="font-mono text-sm font-extrabold text-purple-700">
                                         {formatVnd(stat.totalAmount)}
@@ -816,21 +816,21 @@ export default function ManualRefundManagementView({
                         <div className="space-y-2.5 text-slate-600">
                             <div className="p-3 rounded-xl bg-emerald-50/70 border border-emerald-200 text-emerald-950">
                                 <p className="font-bold">1. Chốt chặn Chống hoàn lố (Anti-Over-Refund Guardrail)</p>
-                                <p className="mt-0.5 text-[11px]">
+                                <p className="mt-0.5 text-xs">
                                     Tổng tiền hoàn lũy kế + các lệnh đang chờ duyệt trên cùng một đơn đặt tủ không bao
                                     giờ được phép vượt quá tổng thực thu đã khớp trạng thái <code className="font-mono">PAID</code> từ cổng PayOS.
                                 </p>
                             </div>
                             <div className="p-3 rounded-xl bg-purple-50/70 border border-purple-200 text-purple-950">
                                 <p className="font-bold">2. Phân tách Nhiệm vụ (Segregation of Duties — RBAC)</p>
-                                <p className="mt-0.5 text-[11px]">
+                                <p className="mt-0.5 text-xs">
                                     Nhân viên hiện trường (<strong>STAFF</strong>) được phép lập đề xuất kèm biên bản sự
                                     cố nhưng bị khóa hoàn toàn quyền phê duyệt. Chỉ Quản trị viên (<strong>ADMIN</strong>) mới có thẩm quyền phê duyệt và xác nhận tất toán chuyển khoản.
                                 </p>
                             </div>
                             <div className="p-3 rounded-xl bg-blue-50/70 border border-blue-200 text-blue-950">
                                 <p className="font-bold">3. Đồng bộ Sổ cái Đối soát PayOS</p>
-                                <p className="mt-0.5 text-[11px]">
+                                <p className="mt-0.5 text-xs">
                                     Ngay khi xác nhận giải ngân, hệ thống tự động sinh dòng bút toán{' '}
                                     <code className="font-mono">Kind = REFUND, Status = REFUNDED</code> vào bảng{' '}
                                     <code className="font-mono">Payments</code> kèm mã FT ngân hàng, tự động khấu trừ

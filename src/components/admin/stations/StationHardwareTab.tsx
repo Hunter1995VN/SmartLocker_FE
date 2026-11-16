@@ -233,7 +233,7 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                     <div className="flex items-center gap-3">
                         <div className={`p-2.5 rounded-xl border ${
                             isUnprovisioned
-                                ? 'bg-slate-800 text-slate-400 border-slate-700'
+                                ? 'bg-slate-800 text-slate-500 border-slate-700'
                                 : 'bg-blue-500/20 text-blue-400 border-blue-500/30'
                         }`}>
                             <Cpu className="w-5 h-5" />
@@ -243,19 +243,19 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                                 <h3 className="text-sm font-bold tracking-tight">
                                     {isUnprovisioned ? 'Chưa lắp vi điều khiển IoT' : 'ESP32 Master Controller'}
                                 </h3>
-                                <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold border ${
+                                <span className={`text-xs font-mono px-2 py-0.5 rounded-full font-bold border ${
                                     isOnline
                                         ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
                                         : isReboot
                                         ? 'bg-amber-500/20 text-amber-400 border-amber-500/40 animate-pulse'
                                         : isOffline
                                         ? 'bg-rose-500/20 text-rose-400 border-rose-500/40'
-                                        : 'bg-slate-800 text-slate-400 border-slate-700'
+                                        : 'bg-slate-800 text-slate-500 border-slate-700'
                                 }`}>
                                     {isOnline ? 'ONLINE' : isReboot ? 'REBOOTING' : isOffline ? 'OFFLINE' : 'CHƯA GẮN THIẾT BỊ'}
                                 </span>
                             </div>
-                            <p className="text-xs text-slate-400 font-mono mt-0.5">
+                            <p className="text-xs text-slate-500 font-mono mt-0.5">
                                 Mã thiết bị: <span className="text-slate-200 font-semibold">{deviceCode}</span> · Trạm: <span className="text-slate-200">{shortId}</span>
                             </p>
                         </div>
@@ -298,7 +298,7 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                         <div className="flex items-center gap-2 text-slate-300">
                             <Wifi className={`w-4 h-4 ${isOnline ? 'text-emerald-400' : 'text-slate-500'} shrink-0`} />
                             <div>
-                                <span className="text-[10px] text-slate-400 block">Wi-Fi Signal</span>
+                                <span className="text-xs text-slate-500 block">Wi-Fi Signal</span>
                                 <span className="font-mono font-bold">
                                     {device?.wifiRssi ? `${device.wifiRssi} dBm` : 'Mất tín hiệu'}
                                 </span>
@@ -307,14 +307,14 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                         <div className="flex items-center gap-2 text-slate-300">
                             <HardDrive className="w-4 h-4 text-blue-400 shrink-0" />
                             <div>
-                                <span className="text-[10px] text-slate-400 block">Bo mạch</span>
+                                <span className="text-xs text-slate-500 block">Bo mạch</span>
                                 <span className="font-mono font-bold">{device?.deviceType || 'ESP32'}</span>
                             </div>
                         </div>
                         <div className="flex items-center gap-2 text-slate-300">
                             <Clock className="w-4 h-4 text-purple-400 shrink-0" />
                             <div>
-                                <span className="text-[10px] text-slate-400 block">Uptime</span>
+                                <span className="text-xs text-slate-500 block">Uptime</span>
                                 <span className="font-mono font-bold">
                                     {device?.uptimeSeconds
                                         ? `${Math.floor(device.uptimeSeconds / 60)} phút ${device.uptimeSeconds % 60}s`
@@ -325,7 +325,7 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                         <div className="flex items-center gap-2 text-slate-300">
                             <Terminal className="w-4 h-4 text-amber-400 shrink-0" />
                             <div>
-                                <span className="text-[10px] text-slate-400 block">Giao thức</span>
+                                <span className="text-xs text-slate-500 block">Giao thức</span>
                                 <span className="font-mono font-bold">MQTT v3.1.1 (QoS 1)</span>
                             </div>
                         </div>
@@ -342,7 +342,7 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                             Kết quả chẩn đoán tự động phần cứng (Self-Test Report)
                         </h4>
                     </div>
-                    <span className="text-[11px] font-semibold text-slate-400">
+                    <span className="text-xs font-semibold text-slate-500">
                         {lastDiagnostics ? `Đo lường lúc: ${new Date(lastDiagnostics.timestamp).toLocaleTimeString('vi-VN')}` : 'Chưa chạy lần nào'}
                     </span>
                 </div>
@@ -351,7 +351,7 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                     <div className="py-8 flex flex-col items-center justify-center space-y-2">
                         <div className="w-8 h-8 rounded-full border-3 border-blue-500/20 border-t-blue-500 animate-spin" />
                         <p className="text-xs font-semibold text-slate-600">Đang kích hoạt chu trình xung rơ-le và đọc công tắc hành trình...</p>
-                        <p className="text-[11px] text-slate-400">Thời gian dự kiến: ~1 giây</p>
+                        <p className="text-xs text-slate-500">Thời gian dự kiến: ~1 giây</p>
                     </div>
                 ) : lastDiagnostics ? (
                     <div className="space-y-4">
@@ -370,7 +370,7 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {/* Relay check */}
                             <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl space-y-2 text-xs">
-                                <span className="font-bold text-slate-700 uppercase text-[10px] tracking-wider block">
+                                <span className="font-bold text-slate-700 uppercase text-xs tracking-wider block">
                                     Kiểm tra rơ-le khóa Solenoid (Relays)
                                 </span>
                                 <div className="space-y-1.5 font-mono">
@@ -391,7 +391,7 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
 
                             {/* Sensors check */}
                             <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl space-y-2 text-xs">
-                                <span className="font-bold text-slate-700 uppercase text-[10px] tracking-wider block">
+                                <span className="font-bold text-slate-700 uppercase text-xs tracking-wider block">
                                     Cảm biến hành trình cửa (Limit Switches)
                                 </span>
                                 <div className="space-y-1.5 font-mono">
@@ -412,10 +412,10 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                         </div>
                     </div>
                 ) : (
-                    <div className="py-8 text-center text-slate-400">
+                    <div className="py-8 text-center text-slate-500">
                         <Activity className="w-8 h-8 mx-auto text-slate-300 mb-2 stroke-[1.5]" />
                         <p className="text-xs font-semibold text-slate-600">Chưa có dữ liệu chẩn đoán phần cứng gần đây</p>
-                        <p className="text-[11px] text-slate-400 mt-0.5">Bấm nút "Chạy Self-Test" ở trên để kích hoạt kiểm tra tuần tự 3 rơ-le và cảm biến</p>
+                        <p className="text-xs text-slate-500 mt-0.5">Bấm nút "Chạy Self-Test" ở trên để kích hoạt kiểm tra tuần tự 3 rơ-le và cảm biến</p>
                     </div>
                 )}
             </div>
@@ -429,7 +429,7 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                             Cấu hình Ngưỡng an ninh & Cảm biến (UC-A11)
                         </h4>
                     </div>
-                    <span className="text-[11px] font-semibold text-slate-400">Tham số an ninh trạm</span>
+                    <span className="text-xs font-semibold text-slate-500">Tham số an ninh trạm</span>
                 </div>
 
                 {saveThresholdsFeedback && (
@@ -454,7 +454,7 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                             />
                             <span className="text-slate-500 font-medium">giây (Khuyến nghị: 60s)</span>
                         </div>
-                        <p className="text-[11px] text-slate-400 mt-1">
+                        <p className="text-xs text-slate-500 mt-1">
                             Nếu công tắc hành trình báo cửa mở liên tục quá thời gian này, hệ thống sẽ kích hoạt cảnh báo an ninh.
                         </p>
                     </div>
@@ -474,7 +474,7 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                             />
                             <span className="text-slate-500 font-medium">lần (Khóa tạm 5 phút)</span>
                         </div>
-                        <p className="text-[11px] text-slate-400 mt-1">
+                        <p className="text-xs text-slate-500 mt-1">
                             Ngăn chặn tấn công thử mật khẩu liên tục tại màn hình cảm ứng Kiosk.
                         </p>
                     </div>
@@ -524,7 +524,7 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                         <div>
                             <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                                 <span>Giám sát Cảm biến Cửa & Telemetry (UC-S03)</span>
-                                <span className="text-[10px] font-mono bg-sky-100 text-sky-800 px-2 py-0.5 rounded-full font-bold">
+                                <span className="text-xs font-mono bg-sky-100 text-sky-800 px-2 py-0.5 rounded-full font-bold">
                                     {doorTelemetry.length} ô tủ
                                 </span>
                             </h4>
@@ -554,7 +554,7 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                 </div>
 
                 {doorTelemetry.length === 0 ? (
-                    <div className="text-center py-8 text-slate-400 text-xs italic bg-slate-50 rounded-xl">
+                    <div className="text-center py-8 text-slate-500 text-xs italic bg-slate-50 rounded-xl">
                         Chưa có dữ liệu cảm biến cho trạm này.
                     </div>
                 ) : (
@@ -577,23 +577,23 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                                             {item.lockerCode}
                                         </td>
                                         <td className="py-2 px-3">
-                                            <span className="px-2 py-0.5 bg-slate-100 rounded text-[11px] font-bold text-slate-700">
+                                            <span className="px-2 py-0.5 bg-slate-100 rounded text-xs font-bold text-slate-700">
                                                 Size {item.size}
                                             </span>
                                         </td>
                                         <td className="py-2 px-3">
                                             {item.doorState === 'CLOSED' ? (
-                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full font-semibold text-[11px]">
+                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full font-semibold text-xs">
                                                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                                                     ĐÃ ĐÓNG (CLOSED)
                                                 </span>
                                             ) : item.doorState === 'OPEN' ? (
-                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-rose-50 text-rose-700 border border-rose-200 rounded-full font-semibold text-[11px] animate-pulse">
+                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-rose-50 text-rose-700 border border-rose-200 rounded-full font-semibold text-xs animate-pulse">
                                                     <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
                                                     ĐANG MỞ (OPEN)
                                                 </span>
                                             ) : (
-                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-slate-100 text-slate-600 rounded-full text-[11px]">
+                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-slate-100 text-slate-600 rounded-full text-xs">
                                                     ⚪ CHƯA RÕ
                                                 </span>
                                             )}
@@ -602,7 +602,7 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                                             {item.gpioPin != null ? `GPIO ${item.gpioPin}` : '—'}
                                         </td>
                                         <td className="py-2 px-3">
-                                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                            <span className={`px-2 py-0.5 rounded text-xs font-bold ${
                                                 item.healthStatus === 'HEALTHY' ? 'bg-emerald-100 text-emerald-800' :
                                                 item.healthStatus === 'WARNING' ? 'bg-amber-100 text-amber-800' :
                                                 'bg-rose-100 text-rose-800'
@@ -610,7 +610,7 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                                                 {item.healthStatus}
                                             </span>
                                         </td>
-                                        <td className="py-2 px-3 text-slate-500 text-[11px]">
+                                        <td className="py-2 px-3 text-slate-500 text-xs">
                                             {item.lastDoorEventAt
                                                 ? new Date(item.lastDoorEventAt.endsWith('Z') ? item.lastDoorEventAt : item.lastDoorEventAt + 'Z').toLocaleTimeString('vi-VN') + ' ' + new Date(item.lastDoorEventAt.endsWith('Z') ? item.lastDoorEventAt : item.lastDoorEventAt + 'Z').toLocaleDateString('vi-VN')
                                                 : 'Chưa có sự kiện'}
@@ -624,13 +624,13 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
             </div>
 
             {/* Diagnostic Logs Console */}
-            <div className="bg-slate-900 rounded-2xl border border-slate-800 p-4 font-mono text-[11px]">
-                <div className="flex items-center justify-between pb-2 border-b border-slate-800 mb-2 text-slate-400">
+            <div className="bg-slate-900 rounded-2xl border border-slate-800 p-4 font-mono text-xs">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-800 mb-2 text-slate-500">
                     <span className="flex items-center gap-1.5 text-slate-300 font-bold">
                         <Terminal className="w-3.5 h-3.5 text-blue-400" />
                         Live Hardware Console Log
                     </span>
-                    <span className="text-[10px] text-slate-500">Auto-scroll</span>
+                    <span className="text-xs text-slate-500">Auto-scroll</span>
                 </div>
                 <div className="space-y-1 max-h-36 overflow-y-auto scrollbar-thin">
                     {logs.map((log, idx) => (
@@ -681,7 +681,7 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                             <button
                                 type="button"
                                 onClick={handleReboot}
-                                className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                                className="px-3.5 py-1.5 rounded-xl bg-amber-700 hover:bg-amber-800 text-white text-xs font-bold transition shadow-xs cursor-pointer"
                             >
                                 Xác nhận Reboot
                             </button>

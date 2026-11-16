@@ -26,7 +26,7 @@ export default function StationFleetTable({ stations, isLoading }: StationFleetT
                             <Layers className="w-4 h-4" />
                         </span>
                         <h2 className="text-sm font-bold text-slate-900 tracking-tight">Station Fleet Status</h2>
-                        <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-bold text-[11px] border border-slate-200">
+                        <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200">
                             {stations.length} Trạm ghi nhận
                         </span>
                     </div>
@@ -63,15 +63,15 @@ export default function StationFleetTable({ stations, isLoading }: StationFleetT
             {isLoading ? (
                 <div className="py-12 flex flex-col items-center justify-center space-y-2">
                     <div className="w-7 h-7 rounded-full border-2 border-blue-500/20 border-t-blue-500 animate-spin" />
-                    <p className="text-xs text-slate-400">Đang tải danh sách trạm...</p>
+                    <p className="text-xs text-slate-500">Đang tải danh sách trạm...</p>
                 </div>
             ) : stations.length === 0 ? (
-                <div className="p-8 text-center text-xs text-slate-400">Chưa có dữ liệu trạm ghi nhận.</div>
+                <div className="p-8 text-center text-xs text-slate-500">Chưa có dữ liệu trạm ghi nhận.</div>
             ) : (
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs">
                         <thead>
-                            <tr className="border-b border-slate-200/80 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                            <tr className="border-b border-slate-200/80 text-xs font-bold text-slate-500 uppercase tracking-wider">
                                 <th className="py-3 px-3">STATION ID & NAME</th>
                                 <th className="py-3 px-3">BAY CAPACITY</th>
                                 <th className="py-3 px-3">DEVICE CONNECTIVITY</th>
@@ -89,12 +89,12 @@ export default function StationFleetTable({ stations, isLoading }: StationFleetT
                                         {/* Station ID & Name */}
                                         <td className="py-3 px-3">
                                             <div className="flex items-center gap-2.5">
-                                                <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 font-bold text-[11px] flex items-center justify-center shrink-0 border border-blue-200/60">
+                                                <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 font-bold text-xs flex items-center justify-center shrink-0 border border-blue-200/60">
                                                     {st.stationName ? st.stationName.substring(0, 2).toUpperCase() : 'ST'}
                                                 </div>
                                                 <div>
                                                     <p className="font-bold text-slate-900 leading-tight">{st.stationName}</p>
-                                                    <p className="text-[10px] text-slate-400 font-mono mt-0.5">ID: {st.stationId.slice(0, 8)}...</p>
+                                                    <p className="text-xs text-slate-500 font-mono mt-0.5">ID: {st.stationId.slice(0, 8)}...</p>
                                                 </div>
                                             </div>
                                         </td>
@@ -102,7 +102,7 @@ export default function StationFleetTable({ stations, isLoading }: StationFleetT
                                         {/* Bay Capacity Progress */}
                                         <td className="py-3 px-3 min-w-[180px]">
                                             <div className="space-y-1">
-                                                <div className="flex justify-between items-center text-[11px]">
+                                                <div className="flex justify-between items-center text-xs">
                                                     <span className="font-semibold text-slate-800">
                                                         {st.occupiedLockers} / {st.totalLockers} bays
                                                     </span>
@@ -123,7 +123,7 @@ export default function StationFleetTable({ stations, isLoading }: StationFleetT
 
                                         {/* Device Connectivity */}
                                         <td className="py-3 px-3">
-                                            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-semibold border border-emerald-200">
+                                            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200">
                                                 <Wifi className="w-3 h-3 text-emerald-600" />
                                                 <span>Optimal · 18ms</span>
                                             </span>
@@ -131,7 +131,7 @@ export default function StationFleetTable({ stations, isLoading }: StationFleetT
 
                                         {/* Station Status */}
                                         <td className="py-3 px-3">
-                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">
+                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
                                                 <CheckCircle2 className="w-3 h-3" />
                                                 <span>ONLINE</span>
                                             </span>
@@ -139,7 +139,7 @@ export default function StationFleetTable({ stations, isLoading }: StationFleetT
 
                                         {/* Action */}
                                         <td className="py-3 px-3 text-right">
-                                            <span className="text-[11px] font-semibold text-blue-600 hover:text-blue-700 cursor-pointer">
+                                            <span className="text-xs font-semibold text-blue-600 hover:text-blue-700 cursor-pointer">
                                                 Inspect Bays
                                             </span>
                                         </td>

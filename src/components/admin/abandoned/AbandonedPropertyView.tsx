@@ -551,7 +551,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                     </span>
                 </div>
 
-                <div className="flex items-center gap-2 flex-wrap text-[11px] font-semibold">
+                <div className="flex items-center gap-2 flex-wrap text-xs font-semibold">
                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
                         <Shield className="w-3 h-3 text-indigo-600" />
                         Nguyên Tắc 4 Mắt (Dual-Control)
@@ -564,7 +564,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                         Realtime Sync
                     </span>
-                    <span className="text-slate-400 font-mono text-[10px]">ISO/IEC 27001</span>
+                    <span className="text-slate-500 font-mono text-xs">ISO/IEC 27001</span>
                 </div>
             </div>
 
@@ -631,7 +631,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                 <div className="flex-1">
                     <p className="font-extrabold uppercase tracking-wide text-indigo-950 flex items-center gap-2">
                         <span>Cảnh báo tuân thủ kiểm kê vật lý &amp; Quy chuẩn an toàn 72h</span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-200/80 text-indigo-800 font-mono font-bold">
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-200/80 text-indigo-800 font-mono font-bold">
                             DUAL-CONTROL
                         </span>
                     </p>
@@ -657,7 +657,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                         </span>
                         <span className="text-xs font-semibold text-slate-500">hồ sơ</span>
                     </div>
-                    <p className="text-[11px] font-semibold text-rose-600 mt-1 flex items-center gap-1">
+                    <p className="text-xs font-semibold text-rose-600 mt-1 flex items-center gap-1">
                         <AlertTriangle className="w-3 h-3 shrink-0" />
                         {overdue72Count} ô tủ quá hạn thực tế &ge; 72h
                     </p>
@@ -675,7 +675,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                         </span>
                         <span className="text-xs font-semibold text-slate-500">đ</span>
                     </div>
-                    <p className="text-[11px] font-semibold text-slate-500 mt-1">
+                    <p className="text-xs font-semibold text-slate-500 mt-1">
                         {debtorCount > 0
                             ? `${debtorCount} khách hàng đang bị khóa quyền đặt tủ`
                             : 'Không có công nợ tồn đọng'}
@@ -694,7 +694,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                         </span>
                         <span className="text-xs font-semibold text-slate-500">biên bản</span>
                     </div>
-                    <p className="text-[11px] font-semibold text-indigo-600 mt-1">
+                    <p className="text-xs font-semibold text-indigo-600 mt-1">
                         {pendingCount > 0 ? 'Cần Quản trị viên thẩm tra & ký số' : 'Toàn bộ hồ sơ đã được thẩm định'}
                     </p>
                 </div>
@@ -711,7 +711,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                         </span>
                         <span className="text-xs font-semibold text-slate-500">hoàn tất</span>
                     </div>
-                    <p className="text-[11px] font-semibold text-slate-500 mt-1">
+                    <p className="text-xs font-semibold text-slate-500 mt-1">
                         {returnedCount} đã trả khách · {disposedCount} đã xuất kho / thanh lý
                     </p>
                 </div>
@@ -752,7 +752,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                         >
                             <span>{tab.label}</span>
                             <span
-                                className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                                className={`px-1.5 py-0.5 rounded-full text-xs font-mono font-bold ${
                                     currentTab === tab.key
                                         ? 'bg-white/20 text-white'
                                         : tab.highlight
@@ -769,7 +769,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                 {/* Filter and Search */}
                 <div className="flex items-center gap-2">
                     <div className="relative flex-1 md:w-64">
-                        <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
+                        <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5" />
                         <input
                             type="text"
                             value={searchQuery}
@@ -797,7 +797,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
             {/* Quick Case Selector Pill Bar (if multiple records) */}
             {filteredRecords.length > 1 && (
                 <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
-                    <span className="text-slate-400 text-[11px] font-bold uppercase shrink-0">Chọn hồ sơ:</span>
+                    <span className="text-slate-500 text-xs font-bold uppercase shrink-0">Chọn hồ sơ:</span>
                     {filteredRecords.map((r) => {
                         const isPending =
                             (r.status || '').toUpperCase() === 'PENDING_APPROVAL' ||
@@ -817,7 +817,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                 }`}
                             >
                                 <span>{r.lockerCode}</span>
-                                <span className="text-[10px] opacity-70">({r.recordCode.slice(-4)})</span>
+                                <span className="text-xs opacity-70">({r.recordCode.slice(-4)})</span>
                                 {isPending && <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />}
                                 {isResolved && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />}
                             </button>
@@ -860,7 +860,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                 <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center text-slate-500">
                     <Package className="w-10 h-10 mx-auto text-slate-300 mb-2" />
                     <p className="font-bold text-sm text-slate-700">Không tìm thấy biên bản phù hợp</p>
-                    <p className="text-xs text-slate-400 mt-1">
+                    <p className="text-xs text-slate-500 mt-1">
                         Hãy thử đổi bộ lọc hoặc bấm &quot;Lập biên bản 72h&quot; để ghi nhận đồ bỏ quên mới.
                     </p>
                 </div>
@@ -875,7 +875,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                             <div className="flex items-start justify-between gap-3">
                                 <div className="flex items-start gap-3">
                                     <div className="w-14 h-14 rounded-2xl bg-indigo-600 text-white flex flex-col items-center justify-center font-mono font-black shadow-md shadow-indigo-500/25 shrink-0">
-                                        <span className="text-[10px] uppercase font-bold opacity-80">Ô TỦ</span>
+                                        <span className="text-xs uppercase font-bold opacity-80">Ô TỦ</span>
                                         <span className="text-base tracking-tighter">{activeRecord.lockerCode}</span>
                                     </div>
                                     <div>
@@ -890,19 +890,19 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                             <span className="text-slate-300">·</span>
                                             <span className="font-mono text-slate-500">Đơn #{activeRecord.bookingCode}</span>
                                             <span className="text-slate-300">·</span>
-                                            <span className="font-mono text-slate-400">{activeRecord.recordCode}</span>
+                                            <span className="font-mono text-slate-500">{activeRecord.recordCode}</span>
                                         </p>
                                     </div>
                                 </div>
 
                                 <div className="text-right shrink-0">
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                                         Đơn quá hạn khi lập BB
                                     </p>
                                     <p className="text-base font-black text-rose-600 font-mono">
                                         {overdueDisplay(activeRecord.overdueHours)}
                                     </p>
-                                    <p className="text-[10px] text-slate-400 mt-0.5">
+                                    <p className="text-xs text-slate-500 mt-0.5">
                                         Lập BB: {new Date(activeRecord.reportedAt).toLocaleDateString('vi-VN')}
                                     </p>
                                 </div>
@@ -911,7 +911,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                             {/* Customer info & Debt verification subgrid */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t border-slate-100 text-xs">
                                 <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                                         Khách thuê &amp; Liên hệ
                                     </p>
                                     <p className="font-bold text-slate-900 text-sm">
@@ -926,7 +926,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                 </div>
 
                                 <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                                         Tình trạng công nợ quá hạn
                                     </p>
                                     <div className="flex items-baseline gap-1 mt-0.5">
@@ -937,7 +937,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                         </span>
                                         <span className="text-xs text-slate-500 font-semibold">đ</span>
                                     </div>
-                                    <p className="text-[11px] leading-relaxed">
+                                    <p className="text-xs leading-relaxed">
                                         {activeRecord.overdueDebt && activeRecord.overdueDebt > 0 ? (
                                             <span className="text-rose-600 font-semibold">
                                                 Tạm khóa quyền đặt tủ mới cho đến khi thu nợ tại quầy/bàn giao.
@@ -963,12 +963,12 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                         <h3 className="text-sm font-black text-slate-900">
                                             Biên Bản Kiểm Kê Hiện Trường (Mắt 1)
                                         </h3>
-                                        <p className="text-[11px] text-slate-500">
+                                        <p className="text-xs text-slate-500">
                                             Lập bởi Nhân viên hiện trường · Bước 1/2 của quy trình 4-Eyes
                                         </p>
                                     </div>
                                 </div>
-                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <span className="px-2.5 py-0.5 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
                                     ✓ KTV ĐÃ KÝ SỐ
                                 </span>
                             </div>
@@ -983,12 +983,12 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                         <p className="font-bold text-slate-900">
                                             {activeRecord.staffWitnessName || 'Nhân viên vận hành'}
                                         </p>
-                                        <p className="text-[11px] text-slate-500">
+                                        <p className="text-xs text-slate-500">
                                             Nhân viên tiếp nhận hiện trường · {activeRecord.stationName}
                                         </p>
                                     </div>
                                 </div>
-                                <div className="text-right text-[11px] text-slate-400">
+                                <div className="text-right text-xs text-slate-500">
                                     <p>Thời điểm lập biên bản</p>
                                     <p className="font-mono text-slate-700 font-semibold">
                                         {new Date(activeRecord.reportedAt).toLocaleString('vi-VN')}
@@ -999,29 +999,29 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                             {/* Seal Barcode & Scale Weight (Parsed dynamically from itemDescription) */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                                 <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                                         Mã tem niêm phong vật lý
                                     </p>
                                     <p className="text-sm font-mono font-black text-indigo-700 mt-1 flex items-center gap-1.5">
                                         <span>{parsedInspection.sealCode || activeRecord.recordCode}</span>
                                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
                                     </p>
-                                    <p className="text-[10px] text-slate-400 mt-0.5">
+                                    <p className="text-xs text-slate-500 mt-0.5">
                                         Tem hologram niêm phong chống can thiệp vật lý
                                     </p>
                                 </div>
 
                                 <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                                         Tải trọng cân thực địa
                                     </p>
                                     <p className="text-sm font-black text-slate-900 mt-1 flex items-center gap-1.5">
                                         <span className="font-mono">{parsedInspection.measuredWeight || 'Ghi nhận theo biên bản'}</span>
-                                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">
+                                        <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">
                                             Đã xác nhận
                                         </span>
                                     </p>
-                                    <p className="text-[10px] text-slate-400 mt-0.5">
+                                    <p className="text-xs text-slate-500 mt-0.5">
                                         Tình trạng an toàn: {parsedInspection.safetyVerified !== false ? 'Không chất cấm / cháy nổ' : 'Chưa kiểm tra'}
                                     </p>
                                 </div>
@@ -1029,7 +1029,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
 
                             {/* Item description & Parsed item list */}
                             <div>
-                                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
                                     Danh mục tài sản &amp; Mô tả hiện trường:
                                 </p>
 
@@ -1037,7 +1037,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                     <div className="space-y-2 mb-3">
                                         <div className="overflow-x-auto rounded-xl border border-slate-200">
                                             <table className="w-full text-left text-xs">
-                                                <thead className="bg-slate-50 text-[11px] font-bold text-slate-500 uppercase border-b border-slate-200">
+                                                <thead className="bg-slate-50 text-xs font-bold text-slate-500 uppercase border-b border-slate-200">
                                                     <tr>
                                                         <th className="py-2 px-3">Danh mục</th>
                                                         <th className="py-2 px-3">Mô tả vật phẩm</th>
@@ -1054,14 +1054,14 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                                             <td className="py-2 px-3 text-slate-700">
                                                                 <p>{item.description}</p>
                                                                 {item.note && (
-                                                                    <p className="text-[10px] text-slate-400 italic mt-0.5">{item.note}</p>
+                                                                    <p className="text-xs text-slate-500 italic mt-0.5">{item.note}</p>
                                                                 )}
                                                             </td>
                                                             <td className="py-2 px-3 text-center font-mono font-bold text-slate-700">
                                                                 {item.quantity || 1}
                                                             </td>
                                                             <td className="py-2 px-3 text-slate-600">
-                                                                <span className="px-2 py-0.5 rounded-md bg-slate-100 text-[11px] font-medium">
+                                                                <span className="px-2 py-0.5 rounded-md bg-slate-100 text-xs font-medium">
                                                                     {item.condition || 'Bình thường'}
                                                                 </span>
                                                             </td>
@@ -1086,7 +1086,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
 
                             {/* Real Evidence Photos Gallery (100% Real from activeRecord.photos) */}
                             <div className="pt-2 border-t border-slate-100 space-y-2">
-                                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center justify-between">
+                                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center justify-between">
                                     <span className="flex items-center gap-1.5">
                                         <Camera className="w-3.5 h-3.5 text-indigo-600" />
                                         <span>
@@ -1098,7 +1098,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                         </span>
                                     </span>
                                     {activeRecord.photos && activeRecord.photos.length > 0 && (
-                                        <span className="text-[10px] text-slate-400 font-normal">
+                                        <span className="text-xs text-slate-500 font-normal">
                                             Bấm vào ảnh để xem kích thước lớn
                                         </span>
                                     )}
@@ -1127,14 +1127,14 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                                         <Maximize2 className="w-4 h-4" />
                                                     </span>
                                                 </div>
-                                                <span className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/60 text-white font-mono text-[9px] font-bold">
+                                                <span className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/60 text-white font-mono text-xs font-bold">
                                                     Ảnh #{idx + 1}
                                                 </span>
                                             </div>
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="p-4 rounded-xl border border-dashed border-slate-200 text-center text-slate-400 text-xs">
+                                    <div className="p-4 rounded-xl border border-dashed border-slate-200 text-center text-slate-500 text-xs">
                                         <Camera className="w-6 h-6 mx-auto mb-1 text-slate-300" />
                                         <span>Chưa có ảnh bằng chứng đính kèm trong biên bản này.</span>
                                     </div>
@@ -1158,13 +1158,13 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                         <h3 className="text-sm font-black text-slate-900">
                                             Phê Duyệt Kép Quản Trị Viên (4-Eyes)
                                         </h3>
-                                        <p className="text-[11px] text-slate-500">
+                                        <p className="text-xs text-slate-500">
                                             Four-Eyes Sign-Off · Thẩm định biên bản quá hạn 72h
                                         </p>
                                     </div>
                                 </div>
                                 <span
-                                    className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${
+                                    className={`px-2.5 py-0.5 rounded-full text-xs font-black uppercase tracking-wider border ${
                                         activeRecord.status.toUpperCase() === 'APPROVED' ||
                                         activeRecord.status.toUpperCase() === 'RETURNED' ||
                                         activeRecord.status.toUpperCase() === 'DISPOSED'
@@ -1195,7 +1195,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                                     ? currentUser?.fullName || 'Quản trị viên (Bạn)'
                                                     : 'Chờ Quản trị viên thẩm tra')}
                                         </p>
-                                        <p className="text-[11px] text-slate-500">
+                                        <p className="text-xs text-slate-500">
                                             {activeRecord.approvedAt
                                                 ? `Đã duyệt lúc ${new Date(activeRecord.approvedAt).toLocaleString('vi-VN')}`
                                                 : isAdmin
@@ -1204,7 +1204,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                         </p>
                                     </div>
                                 </div>
-                                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-indigo-200/80 text-indigo-900">
+                                <span className="px-2 py-0.5 rounded text-xs font-mono font-bold bg-indigo-200/80 text-indigo-900">
                                     {isAdmin ? 'ADMIN' : userRole.toUpperCase()}
                                 </span>
                             </div>
@@ -1216,7 +1216,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                         Checklist Thẩm Tra An Toàn 72h (Bắt buộc đủ 4 tiêu chí):
                                     </p>
                                     <span
-                                        className={`text-[10px] font-bold ${
+                                        className={`text-xs font-bold ${
                                             isChecklistComplete ? 'text-emerald-600' : 'text-rose-600'
                                         }`}
                                     >
@@ -1307,7 +1307,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                             <p className="font-bold text-slate-900">
                                                 Chuyển về Kho lưu giữ trung tâm (Central Warehouse)
                                             </p>
-                                            <p className="text-[11px] text-slate-500 mt-0.5">
+                                            <p className="text-xs text-slate-500 mt-0.5">
                                                 Lưu giữ bảo vệ nghiêm ngặt 30 ngày chờ khách đến nhận diện theo quy chế dịch vụ.
                                             </p>
                                         </div>
@@ -1327,7 +1327,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                             <p className="font-bold text-slate-900">
                                                 Bàn giao trả lại cho Khách hàng / Chủ sở hữu
                                             </p>
-                                            <p className="text-[11px] text-slate-500 mt-0.5">
+                                            <p className="text-xs text-slate-500 mt-0.5">
                                                 Áp dụng khi khách đã liên hệ đối chiếu CCCD và có mặt tại trạm/kho nhận lại.
                                             </p>
                                         </div>
@@ -1347,7 +1347,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                             <p className="font-bold text-slate-900">
                                                 Chuyển diện thanh lý / tiêu hủy tài sản
                                             </p>
-                                            <p className="text-[11px] text-slate-500 mt-0.5">
+                                            <p className="text-xs text-slate-500 mt-0.5">
                                                 Phê duyệt thanh lý đồ bỏ quên quá hạn theo biên bản thẩm định pháp lý 4 mắt.
                                             </p>
                                         </div>
@@ -1369,12 +1369,12 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                         <button
                                             type="button"
                                             disabled
-                                            className="w-full py-3 px-4 rounded-xl bg-slate-200 text-slate-400 font-bold text-xs flex items-center justify-center gap-2 cursor-not-allowed"
+                                            className="w-full py-3 px-4 rounded-xl bg-slate-200 text-slate-500 font-bold text-xs flex items-center justify-center gap-2 cursor-not-allowed"
                                         >
                                             <Lock className="w-4 h-4" />
                                             <span>TÀI KHOẢN STAFF KHÔNG ĐƯỢC PHÉP PHÊ DUYỆT (FOUR-EYES)</span>
                                         </button>
-                                        <p className="text-[11px] text-center text-slate-400">
+                                        <p className="text-xs text-center text-slate-500">
                                             Hồ sơ đang ở trạng thái PENDING_APPROVAL. Cần tài khoản Admin đăng nhập để thẩm tra.
                                         </p>
                                     </div>
@@ -1432,7 +1432,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
 
                             {/* UC-S11 & UC-A07: Post-Inspection Handover & Liquidation Actions */}
                             <div className="pt-3 border-t border-slate-100 space-y-2">
-                                <p className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                                <p className="text-xs font-bold text-slate-600 uppercase tracking-wider">
                                     Thủ tục Bàn giao lại Khách &amp; Hoàn tất Thanh lý:
                                 </p>
                                 <div className="grid grid-cols-1 gap-2">
@@ -1444,7 +1444,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                             activeRecord.status.toUpperCase() === 'RETURNED' ||
                                             activeRecord.status.toUpperCase() === 'DISPOSED'
                                         }
-                                        className="w-full py-2.5 px-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-400 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-xs transition cursor-pointer disabled:cursor-not-allowed"
+                                        className="w-full py-2.5 px-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-500 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-xs transition cursor-pointer disabled:cursor-not-allowed"
                                     >
                                         <UserCheck className="w-4 h-4" />
                                         <span>Thực Hiện Thủ Tục Bàn Giao Lại Đồ Cho Khách</span>
@@ -1472,19 +1472,19 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                     <Clock className="w-3.5 h-3.5 text-indigo-600" />
                                     TIẾN TRÌNH VÒNG ĐỜI HỒ SƠ 72H
                                 </span>
-                                <span className="font-mono text-[10px] text-slate-400">Quy tắc 4 Mắt</span>
+                                <span className="font-mono text-xs text-slate-500">Quy tắc 4 Mắt</span>
                             </div>
 
-                            <div className="space-y-3 text-[11px]">
+                            <div className="space-y-3 text-xs">
                                 {/* Step 1: Staff Reported */}
                                 <div className="flex items-start gap-2.5">
-                                    <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">
+                                    <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
                                         <Check className="w-3 h-3" />
                                     </div>
                                     <div className="flex-1">
                                         <div className="flex items-center justify-between">
                                             <p className="font-bold text-slate-900">1. Lập biên bản niêm phong</p>
-                                            <span className="font-mono text-[10px] text-slate-400">
+                                            <span className="font-mono text-xs text-slate-500">
                                                 {new Date(activeRecord.reportedAt).toLocaleDateString('vi-VN')}
                                             </span>
                                         </div>
@@ -1497,7 +1497,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                 {/* Step 2: Admin Approval */}
                                 <div className="flex items-start gap-2.5">
                                     <div
-                                        className={`w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5 ${
+                                        className={`w-5 h-5 rounded-full flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 ${
                                             activeRecord.approvedAt
                                                 ? 'bg-emerald-100 text-emerald-700'
                                                 : 'bg-amber-100 text-amber-700'
@@ -1508,7 +1508,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                     <div className="flex-1">
                                         <div className="flex items-center justify-between">
                                             <p className="font-bold text-slate-900">2. Thẩm tra &amp; Ký duyệt 4-Eyes</p>
-                                            <span className="font-mono text-[10px] text-slate-400">
+                                            <span className="font-mono text-xs text-slate-500">
                                                 {activeRecord.approvedAt
                                                     ? new Date(activeRecord.approvedAt).toLocaleDateString('vi-VN')
                                                     : 'Chờ duyệt'}
@@ -1525,10 +1525,10 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                 {/* Step 3: Resolution */}
                                 <div className="flex items-start gap-2.5">
                                     <div
-                                        className={`w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5 ${
+                                        className={`w-5 h-5 rounded-full flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 ${
                                             activeRecord.resolvedAt
                                                 ? 'bg-emerald-100 text-emerald-700'
-                                                : 'bg-slate-100 text-slate-400'
+                                                : 'bg-slate-100 text-slate-500'
                                         }`}
                                     >
                                         {activeRecord.resolvedAt ? <Check className="w-3 h-3" /> : '3'}
@@ -1536,7 +1536,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                     <div className="flex-1">
                                         <div className="flex items-center justify-between">
                                             <p className="font-bold text-slate-900">3. Bàn giao hoặc Thanh lý</p>
-                                            <span className="font-mono text-[10px] text-slate-400">
+                                            <span className="font-mono text-xs text-slate-500">
                                                 {activeRecord.resolvedAt
                                                     ? new Date(activeRecord.resolvedAt).toLocaleDateString('vi-VN')
                                                     : 'Chưa thực hiện'}
@@ -1611,7 +1611,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                             <button
                                 type="button"
                                 onClick={() => setShowHandoverModal(false)}
-                                className="text-slate-400 hover:text-slate-700 cursor-pointer"
+                                className="text-slate-500 hover:text-slate-700 cursor-pointer"
                             >
                                 <X className="w-4 h-4" />
                             </button>
@@ -1667,14 +1667,14 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                             onChange={handleHandoverFileUpload}
                                             className="hidden"
                                         />
-                                        <span className="text-[11px] text-slate-400">hoặc nhập link URL ảnh:</span>
+                                        <span className="text-xs text-slate-500">hoặc nhập link URL ảnh:</span>
                                     </div>
                                     <input
                                         type="text"
                                         value={handoverProofUrl}
                                         onChange={(e) => setHandoverProofUrl(e.target.value)}
                                         placeholder="https://... hoặc data:image/..."
-                                        className="w-full px-3 py-2 rounded-xl border border-slate-200 font-mono text-[11px] focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                                        className="w-full px-3 py-2 rounded-xl border border-slate-200 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
                                     />
                                     {handoverProofUrl && (
                                         <div className="relative w-20 h-20 rounded-xl overflow-hidden border border-slate-200">
@@ -1708,7 +1708,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                         Đã thu đủ phí phạt quá hạn{' '}
                                         {activeRecord.overdueDebt ? `(${activeRecord.overdueDebt.toLocaleString('vi-VN')} đ)` : ''}
                                     </span>
-                                    <p className="text-[11px] text-emerald-800 mt-0.5">
+                                    <p className="text-xs text-emerald-800 mt-0.5">
                                         Hệ thống sẽ cập nhật số nợ về 0 đ và mở khóa quyền đặt tủ cho tài khoản khách hàng.
                                     </p>
                                 </div>
@@ -1768,7 +1768,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                             <button
                                 type="button"
                                 onClick={() => setShowRejectModal(false)}
-                                className="text-slate-400 hover:text-slate-700"
+                                className="text-slate-500 hover:text-slate-700"
                             >
                                 <X className="w-4 h-4" />
                             </button>
@@ -1823,7 +1823,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                             <button
                                 type="button"
                                 onClick={() => setShowLawModal(false)}
-                                className="text-slate-400 hover:text-slate-700 cursor-pointer"
+                                className="text-slate-500 hover:text-slate-700 cursor-pointer"
                             >
                                 <X className="w-4 h-4" />
                             </button>

@@ -316,7 +316,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                         <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0b1c30] tracking-tight">
                             Quản lý tài khoản & Dư nợ
                         </h1>
-                        <p className="text-sm text-[#737686] mt-1">
+                        <p className="text-sm text-[#5c5f70] mt-1">
                             Xem thông tin cá nhân, cập nhật bảo mật và tra cứu chi tiết dư nợ quá hạn
                         </p>
                     </div>
@@ -369,7 +369,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                         className={`flex items-center gap-2 py-3 px-4 text-sm font-bold border-b-2 transition-all cursor-pointer ${
                             activeTab === 'info'
                                 ? 'border-[#004ac6] text-[#004ac6]'
-                                : 'border-transparent text-[#737686] hover:text-[#0b1c30]'
+                                : 'border-transparent text-[#5c5f70] hover:text-[#0b1c30]'
                         }`}
                     >
                         <User className="w-4 h-4" />
@@ -381,7 +381,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                         className={`flex items-center gap-2 py-3 px-4 text-sm font-bold border-b-2 transition-all cursor-pointer relative ${
                             activeTab === 'debt'
                                 ? 'border-[#004ac6] text-[#004ac6]'
-                                : 'border-transparent text-[#737686] hover:text-[#0b1c30]'
+                                : 'border-transparent text-[#5c5f70] hover:text-[#0b1c30]'
                         }`}
                     >
                         <DollarSign className="w-4 h-4" />
@@ -427,13 +427,13 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                     <h3 className="text-lg font-bold text-[#0b1c30]">
                                         {profile.fullName || 'Khách hàng'}
                                     </h3>
-                                    <p className="text-xs text-[#737686] mt-0.5">{profile.email}</p>
+                                    <p className="text-xs text-[#5c5f70] mt-0.5">{profile.email}</p>
 
                                     <div className="flex items-center gap-2 mt-3">
-                                        <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-100">
+                                        <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-100">
                                             {profile.role === 'TRAVELER' ? 'Khách hàng SmartLocker' : profile.role}
                                         </span>
-                                        <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold border ${
+                                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${
                                             profile.status === 'ACTIVE'
                                                 ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
                                                 : 'bg-amber-50 text-amber-700 border-amber-100'
@@ -447,21 +447,21 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
 
                                 <div className="space-y-3.5 text-xs text-[#434655]">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-[#737686] flex items-center gap-1.5">
+                                        <span className="text-[#5c5f70] flex items-center gap-1.5">
                                             <Phone className="w-3.5 h-3.5" /> Số điện thoại:
                                         </span>
                                         <span className="font-semibold text-[#0b1c30]">{profile.phone || '--'}</span>
                                     </div>
 
                                     <div className="flex items-center justify-between">
-                                        <span className="text-[#737686] flex items-center gap-1.5">
+                                        <span className="text-[#5c5f70] flex items-center gap-1.5">
                                             <Calendar className="w-3.5 h-3.5" /> Ngày đăng ký:
                                         </span>
                                         <span className="font-semibold text-[#0b1c30]">{formatDate(profile.createdAt)}</span>
                                     </div>
 
                                     <div className="flex items-center justify-between">
-                                        <span className="text-[#737686] flex items-center gap-1.5">
+                                        <span className="text-[#5c5f70] flex items-center gap-1.5">
                                             <Shield className="w-3.5 h-3.5" /> Liên kết Google:
                                         </span>
                                         <span className={`font-semibold ${profile.googleLinked ? 'text-emerald-600' : 'text-slate-500'}`}>
@@ -470,7 +470,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                     </div>
 
                                     <div className="flex items-center justify-between">
-                                        <span className="text-[#737686] flex items-center gap-1.5">
+                                        <span className="text-[#5c5f70] flex items-center gap-1.5">
                                             <Clock className="w-3.5 h-3.5" /> Lượt đặt tủ:
                                         </span>
                                         <span className="font-semibold text-[#0b1c30]">{profile.totalBookings} đơn</span>
@@ -489,7 +489,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                     </div>
                                     <div>
                                         <h3 className="text-base font-bold text-[#0b1c30]">Cập nhật thông tin cá nhân</h3>
-                                        <p className="text-xs text-[#737686]">Thay đổi họ và tên, số điện thoại hoặc ảnh đại diện</p>
+                                        <p className="text-xs text-[#5c5f70]">Thay đổi họ và tên, số điện thoại hoặc ảnh đại diện</p>
                                     </div>
                                 </div>
 
@@ -531,7 +531,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                                 type="email"
                                                 value={profile.email}
                                                 disabled
-                                                className="w-full px-4 py-2.5 rounded-xl text-xs border border-[#e5eeff] bg-[#f8faff] text-[#737686] cursor-not-allowed"
+                                                className="w-full px-4 py-2.5 rounded-xl text-xs border border-[#e5eeff] bg-[#f8faff] text-[#5c5f70] cursor-not-allowed"
                                             />
                                         </div>
 
@@ -583,7 +583,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                                     Xóa ảnh
                                                 </button>
                                             )}
-                                            <span className="text-[11px] text-[#737686]">JPEG, PNG hoặc WebP, tối đa 2 MB. Ảnh được lưu ngay khi tải lên.</span>
+                                            <span className="text-xs text-[#5c5f70]">JPEG, PNG hoặc WebP, tối đa 2 MB. Ảnh được lưu ngay khi tải lên.</span>
                                         </div>
                                     </div>
 
@@ -610,7 +610,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                         <h3 className="text-base font-bold text-[#0b1c30]">
                                             {profile.hasPassword ? 'Đổi mật khẩu' : 'Thiết lập mật khẩu'}
                                         </h3>
-                                        <p className="text-xs text-[#737686]">
+                                        <p className="text-xs text-[#5c5f70]">
                                             {profile.hasPassword
                                                 ? 'Cập nhật mật khẩu định kỳ để bảo vệ tài khoản an toàn'
                                                 : 'Tài khoản đăng nhập bằng Google. Bạn có thể đặt mật khẩu để đăng nhập trực tiếp.'}
@@ -713,7 +713,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                     </div>
 
                                     <div>
-                                        <span className={`text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
+                                        <span className={`text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
                                             hasOverdueDebt
                                                 ? 'bg-rose-100/70 text-rose-800 border-rose-300'
                                                 : 'bg-emerald-100/70 text-emerald-800 border-emerald-300'
@@ -732,7 +732,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                 </div>
 
                                 <div className="text-left sm:text-right shrink-0 bg-white/70 p-4 rounded-2xl border border-white/60 backdrop-blur-xs">
-                                    <span className="text-[11px] text-[#737686] font-semibold block uppercase">
+                                    <span className="text-xs text-[#5c5f70] font-semibold block uppercase">
                                         Tổng nợ quá hạn
                                     </span>
                                     <span className={`text-2xl sm:text-3xl font-black ${
@@ -763,29 +763,29 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                         {/* 3 Metric Cards */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                             <div className="bg-white p-5 rounded-2xl border border-[#e5eeff] shadow-xs">
-                                <span className="text-xs font-semibold text-[#737686] block">Dư nợ tài khoản (BR-P08)</span>
+                                <span className="text-xs font-semibold text-[#5c5f70] block">Dư nợ tài khoản (BR-P08)</span>
                                 <span className="text-xl font-bold text-[#0b1c30] mt-1 block">
                                     {formatCurrency(debtData.accountOverdueDebt)} VNĐ
                                 </span>
-                                <span className="text-[11px] text-[#737686] mt-0.5 block">Khoản nợ ghi nhận trên hồ sơ</span>
+                                <span className="text-xs text-[#5c5f70] mt-0.5 block">Khoản nợ ghi nhận trên hồ sơ</span>
                             </div>
 
                             <div className="bg-white p-5 rounded-2xl border border-[#e5eeff] shadow-xs">
-                                <span className="text-xs font-semibold text-[#737686] block">Đơn đang quá hạn</span>
+                                <span className="text-xs font-semibold text-[#5c5f70] block">Đơn đang quá hạn</span>
                                 <span className={`text-xl font-bold mt-1 block ${
                                     debtData.overdueBookings.length > 0 ? 'text-rose-600' : 'text-[#0b1c30]'
                                 }`}>
                                     {debtData.overdueBookings.length} đơn
                                 </span>
-                                <span className="text-[11px] text-[#737686] mt-0.5 block">Tủ đang lưu quá giờ hẹn</span>
+                                <span className="text-xs text-[#5c5f70] mt-0.5 block">Tủ đang lưu quá giờ hẹn</span>
                             </div>
 
                             <div className="bg-white p-5 rounded-2xl border border-[#e5eeff] shadow-xs">
-                                <span className="text-xs font-semibold text-[#737686] block">Đã thanh toán nợ quá hạn</span>
+                                <span className="text-xs font-semibold text-[#5c5f70] block">Đã thanh toán nợ quá hạn</span>
                                 <span className="text-xl font-bold text-emerald-600 mt-1 block">
                                     {debtData.paymentHistory.length} giao dịch
                                 </span>
-                                <span className="text-[11px] text-[#737686] mt-0.5 block">Các khoản nợ đã hoàn tất</span>
+                                <span className="text-xs text-[#5c5f70] mt-0.5 block">Các khoản nợ đã hoàn tất</span>
                             </div>
                         </div>
 
@@ -800,7 +800,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                         <h3 className="text-base font-bold text-[#0b1c30]">
                                             Danh sách đơn đặt tủ đang quá hạn ({debtData.overdueBookings.length})
                                         </h3>
-                                        <p className="text-xs text-[#737686]">
+                                        <p className="text-xs text-[#5c5f70]">
                                             Các đơn tủ quá hạn gửi đồ cần được thanh toán phụ phí trước khi lấy đồ hoặc đặt đơn mới
                                         </p>
                                     </div>
@@ -811,7 +811,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                 <div className="text-center py-12 px-4 bg-[#f8faff] rounded-2xl border border-dashed border-[#dce3f1]">
                                     <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto mb-2" />
                                     <h4 className="text-sm font-bold text-[#0b1c30]">Không có đơn nào bị quá hạn</h4>
-                                    <p className="text-xs text-[#737686] mt-1 max-w-md mx-auto">
+                                    <p className="text-xs text-[#5c5f70] mt-1 max-w-md mx-auto">
                                         Tất cả các lượt gửi tủ của bạn đều đang trong khung giờ quy định hoặc đã được hoàn tất đúng hạn.
                                     </p>
                                 </div>
@@ -828,15 +828,15 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                                         {b.bookingCode}
                                                     </span>
                                                     <span className="text-xs font-bold text-[#0b1c30] flex items-center gap-1">
-                                                        <Building className="w-3.5 h-3.5 text-[#737686]" />
+                                                        <Building className="w-3.5 h-3.5 text-[#5c5f70]" />
                                                         {b.stationName}
                                                     </span>
-                                                    <span className="text-[11px] font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">
+                                                    <span className="text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">
                                                         Tủ {b.lockerCode} ({b.lockerSize})
                                                     </span>
                                                 </div>
 
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-xs text-[#737686]">
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-xs text-[#5c5f70]">
                                                     <div>
                                                         <span>Bắt đầu quá hạn từ: </span>
                                                         <strong className="text-rose-600">{formatDate(b.overdueSince)}</strong>
@@ -858,7 +858,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
 
                                             <div className="flex sm:flex-col items-center sm:items-end justify-between gap-3 shrink-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-[#f0f4ff]">
                                                 <div className="text-left sm:text-right">
-                                                    <span className="text-[10px] text-[#737686] uppercase font-bold block">Phụ phí quá hạn</span>
+                                                    <span className="text-xs text-[#5c5f70] uppercase font-bold block">Phụ phí quá hạn</span>
                                                     <span className="text-lg font-extrabold text-rose-600">
                                                         {formatCurrency(b.estimatedOverdueFee)} VNĐ
                                                     </span>
@@ -887,19 +887,19 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                 </div>
                                 <div>
                                     <h3 className="text-base font-bold text-[#0b1c30]">Lịch sử thanh toán phụ phí quá hạn</h3>
-                                    <p className="text-xs text-[#737686]">Các giao dịch thanh toán quá hạn đã được đối soát thành công qua PayOS</p>
+                                    <p className="text-xs text-[#5c5f70]">Các giao dịch thanh toán quá hạn đã được đối soát thành công qua PayOS</p>
                                 </div>
                             </div>
 
                             {debtData.paymentHistory.length === 0 ? (
-                                <div className="text-center py-8 text-xs text-[#737686] bg-[#f8faff] rounded-2xl border border-[#e5eeff]">
+                                <div className="text-center py-8 text-xs text-[#5c5f70] bg-[#f8faff] rounded-2xl border border-[#e5eeff]">
                                     Chưa có giao dịch thanh toán phụ phí quá hạn nào.
                                 </div>
                             ) : (
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left text-xs">
                                         <thead>
-                                            <tr className="border-b border-[#e5eeff] text-[#737686] font-bold">
+                                            <tr className="border-b border-[#e5eeff] text-[#5c5f70] font-bold">
                                                 <th className="pb-3 px-3">Mã đơn hàng</th>
                                                 <th className="pb-3 px-3">Mã đơn đặt tủ</th>
                                                 <th className="pb-3 px-3">Số tiền</th>
@@ -920,14 +920,14 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                                     <td className="py-3 px-3 font-bold text-rose-600">
                                                         {formatCurrency(p.amount)} VNĐ
                                                     </td>
-                                                    <td className="py-3 px-3 text-[#737686]">
+                                                    <td className="py-3 px-3 text-[#5c5f70]">
                                                         {p.gateway}
                                                     </td>
-                                                    <td className="py-3 px-3 text-[#737686]">
+                                                    <td className="py-3 px-3 text-[#5c5f70]">
                                                         {formatDate(p.paidAt)}
                                                     </td>
                                                     <td className="py-3 px-3 text-right">
-                                                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                                                        <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
                                                             Thành công
                                                         </span>
                                                     </td>

@@ -30,13 +30,13 @@ export default function DashboardHeader({
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
                 {/* Left: Breadcrumbs & Search */}
                 <div className="flex items-center gap-4 flex-1 max-w-xl">
-                    <div className="flex items-center gap-1.5 text-slate-400 font-medium whitespace-nowrap">
-                        <span className="text-slate-400">/</span>
+                    <div className="flex items-center gap-1.5 text-slate-500 font-medium whitespace-nowrap">
+                        <span className="text-slate-500">/</span>
                         <span className="text-slate-800 font-semibold">Operations</span>
                     </div>
 
                     <div className="relative w-full">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
                             <Search className="w-3.5 h-3.5" />
                         </div>
                         <input
@@ -50,31 +50,31 @@ export default function DashboardHeader({
 
                 {/* Right: Telemetry Status Badges */}
                 <div className="flex items-center gap-2 flex-wrap">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold text-[11px]">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold text-xs">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                         <span>Mesh Stream: Active</span>
                     </span>
 
                     {offlineDevicesCount > 0 ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200 font-semibold text-[11px]">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200 font-semibold text-xs">
                             <Zap className="w-3 h-3 text-rose-600" />
                             <span>{offlineDevicesCount} Fault / Offline</span>
                         </span>
                     ) : (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200 font-medium text-[11px]">
-                            <Zap className="w-3 h-3 text-slate-400" />
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200 font-medium text-xs">
+                            <Zap className="w-3 h-3 text-slate-500" />
                             <span>0 Fault</span>
                         </span>
                     )}
 
                     {openIncidentsCount > 0 ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-semibold text-[11px]">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-semibold text-xs">
                             <AlertTriangle className="w-3 h-3 text-amber-600" />
                             <span>{openIncidentsCount} Incidents</span>
                         </span>
                     ) : (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200 font-medium text-[11px]">
-                            <AlertTriangle className="w-3 h-3 text-slate-400" />
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200 font-medium text-xs">
+                            <AlertTriangle className="w-3 h-3 text-slate-500" />
                             <span>0 Incidents</span>
                         </span>
                     )}
@@ -84,17 +84,17 @@ export default function DashboardHeader({
             {/* Sync Heartbeat & Live Control Bar */}
             <div className="bg-white border border-slate-200/90 rounded-2xl p-3 sm:px-4 sm:py-3 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                 <div className="flex items-center gap-3">
-                    <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 font-bold text-[11px]">
+                    <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 font-bold text-xs">
                         <Activity className="w-3 h-3" />
                         <span>LIVE TELEMETRY</span>
                     </span>
-                    <span className="text-slate-500 font-mono text-[11px] hidden md:inline">
+                    <span className="text-slate-500 font-mono text-xs hidden md:inline">
                         Sync Heartbeat: {lastUpdated ? lastUpdated.toISOString().replace('T', ' ').slice(0, 19) : '--'} UTC
                     </span>
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 font-medium text-[11px]">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 font-medium text-xs">
                         <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
                         <span>{isAdmin ? 'ADMIN (FULL CONTROL)' : 'STAFF (OPERATIONS)'}</span>
                     </div>

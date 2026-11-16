@@ -216,7 +216,7 @@ export default function KioskQrScanner({ lang, busy = false, onDecoded }: {
       {live && <span aria-hidden="true" className="kiosk-sweep absolute left-[16%] right-[16%] h-0.5 rounded-full bg-sky-400 shadow-[0_0_12px_3px_rgba(56,189,248,0.7)]" />}
       {busy && <div className="absolute inset-0 grid place-items-center bg-slate-950/60 text-white font-bold">{t[5]}</div>}
     </div>
-    <p className="text-center text-slate-500 dark:text-slate-400">{t[3]}</p>
+    <p className="text-center text-slate-500 dark:text-slate-500">{t[3]}</p>
     {cameras.length > 1 && <label className="block text-xs text-slate-500">{t[4]}
       <select className="mt-1 block w-full rounded-xl border p-2 text-slate-900 bg-white" value={cameraId}
         disabled={busy || transitioning || live} onChange={event => setCameraId(event.target.value)}>

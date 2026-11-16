@@ -183,7 +183,7 @@ export const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
           {/* 2. Booking Summary Card */}
           <div className="p-4 rounded-xl bg-[#eff4ff] border border-outline-variant/30 flex flex-col gap-2.5">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] uppercase tracking-wider text-secondary font-bold">Active Reservation</span>
+              <span className="text-xs uppercase tracking-wider text-secondary font-bold">Active Reservation</span>
               <span className="text-xs font-bold text-primary bg-[#dbe1ff]/60 px-2.5 py-0.5 rounded-md font-mono">{bookingCode}</span>
             </div>
             <div className="grid grid-cols-2 gap-3 pt-1">
@@ -211,11 +211,11 @@ export const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
           ) : isLimitExceeded ? (
             <div className="p-4 rounded-xl bg-amber-50 border-2 border-amber-300 shadow-xs">
               <div className="flex items-center justify-between mb-2">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 text-[11px] font-bold uppercase tracking-wider">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-bold uppercase tracking-wider">
                   <ShieldAlert className="w-3.5 h-3.5 text-amber-700" />
                   <span>Daily Cancellation Limit Reached (0% Refund)</span>
                 </div>
-                <span className="text-[11px] text-amber-800 font-mono font-bold">Attempt #{preview ? preview.dailyCancellationCount + 1 : 3} Today</span>
+                <span className="text-xs text-amber-800 font-mono font-bold">Attempt #{preview ? preview.dailyCancellationCount + 1 : 3} Today</span>
               </div>
               <p className="text-xs text-amber-900 leading-relaxed font-medium">
                 To prevent automated reservation spamming, customers who have cancelled 2 bookings today are charged 100% reservation retention on subsequent cancellations. No refund will be credited.
@@ -238,11 +238,11 @@ export const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
           ) : (
             <div className="p-4 rounded-xl bg-emerald-50/75 border border-emerald-300 shadow-xs">
               <div className="flex items-center justify-between mb-2">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold uppercase tracking-wider">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider">
                   <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
                   <span>Eligible for 100% Full Refund</span>
                 </div>
-                <span className="text-[11px] text-emerald-800 font-bold">SmartLocker Policy</span>
+                <span className="text-xs text-emerald-800 font-bold">SmartLocker Policy</span>
               </div>
               <p className="text-xs text-[#0b1c30] leading-relaxed">
                 You are cancelling before storage check-in. You will receive a 100% refund of <strong>{formatCurrency(calculatedRefund)} VND</strong>.

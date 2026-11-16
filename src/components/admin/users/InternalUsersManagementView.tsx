@@ -351,7 +351,7 @@ export default function InternalUsersManagementView({
         <div className="space-y-4">
             {/* Top Breadcrumb & Page Header */}
             <div>
-                <nav className="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1.5">
+                <nav className="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-1.5">
                     <span>Quản trị</span>
                     <span>/</span>
                     <span>Quản trị hệ thống</span>
@@ -367,7 +367,7 @@ export default function InternalUsersManagementView({
                             <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
                                 Quản Lý Tài Khoản Hệ Thống
                             </h1>
-                            <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-blue-100 text-blue-700 border border-blue-200">
+                            <span className="px-2 py-0.5 rounded-md text-xs font-extrabold uppercase bg-blue-100 text-blue-700 border border-blue-200">
                                 TOÀN BỘ TÀI KHOẢN (TRAVELER, STAFF, ADMIN)
                             </span>
                         </div>
@@ -413,7 +413,7 @@ export default function InternalUsersManagementView({
                     <button
                         type="button"
                         onClick={() => setNotification(null)}
-                        className="text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+                        className="text-slate-500 hover:text-slate-600 p-1 cursor-pointer"
                     >
                         <X className="w-4 h-4" />
                     </button>

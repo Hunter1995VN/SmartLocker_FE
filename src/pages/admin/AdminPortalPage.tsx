@@ -345,7 +345,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                 </main>
 
                 {/* Footer */}
-                <footer className="w-full py-4 text-center text-xs text-slate-400 border-t border-slate-200/80 bg-white mt-auto print:hidden">
+                <footer className="w-full py-4 text-center text-xs text-slate-500 border-t border-slate-200/80 bg-white mt-auto print:hidden">
                     <span>SmartLocker Management System (SLMS) · Operations & Fleet Control</span>
                 </footer>
             </div>

@@ -384,7 +384,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                 <DoorOpen className="w-6 h-6" />
               </div>
               <div>
-                <div className="text-[11px] uppercase tracking-wider text-secondary font-bold">Assigned Bay</div>
+                <div className="text-xs uppercase tracking-wider text-secondary font-bold">Assigned Bay</div>
                 <div className="text-lg text-primary font-bold">{bayCode}</div>
                 <div className="text-xs text-[#434655]">
                   {size === 'S' ? 'Cỡ nhỏ (S)' : size === 'M' ? 'Cỡ vừa (M)' : 'Cỡ lớn (L)'}
@@ -464,7 +464,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
               {/* Section B: 8-Digit Backup Access PIN Passcode */}
               <div className="mt-6 pt-6 border-t border-outline-variant/30 space-y-3">
                 <div className="text-center">
-                  <span className="text-[11px] text-secondary tracking-wider uppercase font-bold">
+                  <span className="text-xs text-secondary tracking-wider uppercase font-bold">
                     HOẶC NHẬP MÃ PIN 8 SỐ TẠI BÀN PHÍM KIOSK
                   </span>
                 </div>
@@ -538,7 +538,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                             : 'Thời gian lưu trữ còn lại'}
                       </span>
                       {isHoldPeriod && (
-                        <p className="text-[11px] text-amber-800 font-medium">Giờ thuê thực tế chỉ bắt đầu tính khi bạn mở tủ tại trạm</p>
+                        <p className="text-xs text-amber-800 font-medium">Giờ thuê thực tế chỉ bắt đầu tính khi bạn mở tủ tại trạm</p>
                       )}
                     </div>
                   </div>
@@ -606,7 +606,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                   <div className="space-y-0.5">
                     <div className="text-sm font-semibold text-[#0b1c30] flex items-center gap-1.5">
                       <span>Vé ngoại tuyến</span>
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">HMAC JWS</span>
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">HMAC JWS</span>
                     </div>
                     <p className="text-xs text-[#434655] leading-relaxed">
                       Vé ngoại tuyến được hiển thị riêng. Mã QR động phía trên chỉ dùng để xác thực trực tuyến.

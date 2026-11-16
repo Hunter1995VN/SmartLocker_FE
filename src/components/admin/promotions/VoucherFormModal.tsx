@@ -510,7 +510,7 @@ export default function VoucherFormModal({
                             </div>
                         </div>
 
-                        <p className="text-[11px] text-slate-500">
+                        <p className="text-xs text-slate-500">
                             Nghĩa vụ chiết khấu tối đa lý thuyết ({usageLimit} lượt):{' '}
                             <strong className="text-slate-700">{formatVnd(worstCaseLiability)}</strong> · Hệ thống sẽ tự
                             động khóa mã ngay khi giải ngân chạm mốc{' '}
@@ -541,7 +541,7 @@ export default function VoucherFormModal({
                                     );
                                 })}
                             </div>
-                            <p className="text-[10px] text-slate-400 mt-1">
+                            <p className="text-xs text-slate-500 mt-1">
                                 {applicableSizes.length === 0
                                     ? 'Đang áp dụng cho tất cả kích cỡ (S, M, L)'
                                     : `Chỉ áp dụng cho ngăn cỡ: ${applicableSizes.join(', ')}`}

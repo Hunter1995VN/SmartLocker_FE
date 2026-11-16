@@ -124,13 +124,13 @@ export default function StationCompartmentsTab({ station }: StationCompartmentsT
                 <div className="p-3.5 bg-blue-50/60 rounded-xl border border-blue-200/80">
                     <div className="flex items-center justify-between text-blue-700 mb-1">
                         <span className="text-xs font-bold uppercase tracking-wider">Cỡ Small (S)</span>
-                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100/80">Tủ nhỏ</span>
+                        <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-blue-100/80">Tủ nhỏ</span>
                     </div>
                     <div className="flex items-baseline gap-1.5">
                         <span className="text-2xl font-black text-slate-900">{totalS}</span>
                         <span className="text-xs text-slate-500 font-medium">ô tủ</span>
                     </div>
-                    <p className="text-[11px] text-emerald-600 font-semibold mt-1">
+                    <p className="text-xs text-emerald-600 font-semibold mt-1">
                         {station.availableS} ô sẵn sàng
                     </p>
                 </div>
@@ -139,13 +139,13 @@ export default function StationCompartmentsTab({ station }: StationCompartmentsT
                 <div className="p-3.5 bg-indigo-50/60 rounded-xl border border-indigo-200/80">
                     <div className="flex items-center justify-between text-indigo-700 mb-1">
                         <span className="text-xs font-bold uppercase tracking-wider">Cỡ Medium (M)</span>
-                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-100/80">Tủ vừa</span>
+                        <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-indigo-100/80">Tủ vừa</span>
                     </div>
                     <div className="flex items-baseline gap-1.5">
                         <span className="text-2xl font-black text-slate-900">{totalM}</span>
                         <span className="text-xs text-slate-500 font-medium">ô tủ</span>
                     </div>
-                    <p className="text-[11px] text-emerald-600 font-semibold mt-1">
+                    <p className="text-xs text-emerald-600 font-semibold mt-1">
                         {station.availableM} ô sẵn sàng
                     </p>
                 </div>
@@ -154,13 +154,13 @@ export default function StationCompartmentsTab({ station }: StationCompartmentsT
                 <div className="p-3.5 bg-purple-50/60 rounded-xl border border-purple-200/80">
                     <div className="flex items-center justify-between text-purple-700 mb-1">
                         <span className="text-xs font-bold uppercase tracking-wider">Cỡ Large (L)</span>
-                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-purple-100/80">Tủ lớn</span>
+                        <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-purple-100/80">Tủ lớn</span>
                     </div>
                     <div className="flex items-baseline gap-1.5">
                         <span className="text-2xl font-black text-slate-900">{totalL}</span>
                         <span className="text-xs text-slate-500 font-medium">ô tủ</span>
                     </div>
-                    <p className="text-[11px] text-emerald-600 font-semibold mt-1">
+                    <p className="text-xs text-emerald-600 font-semibold mt-1">
                         {station.availableL} ô sẵn sàng
                     </p>
                 </div>
@@ -175,7 +175,7 @@ export default function StationCompartmentsTab({ station }: StationCompartmentsT
                         <span className="text-2xl font-black text-slate-900">{totalBays}</span>
                         <span className="text-xs text-slate-500 font-medium">ngăn tủ</span>
                     </div>
-                    <p className="text-[11px] text-slate-500 font-semibold mt-1">
+                    <p className="text-xs text-slate-500 font-semibold mt-1">
                         S:{totalS} + M:{totalM} + L:{totalL}
                     </p>
                 </div>
@@ -223,7 +223,7 @@ export default function StationCompartmentsTab({ station }: StationCompartmentsT
 
                     <div className="flex items-center gap-2">
                         {/* Size Filter */}
-                        <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg text-[11px] font-semibold">
+                        <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg text-xs font-semibold">
                             <button
                                 type="button"
                                 onClick={() => setFilterSize('all')}
@@ -255,7 +255,7 @@ export default function StationCompartmentsTab({ station }: StationCompartmentsT
                         </div>
 
                         {/* Status Filter */}
-                        <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg text-[11px] font-semibold">
+                        <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg text-xs font-semibold">
                             <button
                                 type="button"
                                 onClick={() => setFilterStatus('all')}
@@ -306,10 +306,10 @@ export default function StationCompartmentsTab({ station }: StationCompartmentsT
                         ))}
                     </div>
                 ) : filteredLockers.length === 0 ? (
-                    <div className="py-10 text-center text-slate-400 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
+                    <div className="py-10 text-center text-slate-500 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
                         <Box className="w-8 h-8 mx-auto text-slate-300 mb-2 stroke-[1.5]" />
                         <p className="text-xs font-semibold text-slate-600">Chưa có ô tủ nào trong bộ lọc này</p>
-                        <p className="text-[11px] text-slate-400 mt-0.5">Trạm này chưa có ô tủ hoặc không khớp điều kiện tìm</p>
+                        <p className="text-xs text-slate-500 mt-0.5">Trạm này chưa có ô tủ hoặc không khớp điều kiện tìm</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 max-h-[380px] overflow-y-auto p-1">
@@ -334,12 +334,12 @@ export default function StationCompartmentsTab({ station }: StationCompartmentsT
                                         <span className="font-mono text-xs font-black text-slate-900">
                                             {locker.lockerCode}
                                         </span>
-                                        <span className="text-[10px] font-black px-1 rounded bg-white border border-slate-200 text-slate-700">
+                                        <span className="text-xs font-black px-1 rounded bg-white border border-slate-200 text-slate-700">
                                             {locker.size}
                                         </span>
                                     </div>
 
-                                    <div className="flex items-center justify-between text-[10px] mt-1.5">
+                                    <div className="flex items-center justify-between text-xs mt-1.5">
                                         <span className={`font-bold ${
                                             isAvailable
                                                 ? 'text-emerald-700'
@@ -350,11 +350,11 @@ export default function StationCompartmentsTab({ station }: StationCompartmentsT
                                             {isAvailable ? 'Sẵn sàng' : isOccupied ? 'Đang dùng' : 'Bảo trì'}
                                         </span>
 
-                                        <span title={`Cửa: ${locker.doorState}`} className="text-slate-400">
+                                        <span title={`Cửa: ${locker.doorState}`} className="text-slate-500">
                                             {isDoorOpen ? (
                                                 <DoorOpen className="w-3.5 h-3.5 text-amber-500" />
                                             ) : (
-                                                <DoorClosed className="w-3.5 h-3.5 text-slate-400" />
+                                                <DoorClosed className="w-3.5 h-3.5 text-slate-500" />
                                             )}
                                         </span>
                                     </div>
@@ -381,7 +381,7 @@ export default function StationCompartmentsTab({ station }: StationCompartmentsT
                             <button
                                 type="button"
                                 onClick={() => setSelectedLocker(null)}
-                                className="text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+                                className="text-slate-500 hover:text-slate-600 p-1 cursor-pointer"
                             >
                                 ✕
                             </button>
@@ -392,7 +392,7 @@ export default function StationCompartmentsTab({ station }: StationCompartmentsT
                             <p><b>Sức khỏe cảm biến:</b> {selectedLocker.healthStatus}</p>
                             <p><b>Trạng thái cửa chốt:</b> {selectedLocker.doorState}</p>
                             {selectedLocker.currentBooking && (
-                                <div className="p-2.5 rounded-lg bg-blue-50/70 border border-blue-100 text-[11px] text-blue-900 space-y-0.5">
+                                <div className="p-2.5 rounded-lg bg-blue-50/70 border border-blue-100 text-xs text-blue-900 space-y-0.5">
                                     <p><b>Khách:</b> {selectedLocker.currentBooking.customerName}</p>
                                     <p><b>SĐT:</b> {selectedLocker.currentBooking.customerPhone}</p>
                                     <p><b>Mã đơn:</b> {selectedLocker.currentBooking.bookingCode}</p>

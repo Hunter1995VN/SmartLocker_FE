@@ -50,7 +50,7 @@ export default function UserKpiSummaryCards({ users, isLoading = false }: UserKp
             <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-slate-300 transition">
                 <div className="flex items-start justify-between">
                     <div>
-                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                             Tổng Tài Khoản Hệ Thống
                         </span>
                         <div className="flex items-baseline gap-2 mt-1">
@@ -65,7 +65,7 @@ export default function UserKpiSummaryCards({ users, isLoading = false }: UserKp
                     </div>
                 </div>
 
-                <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center gap-2 text-[11px] font-medium text-slate-600 flex-wrap">
+                <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center gap-2 text-xs font-medium text-slate-600 flex-wrap">
                     <span className="inline-flex items-center gap-1" title="Tài khoản hoạt động bình thường">
                         <span className="w-2 h-2 rounded-full bg-emerald-500" />
                         <span>{activeNormalCount} Bình thường</span>
@@ -93,7 +93,7 @@ export default function UserKpiSummaryCards({ users, isLoading = false }: UserKp
             <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-slate-300 transition">
                 <div className="flex items-start justify-between">
                     <div>
-                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                             Khách Hàng (Traveler)
                         </span>
                         <div className="flex items-baseline gap-2 mt-1">
@@ -109,10 +109,10 @@ export default function UserKpiSummaryCards({ users, isLoading = false }: UserKp
                 </div>
 
                 <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-slate-600">
-                    <span className="text-emerald-700 font-semibold text-[11px]">
+                    <span className="text-emerald-700 font-semibold text-xs">
                         Chiếm {totalCount > 0 ? Math.round((travelerCount / totalCount) * 100) : 0}% tổng người dùng
                     </span>
-                    <span className="text-[10px] text-slate-400">Khách thuê tủ</span>
+                    <span className="text-xs text-slate-500">Khách thuê tủ</span>
                 </div>
             </div>
 
@@ -120,7 +120,7 @@ export default function UserKpiSummaryCards({ users, isLoading = false }: UserKp
             <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-slate-300 transition">
                 <div className="flex items-start justify-between">
                     <div className="flex-1 pr-2">
-                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                             Nhân Sự Nội Bộ
                         </span>
                         <div className="mt-1 space-y-0.5">
@@ -145,7 +145,7 @@ export default function UserKpiSummaryCards({ users, isLoading = false }: UserKp
                     </div>
                 </div>
 
-                <div className="mt-3 pt-2.5 border-t border-slate-100 text-[11px] text-slate-500 flex items-center justify-between font-medium">
+                <div className="mt-3 pt-2.5 border-t border-slate-100 text-xs text-slate-500 flex items-center justify-between font-medium">
                     <span>Tổng: {staffCount + adminCount} tài khoản</span>
                     <span className="text-purple-600 font-bold">Phân quyền RBAC</span>
                 </div>
@@ -155,7 +155,7 @@ export default function UserKpiSummaryCards({ users, isLoading = false }: UserKp
             <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex flex-col justify-between hover:border-slate-300 transition">
                 <div className="flex items-start justify-between">
                     <div>
-                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                             Quyền Đăng Nhập Hệ Thống
                         </span>
                         <div className="flex items-baseline gap-2 mt-1">
@@ -172,7 +172,7 @@ export default function UserKpiSummaryCards({ users, isLoading = false }: UserKp
                     </div>
                 </div>
 
-                <div className="mt-3 pt-2.5 border-t border-slate-100 text-[11px] flex items-center justify-between font-medium">
+                <div className="mt-3 pt-2.5 border-t border-slate-100 text-xs flex items-center justify-between font-medium">
                     <span className="text-emerald-700 font-semibold flex items-center gap-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                         {activeNormalCount} đầy đủ quyền
@@ -182,7 +182,7 @@ export default function UserKpiSummaryCards({ users, isLoading = false }: UserKp
                             {bookingBlockedCount} khóa đặt tủ
                         </span>
                     ) : (
-                        <span className="text-slate-400">Không có tài khoản bị chặn đặt</span>
+                        <span className="text-slate-500">Không có tài khoản bị chặn đặt</span>
                     )}
                 </div>
             </div>

@@ -194,7 +194,7 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                             <div className="flex flex-col">
                                 <span className="text-lg font-bold text-gray-900 tracking-tight leading-tight">
                                     SmartLocker
-                                    <span className="hidden sm:inline-block ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase tracking-wider">
+                                    <span className="hidden sm:inline-block ml-2 px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase tracking-wider">
                                         24/7 Online
                                     </span>
                                 </span>
@@ -325,11 +325,11 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                             </div>
                             <div className="hidden md:flex flex-col leading-none">
                                 <span className="text-xs font-semibold text-[#0b1c30]">{user.fullName}</span>
-                                <span className="text-[11px] text-[#434655]">{user.role || 'Traveler'}</span>
+                                <span className="text-xs text-[#434655]">{user.role || 'Traveler'}</span>
                             </div>
                             <button
                                 onClick={handleLogout}
-                                className="ml-2 p-1 rounded-lg hover:bg-red-50 text-[#737686] hover:text-red-500 transition-colors"
+                                className="ml-2 p-1 rounded-lg hover:bg-red-50 text-[#5c5f70] hover:text-red-500 transition-colors"
                                 title="Đăng xuất"
                             >
                                 <LogOut className="w-3.5 h-3.5" />
@@ -358,7 +358,7 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
 
                         {/* Quick Actions */}
                         <div className="px-4 py-3 border-b border-gray-50">
-                            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Thao tác nhanh</p>
+                            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Thao tác nhanh</p>
                             <div className="grid grid-cols-2 gap-2">
                                 <QuickAction icon={<Zap className="w-4 h-4" />} label="Đặt tủ ngay" color="bg-blue-600" onClick={() => {}} />
                                 <QuickAction icon={<Clock className="w-4 h-4" />} label="Lịch sử" color="bg-violet-600" onClick={() => {}} />
@@ -374,7 +374,7 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                                     <button
                                         key={tab}
                                         onClick={() => setActiveTab(tab)}
-                                        className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === tab ? 'bg-white text-primary shadow-elevation-1' : 'text-gray-400'}`}
+                                        className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === tab ? 'bg-white text-primary shadow-elevation-1' : 'text-gray-500'}`}
                                     >
                                         {tab === 'map' ? '🗺️ Bản đồ' : '📋 Danh sách'}
                                     </button>
@@ -385,7 +385,7 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                         {/* Search Input */}
                         <div className="px-4 py-1.5">
                             <div className="relative">
-                                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                                <Search className="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2" />
                                 <input
                                     type="text"
                                     value={searchQuery}
@@ -396,7 +396,7 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                                 {searchQuery && (
                                     <button
                                         onClick={() => setSearchQuery('')}
-                                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+                                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-600 cursor-pointer"
                                     >
                                         <X className="w-3.5 h-3.5" />
                                     </button>
@@ -406,7 +406,7 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
 
                         {/* Station count */}
                         <div className="px-4 py-1.5 flex items-center justify-between">
-                            <p className="text-xs text-gray-400">
+                            <p className="text-xs text-gray-500">
                                 <span className="font-bold text-on-surface">{filtered.length}</span> trạm tủ
                                 {userLocation ? ' gần bạn' : ''}
                             </p>
@@ -434,7 +434,7 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                                     ))}
                                 </div>
                             ) : filtered.length === 0 ? (
-                                <div className="text-center py-10 text-gray-400">
+                                <div className="text-center py-10 text-gray-500">
                                     <MapPin className="w-8 h-8 mx-auto mb-2 opacity-30" />
                                     <p className="text-sm">Không tìm thấy trạm tủ</p>
                                 </div>
@@ -607,7 +607,7 @@ function ActiveBookingCard({ booking, timeLeft }: { booking: Booking; timeLeft: 
         <div className={`mx-4 mt-4 mb-1 rounded-2xl border-2 p-4 ${isCheckedIn ? 'border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50' : 'border-blue-200 bg-blue-50'}`}>
             <div className="flex items-start justify-between mb-3">
                 <div>
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Booking hiện tại</p>
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Booking hiện tại</p>
                     <p className="font-bold text-on-surface mt-0.5">{booking.bookingCode}</p>
                 </div>
                 <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${st.color}`}>
@@ -616,10 +616,10 @@ function ActiveBookingCard({ booking, timeLeft }: { booking: Booking; timeLeft: 
             </div>
 
             <div className="flex items-center gap-2 mb-2">
-                <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                <MapPin className="w-3.5 h-3.5 text-gray-500 shrink-0" />
                 <div>
                     <p className="text-sm font-semibold text-on-surface leading-tight">{booking.stationName}</p>
-                    <p className="text-xs text-gray-400">{booking.stationAddress}</p>
+                    <p className="text-xs text-gray-500">{booking.stationAddress}</p>
                 </div>
             </div>
 
@@ -635,7 +635,7 @@ function ActiveBookingCard({ booking, timeLeft }: { booking: Booking; timeLeft: 
 
             {isCheckedIn && timeLeft && (
                 <div className="bg-white/70 rounded-xl p-3 text-center mb-3">
-                    <p className="text-xs text-gray-400 mb-0.5">Thời gian còn lại</p>
+                    <p className="text-xs text-gray-500 mb-0.5">Thời gian còn lại</p>
                     <p className="text-2xl font-mono font-bold text-emerald-600">{timeLeft}</p>
                 </div>
             )}
@@ -684,20 +684,20 @@ function StationCard({ station, isSelected, onClick }: {
             <div className="flex items-start gap-3">
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5
                     ${isActive ? 'bg-blue-100' : 'bg-gray-100'}`}>
-                    <MapPin className={`w-4 h-4 ${isActive ? 'text-blue-600' : 'text-gray-400'}`} />
+                    <MapPin className={`w-4 h-4 ${isActive ? 'text-blue-600' : 'text-gray-500'}`} />
                 </div>
                 <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                         <p className="text-sm font-bold text-on-surface leading-tight line-clamp-1">{station.name}</p>
                         {station.distanceKm != null && (
-                            <span className="text-xs text-gray-400 shrink-0 mt-0.5">
+                            <span className="text-xs text-gray-500 shrink-0 mt-0.5">
                                 {station.distanceKm < 1
                                     ? `${Math.round(station.distanceKm * 1000)}m`
                                     : `${station.distanceKm.toFixed(1)}km`}
                             </span>
                         )}
                     </div>
-                    <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">{station.address}</p>
+                    <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{station.address}</p>
 
                     <div className="flex items-center gap-2 mt-2">
                         {isActive ? (
@@ -707,7 +707,7 @@ function StationCard({ station, isSelected, onClick }: {
                                     {totalAvail} ô trống
                                 </span>
                                 <span className="text-gray-200">|</span>
-                                <span className="text-xs text-gray-400">{station.opensAt || '06:00'}–{station.closesAt || '22:00'}</span>
+                                <span className="text-xs text-gray-500">{station.opensAt || '06:00'}–{station.closesAt || '22:00'}</span>
                             </>
                         ) : (
                             <span className="flex items-center gap-1 text-xs text-amber-600 font-semibold">
@@ -760,7 +760,7 @@ function MapInfoWindow({ station, onBook }: { station: Station; onBook?: (s: Sta
                         { key: 'M', avail: availM, total: station.totalM },
                         { key: 'L', avail: availL, total: station.totalL },
                     ].map(({ key, avail, total }) => (
-                        <div key={key} className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${(avail ?? 0) > 0 ? SIZE_COLOR[key] : 'bg-gray-100 text-gray-400'}`}>
+                        <div key={key} className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${(avail ?? 0) > 0 ? SIZE_COLOR[key] : 'bg-gray-100 text-gray-500'}`}>
                             {key}: {avail}/{total}
                         </div>
                     ))}
@@ -787,7 +787,7 @@ function MapInfoWindow({ station, onBook }: { station: Station; onBook?: (s: Sta
                 </button>
             )}
             {isActive && totalAvail === 0 && (
-                <p className="text-xs text-center text-gray-400 py-1">Hết ô trống — thử trạm khác</p>
+                <p className="text-xs text-center text-gray-500 py-1">Hết ô trống — thử trạm khác</p>
             )}
         </div>
     );
@@ -801,19 +801,19 @@ function MapErrorFallback({ stations, onSelect }: { stations: Station[]; onSelec
                 <div className="text-center p-6">
                     <MapPin className="w-12 h-12 text-blue-400 mx-auto mb-3 opacity-50" />
                     <p className="text-gray-500 text-sm mb-1">Cần Google Maps API Key</p>
-                    <p className="text-xs text-gray-400 max-w-xs">
+                    <p className="text-xs text-gray-500 max-w-xs">
                         Thêm <code className="bg-white px-1 rounded text-blue-600">VITE_GOOGLE_MAPS_API_KEY</code> vào file <code className="bg-white px-1 rounded text-blue-600">.env</code>
                     </p>
                 </div>
             </div>
             <div className="p-4 bg-white border-t border-gray-100">
-                <p className="text-xs font-bold text-gray-400 mb-2">DANH SÁCH TRẠM TỦ</p>
+                <p className="text-xs font-bold text-gray-500 mb-2">DANH SÁCH TRẠM TỦ</p>
                 <div className="grid grid-cols-2 gap-2 overflow-y-auto max-h-48">
                     {stations.map(s => (
                         <button key={s.id} onClick={() => onSelect(s)}
                             className="text-left p-2 rounded-lg bg-gray-50 hover:bg-blue-50 transition-colors">
                             <p className="text-xs font-semibold text-on-surface line-clamp-1">{s.name}</p>
-                            <p className="text-xs text-gray-400 line-clamp-1">{s.address}</p>
+                            <p className="text-xs text-gray-500 line-clamp-1">{s.address}</p>
                         </button>
                     ))}
                 </div>

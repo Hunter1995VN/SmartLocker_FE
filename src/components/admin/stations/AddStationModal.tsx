@@ -133,7 +133,7 @@ export default function AddStationModal({
                             <h3 className="text-base font-extrabold text-slate-900 tracking-tight">
                                 Thêm Trạm Tủ Mới (Add Station)
                             </h3>
-                            <p className="text-[11px] text-slate-400">
+                            <p className="text-xs text-slate-500">
                                 Cấu hình thông tin vị trí, số ngăn tủ S/M/L và giá khởi tạo
                             </p>
                         </div>
@@ -141,7 +141,7 @@ export default function AddStationModal({
                     <button
                         type="button"
                         onClick={onClose}
-                        className="w-8 h-8 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center transition cursor-pointer"
+                        className="w-8 h-8 rounded-xl text-slate-500 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center transition cursor-pointer"
                     >
                         <X className="w-4 h-4" />
                     </button>
@@ -179,7 +179,7 @@ export default function AddStationModal({
                                         errors.name ? 'border-rose-400 focus:ring-rose-200' : 'border-slate-200 focus:ring-blue-200'
                                     }`}
                                 />
-                                {errors.name && <p className="text-[11px] text-rose-500 mt-1">{errors.name}</p>}
+                                {errors.name && <p className="text-xs text-rose-500 mt-1">{errors.name}</p>}
                             </div>
 
                             <div>
@@ -198,7 +198,7 @@ export default function AddStationModal({
                                         errors.address ? 'border-rose-400 focus:ring-rose-200' : 'border-slate-200 focus:ring-blue-200'
                                     }`}
                                 />
-                                {errors.address && <p className="text-[11px] text-rose-500 mt-1">{errors.address}</p>}
+                                {errors.address && <p className="text-xs text-rose-500 mt-1">{errors.address}</p>}
                             </div>
 
                             {/* GPS Coordinates */}
@@ -208,7 +208,7 @@ export default function AddStationModal({
                                         Vĩ độ GPS (Latitude) <span className="text-rose-500">*</span>
                                     </label>
                                     <div className="relative">
-                                        <MapPin className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                                        <MapPin className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                                         <input
                                             type="text"
                                             value={latitude}
@@ -219,7 +219,7 @@ export default function AddStationModal({
                                             className="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-mono font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-200"
                                         />
                                     </div>
-                                    {errors.latitude && <p className="text-[11px] text-rose-500 mt-1">{errors.latitude}</p>}
+                                    {errors.latitude && <p className="text-xs text-rose-500 mt-1">{errors.latitude}</p>}
                                 </div>
 
                                 <div>
@@ -227,7 +227,7 @@ export default function AddStationModal({
                                         Kinh độ GPS (Longitude) <span className="text-rose-500">*</span>
                                     </label>
                                     <div className="relative">
-                                        <Navigation className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                                        <Navigation className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                                         <input
                                             type="text"
                                             value={longitude}
@@ -238,7 +238,7 @@ export default function AddStationModal({
                                             className="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-mono font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-200"
                                         />
                                     </div>
-                                    {errors.longitude && <p className="text-[11px] text-rose-500 mt-1">{errors.longitude}</p>}
+                                    {errors.longitude && <p className="text-xs text-rose-500 mt-1">{errors.longitude}</p>}
                                 </div>
                             </div>
 
@@ -283,7 +283,7 @@ export default function AddStationModal({
                                 <Clock className="w-4 h-4 text-indigo-600" />
                                 <span>2. Cấu hình số ô tủ (Total: {totalBays} ngăn)</span>
                             </h4>
-                            {errors.lockers && <span className="text-[11px] font-bold text-rose-500">{errors.lockers}</span>}
+                            {errors.lockers && <span className="text-xs font-bold text-rose-500">{errors.lockers}</span>}
                         </div>
 
                         <div className="grid grid-cols-3 gap-3">
@@ -296,7 +296,7 @@ export default function AddStationModal({
                                     onChange={(e) => setTotalS(e.target.value)}
                                     className="w-full px-3 py-1.5 bg-white border border-blue-200 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-none"
                                 />
-                                {errors.totalS && <p className="text-[10px] text-rose-500 mt-1">{errors.totalS}</p>}
+                                {errors.totalS && <p className="text-xs text-rose-500 mt-1">{errors.totalS}</p>}
                             </div>
 
                             <div className="p-3 rounded-xl bg-indigo-50/70 border border-indigo-200">
@@ -308,7 +308,7 @@ export default function AddStationModal({
                                     onChange={(e) => setTotalM(e.target.value)}
                                     className="w-full px-3 py-1.5 bg-white border border-indigo-200 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-none"
                                 />
-                                {errors.totalM && <p className="text-[10px] text-rose-500 mt-1">{errors.totalM}</p>}
+                                {errors.totalM && <p className="text-xs text-rose-500 mt-1">{errors.totalM}</p>}
                             </div>
 
                             <div className="p-3 rounded-xl bg-purple-50/70 border border-purple-200">
@@ -320,7 +320,7 @@ export default function AddStationModal({
                                     onChange={(e) => setPriceL(e.target.value)}
                                     className="w-full px-3 py-1.5 bg-white border border-purple-200 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-none"
                                 />
-                                {errors.totalL && <p className="text-[10px] text-rose-500 mt-1">{errors.totalL}</p>}
+                                {errors.totalL && <p className="text-xs text-rose-500 mt-1">{errors.totalL}</p>}
                             </div>
                         </div>
                     </div>

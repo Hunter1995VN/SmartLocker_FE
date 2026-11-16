@@ -101,7 +101,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                         </div>
                         <div>
                             <span className="text-lg font-extrabold text-white tracking-tight">SmartLocker</span>
-                            <p className="text-[11px] text-white/60 uppercase tracking-widest">Tủ hành lý thông minh</p>
+                            <p className="text-xs text-white/60 uppercase tracking-widest">Tủ hành lý thông minh</p>
                         </div>
                     </div>
 
@@ -152,7 +152,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                             </div>
                             <div>
                                 <p className="text-white/80 text-xs font-semibold">Trần Minh Đức</p>
-                                <p className="text-white/45 text-[10px]">Freelance Designer</p>
+                                <p className="text-white/45 text-xs">Freelance Designer</p>
                             </div>
                             <div className="ml-auto flex gap-0.5">
                                 {[...Array(5)].map((_, i) => (
@@ -235,7 +235,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                                 <div className="w-full border-t border-gray-100"></div>
                             </div>
                             <div className="relative flex justify-center">
-                                <span className="bg-white px-3 text-xs text-gray-400 uppercase tracking-widest font-semibold">
+                                <span className="bg-white px-3 text-xs text-gray-500 uppercase tracking-widest font-semibold">
                                     hoặc đăng nhập với email
                                 </span>
                             </div>
@@ -256,7 +256,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                                     placeholder="nguyenvana@example.com"
                                     autoComplete="email"
                                     disabled={isLoading}
-                                    className="w-full h-12 px-4 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-900 text-sm placeholder:text-gray-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all disabled:opacity-50"
+                                    className="w-full h-12 px-4 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-900 text-sm placeholder:text-gray-500 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all disabled:opacity-50"
                                 />
                             </div>
 
@@ -283,12 +283,12 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                                         placeholder="Nhập mật khẩu..."
                                         autoComplete="current-password"
                                         disabled={isLoading}
-                                        className="w-full h-12 px-4 pr-12 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-900 text-sm placeholder:text-gray-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all disabled:opacity-50"
+                                        className="w-full h-12 px-4 pr-12 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-900 text-sm placeholder:text-gray-500 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all disabled:opacity-50"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 hover:text-gray-600 transition-colors"
+                                        className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500 hover:text-gray-600 transition-colors"
                                         aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
                                     >
                                         {showPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
@@ -340,7 +340,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                         </form>
 
                         {/* Trust Footer */}
-                        <p className="mt-6 text-center text-xs text-gray-400 leading-relaxed">
+                        <p className="mt-6 text-center text-xs text-gray-500 leading-relaxed">
                             Bằng việc đăng nhập, bạn đồng ý với{' '}
                             <a href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }} className="text-blue-600 font-semibold hover:underline">Điều khoản dịch vụ</a>
                             {' '}và{' '}

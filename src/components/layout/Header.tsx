@@ -50,7 +50,7 @@ const Header = ({ onNavigate }: HeaderProps) => {
             <div className="flex flex-col">
               <span className="text-lg font-bold text-on-surface flex items-center gap-2 tracking-tight leading-tight">
                 SmartLocker
-                <span className="hidden sm:inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-gradient-to-r from-emerald-50 to-emerald-100 text-emerald-700 border border-emerald-200 uppercase tracking-wider">
+                <span className="hidden sm:inline-block px-2 py-0.5 rounded-full text-xs font-bold bg-gradient-to-r from-emerald-50 to-emerald-100 text-emerald-700 border border-emerald-200 uppercase tracking-wider">
                   24/7 Online
                 </span>
               </span>

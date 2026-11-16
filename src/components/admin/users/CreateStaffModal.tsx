@@ -90,7 +90,7 @@ export default function CreateStaffModal({
                         type="button"
                         onClick={onClose}
                         disabled={isSubmitting}
-                        className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+                        className="p-1 rounded-lg text-slate-500 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
                     >
                         <X className="w-4 h-4" />
                     </button>
@@ -109,7 +109,7 @@ export default function CreateStaffModal({
                             Họ và tên nhân viên <span className="text-rose-500">*</span>
                         </label>
                         <div className="relative">
-                            <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                            <User className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                             <input
                                 id="create-staff-fullname"
                                 type="text"
@@ -128,7 +128,7 @@ export default function CreateStaffModal({
                                 Email đăng nhập <span className="text-rose-500">*</span>
                             </label>
                             <div className="relative">
-                                <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                                <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                                 <input
                                     id="create-staff-email"
                                     type="email"
@@ -146,7 +146,7 @@ export default function CreateStaffModal({
                                 Số điện thoại <span className="text-rose-500">*</span>
                             </label>
                             <div className="relative">
-                                <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                                <Phone className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                                 <input
                                     id="create-staff-phone"
                                     type="tel"
@@ -166,7 +166,7 @@ export default function CreateStaffModal({
                                 Mật khẩu khởi tạo <span className="text-rose-500">*</span>
                             </label>
                             <div className="relative">
-                                <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                                <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                                 <input
                                     id="create-staff-password"
                                     type="password"
@@ -184,7 +184,7 @@ export default function CreateStaffModal({
                                 Vai trò & Phân quyền <span className="text-rose-500">*</span>
                             </label>
                             <div className="relative">
-                                <Shield className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                                <Shield className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                                 <select
                                     id="create-staff-role"
                                     value={role}

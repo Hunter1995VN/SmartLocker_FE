@@ -180,7 +180,7 @@ export default function StationDetailPage({
                     <div className="bg-white rounded-2xl shadow-md border border-[#e5eeff] p-8 max-w-md w-full text-center">
                         <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-3" />
                         <h2 className="text-lg font-bold text-[#0b1c30] mb-1">Không thể tải thông tin trạm</h2>
-                        <p className="text-xs text-[#737686] mb-5">{error}</p>
+                        <p className="text-xs text-[#5c5f70] mb-5">{error}</p>
                         <div className="flex items-center gap-3 justify-center">
                             <button
                                 onClick={onBack}
@@ -309,7 +309,7 @@ export default function StationDetailPage({
                                 <div className="flex flex-wrap items-start justify-between gap-4 relative z-10">
                                     <div className="flex flex-col gap-1.5">
                                         <div className="flex flex-wrap items-center gap-2">
-                                            <span className="px-2 py-0.5 rounded bg-[#e5eeff] text-[#434655] text-[11px] font-bold tracking-wider font-mono">
+                                            <span className="px-2 py-0.5 rounded bg-[#e5eeff] text-[#434655] text-xs font-bold tracking-wider font-mono">
                                                 {getStationCode(detail.name)}
                                             </span>
                                             {detail.status === 'ACTIVE' ? (
@@ -343,7 +343,7 @@ export default function StationDetailPage({
                                                 <Phone className="w-4 h-4 text-[#2563eb]" />
                                             </div>
                                             <div className="flex flex-col leading-none">
-                                                <span className="text-[10px] font-bold uppercase tracking-wide text-[#737686]">Hotline Trạm</span>
+                                                <span className="text-xs font-bold uppercase tracking-wide text-[#5c5f70]">Hotline Trạm</span>
                                                 <span className="text-sm font-bold text-[#0b1c30]">{detail.contactPhone}</span>
                                             </div>
                                         </a>
@@ -357,7 +357,7 @@ export default function StationDetailPage({
                                             <MapPin className="w-4 h-4 text-[#2563eb] shrink-0 mt-0.5" />
                                             <span>{detail.address}</span>
                                         </div>
-                                        <span className="text-[11px] text-[#737686] font-mono ml-6">
+                                        <span className="text-xs text-[#5c5f70] font-mono ml-6">
                                             Tọa độ GPS: {Number(detail.latitude).toFixed(5)}, {Number(detail.longitude).toFixed(5)}
                                         </span>
                                     </div>
@@ -441,13 +441,13 @@ export default function StationDetailPage({
                                                             ${sz === 'S' ? 'bg-[#eff4ff] text-[#2563eb]' : sz === 'M' ? 'bg-[#e5eeff] text-[#004ac6]' : 'bg-red-50 text-red-500'}`}>
                                                             {sz}
                                                         </span>
-                                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${urgencyClass}`}>{urgency}</span>
+                                                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${urgencyClass}`}>{urgency}</span>
                                                     </div>
                                                     <div>
                                                         <h3 className="font-bold text-[#0b1c30] text-sm">{meta.label}</h3>
-                                                        <p className="text-xs text-[#737686]">{meta.desc}</p>
+                                                        <p className="text-xs text-[#5c5f70]">{meta.desc}</p>
                                                     </div>
-                                                    <div className="flex items-center justify-between bg-[#f8f9ff] px-2.5 py-1.5 rounded-lg text-xs text-[#737686]">
+                                                    <div className="flex items-center justify-between bg-[#f8f9ff] px-2.5 py-1.5 rounded-lg text-xs text-[#5c5f70]">
                                                         <span>{meta.dims}</span>
                                                         <span>Tối đa {meta.maxKg} kg</span>
                                                     </div>
@@ -456,11 +456,11 @@ export default function StationDetailPage({
                                                     <div className="flex items-baseline justify-between">
                                                         <span className={`text-3xl font-bold ${meta.color}`}>
                                                             {Math.min(t, a)}
-                                                            <span className="text-sm text-[#737686] font-normal ml-1">/ {t} trống</span>
+                                                            <span className="text-sm text-[#5c5f70] font-normal ml-1">/ {t} trống</span>
                                                         </span>
                                                         <span className="text-base font-bold text-[#2563eb]">
                                                             {price > 0 ? `${(price / 1000).toFixed(0)}.000đ` : 'Liên hệ'}
-                                                            <span className="text-xs text-[#737686] font-normal">/h</span>
+                                                            <span className="text-xs text-[#5c5f70] font-normal">/h</span>
                                                         </span>
                                                     </div>
                                                     <div className="w-full bg-[#e5eeff] h-2 rounded-full overflow-hidden">
@@ -483,7 +483,7 @@ export default function StationDetailPage({
                                         <Calendar className="w-5 h-5 text-[#2563eb]" />
                                         <div>
                                             <h2 className="text-[18px] font-semibold text-[#0b1c30]">Kiểm tra ô trống theo khung giờ</h2>
-                                            <p className="text-xs text-[#737686]">Dữ liệu tính toán trực tiếp từ các đơn đặt chỗ trong cơ sở dữ liệu</p>
+                                            <p className="text-xs text-[#5c5f70]">Dữ liệu tính toán trực tiếp từ các đơn đặt chỗ trong cơ sở dữ liệu</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-1.5">
@@ -511,19 +511,19 @@ export default function StationDetailPage({
 
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-[#f8f9ff] p-4 rounded-xl border border-[#e5eeff] text-xs">
                                     <div>
-                                        <span className="text-[#737686] uppercase font-bold text-[10px]">Bắt đầu gửi</span>
+                                        <span className="text-[#5c5f70] uppercase font-bold text-xs">Bắt đầu gửi</span>
                                         <p className="font-bold text-[#0b1c30] text-sm mt-0.5">
                                             {simStartDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} - {simStartDate.toLocaleDateString('vi-VN')}
                                         </p>
                                     </div>
                                     <div>
-                                        <span className="text-[#737686] uppercase font-bold text-[10px]">Dự kiến nhận lại</span>
+                                        <span className="text-[#5c5f70] uppercase font-bold text-xs">Dự kiến nhận lại</span>
                                         <p className="font-bold text-[#0b1c30] text-sm mt-0.5">
                                             {simEndDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} - {simEndDate.toLocaleDateString('vi-VN')}
                                         </p>
                                     </div>
                                     <div>
-                                        <span className="text-[#737686] uppercase font-bold text-[10px]">Thời lượng thuê</span>
+                                        <span className="text-[#5c5f70] uppercase font-bold text-xs">Thời lượng thuê</span>
                                         <p className="font-bold text-[#2563eb] text-sm mt-0.5">{selectedDuration} giờ liên tục</p>
                                     </div>
                                 </div>
@@ -537,7 +537,7 @@ export default function StationDetailPage({
                                 <div className="overflow-x-auto rounded-xl border border-[#e5eeff]">
                                     <table className="w-full text-sm">
                                         <thead>
-                                            <tr className="bg-[#f8f9ff] text-[#737686] text-[11px] font-bold uppercase tracking-wide">
+                                            <tr className="bg-[#f8f9ff] text-[#5c5f70] text-xs font-bold uppercase tracking-wide">
                                                 <th className="py-3 px-4 text-left">Kích cỡ tủ</th>
                                                 <th className="py-3 px-4 text-left">Giá thuê / giờ</th>
                                                 <th className="py-3 px-4 text-left">Thời gian thuê</th>
@@ -553,7 +553,7 @@ export default function StationDetailPage({
                                                     <tr key={sz} className="hover:bg-[#f8f9ff] transition-colors">
                                                         <td className="py-3.5 px-4 font-semibold text-[#0b1c30]">
                                                             <div className="flex items-center gap-2">
-                                                                <span className={`w-5 h-5 rounded flex items-center justify-center text-[11px] font-bold
+                                                                <span className={`w-5 h-5 rounded flex items-center justify-center text-xs font-bold
                                                                     ${sz === 'S' ? 'bg-[#eff4ff] text-[#2563eb]' : sz === 'M' ? 'bg-[#e5eeff] text-[#004ac6]' : 'bg-red-50 text-red-500'}`}>
                                                                     {sz}
                                                                 </span>
@@ -563,7 +563,7 @@ export default function StationDetailPage({
                                                         <td className="py-3.5 px-4 font-bold text-[#2563eb]">
                                                             {rate > 0 ? `${formatVND(rate)} / giờ` : 'Chưa cấu hình'}
                                                         </td>
-                                                        <td className="py-3.5 px-4 text-[#737686]">
+                                                        <td className="py-3.5 px-4 text-[#5c5f70]">
                                                             {detail.minHours ?? 1}h – {detail.maxHours ?? 72}h
                                                         </td>
                                                         <td className="py-3.5 px-4 text-amber-700 font-medium">
@@ -612,12 +612,12 @@ export default function StationDetailPage({
                                         { icon: Video, label: 'Giám sát An ninh', title: 'Camera CCTV 24/7', sub: 'Cảm biến từ trường cửa tủ', color: 'text-[#007d55]' },
                                     ].map((item, i) => (
                                         <div key={i} className="p-4 rounded-xl bg-[#f8f9ff] border border-[#e5eeff] flex flex-col gap-1.5">
-                                            <div className="flex items-center justify-between text-[#737686]">
-                                                <span className="text-[10px] font-bold uppercase tracking-wide">{item.label}</span>
+                                            <div className="flex items-center justify-between text-[#5c5f70]">
+                                                <span className="text-xs font-bold uppercase tracking-wide">{item.label}</span>
                                                 <item.icon className={`w-4 h-4 ${item.color}`} />
                                             </div>
                                             <span className="text-sm font-bold text-[#0b1c30]">{item.title}</span>
-                                            <span className="text-xs text-[#737686]">{item.sub}</span>
+                                            <span className="text-xs text-[#5c5f70]">{item.sub}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -631,7 +631,7 @@ export default function StationDetailPage({
                             <div className="rounded-2xl bg-white shadow-[0_4px_16px_rgba(15,23,42,0.1)] p-6 flex flex-col gap-5 border border-[#e5eeff]">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-wider text-[#2563eb]">Đặt chỗ nhanh trạm này</p>
+                                        <p className="text-xs font-bold uppercase tracking-wider text-[#2563eb]">Đặt chỗ nhanh trạm này</p>
                                         <h3 className="text-lg font-bold text-[#0b1c30] mt-0.5">Cấu hình gửi hành lý</h3>
                                     </div>
                                     <Shield className="w-6 h-6 text-[#2563eb]" />
@@ -641,7 +641,7 @@ export default function StationDetailPage({
                                 <div className="flex flex-col gap-2">
                                     <div className="flex items-center justify-between">
                                         <label className="text-sm font-semibold text-[#0b1c30]">1. Chọn kích thước ngăn tủ</label>
-                                        <span className="text-xs text-[#737686]">Đã chọn: <strong className="text-[#2563eb]">Size {selectedSize}</strong></span>
+                                        <span className="text-xs text-[#5c5f70]">Đã chọn: <strong className="text-[#2563eb]">Size {selectedSize}</strong></span>
                                     </div>
                                     <div className="grid grid-cols-3 gap-2">
                                         {(['S', 'M', 'L'] as SizeKey[]).map(sz => {
@@ -659,7 +659,7 @@ export default function StationDetailPage({
                                                             ${isSelected ? 'bg-[#2563eb] text-white' : a === 0 ? 'bg-[#f8f9ff] text-[#c3c6d7] cursor-not-allowed' : 'bg-[#f0f4ff] text-[#434655] hover:bg-[#e5eeff]'}`}
                                                     >
                                                         <span className="text-xl font-bold">{sz}</span>
-                                                        <span className="text-[11px] opacity-90">{r > 0 ? `${(r / 1000).toFixed(0)}k/h` : '--'}</span>
+                                                        <span className="text-xs opacity-90">{r > 0 ? `${(r / 1000).toFixed(0)}k/h` : '--'}</span>
                                                     </button>
                                                 </div>
                                             );
@@ -691,18 +691,18 @@ export default function StationDetailPage({
 
                                 {/* Pricing breakdown */}
                                 <div className="p-4 rounded-xl bg-[#f8f9ff] border border-[#e5eeff] flex flex-col gap-2.5">
-                                    <div className="flex items-center justify-between text-xs text-[#737686]">
+                                    <div className="flex items-center justify-between text-xs text-[#5c5f70]">
                                         <span>Đơn giá ({formatVND(currentRate)} × {selectedDuration}h)</span>
                                         <span className="font-semibold text-[#0b1c30]">{formatVND(totalAmount)}</span>
                                     </div>
-                                    <div className="flex items-center justify-between text-xs text-[#737686]">
+                                    <div className="flex items-center justify-between text-xs text-[#5c5f70]">
                                         <span className="flex items-center gap-1">Số ô Size {selectedSize} khả dụng</span>
                                         <span className="text-[#007d55] font-bold">{avail} ô trống</span>
                                     </div>
                                     <div className="pt-2.5 mt-1 border-t border-[#e5eeff] flex items-center justify-between">
                                         <div className="flex flex-col">
-                                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#737686]">Tạm tính thanh toán</span>
-                                            <span className="text-[10px] text-[#94a3b8]">(Giá chính thức từ hệ thống)</span>
+                                            <span className="text-xs font-bold uppercase tracking-wider text-[#5c5f70]">Tạm tính thanh toán</span>
+                                            <span className="text-xs text-[#5b6b80]">(Giá chính thức từ hệ thống)</span>
                                         </div>
                                         <span className="text-2xl font-bold text-[#2563eb]">{formatVND(totalAmount)}</span>
                                     </div>
@@ -716,7 +716,7 @@ export default function StationDetailPage({
                                     disabled={avail === 0 || detail.status !== 'ACTIVE'}
                                     className={`w-full h-12 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer
                                         ${avail === 0 || detail.status !== 'ACTIVE'
-                                            ? 'bg-[#e5eeff] text-[#94a3b8] cursor-not-allowed'
+                                            ? 'bg-[#e5eeff] text-[#5b6b80] cursor-not-allowed'
                                             : 'bg-[#2563eb] hover:bg-[#1d4ed8] text-white active:scale-[0.98]'
                                         }`}
                                 >
@@ -749,7 +749,7 @@ export default function StationDetailPage({
                                             <Phone className="w-5 h-5" />
                                         </div>
                                         <div className="flex flex-col leading-none">
-                                            <span className="text-[10px] font-bold uppercase tracking-wide text-[#737686]">Hỗ trợ tại trạm</span>
+                                            <span className="text-xs font-bold uppercase tracking-wide text-[#5c5f70]">Hỗ trợ tại trạm</span>
                                             <span className="text-base font-bold text-[#0b1c30] font-mono mt-0.5">{detail.contactPhone}</span>
                                         </div>
                                     </div>

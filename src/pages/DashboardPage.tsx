@@ -322,14 +322,14 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                 <div className={`flex items-center gap-2 px-4 py-2 rounded-xl ${storedCount > 0 ? 'bg-[#007d55] text-white shadow-sm' : 'bg-[#e5eeff] text-[#0b1c30]'}`}>
                                     <Lock className="w-5 h-5" />
                                     <div className="flex flex-col leading-none">
-                                        <span className="text-[10px] font-bold uppercase tracking-wider opacity-80">Đang sử dụng</span>
+                                        <span className="text-xs font-bold uppercase tracking-wider opacity-80">Đang sử dụng</span>
                                         <span className="text-sm font-bold">{storedCount > 0 ? `${storedCount} tủ đang gửi` : 'Chưa gửi tủ nào'}</span>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2 px-4 py-2 bg-[#e5eeff] text-[#0b1c30] rounded-xl">
                                     <CheckCircle className="w-5 h-5 text-[#004ac6]" />
                                     <div className="flex flex-col leading-none">
-                                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#434655]">Lịch sử</span>
+                                        <span className="text-xs font-bold uppercase tracking-wider text-[#434655]">Lịch sử</span>
                                         <span className="text-sm font-bold">{isLoadingBookings ? '...' : `${totalBookings} đơn đặt`}</span>
                                     </div>
                                 </div>
@@ -377,7 +377,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                         <div className="relative overflow-hidden rounded-2xl bg-white shadow-[0_1px_3px_rgba(15,23,42,0.05)] p-6 md:p-8 flex flex-col gap-6">
                                             <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#f1f5f9]">
                                                 <div className="flex items-center gap-2">
-                                                    <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide ${STATUS_LABEL[activeBooking.status]?.className ?? 'bg-[#dce9ff] text-[#434655]'}`}>
+                                                    <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${STATUS_LABEL[activeBooking.status]?.className ?? 'bg-[#dce9ff] text-[#434655]'}`}>
                                                         {STATUS_LABEL[activeBooking.status]?.label ?? activeBooking.status}
                                                     </span>
                                                     <span className="text-sm text-[#434655] font-mono">#{activeBooking.bookingCode}</span>
@@ -387,11 +387,11 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                             <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-stretch">
                                                 <div className="md:col-span-7 flex flex-col justify-between gap-3 bg-[#eff4ff] p-4 rounded-xl">
                                                     <div className="flex flex-col gap-1">
-                                                        <span className="text-[11px] font-bold uppercase tracking-wide text-[#2563eb]">Trạm thông minh</span>
+                                                        <span className="text-xs font-bold uppercase tracking-wide text-[#2563eb]">Trạm thông minh</span>
                                                         <h3 className="text-[22px] font-bold leading-7 text-[#0b1c30]">{activeBooking.stationName}</h3>
                                                         {activeBooking.stationAddress && (
                                                             <p className="text-sm text-[#434655] flex items-start gap-1">
-                                                                <Navigation className="w-4 h-4 text-[#737686] shrink-0 mt-0.5" />
+                                                                <Navigation className="w-4 h-4 text-[#5c5f70] shrink-0 mt-0.5" />
                                                                 <span>{activeBooking.stationAddress}</span>
                                                             </p>
                                                         )}
@@ -410,7 +410,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                                 </div>
 
                                                 <div className="md:col-span-5 bg-[#e5eeff] p-4 rounded-xl flex flex-col justify-between gap-3">
-                                                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#434655]">
+                                                    <span className="text-xs font-bold uppercase tracking-wider text-[#434655]">
                                                         {isStored ? 'Thời gian còn lại' : 'Giữ chỗ còn'}
                                                     </span>
                                                     <div className="flex flex-col">
@@ -564,18 +564,18 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                     </div>
 
                                     <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#eff4ff] text-[#0b1c30]">
-                                        <Navigation className={`w-4 h-4 shrink-0 ${locState === 'granted' ? 'text-[#006242]' : 'text-[#94a3b8]'}`} />
+                                        <Navigation className={`w-4 h-4 shrink-0 ${locState === 'granted' ? 'text-[#006242]' : 'text-[#5b6b80]'}`} />
                                         <span className="text-sm">
                                             {locState === 'granted' ? 'Đang dùng vị trí hiện tại của bạn' : locationText}
                                         </span>
                                     </div>
 
                                     <div className="relative w-full">
-                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#737686]" />
+                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#5c5f70]" />
                                         <input
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}
-                                            className="w-full h-11 pl-10 pr-4 rounded-xl bg-[#f8f9ff] border border-[#e2e8f0] text-sm text-[#0b1c30] placeholder:text-[#94a3b8] focus:outline-hidden focus:border-[#2563eb]"
+                                            className="w-full h-11 pl-10 pr-4 rounded-xl bg-[#f8f9ff] border border-[#e2e8f0] text-sm text-[#0b1c30] placeholder:text-[#5b6b80] focus:outline-hidden focus:border-[#2563eb]"
                                             placeholder="Nhập địa chỉ, tên ga, sân bay..."
                                             type="text"
                                             aria-label="Tìm trạm theo tên hoặc địa chỉ"
@@ -673,7 +673,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                 </div>
 
                 <footer className="border-t border-[#e5eeff] mt-4 px-4 md:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
-                    <p className="text-xs text-[#737686]">© {new Date().getFullYear()} SmartLocker. Bản quyền thuộc về SmartLocker.</p>
+                    <p className="text-xs text-[#5c5f70]">© {new Date().getFullYear()} SmartLocker. Bản quyền thuộc về SmartLocker.</p>
                     <div className="flex items-center gap-4 text-xs text-[#434655]">
                         <button type="button" onClick={() => openLegal('privacy')} className="hover:text-[#004ac6] transition-colors cursor-pointer">Chính sách bảo mật</button>
                         <button type="button" onClick={() => openLegal('terms')} className="hover:text-[#004ac6] transition-colors cursor-pointer">Điều khoản dịch vụ</button>
@@ -690,7 +690,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
 function InfoCell({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
     return (
         <div className="flex flex-col items-center justify-center p-1">
-            <span className="text-[11px] font-bold text-[#434655]">{label}</span>
+            <span className="text-xs font-bold text-[#434655]">{label}</span>
             <span className={`text-xs mt-0.5 text-[#0b1c30] ${mono ? 'font-mono' : ''}`}>{value}</span>
         </div>
     );
@@ -711,21 +711,21 @@ function BookingRow({ booking, onOpen }: { booking: BookingListItemDto; onOpen: 
                 <div className="flex flex-col min-w-0">
                     <div className="flex items-center gap-2">
                         <span className="text-sm font-bold text-[#0b1c30] truncate">{booking.stationName}</span>
-                        <span className="px-1.5 py-0.5 rounded bg-[#dce9ff] text-[#434655] text-[11px] font-mono font-bold shrink-0">
+                        <span className="px-1.5 py-0.5 rounded bg-[#dce9ff] text-[#434655] text-xs font-mono font-bold shrink-0">
                             {booking.lockerCode ? `Tủ ${booking.lockerCode}` : `Size ${booking.size}`}
                         </span>
                     </div>
                     <p className="text-sm text-[#434655] flex flex-wrap items-center gap-2 mt-0.5">
                         <span>{date}</span>
                         <span className="text-[#c3c6d7]">·</span>
-                        <span className={`font-mono font-bold ${isCancelled ? 'line-through text-[#737686]' : 'text-[#0b1c30]'}`}>
+                        <span className={`font-mono font-bold ${isCancelled ? 'line-through text-[#5c5f70]' : 'text-[#0b1c30]'}`}>
                             {booking.baseAmount.toLocaleString('vi-VN')}đ
                         </span>
                     </p>
                 </div>
             </div>
             <div className="flex items-center justify-between sm:justify-end gap-4 shrink-0">
-                <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide ${status.className}`}>
+                <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${status.className}`}>
                     {status.label}
                 </span>
                 <button type="button" onClick={onOpen} className="text-xs font-semibold text-[#2563eb] hover:text-[#004ac6] flex items-center gap-0.5 transition-colors cursor-pointer">
@@ -745,18 +745,18 @@ function LockerRow({ size, total, available, mine }: { size: 'S' | 'M' | 'L'; to
             <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-bold text-[#0b1c30]">
                     Size {size} <span className="font-normal text-[#434655]">· {label}</span>
-                    {mine && <span className="ml-2 text-[10px] font-bold uppercase bg-[#2563eb] text-white px-1.5 py-0.5 rounded">Cỡ của bạn</span>}
+                    {mine && <span className="ml-2 text-xs font-bold uppercase bg-[#2563eb] text-white px-1.5 py-0.5 rounded">Cỡ của bạn</span>}
                 </span>
                 <span className={`text-xs font-bold ${available > 0 ? 'text-[#006242]' : 'text-[#ba1a1a]'}`}>{available}/{total} trống</span>
             </div>
             {total === 0 ? (
-                <p className="text-xs text-[#737686]">Trạm không có tủ cỡ này.</p>
+                <p className="text-xs text-[#5c5f70]">Trạm không có tủ cỡ này.</p>
             ) : (
                 <div className="flex flex-wrap gap-1.5" aria-label={`${available} trên ${total} tủ cỡ ${size} còn trống`}>
                     {cells.map((free, i) => (
                         <span
                             key={i}
-                            className={`w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-mono font-bold ${free ? 'bg-[#6ffbbe] text-[#002113]' : 'bg-[#e2e8f0] text-[#737686]'}`}
+                            className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-mono font-bold ${free ? 'bg-[#6ffbbe] text-[#002113]' : 'bg-[#e2e8f0] text-[#5c5f70]'}`}
                             title={free ? 'Trống' : 'Đang dùng'}
                         >
                             {size}{i + 1}
@@ -800,7 +800,7 @@ function NearbyStationCard({ station, onBook }: { station: Station; onBook: () =
                             ? isPrimary
                                 ? 'bg-[#2563eb] text-white hover:bg-[#1d4ed8]'
                                 : 'bg-[#dce9ff] text-[#0b1c30] hover:bg-[#2563eb] hover:text-white'
-                            : 'bg-[#f1f5f9] text-[#94a3b8] cursor-not-allowed'
+                            : 'bg-[#f1f5f9] text-[#5b6b80] cursor-not-allowed'
                     }`}
                 >
                     {totalAvail > 0 ? 'Đặt tủ' : 'Hết chỗ'}

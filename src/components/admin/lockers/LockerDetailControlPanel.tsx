@@ -146,31 +146,31 @@ export default function LockerDetailControlPanel({
             )}
 
             <dl className="grid grid-cols-2 gap-2 text-xs text-slate-600 bg-slate-50 p-3 rounded-xl">
-                <dt className="text-slate-400">Cửa cảm biến:</dt>
+                <dt className="text-slate-500">Cửa cảm biến:</dt>
                 <dd className="font-semibold text-slate-800">
                     {locker.doorState === 'CLOSED' ? '🟢 Đã đóng' : locker.doorState === 'OPEN' ? '🔴 Đang mở' : '⚪ Chưa xác định'}
                 </dd>
-                <dt className="text-slate-400">Sức khỏe:</dt>
+                <dt className="text-slate-500">Sức khỏe:</dt>
                 <dd className="font-semibold">{locker.healthStatus}</dd>
-                <dt className="text-slate-400">Kết nối:</dt>
+                <dt className="text-slate-500">Kết nối:</dt>
                 <dd className="font-semibold">{locker.connectivityStatus || 'UNKNOWN'}</dd>
-                <dt className="text-slate-400">Thiết bị IoT:</dt>
+                <dt className="text-slate-500">Thiết bị IoT:</dt>
                 <dd className="font-semibold font-mono">{locker.deviceCode || 'Chưa ánh xạ'}</dd>
-                <dt className="text-slate-400">Chân GPIO:</dt>
+                <dt className="text-slate-500">Chân GPIO:</dt>
                 <dd className="font-mono font-bold text-indigo-700">
                     {locker.gpioPin != null ? `GPIO ${locker.gpioPin}` : 'Chưa gán'}
                 </dd>
-                <dt className="text-slate-400">Firmware:</dt>
+                <dt className="text-slate-500">Firmware:</dt>
                 <dd className="font-semibold font-mono">{locker.firmwareVersion || 'Chưa có'}</dd>
-                <dt className="text-slate-400">Heartbeat:</dt>
+                <dt className="text-slate-500">Heartbeat:</dt>
                 <dd className="font-semibold">
                     {locker.lastSeenAt
                         ? new Date(locker.lastSeenAt.endsWith('Z') ? locker.lastSeenAt : locker.lastSeenAt + 'Z').toLocaleTimeString('vi-VN')
                         : 'Chưa có dữ liệu'}
                 </dd>
-                <dt className="text-slate-400">Đơn hiện tại:</dt>
+                <dt className="text-slate-500">Đơn hiện tại:</dt>
                 <dd className="font-bold text-blue-600">{locker.currentBooking?.bookingCode || 'Trống'}</dd>
-                <dt className="text-slate-400">Ghi chú:</dt>
+                <dt className="text-slate-500">Ghi chú:</dt>
                 <dd className="text-slate-500 italic truncate">{locker.notes || '—'}</dd>
             </dl>
 
@@ -189,11 +189,11 @@ export default function LockerDetailControlPanel({
                         <Cpu className="w-3.5 h-3.5 text-indigo-600" />
                         <span>Ánh xạ chân GPIO (UC-A02)</span>
                     </h4>
-                    <span className="text-[10px] bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full font-mono font-bold">
+                    <span className="text-xs bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full font-mono font-bold">
                         {locker.gpioPin != null ? `GPIO ${locker.gpioPin}` : 'Chưa gán'}
                     </span>
                 </div>
-                <p className="text-[11px] text-slate-500">
+                <p className="text-xs text-slate-500">
                     Cấu hình số thứ tự chân GPIO của bo mạch điều khiển rơ-le Solenoid và cảm biến từ của ngăn {locker.lockerCode}.
                 </p>
                 <div className="flex items-center gap-2">
@@ -216,7 +216,7 @@ export default function LockerDetailControlPanel({
                     </button>
                 </div>
                 {gpioFeedback && (
-                    <p className={`text-[11px] font-medium p-2 rounded-lg ${gpioFeedback.includes('thành công') ? 'bg-emerald-50 text-emerald-800' : 'bg-rose-50 text-rose-800'}`}>
+                    <p className={`text-xs font-medium p-2 rounded-lg ${gpioFeedback.includes('thành công') ? 'bg-emerald-50 text-emerald-800' : 'bg-rose-50 text-rose-800'}`}>
                         {gpioFeedback}
                     </p>
                 )}
@@ -230,13 +230,13 @@ export default function LockerDetailControlPanel({
                         <span>Xử lý kẹt cơ học (UC-S12)</span>
                     </h4>
                 </div>
-                <p className="text-[11px] text-slate-500">
+                <p className="text-xs text-slate-500">
                     Khi chốt solenoid bị kẹt hoặc cửa không bật mở, bấm đổi sang ô dự phòng trống cùng kích cỡ ({locker.size}) để giải cứu khách ngay lập tức.
                 </p>
                 <button
                     type="button"
                     onClick={() => setShowSwapModal(true)}
-                    className="w-full py-2 px-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
+                    className="w-full py-2 px-3 bg-amber-700 hover:bg-amber-800 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
                 >
                     <ArrowRightLeft className="w-4 h-4" />
                     <span>Đổi sang hộc dự phòng (Swap Spare)</span>
@@ -260,7 +260,7 @@ export default function LockerDetailControlPanel({
                     <span>Quản lý trạng thái thủ công</span>
                 </h4>
                 {active && (
-                    <p className="text-amber-700 bg-amber-50 p-2 rounded-lg text-[11px]">
+                    <p className="text-amber-700 bg-amber-50 p-2 rounded-lg text-xs">
                         Ngăn đang có đơn hoạt động. Dùng nút "Đổi sang hộc dự phòng" ở trên nếu ô bị kẹt.
                     </p>
                 )}
@@ -341,7 +341,7 @@ export default function LockerDetailControlPanel({
                                 <h3 className="text-sm font-bold text-slate-900">
                                     Đổi sang hộc tủ dự phòng (UC-S12)
                                 </h3>
-                                <p className="text-[11px] text-slate-500">
+                                <p className="text-xs text-slate-500">
                                     Xử lý sự cố kẹt cơ học solenoid / hộc tủ không bung
                                 </p>
                             </div>
@@ -395,7 +395,7 @@ export default function LockerDetailControlPanel({
                                 type="button"
                                 onClick={handleConfirmSwap}
                                 disabled={isSwapping || swapReason.trim().length < 5}
-                                className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 shadow-xs cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+                                className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-amber-700 hover:bg-amber-800 shadow-xs cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
                             >
                                 {isSwapping ? 'Đang điều phối...' : 'Xác nhận Đổi hộc'}
                             </button>

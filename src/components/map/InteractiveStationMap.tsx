@@ -214,7 +214,7 @@ export default function InteractiveStationMap({
 
         const userHtml = `
             <div style="display:flex;flex-direction:column;align-items:center;cursor:grab;">
-                <div style="background:#dc2626;color:#ffffff;padding:3px 9px;border-radius:9999px;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:800;white-space:nowrap;border:2px solid #ffffff;box-shadow:0 4px 12px rgba(220,38,38,0.45);display:flex;align-items:center;gap:4px;">
+                <div style="background:#dc2626;color:#ffffff;padding:3px 9px;border-radius:9999px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:800;white-space:nowrap;border:2px solid #ffffff;box-shadow:0 4px 12px rgba(220,38,38,0.45);display:flex;align-items:center;gap:4px;">
                     <span>📍</span>
                     <span>Vị trí của bạn</span>
                 </div>
@@ -236,7 +236,7 @@ export default function InteractiveStationMap({
         });
 
         userMarker.bindTooltip(
-            '<div style="font-family:sans-serif;font-size:11px;font-weight:700;">Kéo thả ghim này hoặc bấm "Đặt vị trí của tôi" để chọn vị trí</div>',
+            '<div style="font-family:sans-serif;font-size:12px;font-weight:700;">Kéo thả ghim này hoặc bấm "Đặt vị trí của tôi" để chọn vị trí</div>',
             { direction: 'top', offset: [0, -32] }
         );
 
@@ -288,7 +288,7 @@ export default function InteractiveStationMap({
                 : `${selectedStation.distanceKm.toFixed(1)} km`;
 
             const badgeIcon = L.divIcon({
-                html: `<div style="background:#0b1c30;color:#ffffff;padding:2px 8px;border-radius:9999px;font-size:10px;font-weight:700;white-space:nowrap;border:1.5px solid #ffffff;box-shadow:0 2px 6px rgba(0,0,0,0.25);">🧭 Cách bạn ${dText}</div>`,
+                html: `<div style="background:#0b1c30;color:#ffffff;padding:2px 8px;border-radius:9999px;font-size:12px;font-weight:700;white-space:nowrap;border:1.5px solid #ffffff;box-shadow:0 2px 6px rgba(0,0,0,0.25);">🧭 Cách bạn ${dText}</div>`,
                 className: 'smartlocker-route-badge',
                 iconSize: [100, 22],
                 iconAnchor: [50, 11],
@@ -318,7 +318,7 @@ export default function InteractiveStationMap({
                     ? '#1d4ed8'
                     : totalAvail > 0
                         ? '#2563eb'
-                        : '#d97706';
+                        : '#b45309';
 
             const scale = isSelected ? 'transform:scale(1.15);' : '';
             const ring = isSelected
@@ -327,7 +327,7 @@ export default function InteractiveStationMap({
 
             const pinHtml = `
                 <div style="display:flex;flex-direction:column;align-items:center;transition:all 0.2s ease;${scale}">
-                    <div style="background:${bg};color:#ffffff;padding:4px 10px;border-radius:9999px;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:800;white-space:nowrap;border:2px solid #ffffff;display:flex;align-items:center;gap:4px;${ring}">
+                    <div style="background:${bg};color:#ffffff;padding:4px 10px;border-radius:9999px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:800;white-space:nowrap;border:2px solid #ffffff;display:flex;align-items:center;gap:4px;${ring}">
                         <span>🔒</span>
                         <span>${isActive ? `${totalAvail} trống` : 'Bảo trì'}</span>
                     </div>
@@ -380,7 +380,7 @@ export default function InteractiveStationMap({
                 <div className="bg-white rounded-2xl p-6 shadow-md max-w-sm text-center border border-[#e5eeff]">
                     <MapPin className="w-10 h-10 text-[#2563eb] mx-auto mb-3" />
                     <p className="font-bold text-[#0b1c30] text-sm">Không thể tải lớp bản đồ trực tuyến</p>
-                    <p className="text-xs text-[#737686] mt-1">Vui lòng kiểm tra kết nối mạng Internet để tải bản đồ số.</p>
+                    <p className="text-xs text-[#5c5f70] mt-1">Vui lòng kiểm tra kết nối mạng Internet để tải bản đồ số.</p>
                 </div>
             </div>
         );
@@ -425,7 +425,7 @@ export default function InteractiveStationMap({
                             key={key}
                             type="button"
                             onClick={() => setMapStyle(key)}
-                            className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                                 mapStyle === key
                                     ? 'bg-[#2563eb] text-white shadow-xs'
                                     : 'text-[#434655] hover:bg-[#eff4ff]'
@@ -440,7 +440,7 @@ export default function InteractiveStationMap({
                     <button
                         type="button"
                         onClick={() => setPickLocationMode(v => !v)}
-                        className={`px-3 py-1.5 rounded-xl text-[11px] font-bold shadow-[0_2px_12px_rgba(15,23,42,0.12)] border transition-all cursor-pointer flex items-center gap-1.5 ${
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold shadow-[0_2px_12px_rgba(15,23,42,0.12)] border transition-all cursor-pointer flex items-center gap-1.5 ${
                             pickLocationMode
                                 ? 'bg-[#dc2626] text-white border-[#dc2626]'
                                 : 'bg-white/95 text-[#dc2626] border-[#fecaca] hover:bg-red-50'
@@ -467,7 +467,7 @@ export default function InteractiveStationMap({
 
                     <div className="pr-7">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                            <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
                                 selectedStation.status === 'ACTIVE'
                                     ? 'bg-emerald-100 text-emerald-700'
                                     : 'bg-amber-100 text-amber-700'
@@ -475,18 +475,18 @@ export default function InteractiveStationMap({
                                 {selectedStation.status === 'ACTIVE' ? '● Đang hoạt động' : '⚠ Bảo trì'}
                             </span>
                             {distLabel && (
-                                <span className="text-[11px] font-bold text-[#dc2626] bg-red-50 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                <span className="text-xs font-bold text-[#dc2626] bg-red-50 px-2 py-0.5 rounded-full flex items-center gap-1">
                                     <Navigation className="w-3 h-3" /> Cách bạn {distLabel}
                                 </span>
                             )}
                             {minPrice != null && Number.isFinite(minPrice) && (
-                                <span className="text-[11px] font-bold text-[#007d55] bg-emerald-50 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                <span className="text-xs font-bold text-[#007d55] bg-emerald-50 px-2 py-0.5 rounded-full flex items-center gap-1">
                                     <Sparkles className="w-3 h-3" /> Từ {(minPrice / 1000).toFixed(0)}k/h
                                 </span>
                             )}
                         </div>
                         <h3 className="font-bold text-[#0b1c30] text-base leading-snug">{selectedStation.name}</h3>
-                        <p className="text-xs text-[#737686] mt-0.5 line-clamp-2 flex items-start gap-1">
+                        <p className="text-xs text-[#5c5f70] mt-0.5 line-clamp-2 flex items-start gap-1">
                             <MapPin className="w-3.5 h-3.5 text-[#2563eb] shrink-0 mt-0.5" />
                             <span>{selectedStation.address}</span>
                         </p>
@@ -505,12 +505,12 @@ export default function InteractiveStationMap({
                                     a > 0 ? 'bg-[#f8f9ff] border-[#dce9ff]' : 'bg-red-50/60 border-red-100'
                                 }`}
                             >
-                                <div className="text-[10px] font-bold text-[#737686] flex items-center justify-between">
+                                <div className="text-xs font-bold text-[#5c5f70] flex items-center justify-between">
                                     <span>{label}</span>
                                     {p != null && <span className="text-[#2563eb]">{(p / 1000).toFixed(0)}k/h</span>}
                                 </div>
                                 <div className={`text-sm font-extrabold mt-0.5 ${a > 0 ? 'text-[#0b1c30]' : 'text-red-500'}`}>
-                                    {Math.min(t, a)}<span className="text-[11px] font-normal text-[#737686]">/{t} trống</span>
+                                    {Math.min(t, a)}<span className="text-xs font-normal text-[#5c5f70]">/{t} trống</span>
                                 </div>
                             </div>
                         ))}

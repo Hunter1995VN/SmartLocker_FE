@@ -172,14 +172,14 @@ export default function StationManagementView() {
             {/* Page Header matching mockup */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <div className="text-[11px] font-semibold text-slate-400 mb-1">
+                    <div className="text-xs font-semibold text-slate-500 mb-1">
                         Operations / <span className="text-blue-600 font-bold">Manage Stations & Lockers</span>
                     </div>
                     <div className="flex items-center gap-2.5 flex-wrap">
                         <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
                             Station Network & Compartment Configuration
                         </h1>
-                        <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold tracking-wider uppercase border border-slate-200">
+                        <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-xs font-bold tracking-wider uppercase border border-slate-200">
                             QUẢN LÝ TRẠM & BẢNG GIÁ
                         </span>
                     </div>
@@ -255,13 +255,13 @@ export default function StationManagementView() {
             {/* Bottom Status Bar: Edge Mesh Network Status */}
             <div className="p-4 bg-white rounded-2xl border border-slate-200/90 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                 <div className="flex items-center gap-3">
-                    <span className="font-bold text-slate-800 uppercase tracking-wider text-[11px]">
+                    <span className="font-bold text-slate-800 uppercase tracking-wider text-xs">
                         EDGE MESH NETWORK STATUS
                     </span>
                     <div className="w-32 h-2 rounded-full bg-slate-100 overflow-hidden">
                         <div className="h-full bg-emerald-500 w-[95.8%]" />
                     </div>
-                    <span className="text-slate-400 font-medium">
+                    <span className="text-slate-500 font-medium">
                         {activeStationsCount}/{stations.length} Controllers responding &lt; 50ms
                     </span>
                 </div>

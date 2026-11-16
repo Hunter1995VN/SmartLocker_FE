@@ -97,7 +97,7 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
                         <div>
                             <div className="flex items-center gap-2">
                                 <h2 className="text-base font-bold">Thiết Lập Kênh Nhận Thông Báo</h2>
-                                <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-blue-500/30 text-blue-100 border border-blue-400/30">
+                                <span className="text-xs font-bold uppercase px-2 py-0.5 rounded-full bg-blue-500/30 text-blue-100 border border-blue-400/30">
                                     THIẾT LẬP THÔNG BÁO
                                 </span>
                             </div>
@@ -119,14 +119,14 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
                 {/* Body */}
                 <div className="p-5 space-y-5 max-h-[78vh] overflow-y-auto">
                     {isLoading ? (
-                        <div className="py-8 text-center text-xs text-slate-400">
+                        <div className="py-8 text-center text-xs text-slate-500">
                             Đang tải cấu hình thông báo của bạn...
                         </div>
                     ) : (
                         <>
                             {/* Section 1: 3 Kênh nhận thông báo (Email, SMS, WebPush) */}
                             <div>
-                                <p className="text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-2.5">
+                                <p className="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-2.5">
                                     1. Kênh Nhận Thông Báo (Channels)
                                 </p>
                                 <div className="space-y-2.5">
@@ -153,7 +153,7 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
                                                 <p className="text-xs font-bold text-slate-900">
                                                     Email Điện Tử (Gmail SMTP)
                                                 </p>
-                                                <p className="text-[11px] text-slate-500">
+                                                <p className="text-xs text-slate-500">
                                                     Nhận vé QR, mã PIN 6 số, hóa đơn điện tử & biên bản thanh toán
                                                 </p>
                                             </div>
@@ -189,7 +189,7 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
                                                 <p className="text-xs font-bold text-slate-900">
                                                     Tin Nhắn SMS Di Động
                                                 </p>
-                                                <p className="text-[11px] text-slate-500">
+                                                <p className="text-xs text-slate-500">
                                                     Nhận mã mở tủ khẩn cấp khi đi vào vùng mất kết nối 4G/Wi-Fi
                                                 </p>
                                             </div>
@@ -225,7 +225,7 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
                                                 <p className="text-xs font-bold text-slate-900">
                                                     Thông Báo Đẩy Trình Duyệt (WebPush)
                                                 </p>
-                                                <p className="text-[11px] text-slate-500">
+                                                <p className="text-xs text-slate-500">
                                                     Thông báo tức thì trên trình duyệt khi cửa tủ đóng/mở hoặc thanh toán xong
                                                 </p>
                                             </div>
@@ -242,7 +242,7 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
 
                             {/* Section 2: Loại sự kiện thông báo */}
                             <div>
-                                <p className="text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-2.5">
+                                <p className="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-2.5">
                                     2. Tùy Chọn Loại Sự Kiện Cảnh Báo
                                 </p>
                                 <div className="bg-slate-50 rounded-2xl border border-slate-200/80 divide-y divide-slate-200/70 text-xs">
@@ -277,7 +277,7 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
                                             <ShieldAlert className="w-4 h-4 text-amber-600" />
                                             Cảnh báo quá hạn lưu trữ & Niêm phong 72h (Bắt buộc)
                                         </span>
-                                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-800">
+                                        <span className="text-xs font-bold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-800">
                                             Luôn bật
                                         </span>
                                     </div>

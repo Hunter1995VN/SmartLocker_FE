@@ -121,7 +121,7 @@ export default function ForgotPasswordPage({ onNavigate }: ForgotPasswordPagePro
                         </div>
                         <div>
                             <span className="text-lg font-extrabold text-white tracking-tight">SmartLocker</span>
-                            <p className="text-[11px] text-white/60 uppercase tracking-widest">Tủ hành lý thông minh</p>
+                            <p className="text-xs text-white/60 uppercase tracking-widest">Tủ hành lý thông minh</p>
                         </div>
                     </div>
 
@@ -253,7 +253,7 @@ export default function ForgotPasswordPage({ onNavigate }: ForgotPasswordPagePro
                                         Email đã đăng ký
                                     </label>
                                     <div className="relative">
-                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
                                         <input
                                             id="fp-email"
                                             type="email"
@@ -262,7 +262,7 @@ export default function ForgotPasswordPage({ onNavigate }: ForgotPasswordPagePro
                                             placeholder="nguyenvana@example.com"
                                             autoComplete="email"
                                             disabled={isLoading}
-                                            className="w-full h-12 pl-11 pr-4 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-900 text-sm placeholder:text-gray-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all disabled:opacity-50"
+                                            className="w-full h-12 pl-11 pr-4 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-900 text-sm placeholder:text-gray-500 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all disabled:opacity-50"
                                         />
                                     </div>
                                 </div>
@@ -290,7 +290,7 @@ export default function ForgotPasswordPage({ onNavigate }: ForgotPasswordPagePro
                                     )}
                                 </button>
 
-                                <p className="text-xs text-center text-gray-400">
+                                <p className="text-xs text-center text-gray-500">
                                     Kiểm tra cả hộp thư Spam nếu không thấy email.
                                 </p>
                             </form>
@@ -303,7 +303,7 @@ export default function ForgotPasswordPage({ onNavigate }: ForgotPasswordPagePro
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 mb-3">
                                         Mã OTP{' '}
-                                        <span className="text-xs text-gray-400 font-normal">(6 chữ số từ email)</span>
+                                        <span className="text-xs text-gray-500 font-normal">(6 chữ số từ email)</span>
                                     </label>
                                     <div className="grid grid-cols-6 gap-2">
                                         {code.map((digit, i) => (
@@ -326,7 +326,7 @@ export default function ForgotPasswordPage({ onNavigate }: ForgotPasswordPagePro
                                         ))}
                                     </div>
                                     <div className="flex items-center justify-between mt-2">
-                                        <p className="text-xs text-gray-400">Mã có hiệu lực trong 5 phút</p>
+                                        <p className="text-xs text-gray-500">Mã có hiệu lực trong 5 phút</p>
                                         <button
                                             type="button"
                                             onClick={() => { setCode(['', '', '', '', '', '']); setError(''); }}
@@ -354,12 +354,12 @@ export default function ForgotPasswordPage({ onNavigate }: ForgotPasswordPagePro
                                             onChange={e => setNewPassword(e.target.value)}
                                             placeholder="Ít nhất 8 ký tự"
                                             disabled={isLoading}
-                                            className="w-full h-12 px-4 pr-12 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-900 text-sm placeholder:text-gray-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all disabled:opacity-50"
+                                            className="w-full h-12 px-4 pr-12 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-900 text-sm placeholder:text-gray-500 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all disabled:opacity-50"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 hover:text-gray-600 transition-colors"
+                                            className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500 hover:text-gray-600 transition-colors"
                                         >
                                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                         </button>

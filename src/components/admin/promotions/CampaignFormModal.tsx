@@ -258,7 +258,7 @@ export default function CampaignFormModal({
                                         <p className={`font-bold ${selected ? 'text-blue-700' : 'text-slate-800'}`}>
                                             {c.label}
                                         </p>
-                                        <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">{c.desc}</p>
+                                        <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{c.desc}</p>
                                     </button>
                                 );
                             })}
@@ -272,7 +272,7 @@ export default function CampaignFormModal({
                                 <Wallet className="w-4 h-4 text-blue-600" />
                                 <span>Ngân sách tối đa cho chiến dịch này (VND)</span>
                             </label>
-                            <span className="text-[11px] font-semibold text-slate-500">
+                            <span className="text-xs font-semibold text-slate-500">
                                 Quỹ toàn hệ thống còn:{' '}
                                 <strong className="text-emerald-600">{formatVnd(globalBudgetRemaining)}</strong>
                             </span>
@@ -294,7 +294,7 @@ export default function CampaignFormModal({
                                         key={preset}
                                         type="button"
                                         onClick={() => setAllocatedBudget(preset)}
-                                        className={`px-2.5 py-1.5 rounded-lg font-bold text-[11px] border transition cursor-pointer ${
+                                        className={`px-2.5 py-1.5 rounded-lg font-bold text-xs border transition cursor-pointer ${
                                             allocatedBudget === preset
                                                 ? 'bg-blue-600 text-white border-blue-600'
                                                 : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
@@ -306,12 +306,12 @@ export default function CampaignFormModal({
                             </div>
                         </div>
 
-                        <p className="text-[11px] text-slate-500 italic">
+                        <p className="text-xs text-slate-500 italic">
                             * Chiến dịch sẽ tự động dừng áp dụng mã khi tổng tiền giảm giá cho khách chạm mức này.
                         </p>
 
                         {editingCampaign && (
-                            <p className="text-[11px] text-slate-500">
+                            <p className="text-xs text-slate-500">
                                 Đã giải ngân thực tế:{' '}
                                 <strong className="text-slate-800">{formatVnd(editingCampaign.spentBudget)}</strong> ·
                                 Khả dụng sau cập nhật:{' '}
@@ -322,7 +322,7 @@ export default function CampaignFormModal({
                         )}
 
                         {exceedsRemainingGlobal && (
-                            <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-[11px] flex items-start gap-2">
+                            <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-start gap-2">
                                 <AlertTriangle className="w-4 h-4 shrink-0 text-amber-600 mt-0.5" />
                                 <span>
                                     Ngân sách chiến dịch đang lớn hơn phần dư ngân sách toàn cục tháng hiện tại (
@@ -337,7 +337,7 @@ export default function CampaignFormModal({
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         <div>
                             <label className="block font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-                                <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                                <Calendar className="w-3.5 h-3.5 text-slate-500" />
                                 <span>Thời điểm bắt đầu</span>
                             </label>
                             <input
@@ -350,7 +350,7 @@ export default function CampaignFormModal({
                         </div>
                         <div>
                             <label className="block font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-                                <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                                <Calendar className="w-3.5 h-3.5 text-slate-500" />
                                 <span>Thời điểm kết thúc</span>
                             </label>
                             <input
@@ -389,7 +389,7 @@ export default function CampaignFormModal({
                                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                                     Tự động ngắt khi cạn ngân sách
                                 </p>
-                                <p className="text-[11px] text-emerald-700">
+                                <p className="text-xs text-emerald-700">
                                     Chặn phát sinh giảm giá vượt trần {formatVnd(allocatedBudget)}
                                 </p>
                             </div>
@@ -404,7 +404,7 @@ export default function CampaignFormModal({
                             />
                             <div>
                                 <p className="font-bold text-slate-800">Khởi tạo ở trạng thái Tạm dừng</p>
-                                <p className="text-[11px] text-slate-500">
+                                <p className="text-xs text-slate-500">
                                     Chuẩn bị sẵn mã voucher trước khi mở công khai cho khách
                                 </p>
                             </div>

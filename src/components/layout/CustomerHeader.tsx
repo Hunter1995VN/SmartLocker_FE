@@ -165,11 +165,11 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                                     <span className="text-xs font-bold text-[#0b1c30] truncate max-w-[140px] leading-tight">
                                         {userName}
                                     </span>
-                                    <span className="text-[10px] text-[#737686] uppercase tracking-wide font-medium leading-none mt-0.5">
+                                    <span className="text-xs text-[#5c5f70] uppercase tracking-wide font-medium leading-none mt-0.5">
                                         Khách hàng
                                     </span>
                                 </div>
-                                <ChevronDown className="w-3.5 h-3.5 text-[#737686]" />
+                                <ChevronDown className="w-3.5 h-3.5 text-[#5c5f70]" />
                             </button>
 
                             {/* Dropdown Menu */}
@@ -177,7 +177,7 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                                 <div className="absolute right-0 top-full mt-2 w-60 bg-white rounded-2xl shadow-xl border border-[#e5eeff] py-1.5 z-50 animate-fade-in-down">
                                     <div className="px-4 py-2.5 border-b border-[#f0f4ff]">
                                         <p className="text-xs font-bold text-[#0b1c30] truncate">{userName}</p>
-                                        <p className="text-[11px] text-[#737686] truncate">{user.email || 'traveler@smartlocker.vn'}</p>
+                                        <p className="text-xs text-[#5c5f70] truncate">{user.email || 'traveler@smartlocker.vn'}</p>
                                     </div>
 
                                     <button

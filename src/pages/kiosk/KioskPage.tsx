@@ -536,7 +536,7 @@ export default function KioskPage() {
               <span className={`w-2 h-2 rounded-full ${stationStatus?.connectivityStatus === 'ONLINE' ? 'bg-emerald-500' : 'bg-amber-500'}`} title={stationStatus?.connectivityStatus || 'UNKNOWN'}></span>
             </div>
 
-            <div className="text-xs text-slate-500 dark:text-slate-400">
+            <div className="text-xs text-slate-500 dark:text-slate-500">
               {stationStatus?.stationAddress || allStations.find(s => s.id === stationId)?.address || x('stationUnavailable')}
             </div>
           </div>
@@ -607,7 +607,7 @@ export default function KioskPage() {
             className={`p-2 rounded-lg border text-xs font-mono font-bold ${
               outdoorMode
                 ? 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'
-                : 'bg-slate-900 hover:bg-slate-800 border-slate-700 text-slate-400'
+                : 'bg-slate-900 hover:bg-slate-800 border-slate-700 text-slate-500'
             }`}
             title={x('sound')}
           >
@@ -676,7 +676,7 @@ export default function KioskPage() {
               <h1 className={`text-4xl md:text-6xl font-black tracking-tight ${outdoorMode ? 'text-slate-900' : 'text-white'}`}>
                 {t.welcomeTitle}
               </h1>
-              <p className="text-base md:text-lg text-slate-500 dark:text-slate-400" aria-hidden="true">
+              <p className="text-base md:text-lg text-slate-500 dark:text-slate-500" aria-hidden="true">
                 Welcome&ensp;환영합니다&ensp;欢迎&ensp;ようこそ
               </p>
             </div>
@@ -735,7 +735,7 @@ export default function KioskPage() {
                     <span className={`block text-3xl md:text-4xl font-black tracking-tight transition-colors ${outdoorMode ? 'text-slate-950' : 'text-white'} ${tone === 'sky' ? 'group-hover:text-sky-600' : 'group-hover:text-emerald-600'}`}>
                       {title}
                     </span>
-                    <span className="block text-sm text-slate-500 dark:text-slate-400">{x('authHint')}</span>
+                    <span className="block text-sm text-slate-500 dark:text-slate-500">{x('authHint')}</span>
                   </span>
                 </button>
               ))}
@@ -793,7 +793,7 @@ export default function KioskPage() {
                     setAuthMethod(method);
                   }}
                   className={`relative z-10 py-2.5 rounded-xl font-bold text-sm transition-colors ${
-                    authMethod === method ? (outdoorMode ? 'text-sky-700' : 'text-white') : 'text-slate-500 dark:text-slate-400'
+                    authMethod === method ? (outdoorMode ? 'text-sky-700' : 'text-white') : 'text-slate-500 dark:text-slate-500'
                   }`}
                 >
                   {label}
@@ -865,7 +865,7 @@ export default function KioskPage() {
                       aria-label={key === 'CLEAR' ? 'Clear' : key === 'BACK' ? 'Backspace' : key}
                       className={`h-14 rounded-2xl font-bold text-xl transition-all duration-100 active:scale-90 ${
                         key === 'CLEAR' || key === 'BACK'
-                          ? (outdoorMode ? 'bg-slate-100 text-slate-500 text-base' : 'bg-slate-900 text-slate-400 text-base')
+                          ? (outdoorMode ? 'bg-slate-100 text-slate-500 text-base' : 'bg-slate-900 text-slate-500 text-base')
                           : (outdoorMode ? 'bg-white border border-slate-200 text-slate-900 shadow-sm hover:bg-sky-50' : 'bg-slate-800 text-white hover:bg-slate-700')
                       }`}
                     >
@@ -880,7 +880,7 @@ export default function KioskPage() {
                   className={`w-full py-4 rounded-2xl font-bold text-base transition-all ${
                     accessCode.length === 8 && !loading
                       ? (outdoorMode ? 'bg-sky-600 hover:bg-sky-500 text-white shadow-md' : 'bg-sky-500 hover:bg-sky-400 text-slate-950')
-                      : 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
+                      : 'bg-slate-200 dark:bg-slate-800 text-slate-500 cursor-not-allowed'
                   }`}
                 >
                   {loading ? t.unlocking : t.confirmUnlock}
@@ -927,7 +927,7 @@ export default function KioskPage() {
                   </span>
                   <span className="text-sm font-bold text-slate-500">{x('sizeLabel')} {activeLockerSize || '—'}</span>
                 </div>
-                <span className="text-xs font-mono text-slate-400">{activeBookingCode}</span>
+                <span className="text-xs font-mono text-slate-500">{activeBookingCode}</span>
               </div>
 
               <p className="text-lg font-bold leading-snug">
@@ -965,7 +965,7 @@ export default function KioskPage() {
                 {overdueFee.toLocaleString(kioskLocales[lang])}<span className="text-2xl ml-1">đ</span>
               </p>
             </div>
-            <p className="text-sm text-slate-500 dark:text-slate-400">{t.overdueSubtitle}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-500">{t.overdueSubtitle}</p>
             {overduePayment ? <div className="kiosk-enter space-y-3 flex flex-col items-center">
               <div className="p-3 bg-white rounded-2xl border border-slate-200"><QRCodeSVG value={overduePayment.qrCode || overduePayment.paymentUrl} size={210} /></div>
               <p className="text-sm">{overduePayment.qrCode ? x('scanPay') : x('paymentPageQr')}</p>
@@ -992,7 +992,7 @@ export default function KioskPage() {
           <section className={`kiosk-enter w-full max-w-md rounded-[28px] p-8 text-center space-y-4 my-auto shadow-xl ${outdoorMode ? 'bg-white text-slate-900' : 'bg-[#131b28] text-white'}`}>
             <div className="mx-auto w-14 h-14 rounded-full border-4 border-amber-200 border-t-amber-500 animate-spin motion-reduce:animate-none" aria-hidden="true" />
             <h2 className="text-2xl font-black">{x('pending')}</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400">{x('pendingHint')}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-500">{x('pendingHint')}</p>
             <button type="button" onClick={handleReturnToWelcome} className="w-full py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-sm font-bold">{x('home')}</button>
           </section>
         )}
@@ -1008,7 +1008,7 @@ export default function KioskPage() {
 
             <div>
               <h2 className="text-3xl font-black">{t.successTitle}</h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
+              <p className="text-sm text-slate-500 dark:text-slate-500 mt-2">
                 {opMode === 'CHECK_IN' ? t.successDepositDesc : t.successRetrieveDesc}
               </p>
             </div>
@@ -1046,7 +1046,7 @@ export default function KioskPage() {
             <div className="p-3 bg-slate-900 rounded-xl text-left text-xs space-y-1.5 text-slate-300">
               {stationStatus?.contactPhone && <div>{x('hotline')}: <strong className="text-sky-400 font-mono">{stationStatus.contactPhone}</strong></div>}
               <div>{t.stationLabel}: <strong className="text-white">{stationStatus?.stationName || x('stationUnavailable')}</strong></div>
-              <div className="text-[11px] text-slate-400">{x('supportHint')}</div>
+              <div className="text-xs text-slate-500">{x('supportHint')}</div>
             </div>
             <button
               onClick={() => setShowHelpModal(false)}

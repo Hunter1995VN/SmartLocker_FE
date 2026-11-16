@@ -232,7 +232,7 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
               <AlertTriangle className="w-5 h-5 text-white" />
             </div>
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded-full">
+              <span className="text-xs font-bold uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded-full">
                 Overdue Fee Settlement
               </span>
               <h3 className="text-base font-bold mt-0.5">Pay Overdue Surcharge</h3>
@@ -345,21 +345,21 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
                   )}
                 </div>
 
-                <p className="text-[11px] text-slate-500 mt-2.5 text-center">
+                <p className="text-xs text-slate-500 mt-2.5 text-center">
                   Scan with any Banking App. Payment is verified automatically within <strong>1–2 seconds</strong>.
                 </p>
 
                 {/* Bank Account Info */}
                 {paymentData.accountNumber && (
-                  <div className="w-full mt-3 pt-3 border-t border-slate-200/80 grid grid-cols-2 gap-2 text-[11px]">
+                  <div className="w-full mt-3 pt-3 border-t border-slate-200/80 grid grid-cols-2 gap-2 text-xs">
                     <div>
-                      <span className="text-slate-400 block">Account Holder:</span>
+                      <span className="text-slate-500 block">Account Holder:</span>
                       <span className="font-bold text-slate-800 truncate block">
                         {paymentData.accountName || 'SMARTLOCKER PAYOS'}
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-slate-400 block">Account Number:</span>
+                      <span className="text-slate-500 block">Account Number:</span>
                       <button
                         onClick={() => {
                           navigator.clipboard.writeText(paymentData.accountNumber || '');
@@ -456,7 +456,7 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+        <div className="px-6 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
           <span className="flex items-center gap-1">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
             Secured by PayOS VietQR

@@ -113,9 +113,9 @@ export function VaultDoorGraphic({ isOpen, size = 'S', code = 'S-01' }: { isOpen
         
         {/* Top Vent & Status LED */}
         <div className="flex justify-between items-center px-2 pt-1 border-b border-slate-800 pb-2">
-          <span className="text-[10px] font-mono font-bold text-slate-400">{code}</span>
+          <span className="text-xs font-mono font-bold text-slate-500">{code}</span>
           <div className="flex items-center gap-1.5">
-            <span className="text-[9px] font-mono text-slate-500 uppercase">SIZE {size}</span>
+            <span className="text-xs font-mono text-slate-500 uppercase">SIZE {size}</span>
             <span className={`w-2 h-2 rounded-full ${isOpen ? 'bg-amber-400 animate-ping' : 'bg-emerald-400'}`}></span>
           </div>
         </div>
@@ -139,13 +139,13 @@ export function VaultDoorGraphic({ isOpen, size = 'S', code = 'S-01' }: { isOpen
               <div className="w-8 h-8 rounded-full border-2 border-slate-600 flex items-center justify-center bg-slate-950">
                 <div className="w-3 h-3 rounded-full bg-slate-500"></div>
               </div>
-              <span className="text-[9px] font-mono text-slate-400 uppercase tracking-widest">LOCKED</span>
+              <span className="text-xs font-mono text-slate-500 uppercase tracking-widest">LOCKED</span>
             </div>
           )}
         </div>
 
         {/* Bottom Latch Sensor */}
-        <div className="flex justify-between items-center px-2 text-[8px] font-mono text-slate-500">
+        <div className="flex justify-between items-center px-2 text-xs font-mono text-slate-500">
           <span>SOLENOID 12V</span>
           <span>LIMIT SW: {isOpen ? 'HIGH' : 'LOW'}</span>
         </div>

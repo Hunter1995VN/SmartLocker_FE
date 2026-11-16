@@ -277,7 +277,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-6 py-6 border-b border-outline-variant/30">
                     {/* Column 1: Station Info (5 cols) */}
                     <div className="md:col-span-5 space-y-3">
-                      <p className="text-[11px] uppercase tracking-wider text-secondary font-bold">Pickup &amp; Access Station</p>
+                      <p className="text-xs uppercase tracking-wider text-secondary font-bold">Pickup &amp; Access Station</p>
                       <div className="flex items-start gap-3">
                         <div className="w-10 h-10 rounded-xl bg-blue-50 text-primary-container flex items-center justify-center shrink-0 mt-0.5 border border-blue-100">
                           <MapPin className="w-5 h-5" />
@@ -300,7 +300,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                     {/* Column 2: Storage Timeline & Remaining Countdown (4 cols) */}
                     <div className="md:col-span-4 space-y-3 md:border-l md:border-r border-outline-variant/30 md:px-5">
                       <div className="flex items-center justify-between">
-                        <p className="text-[11px] uppercase tracking-wider text-secondary font-bold">
+                        <p className="text-xs uppercase tracking-wider text-secondary font-bold">
                           {booking.status === 'CONFIRMED' ? 'Hold Reservation' : 'Session Timeline'}
                         </p>
                         <span className={`text-xs font-bold px-2 py-0.5 rounded ${
@@ -350,7 +350,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                     {/* Column 3: Payment & Mini Key Preview (3 cols) */}
                     <div className="md:col-span-3 space-y-3 flex flex-col justify-between">
                       <div>
-                        <p className="text-[11px] uppercase tracking-wider text-secondary font-bold">Payment &amp; Digital Pass</p>
+                        <p className="text-xs uppercase tracking-wider text-secondary font-bold">Payment &amp; Digital Pass</p>
                         <p className="text-lg text-slate-900 font-bold mt-1">{formatCurrency(booking.baseAmount)} VND</p>
                         <p className="text-xs text-emerald-700 flex items-center gap-1 mt-0.5 font-medium">
                           <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
@@ -364,7 +364,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                         </div>
                         <div className="overflow-hidden">
                           <p className="text-xs text-slate-900 font-bold truncate">Quick Scan at Kiosk</p>
-                          <p className="text-[11px] text-secondary truncate font-mono">
+                          <p className="text-xs text-secondary truncate font-mono">
                             PIN: {booking.status === 'PENDING_PAYMENT' ? 'Chờ thanh toán' : (booking.accessCode ? (booking.accessCode.replace(/\s+/g, '').length === 8 ? `${booking.accessCode.replace(/\s+/g, '').slice(0, 4)} ${booking.accessCode.replace(/\s+/g, '').slice(4)}` : booking.accessCode) : 'Chưa cấp')}
                           </p>
                         </div>
@@ -399,7 +399,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                           setShowExtendModal(true);
                         }}
                         disabled={!booking.canExtend}
-                        className={`inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-300 text-sm font-semibold rounded-xl transition-colors ${booking.canExtend ? 'text-slate-700 hover:bg-slate-50 cursor-pointer active:scale-95' : 'text-slate-400 opacity-50 cursor-not-allowed'}`}
+                        className={`inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-300 text-sm font-semibold rounded-xl transition-colors ${booking.canExtend ? 'text-slate-700 hover:bg-slate-50 cursor-pointer active:scale-95' : 'text-slate-500 opacity-50 cursor-not-allowed'}`}
                       >
                         <PlusCircle className={`w-4 h-4 ${booking.canExtend ? 'text-slate-500' : 'text-slate-300'}`} />
                         <span>Extend Time</span>
@@ -436,7 +436,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
         {/* Empty state when active cancelled */}
         {activeTab === 'active' && activeBookings.length === 0 && (
           <div className="text-center py-12 bg-white rounded-2xl border border-outline-variant/30 p-8 space-y-3">
-            <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
+            <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-500">
               <CheckCircle className="w-6 h-6" />
             </div>
             <h3 className="text-base font-bold text-slate-900">No Active Lockers</h3>
@@ -461,7 +461,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
               {/* Search & Filter Controls */}
               <div className="flex items-center gap-2">
                 <div className="relative">
-                  <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                  <Search className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
                   <input
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -503,7 +503,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                             {item.status}
                           </span>
                           <span className="font-mono text-xs text-slate-900 font-bold">{item.bookingCode}</span>
-                          <span className="text-xs text-slate-400">·</span>
+                          <span className="text-xs text-slate-500">·</span>
                           <span className="text-xs text-secondary">{new Date(item.startAt).toLocaleDateString('vi-VN')}</span>
                         </div>
                         <h4 className="text-sm text-slate-900 font-bold">{item.stationName}</h4>
@@ -514,8 +514,8 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                     </div>
                     <div className="flex items-center justify-between lg:justify-end gap-6 pt-3 lg:pt-0 border-t lg:border-t-0 border-slate-100">
                       <div className="text-left lg:text-right">
-                        <p className="text-[11px] text-secondary uppercase font-semibold">Amount</p>
-                        <p className={`text-sm font-bold ${item.status === 'CANCELLED' ? 'text-slate-400 line-through' : 'text-slate-900'}`}>
+                        <p className="text-xs text-secondary uppercase font-semibold">Amount</p>
+                        <p className={`text-sm font-bold ${item.status === 'CANCELLED' ? 'text-slate-500 line-through' : 'text-slate-900'}`}>
                           {formatCurrency(item.baseAmount)} VND
                         </p>
                       </div>
@@ -674,7 +674,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-[#0b1c30]">Cancellation &amp; Refund</h3>
-                  <p className="text-[11px] text-secondary font-mono">#{cancelledDetailBooking.bookingCode}</p>
+                  <p className="text-xs text-secondary font-mono">#{cancelledDetailBooking.bookingCode}</p>
                 </div>
               </div>
               <button 

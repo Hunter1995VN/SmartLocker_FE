@@ -89,13 +89,13 @@ export default function UserTable({
     if (users.length === 0) {
         return (
             <div className="bg-white rounded-2xl border border-slate-200/80 p-12 text-center shadow-xs">
-                <div className="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center mx-auto mb-3">
+                <div className="w-12 h-12 rounded-2xl bg-slate-50 text-slate-500 flex items-center justify-center mx-auto mb-3">
                     <Users className="w-6 h-6" />
                 </div>
                 <h3 className="text-sm font-bold text-slate-700">
                     Không tìm thấy tài khoản phù hợp
                 </h3>
-                <p className="text-xs text-slate-400 mt-1 mb-4">
+                <p className="text-xs text-slate-500 mt-1 mb-4">
                     Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm để xem kết quả.
                 </p>
                 <button
@@ -114,7 +114,7 @@ export default function UserTable({
             <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                     <thead>
-                        <tr className="bg-slate-50/70 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+                        <tr className="bg-slate-50/70 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">
                             <th className="py-3 px-4">Tài khoản / Định danh</th>
                             <th className="py-3 px-4">Vai trò</th>
                             <th className="py-3 px-4">Trạng thái tài khoản</th>
@@ -154,16 +154,16 @@ export default function UserTable({
                                                         {user.fullName || 'Chưa cập nhật tên'}
                                                     </span>
                                                     {isSelected && (
-                                                        <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-blue-600 text-white">
+                                                        <span className="px-1.5 py-0.2 rounded text-xs font-bold bg-blue-600 text-white">
                                                             ĐANG CHỌN
                                                         </span>
                                                     )}
                                                 </div>
-                                                <div className="text-[11px] text-slate-400 truncate">
+                                                <div className="text-xs text-slate-500 truncate">
                                                     {user.email}
                                                 </div>
                                                 {user.phone && (
-                                                    <div className="text-[10px] text-slate-400 font-mono">
+                                                    <div className="text-xs text-slate-500 font-mono">
                                                         {user.phone}
                                                     </div>
                                                 )}
@@ -195,12 +195,12 @@ export default function UserTable({
                                                 <span>{accountStatus.label}</span>
                                             </span>
                                             {accountStatus.key === 'BOOKING_BLOCKED' && (
-                                                <span className="text-[10px] text-amber-600 font-medium pl-1">
+                                                <span className="text-xs text-amber-600 font-medium pl-1">
                                                     (Vẫn được đăng nhập)
                                                 </span>
                                             )}
                                             {accountStatus.key === 'SUSPENDED' && (
-                                                <span className="text-[10px] text-rose-600 font-medium pl-1">
+                                                <span className="text-xs text-rose-600 font-medium pl-1">
                                                     (Không thể đăng nhập)
                                                 </span>
                                             )}
@@ -208,7 +208,7 @@ export default function UserTable({
                                     </td>
 
                                     {/* Column 4: Created At */}
-                                    <td className="py-3 px-4 whitespace-nowrap text-slate-500 font-mono text-[11px]">
+                                    <td className="py-3 px-4 whitespace-nowrap text-slate-500 font-mono text-xs">
                                         {formatDate(user.createdAt)}
                                     </td>
 
@@ -231,7 +231,7 @@ export default function UserTable({
                                                         <button
                                                             type="button"
                                                             onClick={() => onTriggerLock(user)}
-                                                            className="p-1.5 rounded-lg transition cursor-pointer text-slate-400 hover:text-rose-600 hover:bg-rose-50"
+                                                            className="p-1.5 rounded-lg transition cursor-pointer text-slate-500 hover:text-rose-600 hover:bg-rose-50"
                                                             title="Tạm khóa đăng nhập hệ thống"
                                                         >
                                                             <Lock className="w-4 h-4" />
@@ -242,7 +242,7 @@ export default function UserTable({
                                                         <button
                                                             type="button"
                                                             onClick={() => onTriggerActivate(user)}
-                                                            className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition cursor-pointer"
+                                                            className="p-1.5 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition cursor-pointer"
                                                             title="Mở khóa đăng nhập hệ thống"
                                                         >
                                                             <Unlock className="w-4 h-4" />
@@ -252,7 +252,7 @@ export default function UserTable({
                                                     <button
                                                         type="button"
                                                         onClick={() => onTriggerChangeRole(user)}
-                                                        className="p-1.5 text-slate-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition cursor-pointer"
+                                                        className="p-1.5 text-slate-500 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition cursor-pointer"
                                                         title="Thay đổi vai trò RBAC"
                                                     >
                                                         <UserCog className="w-4 h-4" />
@@ -269,11 +269,11 @@ export default function UserTable({
             </div>
 
             {/* Footer Table Summary */}
-            <div className="py-2.5 px-4 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+            <div className="py-2.5 px-4 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
                 <span>
                     Hiển thị <strong>{users.length}</strong> tài khoản
                 </span>
-                <span className="text-[11px]">
+                <span className="text-xs">
                     Bấm vào tài khoản để mở bảng điều khiển chi tiết
                 </span>
             </div>
