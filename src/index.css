@@ -104,6 +104,17 @@
     -moz-osx-font-smoothing: grayscale;
   }
   
+  /* Vòng focus bàn phím theo màu thương hiệu (chỉ khi dùng phím; chuột và chạm không hiện) và màu bôi chọn chữ */
+  :focus-visible {
+    outline: 2px solid var(--color-primary-container);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--color-primary-fixed);
+    color: var(--color-on-primary-fixed);
+  }
+
   body {
     @apply bg-background text-on-surface;
     font-family: var(--font-family-sans);
