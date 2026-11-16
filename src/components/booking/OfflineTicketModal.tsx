@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import type { OfflineTicketDto } from '../../api/bookingService';
 import ModalOverlay from '../ui/ModalOverlay';
+import { useT } from '../../i18n';
 
 interface OfflineTicketModalProps {
   isOpen: boolean;
@@ -30,6 +31,7 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
   ticket,
   isLoading = false
 }) => {
+    const t = useT();
   const [copied, setCopied] = useState<boolean>(false);
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const qrRef = useRef<HTMLDivElement>(null);
@@ -104,16 +106,16 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
       ctx.fillText('SMARTLOCKER · OFFLINE ACCESS PASS', 70, 95);
       ctx.font = '16px sans-serif';
       ctx.fillStyle = '#bfdbfe';
-      ctx.fillText('Vé mở khóa ngoại tuyến chuẩn HMAC-SHA256 (JWS RFC 7515)', 70, 125);
+      ctx.fillText(t('Vé mở khóa ngoại tuyến chuẩn HMAC-SHA256 (JWS RFC 7515)'), 70, 125);
 
       // Station Info
       ctx.fillStyle = '#0f172a';
       ctx.font = 'bold 24px sans-serif';
-      ctx.fillText(ticket.stationName || 'Trạm SmartLocker', 70, 200);
+      ctx.fillText(ticket.stationName || t('Trạm SmartLocker'), 70, 200);
 
       ctx.fillStyle = '#64748b';
       ctx.font = '16px sans-serif';
-      ctx.fillText(ticket.stationAddress || 'Điểm đặt trạm thông minh', 70, 230);
+      ctx.fillText(ticket.stationAddress || t('Điểm đặt trạm thông minh'), 70, 230);
 
       // Compartment Box
       ctx.fillStyle = '#f8fafc';
@@ -126,14 +128,14 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
 
       ctx.fillStyle = '#64748b';
       ctx.font = 'bold 14px sans-serif';
-      ctx.fillText('MÃ ĐƠN HÀNG', 95, 295);
-      ctx.fillText('Ô TỦ / KÍCH CỠ', 460, 295);
+      ctx.fillText(t('MÃ ĐƠN HÀNG'), 95, 295);
+      ctx.fillText(t('Ô TỦ / KÍCH CỠ'), 460, 295);
 
       ctx.fillStyle = '#1d4ed8';
       ctx.font = 'bold 22px monospace';
       ctx.fillText(ticket.bookingCode, 95, 328);
 
-      const lockerDisplay = ticket.lockerCode ? `Tủ ${ticket.lockerCode} (Size ${ticket.lockerSize})` : `Size ${ticket.lockerSize} Tier`;
+      const lockerDisplay = ticket.lockerCode ? t('Tủ {code} (Size {size})', { code: ticket.lockerCode, size: ticket.lockerSize }) : t('Size {size}', { size: ticket.lockerSize });
       ctx.fillStyle = '#0f172a';
       ctx.font = 'bold 20px sans-serif';
       ctx.fillText(lockerDisplay, 460, 328);
@@ -161,7 +163,7 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
         ctx.fillStyle = '#475569';
         ctx.font = '15px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('Đưa mã QR này cách camera Kiosk 10-15cm để quét mở tủ ngoại tuyến', width / 2, 755);
+        ctx.fillText(t('Đưa mã QR này cách camera Kiosk 10-15cm để quét mở tủ ngoại tuyến'), width / 2, 755);
 
         // PIN section
         ctx.fillStyle = '#eff6ff';
@@ -173,7 +175,7 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
 
         ctx.fillStyle = '#1e40af';
         ctx.font = 'bold 14px sans-serif';
-        ctx.fillText('HOẶC NHẬP MÃ PIN 8 SỐ TRÊN MÀN HÌNH KIOSK', width / 2, 825);
+        ctx.fillText(t('HOẶC NHẬP MÃ PIN 8 SỐ TRÊN MÀN HÌNH KIOSK'), width / 2, 825);
 
         ctx.fillStyle = '#0f172a';
         ctx.font = 'bold 36px monospace';
@@ -182,12 +184,12 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
         // Footer / Expiry note
         ctx.fillStyle = '#64748b';
         ctx.font = '14px sans-serif';
-        const validText = `Vé có hiệu lực đến: ${new Date(ticket.validUntil).toLocaleString('vi-VN')}`;
+        const validText = t('Vé có hiệu lực đến: {time}', { time: new Date(ticket.validUntil).toLocaleString('vi-VN') });
         ctx.fillText(validText, width / 2, 940);
 
         ctx.fillStyle = '#10b981';
         ctx.font = 'bold 14px sans-serif';
-        ctx.fillText('✓ ĐÃ KÝ SỐ MẬT MÃ HMAC · HOẠT ĐỘNG 100% NGOẠI TUYẾN', width / 2, 970);
+        ctx.fillText(t('✓ ĐÃ KÝ SỐ MẬT MÃ HMAC · HOẠT ĐỘNG 100% NGOẠI TUYẾN'), width / 2, 970);
 
         // Export and Trigger download
         const dataUrl = canvas.toDataURL('image/png');
@@ -217,13 +219,13 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
             <div className="space-y-1">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-400/20 border border-emerald-300/40 text-emerald-200 text-xs font-semibold">
                 <WifiOff className="w-3.5 h-3.5" />
-                <span>Hoạt động 100% Offline</span>
+                <span>{t('Hoạt động 100% Offline')}</span>
               </div>
               <h3 className="text-xl sm:text-2xl font-bold tracking-tight">
-                Vé Mở Khóa Ngoại Tuyến
+                {t('Vé Mở Khóa Ngoại Tuyến')}
               </h3>
               <p className="text-sm text-blue-100">
-                Chuẩn mã hóa HMAC-SHA256 (JWS RFC 7515)
+                {t('Chuẩn mã hóa HMAC-SHA256 (JWS RFC 7515)')}
               </p>
             </div>
 
@@ -241,12 +243,12 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
           {isLoading ? (
             <div className="py-16 text-center space-y-3">
               <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-              <p className="text-sm text-slate-500 font-medium">Đang tải và xác thực vé mở khóa ngoại tuyến...</p>
+              <p className="text-sm text-slate-500 font-medium">{t('Đang tải và xác thực vé mở khóa ngoại tuyến...')}</p>
             </div>
           ) : !ticket ? (
             <div className="py-12 text-center space-y-3">
               <Info className="w-10 h-10 text-slate-500 mx-auto" />
-              <p className="text-sm text-slate-600 font-medium">Không tìm thấy vé ngoại tuyến cho đơn đặt này.</p>
+              <p className="text-sm text-slate-600 font-medium">{t('Không tìm thấy vé ngoại tuyến cho đơn đặt này.')}</p>
             </div>
           ) : (
             <>
@@ -266,9 +268,9 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
                 </div>
 
                 <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-xs">
-                  <span className="text-slate-500">Vị trí ô tủ được cấp:</span>
+                  <span className="text-slate-500">{t('Vị trí ô tủ được cấp:')}</span>
                   <span className="font-bold text-slate-900">
-                    {ticket.lockerCode ? `Tủ ${ticket.lockerCode} (Size ${ticket.lockerSize})` : `Size ${ticket.lockerSize} (Tự động cấp tại Kiosk)`}
+                    {ticket.lockerCode ? t('Tủ {code} (Size {size})', { code: ticket.lockerCode, size: ticket.lockerSize }) : t('Size {size} (Tự động cấp tại Kiosk)', { size: ticket.lockerSize })}
                   </span>
                 </div>
               </div>
@@ -286,14 +288,14 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
 
                 <div className="flex items-center justify-center gap-1.5 text-xs text-slate-500 text-center">
                   <QrCode className="w-4 h-4 text-primary shrink-0" />
-                  <span>Đưa mã QR này cách camera Kiosk 10–15 cm</span>
+                  <span>{t('Đưa mã QR này cách camera Kiosk 10–15 cm')}</span>
                 </div>
               </div>
 
               {/* Monospace 6-Digit PIN */}
               <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200/80 space-y-2 text-center">
                 <span className="text-xs font-bold text-blue-800 uppercase tracking-wider">
-                  HOẶC NHẬP MÃ PIN 8 SỐ TRÊN MÀN HÌNH KIOSK
+                  {t('HOẶC NHẬP MÃ PIN 8 SỐ TRÊN MÀN HÌNH KIOSK')}
                 </span>
 
                 <div className="flex items-center justify-center gap-3">
@@ -311,12 +313,12 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
                     {copied ? (
                       <>
                         <Check className="w-4 h-4 text-emerald-600" />
-                        <span className="text-emerald-700">Đã chép!</span>
+                        <span className="text-emerald-700">{t('Đã chép!')}</span>
                       </>
                     ) : (
                       <>
                         <Copy className="w-4 h-4 text-primary" />
-                        <span>Chép PIN</span>
+                        <span>{t('Chép PIN')}</span>
                       </>
                     )}
                   </button>
@@ -328,7 +330,7 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
                 <div className="flex items-center justify-between text-slate-500 py-1 border-b border-slate-100">
                   <span className="flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5 text-slate-500" />
-                    Thời hạn hiệu lực ngoại tuyến:
+                    {t('Thời hạn hiệu lực ngoại tuyến:')}
                   </span>
                   <span className="font-semibold text-slate-800">
                     {new Date(ticket.validUntil).toLocaleString('vi-VN')}
@@ -338,7 +340,7 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
                 <div className="flex items-center justify-between text-slate-500 py-1 border-b border-slate-100">
                   <span className="flex items-center gap-1">
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                    Thuật toán xác thực:
+                    {t('Thuật toán xác thực:')}
                   </span>
                   <span className="font-mono font-medium text-slate-700">
                     {ticket.securityAlgorithm}
@@ -348,7 +350,7 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
                 <div className="p-3 bg-emerald-50 border border-emerald-200/80 rounded-xl flex items-start gap-2 text-emerald-900 leading-relaxed">
                   <Sparkles className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                   <span>
-                    Vé này đã được đồng bộ tự động vào bộ nhớ trình duyệt thiết bị của bạn. Bạn vẫn có thể mở lại trang web và lấy vé này để mở tủ ngay cả khi điện thoại không có sóng 4G/Wifi.
+                    {t('Vé này đã được đồng bộ tự động vào bộ nhớ trình duyệt thiết bị của bạn. Bạn vẫn có thể mở lại trang web và lấy vé này để mở tủ ngay cả khi điện thoại không có sóng 4G/Wifi.')}
                   </span>
                 </div>
               </div>
@@ -366,12 +368,12 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
             {isDownloading ? (
               <>
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span>Đang xuất ảnh vé...</span>
+                <span>{t('Đang xuất ảnh vé...')}</span>
               </>
             ) : (
               <>
                 <Download className="w-4 h-4" />
-                <span>Lưu vé vào máy (Ảnh PNG Pass)</span>
+                <span>{t('Lưu vé vào máy (Ảnh PNG Pass)')}</span>
               </>
             )}
           </button>
@@ -380,7 +382,7 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
             onClick={onClose}
             className="w-full sm:w-auto px-5 py-3 rounded-xl border border-slate-200 hover:bg-slate-100 text-xs sm:text-sm font-semibold text-slate-700 transition-all cursor-pointer"
           >
-            Đóng
+            {t('Đóng')}
           </button>
         </div>
       </div>

@@ -21,6 +21,7 @@ import {
   type CreateBookingResponse,
 } from '../../api/bookingService';
 import ModalOverlay from '../ui/ModalOverlay';
+import { useT } from '../../i18n';
 
 export interface PayOverdueModalProps {
   isOpen: boolean;
@@ -54,6 +55,7 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
   onSuccess,
   onSuccessAndCheckout,
 }) => {
+    const t = useT();
   const [step, setStep] = useState<'LOADING' | 'QR_PAYMENT' | 'SUCCESS' | 'ERROR'>('LOADING');
   const [paymentData, setPaymentData] = useState<CreateBookingResponse | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -234,9 +236,9 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
             </div>
             <div>
               <span className="text-xs font-bold uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded-full">
-                Thanh toán phí quá hạn
+                {t('Thanh toán phí quá hạn')}
               </span>
-              <h3 className="text-base font-bold mt-0.5">Thanh toán phụ phí quá hạn</h3>
+              <h3 className="text-base font-bold mt-0.5">{t('Thanh toán phụ phí quá hạn')}</h3>
             </div>
           </div>
           <button
@@ -252,32 +254,32 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
           {/* Overdue Details Card */}
           <div className="bg-rose-50/70 border border-rose-200 rounded-2xl p-4 space-y-2.5 text-xs">
             <div className="flex items-center justify-between border-b border-rose-200/70 pb-2">
-              <span className="text-slate-600 font-medium">Đơn đặt chỗ / Ngăn tủ:</span>
+              <span className="text-slate-600 font-medium">{t('Đơn đặt chỗ / Ngăn tủ:')}</span>
               <span className="font-mono font-bold text-slate-900">
                 #{bookingCode} • {lockerCode ? `Bay ${lockerCode}` : `Size ${size}`}
               </span>
             </div>
             {stationName && (
               <div className="flex items-center justify-between">
-                <span className="text-slate-600">Trạm:</span>
+                <span className="text-slate-600">{t('Trạm:')}</span>
                 <span className="font-semibold text-slate-900 text-right">{stationName}</span>
               </div>
             )}
             <div className="flex items-center justify-between">
-              <span className="text-slate-600">Hạn gốc:</span>
+              <span className="text-slate-600">{t('Hạn gốc:')}</span>
               <span className="font-medium text-rose-700">
                 {new Date(endAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}{' '}
                 {new Date(endAt).toLocaleDateString('vi-VN')}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-slate-600">Thời gian quá hạn (sau 15 phút ân hạn):</span>
+              <span className="text-slate-600">{t('Thời gian quá hạn (sau 15 phút ân hạn):')}</span>
               <span className="font-bold text-rose-700">
                 {computedOverdueHours}h × {formatVnd(computedRate)}/hr
               </span>
             </div>
             <div className="flex items-center justify-between pt-2 border-t border-rose-200/80">
-              <span className="text-sm font-bold text-slate-900">Tổng phí quá hạn cần trả:</span>
+              <span className="text-sm font-bold text-slate-900">{t('Tổng phí quá hạn cần trả:')}</span>
               <span className="text-xl font-extrabold text-rose-600 font-mono">
                 {formatVnd(finalOverdueAmount)}
               </span>
@@ -289,7 +291,7 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
             <div className="py-10 flex flex-col items-center justify-center space-y-3 text-center">
               <div className="w-10 h-10 border-4 border-rose-600 border-t-transparent rounded-full animate-spin" />
               <p className="text-sm font-semibold text-slate-600">
-                Đang tạo mã VietQR PayOS để thanh toán phí quá hạn...
+                {t('Đang tạo mã VietQR PayOS để thanh toán phí quá hạn...')}
               </p>
             </div>
           )}
@@ -312,7 +314,7 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
                   disabled={isConfirmingDemo}
                   className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer"
                 >
-                  {isConfirmingDemo ? 'Đang xử lý...' : 'Xác nhận ngay'}
+                  {isConfirmingDemo ? t('Đang xử lý...') : t('Xác nhận ngay')}
                 </button>
               </div>
             </div>
@@ -325,7 +327,7 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
                 <div className="flex items-center justify-between w-full mb-3 text-xs">
                   <span className="inline-flex items-center gap-1.5 font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
                     <QrCode className="w-3.5 h-3.5" />
-                    VietQR PayOS chính thức
+                    {t('VietQR PayOS chính thức')}
                   </span>
                   <span className="inline-flex items-center gap-1 font-mono font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
                     <Clock className="w-3.5 h-3.5" />
@@ -354,13 +356,13 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
                 {paymentData.accountNumber && (
                   <div className="w-full mt-3 pt-3 border-t border-slate-200/80 grid grid-cols-2 gap-2 text-xs">
                     <div>
-                      <span className="text-slate-500 block">Chủ tài khoản:</span>
+                      <span className="text-slate-500 block">{t('Chủ tài khoản:')}</span>
                       <span className="font-bold text-slate-800 truncate block">
                         {paymentData.accountName || 'SMARTLOCKER PAYOS'}
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-slate-500 block">Số tài khoản:</span>
+                      <span className="text-slate-500 block">{t('Số tài khoản:')}</span>
                       <button
                         onClick={() => {
                           navigator.clipboard.writeText(paymentData.accountNumber || '');
@@ -396,7 +398,7 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
                     className="py-2.5 px-4 rounded-xl border border-blue-200 bg-blue-50/70 hover:bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
-                    <span>Mở cổng thanh toán PayOS</span>
+                    <span>{t('Mở cổng thanh toán PayOS')}</span>
                   </a>
                 )}
               </div>
@@ -426,7 +428,7 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
                 <CheckCircle2 className="w-8 h-8" />
               </div>
               <div>
-                <h4 className="text-lg font-bold text-slate-900">Đã thanh toán phí quá hạn!</h4>
+                <h4 className="text-lg font-bold text-slate-900">{t('Đã thanh toán phí quá hạn!')}</h4>
                 <p className="text-sm text-slate-600 mt-1 leading-relaxed">
                   Overdue status has been cleared and a <strong>15-minute grace window</strong> has been granted to retrieve your luggage.
                 </p>
@@ -442,14 +444,14 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
                     className="flex-1 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer"
                   >
                     <DoorOpen className="w-4 h-4" />
-                    <span>Mở tủ & hoàn tất lấy đồ</span>
+                    <span>{t('Mở tủ & hoàn tất lấy đồ')}</span>
                   </button>
                 )}
                 <button
                   onClick={onClose}
                   className="flex-1 py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs cursor-pointer"
                 >
-                  Đóng cửa sổ
+                  {t('Đóng cửa sổ')}
                 </button>
               </div>
             </div>
@@ -460,9 +462,9 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
         <div className="px-6 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
           <span className="flex items-center gap-1">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            Bảo mật bởi PayOS VietQR
+            {t('Bảo mật bởi PayOS VietQR')}
           </span>
-          <span>Mở khóa ngay sau khi thanh toán</span>
+          <span>{t('Mở khóa ngay sau khi thanh toán')}</span>
         </div>
       </div>
     </ModalOverlay>

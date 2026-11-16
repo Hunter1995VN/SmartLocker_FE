@@ -23,6 +23,7 @@ import {
 import { QRCodeSVG } from 'qrcode.react';
 import { getBookingById, syncPayment } from '../api/bookingService';
 import CustomerHeader from '../components/layout/CustomerHeader';
+import { useT } from '../i18n';
 
 interface BookingPaymentPageProps {
   onNavigate: (page: string, props?: any) => void;
@@ -53,6 +54,7 @@ interface BookingPaymentPageProps {
 }
 
 const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, bookingData }) => {
+    const t = useT();
   // Lấy thông tin user đăng nhập nếu có
   const savedUser = JSON.parse(localStorage.getItem('smartlocker_user') || '{}');
   const [liveBooking, setLiveBooking] = useState<any>(null);
@@ -68,7 +70,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
   const discountAmount = bookingData?.discountAmount || 0;
   const originalAmount = bookingData?.originalAmount || (discountAmount > 0 ? amount + discountAmount : amount);
   const voucherCode = bookingData?.voucherCode;
-  const storageDate = bookingData?.storageDate || 'Hôm nay';
+  const storageDate = bookingData?.storageDate || t('Hôm nay');
   const dropOffTime = bookingData?.dropOffTime || '14:00';
 
   // Điều hướng quay lại Bước 1 mà giữ nguyên toàn bộ lựa chọn cũ
@@ -87,7 +89,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
     });
   };
 
-  const travelerName = savedUser.fullName || 'Nguyễn Văn A';
+  const travelerName = savedUser.fullName || t('Nguyễn Văn A');
   const travelerPhone = savedUser.phone || '0901 234 567';
   const travelerEmail = savedUser.email || 'nguyenvana@gmail.com';
 
@@ -100,7 +102,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
 
   const getBankName = (b?: string) => {
     switch (b) {
-      case '970422': return 'MB Bank (Ngân hàng Quân Đội)';
+      case '970422': return t('MB Bank (Ngân hàng Quân Đội)');
       case '970436': return 'Vietcombank';
       case '970407': return 'Techcombank';
       case '970415': return 'VietinBank';
@@ -108,7 +110,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
       case '970416': return 'ACB';
       case '970423': return 'TPBank';
       case '970432': return 'VPBank';
-      default: return 'Ngân hàng đối tác PayOS';
+      default: return t('Ngân hàng đối tác PayOS');
     }
   };
 
@@ -118,7 +120,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
     : null;
 
   const maskAccountNumber = (acc?: string) => {
-    if (!acc) return 'Xem trên mã QR';
+    if (!acc) return t('Xem trên mã QR');
     if (acc.length <= 6) return acc;
     return `${acc.substring(0, 4)} •••• ${acc.substring(acc.length - 4)}`;
   };
@@ -161,7 +163,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
 
   const handleCopy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
-    showToast(`Đã sao chép ${label}: ${text}`);
+    showToast(t('Đã sao chép {label}: {text}', { label, text }));
   };
 
   // Trạng thái modal thành công
@@ -215,7 +217,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
   // Hàm kiểm tra thanh toán ngay khi người dùng bấm nút
   const handleCheckPaymentNow = async () => {
     if (!bookingData?.bookingId) {
-      showToast('Không có mã đơn để kiểm tra.');
+      showToast(t('Không có mã đơn để kiểm tra.'));
       return;
     }
     setIsCheckingStatus(true);
@@ -239,19 +241,19 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
           });
           onNavigate('booking-detail', { bookingId: effectiveBookingId });
         } else if (res.data.status === 'NO_SHOW') {
-          showToast('Đơn đã bị huỷ do quá hạn đến nhận tủ (No Show). Vui lòng kiểm tra Lịch sử đơn.');
+          showToast(t('Đơn đã bị huỷ do quá hạn đến nhận tủ (No Show). Vui lòng kiểm tra Lịch sử đơn.'));
         } else if (res.data.status === 'CANCELLED') {
-          showToast('Đơn đặt tủ đã bị huỷ.');
+          showToast(t('Đơn đặt tủ đã bị huỷ.'));
         } else if (res.data.status === 'EXPIRED') {
-          showToast('Đơn đặt tủ đã hết hạn sử dụng.');
+          showToast(t('Đơn đặt tủ đã hết hạn sử dụng.'));
         } else {
-          showToast('Chưa nhận được giao dịch hoặc đang xử lý. Vui lòng thử lại sau vài giây.');
+          showToast(t('Chưa nhận được giao dịch hoặc đang xử lý. Vui lòng thử lại sau vài giây.'));
         }
       } else {
-        showToast('Chưa ghi nhận thanh toán. Vui lòng thử lại sau vài giây.');
+        showToast(t('Chưa ghi nhận thanh toán. Vui lòng thử lại sau vài giây.'));
       }
     } catch (error) {
-      showToast('Lỗi khi kiểm tra. Vui lòng thử lại sau.');
+      showToast(t('Lỗi khi kiểm tra. Vui lòng thử lại sau.'));
     } finally {
       setIsCheckingStatus(false);
     }
@@ -271,7 +273,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
     if (bookingData?.paymentUrl) {
       window.open(bookingData.paymentUrl, '_blank');
     } else {
-      showToast('Chưa có liên kết thanh toán PayOS.');
+      showToast(t('Chưa có liên kết thanh toán PayOS.'));
     }
   };
 
@@ -289,7 +291,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
       {/* MAIN CONTENT */}
       <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 w-full">
         {/* STEP PROGRESS BAR */}
-        <nav aria-label="Tiến trình đặt tủ" className="mb-6 md:mb-8 bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
+        <nav aria-label={t('Tiến trình đặt tủ')} className="mb-6 md:mb-8 bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
           <div className="grid grid-cols-3 gap-2 sm:gap-4 items-center">
             {/* Bước 1 */}
             <button
@@ -300,9 +302,9 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                 <Check className="w-4 h-4 stroke-[3]" />
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="text-xs uppercase font-bold text-slate-500 tracking-wider">Bước 1</span>
+                <span className="text-xs uppercase font-bold text-slate-500 tracking-wider">{t('Bước 1')}</span>
                 <span className="text-sm font-semibold text-slate-700 truncate group-hover:text-blue-600 transition-colors">
-                  Chọn trạm &amp; Tủ
+                  {t('Chọn trạm & Tủ')}
                 </span>
               </div>
             </button>
@@ -313,8 +315,8 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                 2
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="text-xs uppercase font-bold text-blue-600 tracking-wider">Bước 2 (Đang thực hiện)</span>
-                <span className="text-sm font-bold text-blue-600 truncate">Thanh toán PayOS</span>
+                <span className="text-xs uppercase font-bold text-blue-600 tracking-wider">{t('Bước 2 (Đang thực hiện)')}</span>
+                <span className="text-sm font-bold text-blue-600 truncate">{t('Thanh toán PayOS')}</span>
               </div>
             </div>
 
@@ -324,8 +326,8 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                 3
               </div>
               <div className="hidden sm:flex flex-col min-w-0">
-                <span className="text-xs uppercase font-bold text-slate-500 tracking-wider">Bước 3</span>
-                <span className="text-sm font-medium text-slate-500 truncate">Nhận mã mở tủ</span>
+                <span className="text-xs uppercase font-bold text-slate-500 tracking-wider">{t('Bước 3')}</span>
+                <span className="text-sm font-medium text-slate-500 truncate">{t('Nhận mã mở tủ')}</span>
               </div>
             </div>
           </div>
@@ -343,8 +345,8 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                     <DoorOpen className="w-5 h-5" />
                   </div>
                   <div>
-                    <h2 className="text-base font-bold text-slate-900">Thông tin đặt tủ</h2>
-                    <span className="text-xs text-slate-500">Mã đơn: <strong className="font-mono text-slate-800">{orderCode}</strong></span>
+                    <h2 className="text-base font-bold text-slate-900">{t('Thông tin đặt tủ')}</h2>
+                    <span className="text-xs text-slate-500">{t('Mã đơn:')} <strong className="font-mono text-slate-800">{orderCode}</strong></span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -352,10 +354,10 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                     onClick={handleBackToStep1}
                     className="text-xs font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-lg border border-blue-200 transition-colors cursor-pointer"
                   >
-                    Thay đổi
+                    {t('Thay đổi')}
                   </button>
                   <span className="bg-amber-50 text-amber-700 text-xs font-bold uppercase tracking-wide px-2.5 py-1 rounded-md border border-amber-200">
-                    Chờ thanh toán
+                    {t('Chờ thanh toán')}
                   </span>
                 </div>
               </div>
@@ -379,25 +381,25 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-bold text-slate-900">
-                          {size === 'S' ? 'Ngăn Nhỏ (S)' : size === 'M' ? 'Ngăn Vừa (M)' : 'Ngăn Lớn (L)'}
+                          {size === 'S' ? t('Ngăn Nhỏ (S)') : size === 'M' ? t('Ngăn Vừa (M)') : t('Ngăn Lớn (L)')}
                         </span>
                         <span className="bg-emerald-50 text-emerald-700 text-xs font-bold uppercase px-2 py-0.5 rounded border border-emerald-200">
-                          {size === 'S' ? 'Balo / Túi xách' : size === 'M' ? 'Vali xách tay' : 'Vali ký gửi'}
+                          {size === 'S' ? t('Balo / Túi xách') : size === 'M' ? t('Vali xách tay') : t('Vali ký gửi')}
                         </span>
                       </div>
                       <p className="text-sm text-slate-500 mt-0.5">
                         {size === 'S'
-                          ? 'Kích thước: 45 x 45 x 65 cm'
+                          ? t('Kích thước: 45 x 45 x 65 cm')
                           : size === 'M'
-                          ? 'Kích thước: 65 x 45 x 65 cm'
-                          : 'Kích thước: 95 x 55 x 65 cm'}
+                          ? t('Kích thước: 65 x 45 x 65 cm')
+                          : t('Kích thước: 95 x 55 x 65 cm')}
                       </p>
                     </div>
                   </div>
                   <div className="text-right shrink-0">
-                    <span className="text-xs font-semibold text-slate-500 block">Số ô tủ</span>
+                    <span className="text-xs font-semibold text-slate-500 block">{t('Số ô tủ')}</span>
                     <span className="text-xs text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
-                      Cấp tự động
+                      {t('Cấp tự động')}
                     </span>
                   </div>
                 </div>
@@ -405,14 +407,14 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                 {/* Thời gian lưu trữ */}
                 <div className="grid grid-cols-2 gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
                   <div>
-                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Thời lượng</span>
+                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">{t('Thời lượng')}</span>
                     <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5 mt-1">
                       <Clock className="w-3.5 h-3.5 text-blue-600" />
-                      {duration} Giờ
+                      {duration} {t('Giờ')}
                     </span>
                   </div>
                   <div>
-                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Khung giờ sử dụng</span>
+                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">{t('Khung giờ sử dụng')}</span>
                     <span className="text-xs font-bold text-slate-900 mt-1 block">
                       {storageDate}, {dropOffTime}
                     </span>
@@ -422,7 +424,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                 {/* Chi tiết thanh toán */}
                 <div className="pt-2 border-t border-slate-100 space-y-2">
                   <div className="flex justify-between items-center text-xs text-slate-600">
-                    <span>Phí thuê tủ ({duration} giờ)</span>
+                    <span>{t('Phí thuê tủ (')}{duration} {t('giờ)')}</span>
                     <span className="font-mono font-medium text-slate-900">
                       {formatCurrency(originalAmount)} ₫
                     </span>
@@ -430,7 +432,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                   {discountAmount > 0 && (
                     <div className="flex justify-between items-center text-xs text-emerald-700 font-semibold">
                       <span className="flex items-center gap-1.5">
-                        Voucher giảm giá
+                        {t('Voucher giảm giá')}
                         {voucherCode && (
                           <span className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-1.5 py-0.5 rounded font-mono text-xs font-bold">
                             {voucherCode}
@@ -444,21 +446,21 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                   )}
                   <div className="flex justify-between items-center text-xs text-slate-600">
                     <span className="flex items-center gap-1.5">
-                      Bảo hiểm an toàn hành lý
+                      {t('Bảo hiểm an toàn hành lý')}
                       <Verified className="w-3.5 h-3.5 text-emerald-600" />
                     </span>
-                    <span className="text-emerald-600 font-medium">Đã bao gồm (0 ₫)</span>
+                    <span className="text-emerald-600 font-medium">{t('Đã bao gồm (0 ₫)')}</span>
                   </div>
                   <div className="flex justify-between items-center text-xs text-slate-600">
-                    <span>Mã khóa điện tử &amp; Thông báo SMS</span>
-                    <span className="text-emerald-600 font-medium">Miễn phí</span>
+                    <span>{t('Mã khóa điện tử & Thông báo SMS')}</span>
+                    <span className="text-emerald-600 font-medium">{t('Miễn phí')}</span>
                   </div>
 
                   {/* Tổng tiền */}
                   <div className="pt-3 border-t border-slate-200 flex justify-between items-baseline">
                     <div>
-                      <span className="text-sm font-bold text-slate-900">Tổng thanh toán</span>
-                      <span className="block text-xs text-slate-500">Đã bao gồm thuế GTGT (VAT)</span>
+                      <span className="text-sm font-bold text-slate-900">{t('Tổng thanh toán')}</span>
+                      <span className="block text-xs text-slate-500">{t('Đã bao gồm thuế GTGT (VAT)')}</span>
                     </div>
                     <div className="text-right">
                       <span className="font-mono text-2xl font-extrabold text-blue-600 tracking-tight">
@@ -473,7 +475,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                 <div className="bg-blue-50/80 border border-blue-200 rounded-xl p-3 flex items-start gap-2.5">
                   <Info className="text-blue-600 w-4 h-4 mt-0.5 shrink-0" />
                   <p className="text-sm text-blue-900 leading-relaxed">
-                    Sau khi thanh toán thành công, hệ thống sẽ <strong>giữ chỗ tủ cho bạn trong 30 phút</strong> để bạn di chuyển đến trạm. Thời gian thuê <strong>{duration} giờ</strong> chỉ bắt đầu tính từ lúc bạn mở tủ tại trạm.
+                    {t('Sau khi thanh toán thành công, hệ thống sẽ')} <strong>{t('giữ chỗ tủ cho bạn trong 30 phút')}</strong> {t('để bạn di chuyển đến trạm. Thời gian thuê')} <strong>{duration} {t('giờ')}</strong> {t('chỉ bắt đầu tính từ lúc bạn mở tủ tại trạm.')}
                   </p>
                 </div>
               </div>
@@ -484,25 +486,25 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
               <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
                 <div className="flex items-center gap-2">
                   <User className="text-blue-600 w-4 h-4" />
-                  <h3 className="text-sm font-bold text-slate-900">Thông tin người sử dụng</h3>
+                  <h3 className="text-sm font-bold text-slate-900">{t('Thông tin người sử dụng')}</h3>
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
                 <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 sm:col-span-2">
-                  <span className="text-slate-500 block text-xs">Họ và tên người sử dụng</span>
+                  <span className="text-slate-500 block text-xs">{t('Họ và tên người sử dụng')}</span>
                   <span className="font-bold text-slate-800 mt-0.5 block truncate">{travelerName}</span>
                 </div>
                 <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
                   <span className="text-slate-500 block text-xs flex items-center gap-1">
                     <MessageSquare className="w-3 h-3 text-emerald-600" />
-                    Số điện thoại nhận mã
+                    {t('Số điện thoại nhận mã')}
                   </span>
                   <span className="font-mono font-bold text-slate-800 mt-0.5 block">{travelerPhone}</span>
                 </div>
                 <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
                   <span className="text-slate-500 block text-xs flex items-center gap-1">
                     <Mail className="w-3 h-3 text-blue-600" />
-                    Email nhận biên lai
+                    {t('Email nhận biên lai')}
                   </span>
                   <span className="font-medium text-slate-800 mt-0.5 block truncate">{travelerEmail}</span>
                 </div>
@@ -519,13 +521,13 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                   type="checkbox"
                 />
                 <span className="text-xs text-slate-700 leading-snug">
-                  Tôi đồng ý với <span className="text-blue-600 font-semibold hover:underline">Điều khoản dịch vụ</span> &amp;{' '}
-                  <span className="text-blue-600 font-semibold hover:underline">Chính sách sử dụng tủ SmartLocker</span>.
+                  {t('Tôi đồng ý với')} <span className="text-blue-600 font-semibold hover:underline">{t('Điều khoản dịch vụ')}</span> &amp;{' '}
+                  <span className="text-blue-600 font-semibold hover:underline">{t('Chính sách sử dụng tủ SmartLocker')}</span>.
                 </span>
               </label>
               <div className="text-xs text-slate-500 leading-relaxed pl-6 space-y-1">
-                <p>• <strong>Hủy miễn phí:</strong> Được hỗ trợ hủy trước 2 giờ so với thời điểm nhận tủ.</p>
-                <p>• <strong>An toàn:</strong> Nghiêm cấm lưu trữ chất dễ cháy nổ, đồ tươi sống hoặc hàng cấm.</p>
+                <p>• <strong>{t('Hủy miễn phí:')}</strong> {t('Được hỗ trợ hủy trước 2 giờ so với thời điểm nhận tủ.')}</p>
+                <p>• <strong>{t('An toàn:')}</strong> {t('Nghiêm cấm lưu trữ chất dễ cháy nổ, đồ tươi sống hoặc hàng cấm.')}</p>
               </div>
             </div>
           </section>
@@ -540,13 +542,13 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm text-amber-900 font-bold">
-                    Vị trí ngăn tủ đang được giữ chỗ trong:{' '}
+                    {t('Vị trí ngăn tủ đang được giữ chỗ trong:')}{' '}
                     <span className="font-mono text-amber-900 font-extrabold text-sm sm:text-base bg-white/90 px-2 py-0.5 rounded border border-amber-300">
                       {formatTimer(secondsLeft)}
                     </span>
                   </p>
                   <p className="text-sm text-amber-800/80 mt-0.5">
-                    Sau thời gian này, ô tủ sẽ tự động được giải phóng nếu chưa nhận được thanh toán.
+                    {t('Sau thời gian này, ô tủ sẽ tự động được giải phóng nếu chưa nhận được thanh toán.')}
                   </p>
                 </div>
               </div>
@@ -562,11 +564,11 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">Thanh toán qua PayOS</h2>
-                      <span className="bg-blue-100 text-blue-700 font-bold text-xs px-2 py-0.5 rounded">Cổng bảo mật</span>
+                      <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">{t('Thanh toán qua PayOS')}</h2>
+                      <span className="bg-blue-100 text-blue-700 font-bold text-xs px-2 py-0.5 rounded">{t('Cổng bảo mật')}</span>
                     </div>
                     <p className="text-sm text-slate-500 mt-0.5">
-                      Quét mã QR bằng ứng dụng của hơn 40+ ngân hàng hoặc ví điện tử
+                      {t('Quét mã QR bằng ứng dụng của hơn 40+ ngân hàng hoặc ví điện tử')}
                     </p>
                   </div>
                 </div>
@@ -603,10 +605,10 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                 <div className="mt-3 text-center space-y-1">
                   <div className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-3.5 py-1 rounded-full border border-emerald-200 text-xs font-bold">
                     <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Số tiền chính xác: {formatCurrency(amount)} ₫</span>
+                    <span>{t('Số tiền chính xác:')} {formatCurrency(amount)} ₫</span>
                   </div>
                   <p className="text-sm text-slate-600 font-medium">
-                    Mở app ngân hàng ➔ Chọn <strong>Quét mã QR</strong> để chuyển khoản tự động
+                    {t('Mở app ngân hàng ➔ Chọn')} <strong>{t('Quét mã QR')}</strong> {t('để chuyển khoản tự động')}
                   </p>
                 </div>
               </div>
@@ -614,23 +616,23 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
               {/* THÔNG TIN CHUYỂN KHOẢN THỰC TẾ CỦA PAYOS (NẾU CẦN CHUYỂN KHOẢN THỦ CÔNG) */}
               <div className="bg-slate-50 rounded-xl border border-slate-200 divide-y divide-slate-200/80 text-xs mb-5">
                 <div className="p-3 flex items-center justify-between gap-2">
-                  <span className="text-slate-500">Ngân hàng thụ hưởng:</span>
+                  <span className="text-slate-500">{t('Ngân hàng thụ hưởng:')}</span>
                   <span className="font-bold text-slate-900">{getBankName(bin)}</span>
                 </div>
 
                 <div className="p-3 flex items-center justify-between gap-2">
-                  <span className="text-slate-500">Số tài khoản:</span>
+                  <span className="text-slate-500">{t('Số tài khoản:')}</span>
                   <div className="flex items-center gap-2">
                     <span className="font-mono text-sm font-bold text-slate-900">
                       {maskAccountNumber(accountNumber)}
                     </span>
                     {accountNumber && (
                       <button
-                        onClick={() => handleCopy(accountNumber, 'Số tài khoản')}
+                        onClick={() => handleCopy(accountNumber, t('Số tài khoản'))}
                         className="bg-white hover:bg-slate-100 border border-slate-300 text-blue-600 font-semibold px-2 py-0.5 rounded text-xs flex items-center gap-1 transition-colors active:scale-95"
                       >
                         <Copy className="w-3 h-3" />
-                        <span>Sao chép</span>
+                        <span>{t('Sao chép')}</span>
                       </button>
                     )}
                   </div>
@@ -638,26 +640,26 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
 
                 {accountName && (
                   <div className="p-3 flex items-center justify-between gap-2">
-                    <span className="text-slate-500">Tên người nhận:</span>
+                    <span className="text-slate-500">{t('Tên người nhận:')}</span>
                     <span className="font-bold text-slate-900 uppercase font-mono">{accountName}</span>
                   </div>
                 )}
 
                 <div className="p-3 flex items-center justify-between gap-2 bg-blue-50/50">
                   <div>
-                    <span className="text-blue-900 font-semibold block">Nội dung chuyển khoản:</span>
-                    <span className="text-xs text-blue-700/80">Bắt buộc để hệ thống tự động nhận diện</span>
+                    <span className="text-blue-900 font-semibold block">{t('Nội dung chuyển khoản:')}</span>
+                    <span className="text-xs text-blue-700/80">{t('Bắt buộc để hệ thống tự động nhận diện')}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="font-mono text-xs font-extrabold text-blue-700 bg-white px-2 py-1 rounded border border-blue-200">
                       Dat tu {orderCode}
                     </span>
                     <button
-                      onClick={() => handleCopy(`Dat tu ${orderCode}`, 'Nội dung chuyển khoản')}
+                      onClick={() => handleCopy(`Dat tu ${orderCode}`, t('Nội dung chuyển khoản'))}
                       className="bg-white hover:bg-blue-50 border border-blue-300 text-blue-600 font-bold px-2 py-1 rounded text-xs flex items-center gap-1 transition-colors active:scale-95"
                     >
                       <Copy className="w-3 h-3" />
-                      <span>Sao chép</span>
+                      <span>{t('Sao chép')}</span>
                     </button>
                   </div>
                 </div>
@@ -666,15 +668,15 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
               {/* TÙY CHỌN PHỤ: NÚT MỞ TRANG PAYOS TRỰC TIẾP */}
               <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 mb-5">
                 <div className="text-left">
-                  <span className="text-xs font-bold text-slate-800 block">Bạn muốn thanh toán trên trình duyệt riêng?</span>
-                  <span className="text-xs text-slate-500">Hỗ trợ thanh toán qua cổng PayOS hoặc thẻ ngân hàng</span>
+                  <span className="text-xs font-bold text-slate-800 block">{t('Bạn muốn thanh toán trên trình duyệt riêng?')}</span>
+                  <span className="text-xs text-slate-500">{t('Hỗ trợ thanh toán qua cổng PayOS hoặc thẻ ngân hàng')}</span>
                 </div>
                 <button
                   onClick={handleOpenPayOS}
                   className="shrink-0 w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <CreditCard className="w-3.5 h-3.5" />
-                  <span>Mở cổng PayOS</span>
+                  <span>{t('Mở cổng PayOS')}</span>
                   <ExternalLink className="w-3.5 h-3.5 opacity-80" />
                 </button>
               </div>
@@ -689,12 +691,12 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                   <div>
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-bold text-slate-900">
-                        Đang đợi xác nhận thanh toán từ ngân hàng...
+                        {t('Đang đợi xác nhận thanh toán từ ngân hàng...')}
                       </p>
                       <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     </div>
                     <p className="text-sm text-slate-500 mt-0.5">
-                      Hệ thống tự động phát hiện trong 2 – 5 giây khi giao dịch thành công. Không cần tải lại trang.
+                      {t('Hệ thống tự động phát hiện trong 2 – 5 giây khi giao dịch thành công. Không cần tải lại trang.')}
                     </p>
                   </div>
                 </div>
@@ -706,14 +708,14 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                   type="button"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${isCheckingStatus ? 'animate-spin' : ''}`} />
-                  <span>{isCheckingStatus ? 'Đang kiểm tra...' : 'Kiểm tra ngay'}</span>
+                  <span>{isCheckingStatus ? t('Đang kiểm tra...') : t('Kiểm tra ngay')}</span>
                 </button>
               </div>
 
               {/* Footer bảo mật */}
               <div className="mt-4 flex items-center justify-center gap-2 text-xs text-slate-500">
                 <Lock className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Thanh toán an toàn mã hóa SSL 256-bit • VietQR Napas 24/7 • Cổng PayOS</span>
+                <span>{t('Thanh toán an toàn mã hóa SSL 256-bit • VietQR Napas 24/7 • Cổng PayOS')}</span>
               </div>
             </div>
           </section>
@@ -727,39 +729,39 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
             <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 border-2 border-emerald-200 mx-auto flex items-center justify-center mb-4 shadow-sm">
               <CheckCircle className="w-9 h-9 text-emerald-600" />
             </div>
-            <h3 className="text-xl font-bold text-slate-900">Thanh toán thành công!</h3>
+            <h3 className="text-xl font-bold text-slate-900">{t('Thanh toán thành công!')}</h3>
             <p className="text-sm text-slate-600 mt-1">
-              Đã nhận thành công <strong className="text-blue-600">{formatCurrency(amount)} ₫</strong> cho đơn đặt{' '}
+              {t('Đã nhận thành công')} <strong className="text-blue-600">{formatCurrency(amount)} ₫</strong> {t('cho đơn đặt')}{' '}
               <strong className="text-slate-900">{orderCode}</strong>.
             </p>
 
             <div className="my-5 p-4 rounded-xl bg-blue-50/70 border border-blue-200 text-left space-y-2.5">
               <div className="flex justify-between items-center">
-                <span className="text-xs text-slate-500">Vị trí ngăn tủ:</span>
+                <span className="text-xs text-slate-500">{t('Vị trí ngăn tủ:')}</span>
                 {successData?.lockerCode ? (
                   <span className="font-mono text-base font-bold text-blue-600 bg-white px-2.5 py-0.5 rounded border border-blue-200">
                     {successData.lockerCode}
                   </span>
                 ) : (
                   <span className="text-xs font-bold text-blue-700 bg-blue-100/90 px-2.5 py-1 rounded-md border border-blue-200">
-                    Cấp tự động tại Kiosk (Size {size})
+                    {t('Cấp tự động tại Kiosk (Size')} {size})
                   </span>
                 )}
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-xs text-slate-500">Mã PIN mở tủ một lần:</span>
+                <span className="text-xs text-slate-500">{t('Mã PIN mở tủ một lần:')}</span>
                 <span className="font-mono text-xl font-extrabold text-slate-900 tracking-wider">
-                  {successData?.accessCode ? (successData.accessCode.replace(/\s+/g, '').length === 6 ? `${successData.accessCode.replace(/\s+/g, '').slice(0, 3)} ${successData.accessCode.replace(/\s+/g, '').slice(3)}` : successData.accessCode) : 'Chưa cấp'}
+                  {successData?.accessCode ? (successData.accessCode.replace(/\s+/g, '').length === 6 ? `${successData.accessCode.replace(/\s+/g, '').slice(0, 3)} ${successData.accessCode.replace(/\s+/g, '').slice(3)}` : successData.accessCode) : t('Chưa cấp')}
                 </span>
               </div>
               <div className="pt-2 border-t border-blue-200/60 space-y-1 text-xs text-blue-900 leading-relaxed">
-                <p>⏱️ <strong>Giữ chỗ 30 phút:</strong> Bạn có 30 phút để đến trạm nhận tủ.</p>
-                <p>🔒 <strong>Tính giờ:</strong> Thời gian thuê <strong>{duration} tiếng</strong> chỉ bắt đầu đếm khi bạn quét mã QR/nhập PIN mở tủ tại trạm.</p>
+                <p>⏱️ <strong>{t('Giữ chỗ 30 phút:')}</strong> {t('Bạn có 30 phút để đến trạm nhận tủ.')}</p>
+                <p>🔒 <strong>{t('Tính giờ:')}</strong> {t('Thời gian thuê')} <strong>{duration} {t('tiếng')}</strong> {t('chỉ bắt đầu đếm khi bạn quét mã QR/nhập PIN mở tủ tại trạm.')}</p>
               </div>
             </div>
 
             <p className="text-sm text-slate-500 mb-5">
-              Thông tin ngăn tủ và mã khóa đã được lưu vào mục quản lý đơn đặt của bạn.
+              {t('Thông tin ngăn tủ và mã khóa đã được lưu vào mục quản lý đơn đặt của bạn.')}
             </p>
 
             <button
@@ -776,13 +778,13 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                     amount,
                     orderCode,
                     accessCode: successData?.accessCode || ('LK-' + orderCode.substring(2, 7) + 'A'),
-                    bayCode: successData?.lockerCode || (size === 'S' ? 'Ngăn S-02' : size === 'M' ? 'Ngăn M-04' : 'Ngăn L-02'),
+                    bayCode: successData?.lockerCode || (size === 'S' ? t('Ngăn S-02') : size === 'M' ? t('Ngăn M-04') : t('Ngăn L-02')),
                   }
                 });
               }}
               className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-md shadow-blue-500/20 active:scale-98 cursor-pointer flex items-center justify-center gap-2"
             >
-              <span>Xem chi tiết tủ &amp; Mã mở</span>
+              <span>{t('Xem chi tiết tủ & Mã mở')}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -804,18 +806,18 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
             <div className="space-y-1">
               <div className="flex items-center justify-center md:justify-start gap-2">
                 <span className="text-base text-blue-600 font-extrabold tracking-tight">SmartLocker</span>
-                <span className="text-xs text-slate-500 font-medium">Hệ thống tủ lưu trữ hành lý thông minh</span>
+                <span className="text-xs text-slate-500 font-medium">{t('Hệ thống tủ lưu trữ hành lý thông minh')}</span>
               </div>
               <p className="text-sm text-slate-500">
-                © {new Date().getFullYear()} SmartLocker. Cổng thanh toán tích hợp PayOS &amp; VietQR Napas 24/7.
+                © {new Date().getFullYear()} {t('SmartLocker. Cổng thanh toán tích hợp PayOS & VietQR Napas 24/7.')}
               </p>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-500">
-              <a className="hover:text-blue-600 transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>Chính sách bảo mật</a>
+              <a className="hover:text-blue-600 transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>{t('Chính sách bảo mật')}</a>
               <span>•</span>
-              <a className="hover:text-blue-600 transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }}>Điều khoản sử dụng</a>
+              <a className="hover:text-blue-600 transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }}>{t('Điều khoản sử dụng')}</a>
               <span>•</span>
-              <a className="hover:text-blue-600 transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}>Hỗ trợ khách hàng</a>
+              <a className="hover:text-blue-600 transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}>{t('Hỗ trợ khách hàng')}</a>
             </div>
           </div>
         </div>

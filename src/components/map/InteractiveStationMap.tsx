@@ -3,6 +3,7 @@ import {
     MapPin, Navigation, Clock, Phone, ArrowRight, ExternalLink, Layers, Sparkles, X, LocateFixed
 } from 'lucide-react';
 import type { Station } from '../../api/stationService';
+import { useT } from '../../i18n';
 
 interface InteractiveStationMapProps {
     stations: Station[];
@@ -92,6 +93,7 @@ export default function InteractiveStationMap({
     onBookStation,
     onChangeUserLocation,
 }: InteractiveStationMapProps) {
+    const t = useT();
     const mapContainerRef = useRef<HTMLDivElement | null>(null);
     const mapInstanceRef = useRef<any>(null);
     const tileLayerRef = useRef<any>(null);
@@ -236,7 +238,7 @@ export default function InteractiveStationMap({
         });
 
         userMarker.bindTooltip(
-            '<div style="font-family:sans-serif;font-size:12px;font-weight:700;">Kéo thả ghim này hoặc bấm "Đặt vị trí của tôi" để chọn vị trí</div>',
+            '<div style="font-family:sans-serif;font-size:12px;font-weight:700;">' + t('Kéo thả ghim này hoặc bấm “Đặt vị trí của tôi” để chọn vị trí') + '</div>',
             { direction: 'top', offset: [0, -32] }
         );
 
@@ -329,7 +331,7 @@ export default function InteractiveStationMap({
                 <div style="display:flex;flex-direction:column;align-items:center;transition:all 0.2s ease;${scale}">
                     <div style="background:${bg};color:#ffffff;padding:4px 10px;border-radius:9999px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:800;white-space:nowrap;border:2px solid #ffffff;display:flex;align-items:center;gap:4px;${ring}">
                         <span>🔒</span>
-                        <span>${isActive ? `${totalAvail} trống` : 'Bảo trì'}</span>
+                        <span>${isActive ? `${totalAvail} ${t('trống')}` : t('Bảo trì')}</span>
                     </div>
                     <div style="width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:7px solid ${bg};margin-top:-1px;"></div>
                 </div>
@@ -379,8 +381,8 @@ export default function InteractiveStationMap({
             <div className="w-full h-full flex items-center justify-center bg-surface-container-low p-6">
                 <div className="bg-white rounded-2xl p-6 shadow-md max-w-sm text-center border border-surface-container">
                     <MapPin className="w-10 h-10 text-primary-container mx-auto mb-3" />
-                    <p className="font-bold text-on-surface text-sm">Không thể tải lớp bản đồ trực tuyến</p>
-                    <p className="text-xs text-on-surface-muted mt-1">Vui lòng kiểm tra kết nối mạng Internet để tải bản đồ số.</p>
+                    <p className="font-bold text-on-surface text-sm">{t('Không thể tải lớp bản đồ trực tuyến')}</p>
+                    <p className="text-xs text-on-surface-muted mt-1">{t('Vui lòng kiểm tra kết nối mạng Internet để tải bản đồ số.')}</p>
                 </div>
             </div>
         );
@@ -395,7 +397,7 @@ export default function InteractiveStationMap({
             {pickLocationMode && (
                 <div className="absolute top-16 left-1/2 -translate-x-1/2 z-[450] bg-red-600 text-white px-4 py-2 rounded-full shadow-lg text-xs font-bold flex items-center gap-2 animate-bounce">
                     <LocateFixed className="w-4 h-4" />
-                    <span>Nhấp vào bất kỳ điểm nào trên bản đồ để đặt "Vị trí của bạn"</span>
+                    <span>{t('Nhấp vào bất kỳ điểm nào trên bản đồ để đặt "Vị trí của bạn"')}</span>
                     <button
                         type="button"
                         onClick={() => setPickLocationMode(false)}
@@ -411,7 +413,7 @@ export default function InteractiveStationMap({
                 <div className="absolute inset-0 z-20 flex items-center justify-center bg-surface-container-low/90">
                     <div className="text-center">
                         <div className="w-11 h-11 border-4 border-primary-container border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                        <p className="text-sm text-on-surface font-semibold">Đang khởi tạo bản đồ số GPS...</p>
+                        <p className="text-sm text-on-surface font-semibold">{t('Đang khởi tạo bản đồ số GPS...')}</p>
                     </div>
                 </div>
             )}
@@ -431,7 +433,7 @@ export default function InteractiveStationMap({
                                     : 'text-on-surface-variant hover:bg-surface-container-low'
                             }`}
                         >
-                            {TILE_LAYERS[key].label}
+                            {t(TILE_LAYERS[key].label)}
                         </button>
                     ))}
                 </div>
@@ -445,10 +447,10 @@ export default function InteractiveStationMap({
                                 ? 'bg-red-600 text-white border-red-600'
                                 : 'bg-white/95 text-red-600 border-red-200 hover:bg-red-50'
                         }`}
-                        title="Chọn vị trí hiện tại của bạn trực tiếp trên bản đồ"
+                        title={t('Chọn vị trí hiện tại của bạn trực tiếp trên bản đồ')}
                     >
                         <LocateFixed className="w-3.5 h-3.5" />
-                        {pickLocationMode ? 'Đang chọn vị trí...' : 'Đặt vị trí của tôi trên bản đồ'}
+                        {pickLocationMode ? t('Đang chọn vị trí...') : t('Đặt vị trí của tôi trên bản đồ')}
                     </button>
                 )}
             </div>
@@ -460,7 +462,7 @@ export default function InteractiveStationMap({
                         type="button"
                         onClick={() => onSelectStation(null)}
                         className="absolute top-3 right-3 w-7 h-7 rounded-full bg-surface-container-low hover:bg-surface-container flex items-center justify-center text-on-surface-variant cursor-pointer"
-                        title="Đóng"
+                        title={t('Đóng')}
                     >
                         <X className="w-4 h-4" />
                     </button>
@@ -472,16 +474,16 @@ export default function InteractiveStationMap({
                                     ? 'bg-emerald-100 text-emerald-700'
                                     : 'bg-amber-100 text-amber-700'
                             }`}>
-                                {selectedStation.status === 'ACTIVE' ? '● Đang hoạt động' : '⚠ Bảo trì'}
+                                {selectedStation.status === 'ACTIVE' ? t('● Đang hoạt động') : t('⚠ Bảo trì')}
                             </span>
                             {distLabel && (
                                 <span className="text-xs font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full flex items-center gap-1">
-                                    <Navigation className="w-3 h-3" /> Cách bạn {distLabel}
+                                    <Navigation className="w-3 h-3" /> {t('Cách bạn')} {distLabel}
                                 </span>
                             )}
                             {minPrice != null && Number.isFinite(minPrice) && (
                                 <span className="text-xs font-bold text-tertiary-container bg-emerald-50 px-2 py-0.5 rounded-full flex items-center gap-1">
-                                    <Sparkles className="w-3 h-3" /> Từ {(minPrice / 1000).toFixed(0)}k/h
+                                    <Sparkles className="w-3 h-3" /> {t('Từ')} {(minPrice / 1000).toFixed(0)}k/h
                                 </span>
                             )}
                         </div>
@@ -495,10 +497,10 @@ export default function InteractiveStationMap({
                     {/* Locker availability badges */}
                     <div className="grid grid-cols-3 gap-2 my-3">
                         {[
-                            { k: 'S', label: 'Cỡ S', a: selectedStation.availableS ?? 0, t: selectedStation.totalS ?? 0, p: selectedStation.priceS },
-                            { k: 'M', label: 'Cỡ M', a: selectedStation.availableM ?? 0, t: selectedStation.totalM ?? 0, p: selectedStation.priceM },
-                            { k: 'L', label: 'Cỡ L', a: selectedStation.availableL ?? 0, t: selectedStation.totalL ?? 0, p: selectedStation.priceL },
-                        ].map(({ k, label, a, t, p }) => (
+                            { k: 'S', label: t('Cỡ S'), a: selectedStation.availableS ?? 0, total: selectedStation.totalS ?? 0, p: selectedStation.priceS },
+                            { k: 'M', label: t('Cỡ M'), a: selectedStation.availableM ?? 0, total: selectedStation.totalM ?? 0, p: selectedStation.priceM },
+                            { k: 'L', label: t('Cỡ L'), a: selectedStation.availableL ?? 0, total: selectedStation.totalL ?? 0, p: selectedStation.priceL },
+                        ].map(({ k, label, a, total, p }) => (
                             <div
                                 key={k}
                                 className={`rounded-xl px-2.5 py-1.5 text-center border ${
@@ -510,7 +512,7 @@ export default function InteractiveStationMap({
                                     {p != null && <span className="text-primary-container">{(p / 1000).toFixed(0)}k/h</span>}
                                 </div>
                                 <div className={`text-sm font-extrabold mt-0.5 ${a > 0 ? 'text-on-surface' : 'text-red-500'}`}>
-                                    {Math.min(t, a)}<span className="text-xs font-normal text-on-surface-muted">/{t} trống</span>
+                                    {Math.min(total, a)}<span className="text-xs font-normal text-on-surface-muted">/{total} {t('trống')}</span>
                                 </div>
                             </div>
                         ))}
@@ -520,7 +522,7 @@ export default function InteractiveStationMap({
                     <div className="flex items-center justify-between text-xs text-on-surface-variant mb-3 px-1">
                         <span className="flex items-center gap-1 font-medium">
                             <Clock className="w-3.5 h-3.5 text-primary-container" />
-                            Giờ mở cửa: <strong>{selectedStation.opensAt || '00:00'} – {selectedStation.closesAt || '23:59'}</strong>
+                            {t('Giờ mở cửa:')} <strong>{selectedStation.opensAt || '00:00'} – {selectedStation.closesAt || '23:59'}</strong>
                         </span>
                         {selectedStation.contactPhone && (
                             <a
@@ -539,17 +541,17 @@ export default function InteractiveStationMap({
                             onClick={() => onViewDetail(selectedStation)}
                             className="flex-1 py-2.5 px-3 bg-surface-container-low hover:bg-surface-container-high text-primary-container text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
                         >
-                            Xem thông tin trạm
+                            {t('Xem thông tin trạm')}
                         </button>
                         <a
                             href={`https://www.google.com/maps/dir/?api=1&origin=${userLocation ? `${userLocation.lat},${userLocation.lng}` : ''}&destination=${selectedStation.latitude},${selectedStation.longitude}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-on-surface text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1"
-                            title="Mở Google Maps dẫn đường từ vị trí của bạn"
+                            title={t('Mở Google Maps dẫn đường từ vị trí của bạn')}
                         >
                             <ExternalLink className="w-3.5 h-3.5 text-primary-container" />
-                            Chỉ đường
+                            {t('Chỉ đường')}
                         </a>
                         {selectedStation.status === 'ACTIVE' && (
                             <button
@@ -557,7 +559,7 @@ export default function InteractiveStationMap({
                                 onClick={() => onBookStation(selectedStation)}
                                 className="flex-1 py-2.5 px-3 bg-primary-container hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm cursor-pointer flex items-center justify-center gap-1"
                             >
-                                Đặt tủ <ArrowRight className="w-3.5 h-3.5" />
+                                {t('Đặt tủ')} <ArrowRight className="w-3.5 h-3.5" />
                             </button>
                         )}
                     </div>

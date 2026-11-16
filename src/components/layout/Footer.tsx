@@ -1,6 +1,7 @@
 import type { MouseEvent } from 'react';
 import { Lock, Phone, Mail, MapPin, Heart } from 'lucide-react';
 import { CONTACT, SOCIAL_LINKS, mailtoHref, openLegal, openSupport } from '../../utils/contact';
+import { useT } from '../../i18n';
 
 type FooterLink = { label: string; href: string; onClick?: (e: MouseEvent) => void };
 
@@ -22,27 +23,28 @@ const partnerLink = (label: string, subject: string): FooterLink => {
  * Cải thiện layout cân bằng
  */
 const Footer = () => {
+    const t = useT();
   const footerLinks: Record<'locations' | 'services' | 'legal', FooterLink[]> = {
     locations: [
-      { label: 'Bản đồ trạm', href: '/find-station' },
-      { label: 'Trạng thái mạng lưới', href: '#stations' },
-      { label: 'Ga Bến Thành Metro', href: '#stations' },
-      { label: 'Sân bay Tân Sơn Nhất', href: '#stations' },
-      { label: 'Phố Đi Bộ Nguyễn Huệ', href: '#stations' },
+      { label: t('Bản đồ trạm'), href: '/find-station' },
+      { label: t('Trạng thái mạng lưới'), href: '#stations' },
+      { label: t('Ga Bến Thành Metro'), href: '#stations' },
+      { label: t('Sân bay Tân Sơn Nhất'), href: '#stations' },
+      { label: t('Phố Đi Bộ Nguyễn Huệ'), href: '#stations' },
     ],
     services: [
-      { label: 'Bảo hiểm hành lý', href: '#pricing' },
-      { label: 'Kích thước & Giá', href: '#pricing' },
-      { label: 'Kiến trúc bảo mật', href: '#security' },
-      dialogLink('Hỗ trợ khẩn cấp 24/7', openSupport),
-      dialogLink('Quy trình xử lý quá hạn', () => openLegal('overdue')),
+      { label: t('Bảo hiểm hành lý'), href: '#pricing' },
+      { label: t('Kích thước & Giá'), href: '#pricing' },
+      { label: t('Kiến trúc bảo mật'), href: '#security' },
+      dialogLink(t('Hỗ trợ khẩn cấp 24/7'), openSupport),
+      dialogLink(t('Quy trình xử lý quá hạn'), () => openLegal('overdue')),
     ],
     legal: [
-      partnerLink('API & Tích hợp', 'Hợp tác API & tích hợp SmartLocker'),
-      partnerLink('Đối tác doanh nghiệp', 'Hợp tác doanh nghiệp SmartLocker'),
-      dialogLink('Chính sách bảo mật', () => openLegal('privacy')),
-      dialogLink('Điều khoản dịch vụ', () => openLegal('terms')),
-      partnerLink('Hợp tác nhượng quyền', 'Hợp tác nhượng quyền SmartLocker'),
+      partnerLink(t('API & Tích hợp'), t('Hợp tác API & tích hợp SmartLocker')),
+      partnerLink(t('Đối tác doanh nghiệp'), t('Hợp tác doanh nghiệp SmartLocker')),
+      dialogLink(t('Chính sách bảo mật'), () => openLegal('privacy')),
+      dialogLink(t('Điều khoản dịch vụ'), () => openLegal('terms')),
+      partnerLink(t('Hợp tác nhượng quyền'), t('Hợp tác nhượng quyền SmartLocker')),
     ],
   };
 
@@ -65,7 +67,7 @@ const Footer = () => {
 
               {/* Description */}
               <p className="text-sm text-secondary max-w-sm leading-relaxed">
-                Hạ tầng mạng lưới tủ gửi đồ tự động thông minh 24/7 hàng đầu Việt Nam. Tích hợp thanh toán số VietQR, mã hóa bảo mật JWS không phụ thuộc internet và bảo hiểm hành lý theo từng đơn.
+                {t('Hạ tầng mạng lưới tủ gửi đồ tự động thông minh 24/7 hàng đầu Việt Nam. Tích hợp thanh toán số VietQR, mã hóa bảo mật JWS không phụ thuộc internet và bảo hiểm hành lý theo từng đơn.')}
               </p>
 
               {/* Contact Info */}
@@ -74,7 +76,7 @@ const Footer = () => {
                   <div className="w-8 h-8 rounded-lg bg-primary-container/10 flex items-center justify-center">
                     <Phone className="w-4 h-4 text-primary" />
                   </div>
-                  <span>Tổng đài CSKH: <a href={`tel:${CONTACT.hotlineTel}`} className="font-bold hover:text-primary">{CONTACT.hotlineLabel}</a> (24/7)</span>
+                  <span>{t('Tổng đài CSKH:')} <a href={`tel:${CONTACT.hotlineTel}`} className="font-bold hover:text-primary">{CONTACT.hotlineLabel}</a> (24/7)</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-lg bg-primary-container/10 flex items-center justify-center">
@@ -86,7 +88,7 @@ const Footer = () => {
                   <div className="w-8 h-8 rounded-lg bg-primary-container/10 flex items-center justify-center">
                     <MapPin className="w-4 h-4 text-primary" />
                   </div>
-                  <span className="text-secondary">Tòa nhà Innovation Hub, Quận 1, TP.HCM</span>
+                  <span className="text-secondary">{t('Tòa nhà Innovation Hub, Quận 1, TP.HCM')}</span>
                 </div>
               </div>
 
@@ -124,7 +126,7 @@ const Footer = () => {
 
             {/* Links Columns */}
             <div>
-              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wider mb-4">Vị Trí & Trạm Tủ</h3>
+              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wider mb-4">{t('Vị Trí & Trạm Tủ')}</h3>
               <ul className="space-y-2.5 text-sm">
                 {footerLinks.locations.map((link, index) => (
                   <li key={index}>
@@ -141,7 +143,7 @@ const Footer = () => {
             </div>
 
             <div>
-              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wider mb-4">Dịch Vụ & An Toàn</h3>
+              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wider mb-4">{t('Dịch Vụ & An Toàn')}</h3>
               <ul className="space-y-2.5 text-sm">
                 {footerLinks.services.map((link, index) => (
                   <li key={index}>
@@ -158,7 +160,7 @@ const Footer = () => {
             </div>
 
             <div>
-              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wider mb-4">Đối Tác & Pháp Lý</h3>
+              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wider mb-4">{t('Đối Tác & Pháp Lý')}</h3>
               <ul className="space-y-2.5 text-sm">
                 {footerLinks.legal.map((link, index) => (
                   <li key={index}>
@@ -185,8 +187,8 @@ const Footer = () => {
               </span>
             </div>
             <div className="flex items-center gap-4 flex-wrap justify-center">
-              <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>Chính sách bảo mật</a>
-              <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }}>Điều khoản</a>
+              <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>{t('Chính sách bảo mật')}</a>
+              <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }}>{t('Điều khoản')}</a>
             </div>
           </div>
         </div>

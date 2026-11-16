@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { MapPin, Navigation, Plus, Minus, ArrowRight, Star, Building2, RefreshCw } from 'lucide-react';
 import { calcDistance, getStations } from '../../api/stationService';
 import type { Station } from '../../api/stationService';
+import { useT } from '../../i18n';
 
 /**
  * Stations Component - Mạng lưới trạm tủ trên trang chủ.
@@ -43,6 +44,7 @@ const getAvailabilityColor = (count: number) => (count >= 3 ? 'text-emerald-600'
 const formatDistance = (km: number) => (km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`);
 
 const Stations = () => {
+    const t = useT();
   const [stations, setStations] = useState<Station[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -94,11 +96,11 @@ const Stations = () => {
   }, [visible]);
 
   const locate = () => {
-    if (!navigator.geolocation) { setLocMessage('Trình duyệt không hỗ trợ định vị.'); return; }
-    setLocMessage('Đang xác định vị trí...');
+    if (!navigator.geolocation) { setLocMessage(t('Trình duyệt không hỗ trợ định vị.')); return; }
+    setLocMessage(t('Đang xác định vị trí...'));
     navigator.geolocation.getCurrentPosition(
-      (pos) => { setUserLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude }); setLocMessage('Đã sắp xếp theo khoảng cách từ vị trí của bạn.'); },
-      (err) => setLocMessage(err.code === 1 ? 'Bạn đã chặn quyền vị trí. Hãy cho phép vị trí cho trang này rồi thử lại.' : 'Chưa xác định được vị trí. Vui lòng thử lại.'),
+      (pos) => { setUserLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude }); setLocMessage(t('Đã sắp xếp theo khoảng cách từ vị trí của bạn.')); },
+      (err) => setLocMessage(err.code === 1 ? t('Bạn đã chặn quyền vị trí. Hãy cho phép vị trí cho trang này rồi thử lại.') : t('Chưa xác định được vị trí. Vui lòng thử lại.')),
       { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 },
     );
   };
@@ -113,11 +115,11 @@ const Stations = () => {
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
             <div className="max-w-2xl">
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-on-surface tracking-tight leading-tight">
-                Mạng Lưới Trạm Tủ<br className="hidden md:block" />
-                <span className="text-gradient"> Thông Minh Toàn Quốc</span>
+                {t('Mạng Lưới Trạm Tủ')}<br className="hidden md:block" />
+                <span className="text-gradient"> {t('Thông Minh Toàn Quốc')}</span>
               </h2>
               <p className="text-base text-secondary mt-3">
-                {loading ? 'Đang tải danh sách trạm...' : `${stations.length} trạm đang hoạt động. Chọn thành phố hoặc cỡ tủ để xem tủ trống theo thời gian thực.`}
+                {loading ? t('Đang tải danh sách trạm...') : t('{n} trạm đang hoạt động. Chọn thành phố hoặc cỡ tủ để xem tủ trống theo thời gian thực.', { n: stations.length })}
               </p>
             </div>
 
@@ -136,7 +138,7 @@ const Stations = () => {
                         : 'bg-white text-secondary border-outline-variant/40 hover:bg-surface-container-low hover:border-primary/40'
                     }`}
                   >
-                    {id === 'all' ? 'Tất cả' : CITY_LABEL[id]} ({cityCounts[id] ?? 0})
+                    {id === 'all' ? t('Tất cả') : t(CITY_LABEL[id])} ({cityCounts[id] ?? 0})
                   </button>
                 ))}
             </div>
@@ -146,7 +148,7 @@ const Stations = () => {
             {/* Bản đồ xem nhanh */}
             <div className="lg:col-span-5 bg-white rounded-3xl border border-outline-variant/40 shadow-elevation-1 p-5 overflow-hidden flex flex-col">
               <div className="flex items-center gap-2 mb-4 flex-wrap">
-                <span className="text-xs font-bold text-secondary mr-1">Bộ lọc:</span>
+                <span className="text-xs font-bold text-secondary mr-1">{t('Bộ lọc:')}</span>
                 {SIZE_FILTERS.map((f) => (
                   <button
                     key={f.id}
@@ -159,7 +161,7 @@ const Stations = () => {
                         : 'bg-surface-container-low text-on-surface hover:bg-surface-container border border-outline-variant/30'
                     }`}
                   >
-                    {f.name}
+                    {t(f.name)}
                   </button>
                 ))}
               </div>
@@ -195,7 +197,7 @@ const Stations = () => {
                         onDoubleClick={() => goMap(station.id)}
                         className="absolute -translate-x-1/2 -translate-y-1/2 z-20 cursor-pointer"
                         style={{ left: `${left}%`, top: `${top}%` }}
-                        title={`${station.name}: ${total} tủ trống`}
+                        title={t('{name}: {n} tủ trống', { name: station.name, n: total })}
                       >
                         <span className={`bg-white border-2 shadow-elevation-3 px-3 py-1.5 rounded-full flex items-center gap-2 ${active ? 'border-primary' : total > 0 ? 'border-emerald-600' : 'border-red-400'}`} style={{ transform: `scale(${1 / zoom})` }}>
                           <span className={`w-2.5 h-2.5 rounded-full ${total > 0 ? 'bg-emerald-500' : 'bg-red-400'}`}></span>
@@ -208,7 +210,7 @@ const Stations = () => {
 
                 {!loading && pins.length === 0 && (
                   <div className="absolute inset-0 flex items-center justify-center text-sm text-secondary z-10 px-6 text-center">
-                    {error ? 'Không tải được danh sách trạm.' : 'Không có trạm phù hợp bộ lọc hiện tại.'}
+                    {error ? t('Không tải được danh sách trạm.') : t('Không có trạm phù hợp bộ lọc hiện tại.')}
                   </div>
                 )}
 
@@ -218,7 +220,7 @@ const Stations = () => {
                     onClick={() => setZoom((z) => Math.min(2, +(z + 0.25).toFixed(2)))}
                     disabled={zoom >= 2}
                     className="w-9 h-9 flex items-center justify-center text-on-surface hover:bg-surface-container rounded-lg font-bold transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                    aria-label="Phóng to"
+                    aria-label={t('Phóng to')}
                   >
                     <Plus className="w-5 h-5" />
                   </button>
@@ -228,7 +230,7 @@ const Stations = () => {
                     onClick={() => setZoom((z) => Math.max(0.75, +(z - 0.25).toFixed(2)))}
                     disabled={zoom <= 0.75}
                     className="w-9 h-9 flex items-center justify-center text-on-surface hover:bg-surface-container rounded-lg font-bold transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                    aria-label="Thu nhỏ"
+                    aria-label={t('Thu nhỏ')}
                   >
                     <Minus className="w-5 h-5" />
                   </button>
@@ -240,13 +242,13 @@ const Stations = () => {
                   className="absolute top-4 left-4 bg-white/95 backdrop-blur px-3.5 py-2 rounded-xl border border-outline-variant/40 shadow-elevation-2 flex items-center gap-2 text-xs font-bold text-primary cursor-pointer hover:bg-on-primary-fixed-variant hover:text-white transition-all z-30"
                 >
                   <Navigation className="w-4 h-4" />
-                  <span>Định vị gần tôi</span>
+                  <span>{t('Định vị gần tôi')}</span>
                 </button>
 
                 <div className="absolute top-4 right-4 bg-white/95 backdrop-blur px-3 py-2 rounded-xl border border-outline-variant/40 shadow-elevation-2 z-30">
                   <div className="flex items-center gap-2 text-xs">
                     <Building2 className="w-4 h-4 text-primary" />
-                    <span className="font-bold text-on-surface">{visible.length} trạm</span>
+                    <span className="font-bold text-on-surface">{visible.length} {t('trạm')}</span>
                   </div>
                 </div>
               </div>
@@ -254,10 +256,10 @@ const Stations = () => {
               <div className="mt-4 flex items-center justify-between text-xs text-secondary gap-3">
                 <span className="flex items-center gap-1.5 min-w-0">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
-                  <span className="truncate" role="status">{locMessage || 'Số tủ trống lấy trực tiếp từ hệ thống'}</span>
+                  <span className="truncate" role="status">{locMessage || t('Số tủ trống lấy trực tiếp từ hệ thống')}</span>
                 </span>
                 <button type="button" onClick={() => goMap()} className="font-bold text-primary flex items-center gap-1 hover:underline cursor-pointer shrink-0">
-                  Xem toàn màn hình
+                  {t('Xem toàn màn hình')}
                   <ArrowRight className="w-3 h-3" />
                 </button>
               </div>
@@ -267,24 +269,24 @@ const Stations = () => {
             <div className="lg:col-span-7 space-y-4">
               <div className="flex items-center justify-between mb-1">
                 <h3 className="text-sm font-bold text-secondary uppercase tracking-wider">
-                  {userLoc ? 'Trạm gần bạn nhất' : 'Trạm đang hoạt động'}
+                  {userLoc ? t('Trạm gần bạn nhất') : t('Trạm đang hoạt động')}
                 </h3>
                 <button type="button" onClick={load} className="text-xs text-secondary hover:text-primary inline-flex items-center gap-1 cursor-pointer">
-                  <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} /> Làm mới
+                  <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} /> {t('Làm mới')}
                 </button>
               </div>
 
               {loading && stations.length === 0 && (
-                <div className="bg-white rounded-2xl p-8 border border-outline-variant/40 text-center text-sm text-secondary">Đang tải danh sách trạm...</div>
+                <div className="bg-white rounded-2xl p-8 border border-outline-variant/40 text-center text-sm text-secondary">{t('Đang tải danh sách trạm...')}</div>
               )}
               {!loading && error && (
                 <div className="bg-white rounded-2xl p-8 border border-red-200 text-center text-sm text-red-700">
-                  Không kết nối được máy chủ để lấy danh sách trạm.
-                  <button type="button" onClick={load} className="ml-2 font-bold underline cursor-pointer">Thử lại</button>
+                  {t('Không kết nối được máy chủ để lấy danh sách trạm.')}
+                  <button type="button" onClick={load} className="ml-2 font-bold underline cursor-pointer">{t('Thử lại')}</button>
                 </div>
               )}
               {!loading && !error && visible.length === 0 && (
-                <div className="bg-white rounded-2xl p-8 border border-outline-variant/40 text-center text-sm text-secondary">Không có trạm phù hợp. Thử đổi thành phố hoặc cỡ tủ.</div>
+                <div className="bg-white rounded-2xl p-8 border border-outline-variant/40 text-center text-sm text-secondary">{t('Không có trạm phù hợp. Thử đổi thành phố hoặc cỡ tủ.')}</div>
               )}
 
               {visible.slice(0, 6).map((station, index) => {
@@ -306,12 +308,12 @@ const Stations = () => {
                         <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                           <span className="px-2.5 py-0.5 rounded-full text-xs font-bold border flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border-emerald-200">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                            {station.opensAt && station.closesAt ? `Mở cửa ${station.opensAt}–${station.closesAt}` : 'Đang hoạt động'}
+                            {station.opensAt && station.closesAt ? t('Mở cửa {from}–{to}', { from: station.opensAt, to: station.closesAt }) : t('Đang hoạt động')}
                           </span>
                           {station.distanceKm != null && (
                             <span className="text-xs text-secondary flex items-center gap-0.5">
                               <Navigation className="w-3 h-3" />
-                              Cách bạn {formatDistance(station.distanceKm)}
+                              {t('Cách bạn {d}', { d: formatDistance(station.distanceKm) })}
                             </span>
                           )}
                           {(station.ratingCount ?? 0) > 0 && station.ratingAverage != null && (
@@ -328,7 +330,7 @@ const Stations = () => {
                           {(['S', 'M', 'L'] as const).map((size) => (
                             <div key={size} className={`text-center py-2 rounded-lg border ${available(station, size) > 0 ? 'bg-surface-container-low border-outline-variant/30' : 'bg-red-50 border-red-200'}`}>
                               <span className="text-xs text-secondary block">Size {size}</span>
-                              <span className={`font-bold text-sm ${getAvailabilityColor(available(station, size))}`}>{available(station, size)} trống</span>
+                              <span className={`font-bold text-sm ${getAvailabilityColor(available(station, size))}`}>{available(station, size)} {t('trống')}</span>
                             </div>
                           ))}
                         </div>
@@ -338,17 +340,17 @@ const Stations = () => {
                             {price != null && (
                               <>
                                 <div>
-                                  <div className="text-xs text-secondary">Từ</div>
+                                  <div className="text-xs text-secondary">{t('Từ')}</div>
                                   <div className="text-base font-bold text-on-surface">
-                                    {price.toLocaleString('vi-VN')}đ<span className="text-xs font-normal text-secondary">/giờ</span>
+                                    {price.toLocaleString('vi-VN')}{t('đ')}<span className="text-xs font-normal text-secondary">{t('/giờ')}</span>
                                   </div>
                                 </div>
                                 <div className="h-8 w-px bg-outline-variant/40"></div>
                               </>
                             )}
                             <div>
-                              <div className="text-xs text-secondary">Tổng</div>
-                              <div className={`text-base font-bold ${totalAvailable > 0 ? 'text-emerald-600' : 'text-red-600'}`}>{totalAvailable} tủ trống</div>
+                              <div className="text-xs text-secondary">{t('Tổng')}</div>
+                              <div className={`text-base font-bold ${totalAvailable > 0 ? 'text-emerald-600' : 'text-red-600'}`}>{totalAvailable} {t('tủ trống')}</div>
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
@@ -357,7 +359,7 @@ const Stations = () => {
                               onClick={() => { setActiveId(station.id); goMap(station.id); }}
                               className="px-4 py-2.5 rounded-xl text-sm font-bold border border-outline-variant/40 text-secondary hover:text-primary hover:border-primary/40 transition-all cursor-pointer"
                             >
-                              Xem bản đồ
+                              {t('Xem bản đồ')}
                             </button>
                             <button
                               type="button"
@@ -369,7 +371,7 @@ const Stations = () => {
                                   : 'bg-surface-container-low hover:bg-primary-container text-primary hover:text-white border border-outline-variant/40 hover:border-primary'
                               }`}
                             >
-                              {totalAvailable === 0 ? 'Hết tủ trống' : 'Đặt tủ ngay'}
+                              {totalAvailable === 0 ? t('Hết tủ trống') : t('Đặt tủ ngay')}
                               {totalAvailable > 0 && <ArrowRight className="w-4 h-4" />}
                             </button>
                           </div>
@@ -385,7 +387,7 @@ const Stations = () => {
                 onClick={() => goMap()}
                 className="w-full py-4 rounded-xl border-2 border-dashed border-outline-variant text-primary font-bold flex items-center justify-center gap-2 hover:bg-surface-container-low hover:border-primary transition-all text-sm mt-2 cursor-pointer"
               >
-                <span>{stations.length > 6 ? `Xem tất cả ${stations.length} trạm trên bản đồ` : 'Mở bản đồ trạm'}</span>
+                <span>{stations.length > 6 ? t('Xem tất cả {n} trạm trên bản đồ', { n: stations.length }) : t('Mở bản đồ trạm')}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>

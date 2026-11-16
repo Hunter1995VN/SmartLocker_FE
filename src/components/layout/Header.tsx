@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNetworkStats } from '../../utils/useNetworkStats';
 import { Menu, X, Lock, ArrowRight, Zap } from 'lucide-react';
 import { openSupport } from '../../utils/contact';
+import { useT } from '../../i18n';
+import LanguageSwitcher from '../ui/LanguageSwitcher';
 
 type ViewMode = 'login' | 'register' | 'verify-otp' | 'forgot-password';
 
@@ -14,6 +16,7 @@ interface HeaderProps {
 }
 
 const Header = ({ onNavigate }: HeaderProps) => {
+    const t = useT();
   const { stations } = useNetworkStats();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -25,12 +28,12 @@ const Header = ({ onNavigate }: HeaderProps) => {
   }, []);
 
   const navLinks = [
-    { href: '#stations', label: 'Tìm trạm gửi tủ' },
-    { href: '#how-it-works', label: 'Cách hoạt động' },
-    { href: '#pricing', label: 'Kích thước & Bảng giá' },
-    { href: '#security', label: 'Bảo mật & Công nghệ' },
-    { href: '#customer-reviews', label: 'Đánh giá' },
-    { href: '#support', label: 'Hỗ trợ' },
+    { href: '#stations', label: t('Tìm trạm gửi tủ') },
+    { href: '#how-it-works', label: t('Cách hoạt động') },
+    { href: '#pricing', label: t('Kích thước & Bảng giá') },
+    { href: '#security', label: t('Bảo mật & Công nghệ') },
+    { href: '#customer-reviews', label: t('Đánh giá') },
+    { href: '#support', label: t('Hỗ trợ') },
   ];
 
   return (
@@ -57,12 +60,12 @@ const Header = ({ onNavigate }: HeaderProps) => {
                   24/7 Online
                 </span>
               </span>
-              <span className="text-xs text-secondary leading-tight hidden sm:block">Mạng lưới tủ thông minh</span>
+              <span className="text-xs text-secondary leading-tight hidden sm:block">{t('Mạng lưới tủ thông minh')}</span>
             </div>
           </a>
 
           {/* Navigation Links (Desktop) */}
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden xl:flex items-center gap-1">
             {navLinks.map((link, index) => (
               <a
                 key={index}
@@ -78,22 +81,23 @@ const Header = ({ onNavigate }: HeaderProps) => {
           {/* Right Action Cluster */}
           <div className="flex items-center gap-2 md:gap-3">
             {/* Live Status Pill */}
-            <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">
+            <div className="hidden min-[1440px]:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">
               <span className="relative flex items-center justify-center">
                 <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                 <span className="absolute w-2 h-2 rounded-full bg-emerald-500 animate-ping opacity-75"></span>
               </span>
-              <span>{stations != null ? `${stations} trạm đang hoạt động` : "Trạm đang hoạt động"}</span>
+              <span>{stations != null ? t('{n} trạm đang hoạt động', { n: stations }) : t('Trạm đang hoạt động')}</span>
             </div>
 
             {/* Secondary Sign In */}
+            <LanguageSwitcher className="hidden md:inline-flex" />
             <a 
               href="#login"
               className="hidden md:inline-flex text-secondary hover:text-on-surface px-4 py-2 text-sm font-semibold transition-colors rounded-lg hover:bg-surface-container-low"
               onClick={(e) => { e.preventDefault(); onNavigate?.('login'); }}
               role="button"
             >
-              Đăng nhập
+              {t('Đăng nhập')}
             </a>
 
             {/* Primary Action CTA */}
@@ -104,16 +108,16 @@ const Header = ({ onNavigate }: HeaderProps) => {
               role="button"
             >
               <Zap className="w-4 h-4 hidden sm:block" />
-              <span className="sm:hidden">Đặt tủ</span>
-              <span className="hidden sm:inline">Đặt tủ ngay</span>
+              <span className="sm:hidden">{t('Đặt tủ')}</span>
+              <span className="hidden sm:inline">{t('Đặt tủ ngay')}</span>
               <ArrowRight className="w-4 h-4" />
             </a>
 
             {/* Mobile Menu Toggle Button */}
             <button 
-              className="lg:hidden p-2.5 text-on-surface rounded-lg hover:bg-surface-container-low transition-colors"
+              className="xl:hidden p-2.5 text-on-surface rounded-lg hover:bg-surface-container-low transition-colors"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-label={isMobileMenuOpen ? 'Đóng menu' : 'Mở menu'}
+              aria-label={isMobileMenuOpen ? t('Đóng menu') : t('Mở menu')}
               aria-expanded={isMobileMenuOpen}
             >
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -123,14 +127,14 @@ const Header = ({ onNavigate }: HeaderProps) => {
 
         {/* Mobile Dropdown Navigation */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden border-t border-outline-variant/30 bg-white px-4 py-4 space-y-2 shadow-elevation-3">
+          <div className="xl:hidden border-t border-outline-variant/30 bg-white px-4 py-4 space-y-2 shadow-elevation-3">
             {/* Status Banner */}
             <div className="flex items-center gap-2 py-3 px-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">
               <span className="relative flex items-center justify-center">
                 <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                 <span className="absolute w-2 h-2 rounded-full bg-emerald-500 animate-ping opacity-75"></span>
               </span>
-              <span>{stations != null ? `${stations} trạm tủ đang hoạt động` : "Mạng lưới trạm tủ đang hoạt động"}</span>
+              <span>{stations != null ? t('{n} trạm tủ đang hoạt động', { n: stations }) : t('Mạng lưới trạm tủ đang hoạt động')}</span>
             </div>
             
             {/* Navigation Links */}
@@ -149,21 +153,22 @@ const Header = ({ onNavigate }: HeaderProps) => {
             ))}
             
             {/* Action Buttons */}
-            <div className="pt-3 border-t border-outline-variant/30 flex gap-2">
+            <div className="pt-3 border-t border-outline-variant/30 flex items-center gap-2">
+              <LanguageSwitcher />
               <a 
                 href="#login"
                 className="flex-1 text-center py-3 rounded-xl border-2 border-outline-variant text-sm font-semibold"
                 onClick={(e) => { e.preventDefault(); setIsMobileMenuOpen(false); onNavigate?.('login'); }}
                 role="button"
               >
-                Đăng nhập
+                {t('Đăng nhập')}
               </a>
               <a 
                 href="#booking-widget" 
                 className="flex-1 text-center py-3 rounded-xl bg-primary-container text-white text-sm font-bold shadow-elevation-1"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                Đặt tủ ngay
+                {t('Đặt tủ ngay')}
               </a>
             </div>
           </div>

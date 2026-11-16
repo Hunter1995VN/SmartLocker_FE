@@ -1,27 +1,29 @@
 import { Check, Star, Ruler, Shield, Battery, ShieldCheck, Award } from 'lucide-react';
 import { SELECT_SIZE_EVENT } from './Hero';
+import { useT } from '../../i18n';
 
 /**
  * Pricing Component - Phần hiển thị kích cỡ tủ và bảng giá
  * Cải thiện visual hierarchy và spacing
  */
 const Pricing = () => {
+    const t = useT();
   const sizes = [
     {
       code: 'S',
       name: 'Size S',
-      subtitle: '(Nhỏ)',
-      category: 'Balo & Túi Xách',
+      subtitle: t('(Nhỏ)'),
+      category: t('Balo & Túi Xách'),
       codeName: 'S-BAY',
-      description: 'Phù hợp balo laptop, túi xách du lịch, túi đồ mua sắm',
+      description: t('Phù hợp balo laptop, túi xách du lịch, túi đồ mua sắm'),
       dimensions: '45 × 45 × 65 cm',
       price: 10000,
       priceDay: 70000,
-      capacity: '1 balo lớn + 1 túi xách phụ kiện',
+      capacity: t('1 balo lớn + 1 túi xách phụ kiện'),
       features: [
-        'Bảo hiểm hành lý theo từng đơn',
-        'Mở tủ không giới hạn số lần',
-        'Khóa điện tử solenoid bảo mật',
+        t('Bảo hiểm hành lý theo từng đơn'),
+        t('Mở tủ không giới hạn số lần'),
+        t('Khóa điện tử solenoid bảo mật'),
       ],
       popular: false,
       color: 'blue',
@@ -29,19 +31,19 @@ const Pricing = () => {
     {
       code: 'M',
       name: 'Size M',
-      subtitle: '(Tiêu Chuẩn)',
+      subtitle: t('(Tiêu Chuẩn)'),
       category: 'Vali Cabin 20"',
       codeName: 'M-BAY',
-      description: 'Vali xách tay máy bay 20 inch, balo phượt cỡ lớn',
+      description: t('Vali xách tay máy bay 20 inch, balo phượt cỡ lớn'),
       dimensions: '65 × 45 × 65 cm',
       price: 20000,
       priceDay: 140000,
-      capacity: '1 vali xách tay 20" + áo khoác, quà lưu niệm',
+      capacity: t('1 vali xách tay 20" + áo khoác, quà lưu niệm'),
       features: [
-        'Cổng sạc pin dự phòng tích hợp trong tủ',
-        'Bảo hiểm hành lý theo từng đơn',
-        'Mở tủ không giới hạn số lần',
-        'Cảm biến đóng/mở cửa từng ô tủ',
+        t('Cổng sạc pin dự phòng tích hợp trong tủ'),
+        t('Bảo hiểm hành lý theo từng đơn'),
+        t('Mở tủ không giới hạn số lần'),
+        t('Cảm biến đóng/mở cửa từng ô tủ'),
       ],
       popular: true,
       color: 'primary',
@@ -49,18 +51,18 @@ const Pricing = () => {
     {
       code: 'L',
       name: 'Size L',
-      subtitle: '(Cực Đại)',
-      category: 'Vali Lớn Ký Gửi',
+      subtitle: t('(Cực Đại)'),
+      category: t('Vali Lớn Ký Gửi'),
       codeName: 'L-BAY',
-      description: 'Vali ký gửi 28-32 inch hoặc nhóm bạn gửi chung 2-3 kiện',
+      description: t('Vali ký gửi 28-32 inch hoặc nhóm bạn gửi chung 2-3 kiện'),
       dimensions: '95 × 55 × 65 cm',
       price: 30000,
       priceDay: 210000,
-      capacity: '1 vali lớn 28" + 1 balo kéo hoặc 2 vali cỡ vừa',
+      capacity: t('1 vali lớn 28" + 1 balo kéo hoặc 2 vali cỡ vừa'),
       features: [
-        'Bảo hiểm hành lý theo từng đơn',
-        'Mở tủ không giới hạn số lần',
-        'Phù hợp nhóm 3-4 người',
+        t('Bảo hiểm hành lý theo từng đơn'),
+        t('Mở tủ không giới hạn số lần'),
+        t('Phù hợp nhóm 3-4 người'),
       ],
       popular: false,
       color: 'indigo',
@@ -68,10 +70,10 @@ const Pricing = () => {
   ];
 
   const guarantees = [
-    { icon: ShieldCheck, text: 'Khóa điện tử Solenoid chịu lực cao' },
-    { icon: Shield, text: 'Cảm biến đóng/mở cửa từng ô tủ' },
-    { icon: Award, text: 'Tặng kèm bảo hiểm hành lý theo từng đơn' },
-    { icon: Battery, text: 'Hỗ trợ kỹ thuật từ xa 24/7 tức thì' },
+    { icon: ShieldCheck, text: t('Khóa điện tử Solenoid chịu lực cao') },
+    { icon: Shield, text: t('Cảm biến đóng/mở cửa từng ô tủ') },
+    { icon: Award, text: t('Tặng kèm bảo hiểm hành lý theo từng đơn') },
+    { icon: Battery, text: t('Hỗ trợ kỹ thuật từ xa 24/7 tức thì') },
   ];
 
   return (
@@ -82,10 +84,10 @@ const Pricing = () => {
           {/* Section Header */}
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-on-surface tracking-tight leading-tight mb-4 text-balance">
-              Kích Cỡ Tủ & <span className="text-gradient">Bảng Giá Minh Bạch</span>
+              {t('Kích Cỡ Tủ &')} <span className="text-gradient">{t('Bảng Giá Minh Bạch')}</span>
             </h2>
             <p className="text-base sm:text-lg text-secondary max-w-2xl mx-auto">
-              Tính tiền theo giờ linh hoạt, không phụ phí ẩn, tích hợp bảo hiểm hành lý miễn phí theo từng đơn đặt.
+              {t('Tính tiền theo giờ linh hoạt, không phụ phí ẩn, tích hợp bảo hiểm hành lý miễn phí theo từng đơn đặt.')}
             </p>
           </div>
 
@@ -105,7 +107,7 @@ const Pricing = () => {
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
  <div className="bg-primary-container text-white px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider shadow-elevation-2 flex items-center gap-1.5">
                       <Star className="w-3.5 h-3.5 fill-white" />
-                      Phổ biến nhất
+                      {t('Phổ biến nhất')}
                     </div>
                   </div>
                 )}
@@ -135,16 +137,16 @@ const Pricing = () => {
                   <div className={`my-6 py-5 border-y ${size.popular ? 'border-primary/20 bg-primary-container/5 -mx-7 px-7' : 'border-outline-variant/30'}`}>
                     <div className="flex items-baseline gap-1">
                       <span className={`text-4xl font-bold ${size.popular ? 'text-primary' : 'text-on-surface'}`}>
-                        {size.price.toLocaleString()}đ
+                        {size.price.toLocaleString()}{t('đ')}
                       </span>
-                      <span className="text-base text-secondary">/ giờ</span>
+                      <span className="text-base text-secondary">{t('/ giờ')}</span>
                     </div>
                     <p className="text-sm text-secondary mt-1">
-                      hoặc gói trọn ngày <strong className="text-on-surface">{size.priceDay.toLocaleString()}đ</strong>/24h
+                      {t('hoặc gói trọn ngày')} <strong className="text-on-surface">{size.priceDay.toLocaleString()}{t('đ')}</strong>/24h
                     </p>
                     <div className="mt-3 flex items-center gap-1.5 text-xs">
-                      <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-md font-semibold">Tiết kiệm 30%</span>
-                      <span className="text-secondary">khi đặt trọn ngày</span>
+                      <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-md font-semibold">{t('Tiết kiệm 30%')}</span>
+                      <span className="text-secondary">{t('khi đặt trọn ngày')}</span>
                     </div>
                   </div>
 
@@ -161,7 +163,7 @@ const Pricing = () => {
                     </div>
                     <div>
                       <div className={`text-xs ${size.popular ? 'text-primary font-semibold' : 'text-secondary'}`}>
-                        Kích thước (C × R × S)
+                        {t('Kích thước (C × R × S)')}
                       </div>
                       <div className="text-sm font-bold text-on-surface">{size.dimensions}</div>
                     </div>
@@ -169,13 +171,13 @@ const Pricing = () => {
 
                   {/* Capacity */}
                   <div className="mb-5">
-                    <h4 className="text-xs font-bold text-secondary uppercase tracking-wider mb-2">Sức chứa</h4>
+                    <h4 className="text-xs font-bold text-secondary uppercase tracking-wider mb-2">{t('Sức chứa')}</h4>
                     <p className="text-sm text-on-surface">{size.capacity}</p>
                   </div>
 
                   {/* Features list */}
                   <div className="mb-8">
-                    <h4 className="text-xs font-bold text-secondary uppercase tracking-wider mb-3">Quyền lợi bao gồm</h4>
+                    <h4 className="text-xs font-bold text-secondary uppercase tracking-wider mb-3">{t('Quyền lợi bao gồm')}</h4>
                     <ul className="space-y-2.5">
                       {size.features.map((feature, index) => (
                         <li key={index} className="flex items-start gap-2.5 text-sm text-on-surface">
@@ -206,10 +208,10 @@ const Pricing = () => {
                         : 'bg-white hover:bg-primary-container text-primary hover:text-white border-2 border-primary'
                     }`}
                   >
-                    Chọn {size.name}
+                    {t('Chọn')} {size.name}
                   </button>
                   <p className="text-sm text-center text-secondary mt-3">
-                    Thanh toán linh hoạt • Hủy miễn phí trước 2h
+                    {t('Thanh toán linh hoạt • Hủy miễn phí trước 2h')}
                   </p>
                 </div>
               </div>
@@ -219,8 +221,8 @@ const Pricing = () => {
           {/* Trust & Hardware Guarantees Row */}
           <div className="mt-16 bg-white rounded-2xl border border-outline-variant/30 p-6 md:p-8 shadow-elevation-1">
             <div className="text-center mb-6">
-              <h3 className="text-lg font-bold text-on-surface">Cam kết chất lượng phần cứng & dịch vụ</h3>
-              <p className="text-sm text-secondary mt-1">Mọi trạm SmartLocker đều đạt chuẩn an toàn quốc tế</p>
+              <h3 className="text-lg font-bold text-on-surface">{t('Cam kết chất lượng phần cứng & dịch vụ')}</h3>
+              <p className="text-sm text-secondary mt-1">{t('Mọi trạm SmartLocker đều đạt chuẩn an toàn quốc tế')}</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {guarantees.map((item, index) => (
