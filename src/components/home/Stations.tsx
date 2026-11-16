@@ -322,7 +322,7 @@ const Stations = () => {
                           )}
                         </div>
                         <h3 className="font-bold text-on-surface text-base leading-tight">{station.name}</h3>
-                        <p className="text-xs text-secondary mt-0.5">{station.address}</p>
+                        <p className="text-sm text-secondary mt-0.5">{station.address}</p>
 
                         <div className="grid grid-cols-3 gap-2 mt-4">
                           {(['S', 'M', 'L'] as const).map((size) => (

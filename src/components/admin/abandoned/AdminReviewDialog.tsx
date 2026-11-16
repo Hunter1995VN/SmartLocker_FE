@@ -118,7 +118,7 @@ export default function AdminReviewDialog({ record, onApproved, onClose }: Admin
                 <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/60 flex items-start justify-between gap-3">
                     <div className="min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                            <h2 className="text-sm font-black text-slate-900 font-mono">
+                            <h2 className="text-sm font-extrabold text-slate-900 font-mono">
                                 {record.recordCode}
                             </h2>
                             <StatusBadge status={record.status} />
@@ -143,7 +143,7 @@ export default function AdminReviewDialog({ record, onApproved, onClose }: Admin
                         <div className="flex items-start gap-2.5 p-4 rounded-xl bg-emerald-50 border border-emerald-200/80 text-sm text-emerald-800">
                             <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5 text-emerald-600" />
                             <div>
-                                <p className="font-black">Đã phê duyệt thành công!</p>
+                                <p className="font-extrabold">Đã phê duyệt thành công!</p>
                                 <p className="mt-0.5 text-xs">
                                     Hành động xử lý: <strong>{disposalLabel(selectedAction)}</strong>
                                 </p>
@@ -237,7 +237,7 @@ export default function AdminReviewDialog({ record, onApproved, onClose }: Admin
                     {/* Approve form */}
                     {(phase === 'approve_form' || phase === 'submitting') && canApprove && (
                         <div className="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200/80 space-y-3">
-                            <p className="text-xs font-black text-emerald-800">
+                            <p className="text-xs font-extrabold text-emerald-800">
                                 Phê duyệt biên bản — Chọn hành động xử lý
                             </p>
 

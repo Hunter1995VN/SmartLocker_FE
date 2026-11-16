@@ -176,8 +176,8 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                             {userMenuOpen && (
                                 <div className="absolute right-0 top-full mt-2 w-60 bg-white rounded-2xl shadow-xl border border-surface-container py-1.5 z-50 animate-fade-in-down">
                                     <div className="px-4 py-2.5 border-b border-surface-container-low">
-                                        <p className="text-xs font-bold text-on-surface truncate">{userName}</p>
-                                        <p className="text-xs text-on-surface-muted truncate">{user.email || 'traveler@smartlocker.vn'}</p>
+                                        <p className="text-sm font-bold text-on-surface truncate">{userName}</p>
+                                        <p className="text-sm text-on-surface-muted truncate">{user.email || 'traveler@smartlocker.vn'}</p>
                                     </div>
 
                                     <button

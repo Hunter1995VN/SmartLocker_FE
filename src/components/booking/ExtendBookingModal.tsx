@@ -270,7 +270,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                     ? 'Scan VietQR to Complete Extension'
                     : 'Extend Locker Rental Duration (UC-T14)'}
               </h2>
-              <p className="text-slate-500 text-xs mt-0.5">
+              <p className="text-slate-500 text-sm mt-0.5">
                 {isPaidSuccess
                   ? 'Your locker expiration time and QR access key have been updated'
                   : paymentData
@@ -325,7 +325,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                 <h3 className="text-lg font-extrabold text-slate-900">
                   Đã gia hạn thêm +{selectedHours} giờ thành công!
                 </h3>
-                <p className="text-xs text-slate-500">
+                <p className="text-sm text-slate-500">
                   Hạn trả tủ mới của bạn đã được cập nhật thành{' '}
                   <strong className="text-emerald-700">{formatDateTime(newEndDateObj)}</strong>.
                 </p>

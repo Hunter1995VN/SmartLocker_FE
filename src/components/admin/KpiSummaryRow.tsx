@@ -111,7 +111,7 @@ export default function KpiSummaryRow({ stats, isLoading }: KpiSummaryRowProps) 
     ];
 
     return (
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 2xl:grid-cols-8 gap-3">
             {cards.map((card, i) => {
                 const Icon = card.icon;
                 return (
@@ -132,7 +132,7 @@ export default function KpiSummaryRow({ stats, isLoading }: KpiSummaryRowProps) 
                             {isLoading ? (
                                 <div className="h-6 w-16 bg-slate-100 rounded animate-pulse" />
                             ) : (
-                                <p className={`text-xl font-black tracking-tight ${card.valueColor || 'text-slate-900'}`}>
+                                <p className={`text-xl font-extrabold tracking-tight ${card.valueColor || 'text-slate-900'}`}>
                                     {card.value}
                                 </p>
                             )}

@@ -130,7 +130,7 @@ export default function LockerDetailControlPanel({ locker, stationName, onUpdate
         <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
             <div className="p-5 border-b border-slate-100 flex items-start justify-between gap-3">
                 <div>
-                    <h3 className="text-lg font-black text-slate-900 tracking-tight font-mono">{locker.lockerCode}</h3>
+                    <h3 className="text-lg font-extrabold text-slate-900 tracking-tight font-mono">{locker.lockerCode}</h3>
                     <p className="text-xs text-slate-500">Size {locker.size} · {stationName}</p>
                 </div>
                 <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${status.badgeBg} ${status.badgeText} ${status.badgeBorder}`}>

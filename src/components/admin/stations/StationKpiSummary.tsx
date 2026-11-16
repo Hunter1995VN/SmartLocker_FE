@@ -49,7 +49,7 @@ export default function StationKpiSummary({ stations, isLoading }: StationKpiSum
                             Total Stations
                         </p>
                         <div className="flex items-baseline gap-1.5 mt-1.5">
-                            <span className="text-2xl font-black text-slate-900 tracking-tight">
+                            <span className="text-2xl font-extrabold text-slate-900 tracking-tight">
                                 {isLoading ? '—' : totalStations}
                             </span>
                             <span className="text-xs font-semibold text-slate-500">locations</span>
@@ -80,7 +80,7 @@ export default function StationKpiSummary({ stations, isLoading }: StationKpiSum
                             Compartments
                         </p>
                         <div className="flex items-baseline gap-1.5 mt-1.5">
-                            <span className="text-2xl font-black text-slate-900 tracking-tight">
+                            <span className="text-2xl font-extrabold text-slate-900 tracking-tight">
                                 {isLoading ? '—' : totalCompartments.toLocaleString()}
                             </span>
                             <span className="text-xs font-semibold text-slate-500">bays</span>
@@ -111,7 +111,7 @@ export default function StationKpiSummary({ stations, isLoading }: StationKpiSum
                             Applied Pricing Policies
                         </p>
                         <div className="flex items-baseline gap-1.5 mt-1.5">
-                            <span className="text-2xl font-black text-slate-900 tracking-tight">
+                            <span className="text-2xl font-extrabold text-slate-900 tracking-tight">
                                 {isLoading ? '—' : '03'}
                             </span>
                             <span className="text-xs font-semibold text-slate-500">standard models</span>
@@ -136,7 +136,7 @@ export default function StationKpiSummary({ stations, isLoading }: StationKpiSum
                             Avg Occupancy Rate
                         </p>
                         <div className="flex items-baseline gap-2 mt-1.5">
-                            <span className="text-2xl font-black text-slate-900 tracking-tight">
+                            <span className="text-2xl font-extrabold text-slate-900 tracking-tight">
                                 {isLoading ? '—' : `${occupancyRate}%`}
                             </span>
                             <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-full border border-emerald-200">

@@ -57,7 +57,7 @@ export default function RemoteUnlockConfirmModal({
                         <div>
                             <h2
                                 id="unlock-modal-title"
-                                className="text-base font-black text-slate-900 tracking-tight"
+                                className="text-base font-extrabold text-slate-900 tracking-tight"
                             >
                                 Xác nhận mở khóa tủ từ xa
                             </h2>

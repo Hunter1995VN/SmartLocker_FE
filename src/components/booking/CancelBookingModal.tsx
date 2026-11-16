@@ -159,7 +159,7 @@ export const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
             </div>
             <div>
               <h2 className="text-xl text-on-surface font-bold tracking-tight">Cancel Locker Booking</h2>
-              <p className="text-xs text-secondary mt-0.5">Release locker reservation &amp; submit automated refund request</p>
+              <p className="text-sm text-secondary mt-0.5">Release locker reservation &amp; submit automated refund request</p>
             </div>
           </div>
           <button
@@ -217,7 +217,7 @@ export const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
                 </div>
                 <span className="text-xs text-amber-800 font-mono font-bold">Attempt #{preview ? preview.dailyCancellationCount + 1 : 3} Today</span>
               </div>
-              <p className="text-xs text-amber-900 leading-relaxed font-medium">
+              <p className="text-sm text-amber-900 leading-relaxed font-medium">
                 To prevent automated reservation spamming, customers who have cancelled 2 bookings today are charged 100% reservation retention on subsequent cancellations. No refund will be credited.
               </p>
               <div className="mt-3 pt-2.5 border-t border-amber-200/80 flex items-center justify-between text-xs font-bold">
@@ -231,7 +231,7 @@ export const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
                 <span className="text-xs font-bold text-slate-700 uppercase">Unpaid Booking Cancellation</span>
                 <span className="text-xs font-bold text-slate-500">0 VND</span>
               </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
+              <p className="text-sm text-slate-600 leading-relaxed">
                 This reservation has not been paid. Cancelling will release the reserved locker compartment immediately without charge.
               </p>
             </div>
@@ -244,12 +244,12 @@ export const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
                 </div>
                 <span className="text-xs text-emerald-800 font-bold">SmartLocker Policy</span>
               </div>
-              <p className="text-xs text-on-surface leading-relaxed">
+              <p className="text-sm text-on-surface leading-relaxed">
                 You are cancelling before storage check-in. You will receive a 100% refund of <strong>{formatCurrency(calculatedRefund)} VND</strong>.
               </p>
               <div className="mt-3 pt-2.5 border-t border-emerald-200 flex items-center justify-between text-xs">
                 <span className="text-secondary font-medium">Total Refund Payable:</span>
-                <span className="text-emerald-700 font-mono font-black text-sm">{formatCurrency(calculatedRefund)} VND</span>
+                <span className="text-emerald-700 font-mono font-extrabold text-sm">{formatCurrency(calculatedRefund)} VND</span>
               </div>
             </div>
           )}
@@ -305,7 +305,7 @@ export const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
           {/* Caution Banner */}
           <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 flex items-start gap-2.5">
             <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-            <p className="text-xs text-amber-900 leading-snug">
+            <p className="text-sm text-amber-900 leading-snug">
               Once cancelled, the assigned locker compartment will immediately be unlocked and returned to public inventory. Your PIN/QR digital key will be revoked permanently.
             </p>
           </div>

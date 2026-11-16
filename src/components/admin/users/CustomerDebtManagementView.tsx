@@ -434,7 +434,7 @@ export default function CustomerDebtManagementView({
                             <Receipt className="w-4 h-4" />
                         </div>
                     </div>
-                    <p className="text-xl sm:text-2xl font-black text-rose-600 mt-2 font-mono">
+                    <p className="text-xl sm:text-2xl font-extrabold text-rose-600 mt-2 font-mono">
                         {kpis.totalOverdueDebt.toLocaleString('vi-VN')} đ
                     </p>
                     <p className="text-xs text-slate-500 mt-1">
@@ -453,7 +453,7 @@ export default function CustomerDebtManagementView({
                         </div>
                     </div>
                     <div className="flex items-baseline gap-2 mt-2">
-                        <p className="text-xl sm:text-2xl font-black text-slate-900">
+                        <p className="text-xl sm:text-2xl font-extrabold text-slate-900">
                             {kpis.debtorCount}
                         </p>
                         <span className="text-xs text-slate-500 font-medium">/ {kpis.totalTravelers} khách</span>
@@ -473,7 +473,7 @@ export default function CustomerDebtManagementView({
                             <Lock className="w-4 h-4" />
                         </div>
                     </div>
-                    <p className="text-xl sm:text-2xl font-black text-rose-600 mt-2">
+                    <p className="text-xl sm:text-2xl font-extrabold text-rose-600 mt-2">
                         {kpis.debtorCount}
                     </p>
                     <p className="text-xs text-slate-500 mt-1">
@@ -491,7 +491,7 @@ export default function CustomerDebtManagementView({
                             <CheckCircle2 className="w-4 h-4" />
                         </div>
                     </div>
-                    <p className="text-xl sm:text-2xl font-black text-emerald-600 mt-2 font-mono">
+                    <p className="text-xl sm:text-2xl font-extrabold text-emerald-600 mt-2 font-mono">
                         {kpis.eligibleRate}%
                     </p>
                     <p className="text-xs text-slate-500 mt-1">
@@ -661,7 +661,7 @@ export default function CustomerDebtManagementView({
                                                 {/* Overdue Debt */}
                                                 <td className="py-3 px-4 whitespace-nowrap">
                                                     {hasDebt ? (
-                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-black bg-rose-100 text-rose-700 border border-rose-200 font-mono">
+                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-extrabold bg-rose-100 text-rose-700 border border-rose-200 font-mono">
                                                             <AlertTriangle className="w-3.5 h-3.5 text-rose-600 shrink-0" />
                                                             <span>{debtAmount.toLocaleString('vi-VN')} đ</span>
                                                         </span>

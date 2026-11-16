@@ -127,7 +127,7 @@ export default function StationCompartmentsTab({ station }: StationCompartmentsT
                         <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-blue-100/80">Tủ nhỏ</span>
                     </div>
                     <div className="flex items-baseline gap-1.5">
-                        <span className="text-2xl font-black text-slate-900">{totalS}</span>
+                        <span className="text-2xl font-extrabold text-slate-900">{totalS}</span>
                         <span className="text-xs text-slate-500 font-medium">ô tủ</span>
                     </div>
                     <p className="text-xs text-emerald-600 font-semibold mt-1">
@@ -142,7 +142,7 @@ export default function StationCompartmentsTab({ station }: StationCompartmentsT
                         <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-indigo-100/80">Tủ vừa</span>
                     </div>
                     <div className="flex items-baseline gap-1.5">
-                        <span className="text-2xl font-black text-slate-900">{totalM}</span>
+                        <span className="text-2xl font-extrabold text-slate-900">{totalM}</span>
                         <span className="text-xs text-slate-500 font-medium">ô tủ</span>
                     </div>
                     <p className="text-xs text-emerald-600 font-semibold mt-1">
@@ -157,7 +157,7 @@ export default function StationCompartmentsTab({ station }: StationCompartmentsT
                         <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-purple-100/80">Tủ lớn</span>
                     </div>
                     <div className="flex items-baseline gap-1.5">
-                        <span className="text-2xl font-black text-slate-900">{totalL}</span>
+                        <span className="text-2xl font-extrabold text-slate-900">{totalL}</span>
                         <span className="text-xs text-slate-500 font-medium">ô tủ</span>
                     </div>
                     <p className="text-xs text-emerald-600 font-semibold mt-1">
@@ -172,7 +172,7 @@ export default function StationCompartmentsTab({ station }: StationCompartmentsT
                         <Layers className="w-3.5 h-3.5 text-slate-500" />
                     </div>
                     <div className="flex items-baseline gap-1.5">
-                        <span className="text-2xl font-black text-slate-900">{totalBays}</span>
+                        <span className="text-2xl font-extrabold text-slate-900">{totalBays}</span>
                         <span className="text-xs text-slate-500 font-medium">ngăn tủ</span>
                     </div>
                     <p className="text-xs text-slate-500 font-semibold mt-1">
@@ -331,10 +331,10 @@ export default function StationCompartmentsTab({ station }: StationCompartmentsT
                                     }`}
                                 >
                                     <div className="flex items-center justify-between mb-1">
-                                        <span className="font-mono text-xs font-black text-slate-900">
+                                        <span className="font-mono text-xs font-extrabold text-slate-900">
                                             {locker.lockerCode}
                                         </span>
-                                        <span className="text-xs font-black px-1 rounded bg-white border border-slate-200 text-slate-700">
+                                        <span className="text-xs font-extrabold px-1 rounded bg-white border border-slate-200 text-slate-700">
                                             {locker.size}
                                         </span>
                                     </div>
@@ -371,7 +371,7 @@ export default function StationCompartmentsTab({ station }: StationCompartmentsT
                     <div className="bg-white rounded-2xl max-w-sm w-full p-5 border border-slate-200 shadow-xl space-y-4">
                         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                             <div className="flex items-center gap-2">
-                                <span className="font-mono text-sm font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                                <span className="font-mono text-sm font-extrabold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
                                     {selectedLocker.lockerCode}
                                 </span>
                                 <span className="text-xs font-bold text-slate-800">

@@ -307,7 +307,7 @@ export default function FinancialRevenueReportView({
                         <p className="text-xs font-extrabold uppercase tracking-wider text-slate-700">
                             HỆ THỐNG TỦ ĐỒ THÔNG MINH SMARTLOCKER (SLMS)
                         </p>
-                        <h1 className="text-xl font-black text-slate-900 mt-1">
+                        <h1 className="text-xl font-extrabold text-slate-900 mt-1">
                             BÁO CÁO DOANH THU TÀI CHÍNH & LƯU LƯỢNG GIAO DỊCH THANH TOÁN
                         </h1>
                         <p className="text-xs text-slate-600 mt-0.5">
@@ -577,7 +577,7 @@ export default function FinancialRevenueReportView({
                             <DollarSign className="w-4 h-4 text-white" />
                         </div>
                     </div>
-                    <p className="text-2xl font-black mt-2 tracking-tight">
+                    <p className="text-2xl font-extrabold mt-2 tracking-tight">
                         {isLoading ? '...' : formatVnd(report?.netRevenue ?? 0)}
                     </p>
                     <div className="mt-2.5 flex items-center justify-between gap-2 text-xs">
@@ -612,7 +612,7 @@ export default function FinancialRevenueReportView({
                             <TrendingUp className="w-4 h-4" />
                         </div>
                     </div>
-                    <p className="text-2xl font-black text-slate-900 mt-2 tracking-tight">
+                    <p className="text-2xl font-extrabold text-slate-900 mt-2 tracking-tight">
                         {isLoading ? '...' : formatVnd(report?.grossRevenue ?? 0)}
                     </p>
                     <div className="mt-2.5 grid grid-cols-3 gap-1.5 text-xs">
@@ -647,7 +647,7 @@ export default function FinancialRevenueReportView({
                             <RotateCcw className="w-4 h-4" />
                         </div>
                     </div>
-                    <p className="text-2xl font-black text-purple-700 mt-2 tracking-tight">
+                    <p className="text-2xl font-extrabold text-purple-700 mt-2 tracking-tight">
                         {isLoading ? '...' : formatVnd(report?.totalRefundedAmount ?? 0)}
                     </p>
                     <div className="mt-2.5 flex items-center justify-between text-xs text-slate-500">
@@ -674,7 +674,7 @@ export default function FinancialRevenueReportView({
                             <CreditCard className="w-4 h-4" />
                         </div>
                     </div>
-                    <p className="text-2xl font-black text-slate-900 mt-2 tracking-tight">
+                    <p className="text-2xl font-extrabold text-slate-900 mt-2 tracking-tight">
                         {isLoading ? '...' : formatVnd(report?.averageOrderValue ?? 0)}
                     </p>
                     <div className="mt-2.5 flex items-center justify-between text-xs text-slate-500">
@@ -1225,7 +1225,7 @@ export default function FinancialRevenueReportView({
                                         <span className="text-xs font-extrabold text-slate-800">
                                             {sz.sizeLabel}
                                         </span>
-                                        <span className="text-xs font-black text-indigo-700">
+                                        <span className="text-xs font-extrabold text-indigo-700">
                                             {formatVnd(sz.grossRevenue)} ({sz.revenueSharePercent.toFixed(1)}%)
                                         </span>
                                     </div>
@@ -1276,7 +1276,7 @@ export default function FinancialRevenueReportView({
                                         </div>
                                         <div className="text-right">
                                             <p
-                                                className={`text-sm font-black ${
+                                                className={`text-sm font-extrabold ${
                                                     kb.kind === 'REFUND'
                                                         ? 'text-purple-700'
                                                         : 'text-slate-900'

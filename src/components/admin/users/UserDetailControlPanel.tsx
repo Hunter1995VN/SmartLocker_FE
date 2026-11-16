@@ -110,7 +110,7 @@ export default function UserDetailControlPanel({
             {/* User Identity Card */}
             <div className="flex items-center gap-3.5 p-3.5 bg-slate-50/70 rounded-2xl border border-slate-100">
                 <div
-                    className={`w-12 h-12 rounded-full ${roleCfg.avatarBg} ${roleCfg.avatarText} flex items-center justify-center font-black text-sm shrink-0 border border-slate-200/80 shadow-xs`}
+                    className={`w-12 h-12 rounded-full ${roleCfg.avatarBg} ${roleCfg.avatarText} flex items-center justify-center font-extrabold text-sm shrink-0 border border-slate-200/80 shadow-xs`}
                 >
                     {getInitials(user.fullName)}
                 </div>

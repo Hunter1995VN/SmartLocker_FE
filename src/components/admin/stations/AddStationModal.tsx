@@ -289,7 +289,7 @@ export default function AddStationModal({
 
                         <div className="grid grid-cols-3 gap-3">
                             <div className="p-3 rounded-xl bg-blue-50/70 border border-blue-200">
-                                <label className="block text-xs font-black text-blue-800 mb-1">Cỡ S (Small)</label>
+                                <label className="block text-xs font-extrabold text-blue-800 mb-1">Cỡ S (Small)</label>
                                 <input
                                     type="number"
                                     min="0"
@@ -301,7 +301,7 @@ export default function AddStationModal({
                             </div>
 
                             <div className="p-3 rounded-xl bg-indigo-50/70 border border-indigo-200">
-                                <label className="block text-xs font-black text-indigo-800 mb-1">Cỡ M (Medium)</label>
+                                <label className="block text-xs font-extrabold text-indigo-800 mb-1">Cỡ M (Medium)</label>
                                 <input
                                     type="number"
                                     min="0"
@@ -313,7 +313,7 @@ export default function AddStationModal({
                             </div>
 
                             <div className="p-3 rounded-xl bg-purple-50/70 border border-purple-200">
-                                <label className="block text-xs font-black text-purple-800 mb-1">Cỡ L (Large)</label>
+                                <label className="block text-xs font-extrabold text-purple-800 mb-1">Cỡ L (Large)</label>
                                 <input
                                     type="number"
                                     min="0"

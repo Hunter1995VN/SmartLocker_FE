@@ -270,7 +270,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                         <h3 className="font-extrabold text-sm md:text-base">
                                             Bạn đang đăng nhập bằng tài khoản {user.role || 'Quản trị viên'}
                                         </h3>
-                                        <p className="text-xs text-blue-100 mt-0.5">
+                                        <p className="text-sm text-blue-100 mt-0.5">
                                             Để quản lý trạm, giám sát thiết bị, cảnh báo sự cố và doanh thu, vui lòng mở Operations Dashboard
                                         </p>
                                     </div>
@@ -422,7 +422,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                                         {isStored ? 'Thời gian còn lại' : 'Giữ chỗ còn'}
                                                     </span>
                                                     <div className="flex flex-col">
-                                                        <div className={`text-[32px] font-bold font-mono tracking-tight ${timeLeftMs <= 0 && isStored ? 'text-error' : 'text-primary'}`}>
+                                                        <div className={`text-[32px] font-bold tracking-tight ${timeLeftMs <= 0 && isStored ? 'text-error' : 'text-primary'}`}>
                                                             {timeLeftMs > 0 ? formatDuration(timeLeftMs) : isStored ? 'Đã hết giờ' : '00:00:00'}
                                                         </div>
                                                         <span className="text-sm text-on-surface-variant mt-0.5">
@@ -441,7 +441,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                                 <InfoCell label="Mã đơn" value={activeBooking.bookingCode} mono />
                                                 <InfoCell label="Cỡ tủ" value={`Size ${activeBooking.size}`} />
                                                 <InfoCell label="Thời lượng" value={activeBooking.durationHours ? `${activeBooking.durationHours} giờ` : '—'} />
-                                                <InfoCell label="Đã thanh toán" value={`${activeBooking.baseAmount.toLocaleString('vi-VN')}đ`} mono />
+                                                <InfoCell label="Đã thanh toán" value={`${activeBooking.baseAmount.toLocaleString('vi-VN')}đ`} />
                                             </div>
 
                                             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
@@ -669,7 +669,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                             <div className="flex items-center gap-4 shrink-0">
                                 <div className="flex flex-col text-right">
                                     <span className="text-xs text-on-surface-variant">Tổng đài hỗ trợ 24/7</span>
-                                    <span className="text-sm font-bold text-primary font-mono">{CONTACT.hotlineLabel}</span>
+                                    <span className="text-sm font-bold text-primary">{CONTACT.hotlineLabel}</span>
                                 </div>
                                 <button type="button" onClick={openSupport} className="px-4 py-2.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-sm font-semibold flex items-center gap-1.5 transition-colors cursor-pointer">
                                     <Phone className="w-4 h-4 text-primary-container" />
@@ -681,7 +681,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                 </div>
 
                 <footer className="border-t border-surface-container mt-4 px-4 md:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
-                    <p className="text-xs text-on-surface-muted">© {new Date().getFullYear()} SmartLocker. Bản quyền thuộc về SmartLocker.</p>
+                    <p className="text-sm text-on-surface-muted">© {new Date().getFullYear()} SmartLocker. Bản quyền thuộc về SmartLocker.</p>
                     <div className="flex items-center gap-4 text-xs text-on-surface-variant">
                         <a href="/?view=reviews" className="hover:text-primary transition-colors">Đánh giá khách hàng</a>
                         <button type="button" onClick={() => openLegal('privacy')} className="hover:text-primary transition-colors cursor-pointer">Chính sách bảo mật</button>
@@ -727,7 +727,7 @@ function BookingRow({ booking, onOpen }: { booking: BookingListItemDto; onOpen: 
                     <p className="text-sm text-on-surface-variant flex flex-wrap items-center gap-2 mt-0.5">
                         <span>{date}</span>
                         <span className="text-outline-variant">·</span>
-                        <span className={`font-mono font-bold ${isCancelled ? 'line-through text-on-surface-muted' : 'text-on-surface'}`}>
+                        <span className={`font-bold ${isCancelled ? 'line-through text-on-surface-muted' : 'text-on-surface'}`}>
                             {booking.baseAmount.toLocaleString('vi-VN')}đ
                         </span>
                     </p>
@@ -765,7 +765,7 @@ function LockerRow({ size, total, available, mine }: { size: 'S' | 'M' | 'L'; to
                 <span className={`text-xs font-bold ${available > 0 ? 'text-tertiary' : 'text-error'}`}>{available}/{total} trống</span>
             </div>
             {total === 0 ? (
-                <p className="text-xs text-on-surface-muted">Trạm không có tủ cỡ này.</p>
+                <p className="text-sm text-on-surface-muted">Trạm không có tủ cỡ này.</p>
             ) : (
                 <div className="flex flex-wrap gap-1.5" aria-label={`${available} trên ${total} tủ cỡ ${size} còn trống`}>
                     {cells.map((free, i) => (
@@ -797,9 +797,9 @@ function NearbyStationCard({ station, onBook }: { station: Station; onBook: () =
                 <span className="text-sm font-bold text-on-surface truncate">{station.name}</span>
                 <span className={`text-xs font-bold shrink-0 ${isPrimary ? 'text-primary' : 'text-on-surface-variant'}`}>{distLabel}</span>
             </div>
-            <p className="text-xs text-on-surface-variant">{station.address} · Mở {station.opensAt || '--'}–{station.closesAt || '--'}</p>
+            <p className="text-sm text-on-surface-variant">{station.address} · Mở {station.opensAt || '--'}–{station.closesAt || '--'}</p>
             <div className="flex items-center justify-between pt-1">
-                <div className="flex items-center gap-2 text-xs font-mono text-on-surface-variant">
+                <div className="flex items-center gap-2 text-xs text-on-surface-variant">
                     <span>S: <strong className="text-tertiary">{availS}</strong></span>
                     <span>·</span>
                     <span>M: <strong className="text-tertiary">{availM}</strong></span>

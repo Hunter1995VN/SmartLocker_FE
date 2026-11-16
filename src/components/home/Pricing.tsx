@@ -142,7 +142,7 @@ const Pricing = () => {
                       </span>
                       <span className="text-base text-secondary">/ giờ</span>
                     </div>
-                    <p className="text-xs text-secondary mt-1">
+                    <p className="text-sm text-secondary mt-1">
                       hoặc gói trọn ngày <strong className="text-on-surface">{size.priceDay.toLocaleString()}đ</strong>/24h
                     </p>
                     <div className="mt-3 flex items-center gap-1.5 text-xs">
@@ -211,7 +211,7 @@ const Pricing = () => {
                   >
                     Chọn {size.name}
                   </button>
-                  <p className="text-xs text-center text-secondary mt-3">
+                  <p className="text-sm text-center text-secondary mt-3">
                     Thanh toán linh hoạt • Hủy miễn phí trước 2h
                   </p>
                 </div>

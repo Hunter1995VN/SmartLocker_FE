@@ -145,7 +145,7 @@ export default function CustomerReviews({ initialPage = 1, onLogin }: { initialP
               <div className="mt-auto flex items-end justify-between gap-3 border-t border-outline-variant/40 pt-4">
                 <div className="min-w-0">
                   <p className="flex items-start gap-1.5 text-sm font-semibold"><MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" /><span className="[overflow-wrap:anywhere]">{review.stationName}</span></p>
-                  <p className="mt-1 text-xs text-on-surface-variant">Đã sử dụng tủ cỡ {review.lockerSize}</p>
+                  <p className="mt-1 text-sm text-on-surface-variant">Đã sử dụng tủ cỡ {review.lockerSize}</p>
                 </div>
                 {!review.isOwn && (review.hasReported ? (
                   <span className="shrink-0 text-xs text-on-surface-variant">Đã báo cáo</span>

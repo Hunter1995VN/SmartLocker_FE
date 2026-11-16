@@ -135,7 +135,7 @@ export default function ForgotPasswordPage({ onNavigate }: ForgotPasswordPagePro
                             </span>
                         </div>
 
-                        <h1 className="text-4xl xl:text-5xl font-black text-white leading-[1.1] tracking-tight mb-5">
+                        <h1 className="text-4xl xl:text-5xl font-extrabold text-white leading-[1.1] tracking-tight mb-5">
                             {step === 'email' ? (
                                 <>Quên<br /><span style={{background: 'linear-gradient(90deg, #93c5fd, #c4b5fd)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>mật khẩu?</span></>
                             ) : (
@@ -165,7 +165,7 @@ export default function ForgotPasswordPage({ onNavigate }: ForgotPasswordPagePro
                                     }}
                                 >
                                     <div
-                                        className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs font-black"
+                                        className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs font-extrabold"
                                         style={{
                                             background: done ? 'rgba(52,211,153,0.3)' : 'rgba(255,255,255,0.15)',
                                             color: 'white',
@@ -183,7 +183,7 @@ export default function ForgotPasswordPage({ onNavigate }: ForgotPasswordPagePro
                     <div className="p-4 rounded-2xl" style={{background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)'}}>
                         <div className="flex items-start gap-2.5">
                             <Lock className="w-4 h-4 text-blue-300 shrink-0 mt-0.5" />
-                            <p className="text-white/70 text-xs leading-relaxed">
+                            <p className="text-white/70 text-sm leading-relaxed">
                                 Mã OTP được mã hóa và chỉ có hiệu lực một lần. Không ai từ SmartLocker sẽ hỏi mã OTP của bạn.
                             </p>
                         </div>
@@ -220,7 +220,7 @@ export default function ForgotPasswordPage({ onNavigate }: ForgotPasswordPagePro
                                     : <KeyRound className="w-7 h-7 text-blue-600" />}
                             </div>
                             <div>
-                                <h2 className="text-2xl font-black text-gray-900 tracking-tight leading-tight">
+                                <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight leading-tight">
                                     {step === 'email' ? 'Khôi phục mật khẩu' : 'Đặt lại mật khẩu'}
                                 </h2>
                                 <p className="text-sm text-gray-500 mt-1">
@@ -290,7 +290,7 @@ export default function ForgotPasswordPage({ onNavigate }: ForgotPasswordPagePro
                                     )}
                                 </button>
 
-                                <p className="text-xs text-center text-gray-500">
+                                <p className="text-sm text-center text-gray-500">
                                     Kiểm tra cả hộp thư Spam nếu không thấy email.
                                 </p>
                             </form>
@@ -317,7 +317,7 @@ export default function ForgotPasswordPage({ onNavigate }: ForgotPasswordPagePro
                                                 onChange={e => handleCodeChange(i, e.target.value)}
                                                 onKeyDown={e => handleCodeKeyDown(i, e)}
                                                 disabled={isLoading}
-                                                className={`aspect-square text-center text-xl font-black rounded-xl border-2 outline-none transition-all disabled:opacity-50 ${
+                                                className={`aspect-square text-center text-xl font-extrabold rounded-xl border-2 outline-none transition-all disabled:opacity-50 ${
                                                     digit
                                                         ? 'border-blue-500 bg-blue-50 text-blue-700'
                                                         : 'border-gray-200 bg-gray-50 text-gray-900 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50'
@@ -326,7 +326,7 @@ export default function ForgotPasswordPage({ onNavigate }: ForgotPasswordPagePro
                                         ))}
                                     </div>
                                     <div className="flex items-center justify-between mt-2">
-                                        <p className="text-xs text-gray-500">Mã có hiệu lực trong 5 phút</p>
+                                        <p className="text-sm text-gray-500">Mã có hiệu lực trong 5 phút</p>
                                         <button
                                             type="button"
                                             onClick={() => { setCode(['', '', '', '', '', '']); setError(''); }}

@@ -125,7 +125,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                             <Zap className="w-3.5 h-3.5 text-yellow-300" />
                             <span className="text-xs text-white/90 font-semibold">Đăng ký miễn phí — Chỉ 1 phút</span>
                         </div>
-                        <h1 className="text-3xl xl:text-4xl font-black text-white leading-[1.1] tracking-tight mb-4">
+                        <h1 className="text-3xl xl:text-4xl font-extrabold text-white leading-[1.1] tracking-tight mb-4">
                             Tạo tài khoản<br />
                             <span style={{background: 'linear-gradient(90deg, #93c5fd, #c4b5fd)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
                                 miễn phí
@@ -147,8 +147,8 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                                         <Icon className="w-4 h-4 text-emerald-300" />
                                     </div>
                                     <div>
-                                        <p className="text-white text-xs font-semibold">{label}</p>
-                                        <p className="text-white/50 text-xs">{desc}</p>
+                                        <p className="text-white text-sm font-semibold">{label}</p>
+                                        <p className="text-white/50 text-sm">{desc}</p>
                                     </div>
                                 </div>
                             ))}
@@ -163,7 +163,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                             { num: lockers != null ? String(lockers) : '—', label: 'Ô tủ' },
                         ].map(({ num, label }) => (
                             <div key={label} className="text-center py-3 px-2 rounded-xl" style={{background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)'}}>
-                                <div className="text-xl font-black text-white">{num}</div>
+                                <div className="text-xl font-extrabold text-white">{num}</div>
                                 <div className="text-xs text-white/55 mt-0.5">{label}</div>
                             </div>
                         ))}
@@ -200,7 +200,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                     <div className="w-full max-w-[480px]">
                         {/* Header */}
                         <div className="mb-6">
-                            <h2 className="text-2xl font-black text-gray-900 tracking-tight mb-1.5">
+                            <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight mb-1.5">
                                 Tạo tài khoản mới
                             </h2>
                             <p className="text-sm text-gray-500">
@@ -451,7 +451,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                             </button>
                         </form>
 
-                        <p className="mt-5 text-center text-xs text-gray-500">
+                        <p className="mt-5 text-center text-sm text-gray-500">
                             Quản lý thông tin theo{' '}
                             <a href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }} className="text-blue-600 font-semibold hover:underline">Chính sách bảo mật</a>
                         </p>

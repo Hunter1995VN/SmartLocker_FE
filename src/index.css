@@ -67,6 +67,8 @@
 
   /* Font Family */
   --font-family-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  /* Tailwind's font-sans utility reads --font-sans: point it at the brand face so pages using font-sans do not fall back to the system font */
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 
   /* Border Radius */
   --radius-sm: 0.25rem;
@@ -106,6 +108,16 @@
     @apply bg-background text-on-surface;
     font-family: var(--font-family-sans);
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    /* Chữ số cùng độ rộng: tiền, giờ đếm ngược, bảng không bị nhảy khi giá trị đổi (1111 và 0000 từng lệch 45%) */
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Ngắt dòng: tiêu đề cân bằng, đoạn văn tránh dòng cuối chỉ có một từ */
+  h1, h2, h3 {
+    text-wrap: balance;
+  }
+  p, li {
+    text-wrap: pretty;
   }
 }
 

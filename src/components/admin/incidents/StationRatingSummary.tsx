@@ -44,7 +44,7 @@ export default function StationRatingSummary() {
 
     {!!sorted.length && <>
       <div className="flex items-baseline gap-2">
-        <span className="text-2xl font-black text-slate-900 tracking-tight">{overall.toFixed(1)}</span>
+        <span className="text-2xl font-extrabold text-slate-900 tracking-tight">{overall.toFixed(1)}</span>
         <span className="text-xs font-semibold text-slate-500">/ 5 trung bình · {total} lượt · {sorted.length} trạm</span>
       </div>
       <ul className="divide-y divide-slate-100">

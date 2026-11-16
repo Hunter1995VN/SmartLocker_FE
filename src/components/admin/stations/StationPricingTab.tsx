@@ -333,7 +333,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                         <tr className="hover:bg-slate-50/50">
                             <td className="py-3.5 px-4">
                                 <div className="flex items-center gap-2">
-                                    <span className="w-7 h-7 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 font-black flex items-center justify-center">
+                                    <span className="w-7 h-7 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 font-extrabold flex items-center justify-center">
                                         S
                                     </span>
                                     <div>
@@ -392,7 +392,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                         <tr className="hover:bg-slate-50/50">
                             <td className="py-3.5 px-4">
                                 <div className="flex items-center gap-2">
-                                    <span className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 font-black flex items-center justify-center">
+                                    <span className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 font-extrabold flex items-center justify-center">
                                         M
                                     </span>
                                     <div>
@@ -451,7 +451,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                         <tr className="hover:bg-slate-50/50">
                             <td className="py-3.5 px-4">
                                 <div className="flex items-center gap-2">
-                                    <span className="w-7 h-7 rounded-lg bg-purple-50 text-purple-700 border border-purple-200 font-black flex items-center justify-center">
+                                    <span className="w-7 h-7 rounded-lg bg-purple-50 text-purple-700 border border-purple-200 font-extrabold flex items-center justify-center">
                                         L
                                     </span>
                                     <div>

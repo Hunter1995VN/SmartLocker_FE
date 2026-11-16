@@ -46,7 +46,7 @@ export default function WalkInTabletPage() {
                   setStationId(e.target.value);
                   localStorage.setItem('kiosk_station_id', e.target.value);
                 }}
-                className="text-sm font-black tracking-tight uppercase bg-transparent border-0 outline-none cursor-pointer text-slate-900"
+                className="text-sm font-extrabold tracking-tight uppercase bg-transparent border-0 outline-none cursor-pointer text-slate-900"
                 title={x('selectStation')}
               >
                 {stations.map((st) => (

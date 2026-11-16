@@ -522,7 +522,7 @@ export default function KioskPage() {
                   setStationId(newId);
                   localStorage.setItem('kiosk_station_id', newId);
                 }}
-                className={`text-sm font-black tracking-tight uppercase bg-transparent border-0 outline-none cursor-pointer max-w-[240px] md:max-w-[320px] truncate ${
+                className={`text-sm font-extrabold tracking-tight uppercase bg-transparent border-0 outline-none cursor-pointer max-w-[240px] md:max-w-[320px] truncate ${
                   outdoorMode ? 'text-slate-900' : 'text-slate-100'
                 }`}
                 title={x('selectStation')} disabled={!['WELCOME','IDLE'].includes(step)}
@@ -662,7 +662,7 @@ export default function KioskPage() {
         {voiceUnavailable && <p role="status" className="text-xs mb-2 opacity-80">{x('voiceUnavailable')}</p>}
         {errorMessage && (
           <div key={errorMessage} role="alert" className="kiosk-shake w-full max-w-xl mb-3 p-3 pl-4 rounded-2xl bg-rose-700 text-white flex items-center justify-between gap-3 text-sm font-semibold shadow-lg">
-            <span className="flex items-center gap-2"><span aria-hidden="true" className="grid place-items-center w-6 h-6 shrink-0 rounded-full bg-white/20 font-black">!</span>{errorMessage}</span>
+            <span className="flex items-center gap-2"><span aria-hidden="true" className="grid place-items-center w-6 h-6 shrink-0 rounded-full bg-white/20 font-extrabold">!</span>{errorMessage}</span>
             <button onClick={() => setErrorMessage('')} className="px-3 py-1.5 bg-rose-900/70 hover:bg-rose-900 rounded-lg text-xs font-bold">OK</button>
           </div>
         )}
@@ -673,7 +673,7 @@ export default function KioskPage() {
         {step === 'WELCOME' && (
           <div className="kiosk-enter w-full max-w-3xl my-auto text-center space-y-8">
             <div className="space-y-3">
-              <h1 className={`text-4xl md:text-6xl font-black tracking-tight ${outdoorMode ? 'text-slate-900' : 'text-white'}`}>
+              <h1 className={`text-4xl md:text-6xl font-extrabold tracking-tight ${outdoorMode ? 'text-slate-900' : 'text-white'}`}>
                 {t.welcomeTitle}
               </h1>
               <p className="text-base md:text-lg text-slate-500 dark:text-slate-500" aria-hidden="true">
@@ -694,7 +694,7 @@ export default function KioskPage() {
                       : 'bg-slate-900/80 hover:bg-slate-800 border-slate-800 hover:border-sky-400'
                   }`}
                 >
-                  <span className={`text-xl md:text-2xl font-black group-hover:scale-105 transition-transform ${outdoorMode ? 'text-slate-900' : 'text-white'}`}>
+                  <span className={`text-xl md:text-2xl font-extrabold group-hover:scale-105 transition-transform ${outdoorMode ? 'text-slate-900' : 'text-white'}`}>
                     {item.nativeName}
                   </span>
                 </button>
@@ -732,7 +732,7 @@ export default function KioskPage() {
                     <Icon className="w-16 h-16" />
                   </span>
                   <span className="space-y-1.5 pr-8">
-                    <span className={`block text-3xl md:text-4xl font-black tracking-tight transition-colors ${outdoorMode ? 'text-slate-950' : 'text-white'} ${tone === 'sky' ? 'group-hover:text-sky-600' : 'group-hover:text-emerald-600'}`}>
+                    <span className={`block text-3xl md:text-4xl font-extrabold tracking-tight transition-colors ${outdoorMode ? 'text-slate-950' : 'text-white'} ${tone === 'sky' ? 'group-hover:text-sky-600' : 'group-hover:text-emerald-600'}`}>
                       {title}
                     </span>
                     <span className="block text-sm text-slate-500 dark:text-slate-500">{x('authHint')}</span>
@@ -771,7 +771,7 @@ export default function KioskPage() {
               >
                 ←
               </button>
-              <h2 className={`text-xl font-black tracking-tight ${opMode === 'CHECK_IN' ? 'text-sky-700 dark:text-sky-400' : 'text-emerald-700 dark:text-emerald-400'}`}>
+              <h2 className={`text-xl font-extrabold tracking-tight ${opMode === 'CHECK_IN' ? 'text-sky-700 dark:text-sky-400' : 'text-emerald-700 dark:text-emerald-400'}`}>
                 {opMode === 'CHECK_IN' ? t.depositTitle : t.retrieveTitle}
               </h2>
             </div>
@@ -845,7 +845,7 @@ export default function KioskPage() {
                     return (
                       <div
                         key={`${idx}-${char ?? ''}`}
-                        className={`w-9 h-11 rounded-xl flex items-center justify-center font-black text-xl ${idx === 4 ? 'ml-2' : ''} ${
+                        className={`w-9 h-11 rounded-xl flex items-center justify-center font-extrabold text-xl ${idx === 4 ? 'ml-2' : ''} ${
                           char
                             ? `kiosk-pop ${outdoorMode ? 'bg-sky-600 text-white' : 'bg-sky-500 text-slate-950'}`
                             : (outdoorMode ? 'bg-slate-100 text-slate-300' : 'bg-slate-900 text-slate-700')
@@ -908,7 +908,7 @@ export default function KioskPage() {
                   opMode === 'CHECK_IN' ? 'bg-sky-600' : 'bg-emerald-600'
                 } shadow-2xl flex items-center justify-end pr-3`}>
                   <span className="h-14 w-1.5 rounded-full bg-white/70" />
-                  <span className="absolute top-4 left-4 text-lg font-black font-mono text-white/90">{activeLockerCode || '—'}</span>
+                  <span className="absolute top-4 left-4 text-lg font-extrabold font-mono text-white/90">{activeLockerCode || '—'}</span>
                 </div>
               </div>
               <span className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold ${
@@ -922,7 +922,7 @@ export default function KioskPage() {
               <div>
                 <span className="text-sm text-slate-500">{x('yourLocker')}</span>
                 <div className="flex items-baseline gap-3">
-                  <span className={`text-6xl font-black font-mono ${opMode === 'CHECK_IN' ? 'text-sky-600 dark:text-sky-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                  <span className={`text-6xl font-extrabold font-mono ${opMode === 'CHECK_IN' ? 'text-sky-600 dark:text-sky-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                     {activeLockerCode || '—'}
                   </span>
                   <span className="text-sm font-bold text-slate-500">{x('sizeLabel')} {activeLockerSize || '—'}</span>
@@ -960,8 +960,8 @@ export default function KioskPage() {
             outdoorMode ? 'bg-white border-amber-300 text-slate-900' : 'bg-kiosk-bg border-amber-500/50 text-white'
           }`}>
             <div>
-              <h2 className="text-lg font-black text-amber-700 dark:text-amber-400">{t.overdueTitle}</h2>
-              <p className="kiosk-pop mt-2 text-5xl font-black font-mono tabular-nums">
+              <h2 className="text-lg font-extrabold text-amber-700 dark:text-amber-400">{t.overdueTitle}</h2>
+              <p className="kiosk-pop mt-2 text-5xl font-extrabold font-mono tabular-nums">
                 {overdueFee.toLocaleString(kioskLocales[lang])}<span className="text-2xl ml-1">đ</span>
               </p>
             </div>
@@ -991,7 +991,7 @@ export default function KioskPage() {
         {step === 'REVIEW_PENDING' && (
           <section className={`kiosk-enter w-full max-w-md rounded-[28px] p-8 text-center space-y-4 my-auto shadow-xl ${outdoorMode ? 'bg-white text-slate-900' : 'bg-kiosk-bg text-white'}`}>
             <div className="mx-auto w-14 h-14 rounded-full border-4 border-amber-200 border-t-amber-500 animate-spin motion-reduce:animate-none" aria-hidden="true" />
-            <h2 className="text-2xl font-black">{x('pending')}</h2>
+            <h2 className="text-2xl font-extrabold">{x('pending')}</h2>
             <p className="text-sm text-slate-500 dark:text-slate-500">{x('pendingHint')}</p>
             <button type="button" onClick={handleReturnToWelcome} className="w-full py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-sm font-bold">{x('home')}</button>
           </section>
@@ -1007,7 +1007,7 @@ export default function KioskPage() {
             </svg>
 
             <div>
-              <h2 className="text-3xl font-black">{t.successTitle}</h2>
+              <h2 className="text-3xl font-extrabold">{t.successTitle}</h2>
               <p className="text-sm text-slate-500 dark:text-slate-500 mt-2">
                 {opMode === 'CHECK_IN' ? t.successDepositDesc : t.successRetrieveDesc}
               </p>

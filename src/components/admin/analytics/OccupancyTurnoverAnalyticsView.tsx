@@ -331,7 +331,7 @@ export default function OccupancyTurnoverAnalyticsView({
                         <p className="text-xs font-extrabold uppercase tracking-wider text-slate-700">
                             HỆ THỐNG QUẢN TRỊ VẬN HÀNH TỦ THÔNG MINH SMARTLOCKER (SLMS)
                         </p>
-                        <h1 className="text-xl font-black text-slate-900 mt-1">
+                        <h1 className="text-xl font-extrabold text-slate-900 mt-1">
                             BÁO CÁO PHÂN TÍCH TỶ LỆ LẤP ĐẦY & TẦN SUẤT XOAY VÒNG NGĂN TỦ
                         </h1>
                         <p className="text-xs text-slate-600 mt-0.5">
@@ -611,7 +611,7 @@ export default function OccupancyTurnoverAnalyticsView({
                             <Gauge className="w-4 h-4 text-white" />
                         </div>
                     </div>
-                    <p className="text-2xl font-black mt-2 tracking-tight">
+                    <p className="text-2xl font-extrabold mt-2 tracking-tight">
                         {isLoading ? '...' : `${(data?.timeWeightedOccupancyPercent ?? 0).toFixed(2)}%`}
                     </p>
                     <div className="mt-2.5 flex items-center justify-between gap-2 text-xs">
@@ -647,7 +647,7 @@ export default function OccupancyTurnoverAnalyticsView({
                         </div>
                     </div>
                     <div className="flex items-baseline gap-2 mt-2">
-                        <p className="text-2xl font-black text-slate-900 tracking-tight">
+                        <p className="text-2xl font-extrabold text-slate-900 tracking-tight">
                             {isLoading ? '...' : (data?.periodTurnoverPerLocker ?? 0).toFixed(2)}
                         </p>
                         <span className="text-xs font-bold text-blue-700">vòng / tủ (trong kỳ)</span>
@@ -681,7 +681,7 @@ export default function OccupancyTurnoverAnalyticsView({
                         </div>
                     </div>
                     <div className="flex items-baseline gap-2 mt-2">
-                        <p className="text-2xl font-black text-slate-900 tracking-tight">
+                        <p className="text-2xl font-extrabold text-slate-900 tracking-tight">
                             {isLoading ? '...' : `${(data?.averageStorageDurationHours ?? 0).toFixed(1)}h`}
                         </p>
                         <span className="text-xs font-semibold text-slate-500">/ lượt gửi đồ</span>
@@ -709,7 +709,7 @@ export default function OccupancyTurnoverAnalyticsView({
                             <Sparkles className="w-4 h-4" />
                         </div>
                     </div>
-                    <p className="text-2xl font-black text-indigo-700 mt-2 tracking-tight">
+                    <p className="text-2xl font-extrabold text-indigo-700 mt-2 tracking-tight">
                         {isLoading ? '...' : formatVnd(data?.revenuePerAvailableLocker ?? 0)}
                     </p>
                     <div className="mt-2.5 flex items-center justify-between text-xs text-slate-500">
@@ -1146,7 +1146,7 @@ export default function OccupancyTurnoverAnalyticsView({
                                     <span className="text-xs font-bold text-slate-500 uppercase block">
                                         Lấp đầy theo giờ
                                     </span>
-                                    <span className="text-base font-black text-teal-700">
+                                    <span className="text-base font-extrabold text-teal-700">
                                         {sz.timeWeightedOccupancyPercent.toFixed(1)}%
                                     </span>
                                 </div>
@@ -1154,7 +1154,7 @@ export default function OccupancyTurnoverAnalyticsView({
                                     <span className="text-xs font-bold text-slate-500 uppercase block">
                                         Hệ số xoay vòng
                                     </span>
-                                    <span className="text-base font-black text-blue-700">
+                                    <span className="text-base font-extrabold text-blue-700">
                                         {sz.turnoverPerLocker.toFixed(2)} vòng/tủ
                                     </span>
                                 </div>
@@ -1392,7 +1392,7 @@ export default function OccupancyTurnoverAnalyticsView({
                                                         IoT: {u.healthStatus}
                                                     </span>
                                                 </td>
-                                                <td className="py-3 px-3 text-right font-black text-blue-700">
+                                                <td className="py-3 px-3 text-right font-extrabold text-blue-700">
                                                     {u.cycleCount} lượt
                                                 </td>
                                                 <td className="py-3 px-3 text-right font-semibold text-slate-700">

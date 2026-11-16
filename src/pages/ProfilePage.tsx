@@ -345,7 +345,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                 <h4 className="text-sm font-bold text-rose-900">
                                     Tài khoản có dư nợ quá hạn: {formatCurrency(debtData?.totalOverdueDebt || 0)} VNĐ
                                 </h4>
-                                <p className="text-xs text-rose-700 mt-0.5">
+                                <p className="text-sm text-rose-700 mt-0.5">
                                     Theo quy tắc <strong>BR-P08</strong>, bạn cần thanh toán toàn bộ nợ quá hạn để mở khóa tính năng đặt tủ mới.
                                 </p>
                             </div>
@@ -427,7 +427,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                     <h2 className="text-lg font-bold text-on-surface">
                                         {profile.fullName || 'Khách hàng'}
                                     </h2>
-                                    <p className="text-xs text-on-surface-muted mt-0.5">{profile.email}</p>
+                                    <p className="text-sm text-on-surface-muted mt-0.5">{profile.email}</p>
 
                                     <div className="flex items-center gap-2 mt-3">
                                         <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-100">
@@ -489,7 +489,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                     </div>
                                     <div>
                                         <h2 className="text-base font-bold text-on-surface">Cập nhật thông tin cá nhân</h2>
-                                        <p className="text-xs text-on-surface-muted">Thay đổi họ và tên, số điện thoại hoặc ảnh đại diện</p>
+                                        <p className="text-sm text-on-surface-muted">Thay đổi họ và tên, số điện thoại hoặc ảnh đại diện</p>
                                     </div>
                                 </div>
 
@@ -613,7 +613,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                         <h2 className="text-base font-bold text-on-surface">
                                             {profile.hasPassword ? 'Đổi mật khẩu' : 'Thiết lập mật khẩu'}
                                         </h2>
-                                        <p className="text-xs text-on-surface-muted">
+                                        <p className="text-sm text-on-surface-muted">
                                             {profile.hasPassword
                                                 ? 'Cập nhật mật khẩu định kỳ để bảo vệ tài khoản an toàn'
                                                 : 'Tài khoản đăng nhập bằng Google. Bạn có thể đặt mật khẩu để đăng nhập trực tiếp.'}
@@ -741,7 +741,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                     <span className="text-xs text-on-surface-muted font-semibold block uppercase">
                                         Tổng nợ quá hạn
                                     </span>
-                                    <span className={`text-2xl sm:text-3xl font-black ${
+                                    <span className={`text-2xl sm:text-3xl font-extrabold ${
                                         hasOverdueDebt ? 'text-rose-600' : 'text-emerald-600'
                                     }`}>
                                         {formatCurrency(debtData.totalOverdueDebt)} VNĐ
@@ -806,7 +806,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                         <h2 className="text-base font-bold text-on-surface">
                                             Danh sách đơn đặt tủ đang quá hạn ({debtData.overdueBookings.length})
                                         </h2>
-                                        <p className="text-xs text-on-surface-muted">
+                                        <p className="text-sm text-on-surface-muted">
                                             Các đơn tủ quá hạn gửi đồ cần được thanh toán phụ phí trước khi lấy đồ hoặc đặt đơn mới
                                         </p>
                                     </div>
@@ -817,7 +817,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                 <div className="text-center py-12 px-4 bg-surface-bright rounded-2xl border border-dashed border-outline-soft">
                                     <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto mb-2" />
                                     <h4 className="text-sm font-bold text-on-surface">Không có đơn nào bị quá hạn</h4>
-                                    <p className="text-xs text-on-surface-muted mt-1 max-w-md mx-auto">
+                                    <p className="text-sm text-on-surface-muted mt-1 max-w-md mx-auto">
                                         Tất cả các lượt gửi tủ của bạn đều đang trong khung giờ quy định hoặc đã được hoàn tất đúng hạn.
                                     </p>
                                 </div>
@@ -893,7 +893,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                 </div>
                                 <div>
                                     <h2 className="text-base font-bold text-on-surface">Lịch sử thanh toán phụ phí quá hạn</h2>
-                                    <p className="text-xs text-on-surface-muted">Các giao dịch thanh toán quá hạn đã được đối soát thành công qua PayOS</p>
+                                    <p className="text-sm text-on-surface-muted">Các giao dịch thanh toán quá hạn đã được đối soát thành công qua PayOS</p>
                                 </div>
                             </div>
 

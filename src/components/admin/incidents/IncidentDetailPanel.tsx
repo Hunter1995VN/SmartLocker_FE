@@ -107,7 +107,7 @@ function SeverityBadge({ severity }: { severity: string }) {
     };
     const cls = cfg[upper] ?? 'bg-slate-100 text-slate-700';
     return (
-        <span className={`px-2 py-0.5 rounded text-xs font-black uppercase tracking-wider ${cls}`}>
+        <span className={`px-2 py-0.5 rounded text-xs font-extrabold uppercase tracking-wider ${cls}`}>
             {severity || 'UNKNOWN'}
         </span>
     );
@@ -362,7 +362,7 @@ export default function IncidentDetailPanel({
                 <div className="px-5 py-4 bg-slate-50/60 border-b border-slate-100 flex items-start justify-between gap-3">
                     <div className="min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                            <h2 className="text-base font-black text-slate-900 tracking-tight font-mono">
+                            <h2 className="text-base font-extrabold text-slate-900 tracking-tight font-mono">
                                 {incident.incidentCode}
                             </h2>
                             <SeverityBadge severity={incident.severity} />

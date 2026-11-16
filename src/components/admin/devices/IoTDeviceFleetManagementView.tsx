@@ -165,7 +165,7 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                             <Cpu className="w-5 h-5" />
                         </span>
                         <div>
-                            <h1 className="text-xl font-black text-slate-900 tracking-tight">
+                            <h1 className="text-xl font-extrabold text-slate-900 tracking-tight">
                                 Quản lý & Giám sát Thiết bị IoT (ESP32 Fleet)
                             </h1>
                             <p className="text-xs text-slate-500">
@@ -192,7 +192,7 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                         Trạm có mạch phần cứng
                     </span>
                     <div className="flex items-baseline gap-2 mt-1">
-                        <span className="text-2xl font-black text-slate-900">{provisionedCount}</span>
+                        <span className="text-2xl font-extrabold text-slate-900">{provisionedCount}</span>
                         <span className="text-xs text-slate-500 font-medium">/ {totalCount} trạm</span>
                     </div>
                 </div>
@@ -202,7 +202,7 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                         Đang kết nối (Online)
                     </span>
                     <div className="flex items-baseline gap-2 mt-1">
-                        <span className="text-2xl font-black text-emerald-600">{onlineCount}</span>
+                        <span className="text-2xl font-extrabold text-emerald-600">{onlineCount}</span>
                         <span className="text-xs text-emerald-700 font-medium">thiết bị</span>
                     </div>
                 </div>
@@ -212,7 +212,7 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                         Mất kết nối (Offline)
                     </span>
                     <div className="flex items-baseline gap-2 mt-1">
-                        <span className="text-2xl font-black text-rose-600">{offlineCount}</span>
+                        <span className="text-2xl font-extrabold text-rose-600">{offlineCount}</span>
                         <span className="text-xs text-rose-500 font-medium">thiết bị</span>
                     </div>
                 </div>
@@ -222,7 +222,7 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                         Chưa gắn phần cứng
                     </span>
                     <div className="flex items-baseline gap-2 mt-1">
-                        <span className="text-2xl font-black text-slate-600">{unprovisionedCount}</span>
+                        <span className="text-2xl font-extrabold text-slate-600">{unprovisionedCount}</span>
                         <span className="text-xs text-slate-500 font-medium">chưa lắp đặt</span>
                     </div>
                 </div>

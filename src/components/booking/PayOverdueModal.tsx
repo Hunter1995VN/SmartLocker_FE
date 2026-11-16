@@ -278,7 +278,7 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
             </div>
             <div className="flex items-center justify-between pt-2 border-t border-rose-200/80">
               <span className="text-sm font-bold text-slate-900">Total Overdue Fee Due:</span>
-              <span className="text-xl font-black text-rose-600 font-mono">
+              <span className="text-xl font-extrabold text-rose-600 font-mono">
                 {formatVnd(finalOverdueAmount)}
               </span>
             </div>
@@ -288,7 +288,7 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
           {step === 'LOADING' && (
             <div className="py-10 flex flex-col items-center justify-center space-y-3 text-center">
               <div className="w-10 h-10 border-4 border-rose-600 border-t-transparent rounded-full animate-spin" />
-              <p className="text-xs font-semibold text-slate-600">
+              <p className="text-sm font-semibold text-slate-600">
                 Generating PayOS VietQR code for overdue fee settlement...
               </p>
             </div>
@@ -346,7 +346,7 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
                   )}
                 </div>
 
-                <p className="text-xs text-slate-500 mt-2.5 text-center">
+                <p className="text-sm text-slate-500 mt-2.5 text-center">
                   Scan with any Banking App. Payment is verified automatically within <strong>1–2 seconds</strong>.
                 </p>
 
@@ -427,7 +427,7 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
               </div>
               <div>
                 <h4 className="text-lg font-bold text-slate-900">Overdue Fee Settled!</h4>
-                <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                <p className="text-sm text-slate-600 mt-1 leading-relaxed">
                   Overdue status has been cleared and a <strong>15-minute grace window</strong> has been granted to retrieve your luggage.
                 </p>
               </div>
