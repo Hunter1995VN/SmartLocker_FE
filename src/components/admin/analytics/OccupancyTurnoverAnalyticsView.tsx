@@ -611,7 +611,7 @@ export default function OccupancyTurnoverAnalyticsView({
             {/* ROW 1: 4 Primary Occupancy & Locker Turnover KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                 {/* 1. Time-Weighted Occupancy Rate */}
-                <div className="bg-gradient-to-br from-teal-600 to-emerald-700 rounded-2xl p-4 text-white shadow-sm">
+ <div className="bg-tertiary-container rounded-2xl p-4 text-white shadow-sm">
                     <div className="flex items-center justify-between">
                         <span className="text-xs font-bold uppercase tracking-wider text-teal-100">
                             Tỷ Lệ Lấp Đầy Theo Giờ (Occupancy)

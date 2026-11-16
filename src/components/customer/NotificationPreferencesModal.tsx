@@ -90,7 +90,7 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
         <ModalOverlay onClose={onClose}>
             <div className="bg-white rounded-3xl border border-surface-container max-w-lg w-full shadow-2xl overflow-hidden animate-fade-in-down">
                 {/* Header */}
-                <div className="p-5 bg-gradient-to-r from-on-surface to-[#1e3a8a] text-white flex items-center justify-between">
+ <div className="p-5 bg-on-surface text-white flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-2xl bg-white/15 flex items-center justify-center">
                             <Bell className="w-5 h-5 text-blue-200" />

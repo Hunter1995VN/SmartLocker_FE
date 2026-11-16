@@ -61,7 +61,7 @@ export default function StationReviewPanel({ bookingId, status, stationName }: {
   const toggle = (key: string) => setCriteria(old => old.includes(key) ? old.filter(v => v !== key) : [...old, key]);
 
   return <section id="review" aria-label="Đánh giá trạm" className="bg-white rounded-2xl border border-outline-variant/40 shadow-sm p-6 sm:p-7 relative overflow-hidden scroll-mt-24">
-    <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-amber-400 to-orange-400" />
+ <div className="absolute top-0 inset-x-0 h-1.5 bg-on-warning-container"/>
 
     <div className="flex items-start justify-between gap-4 border-b border-outline-variant/20 pb-4 mb-5">
       <div>
@@ -145,7 +145,7 @@ export default function StationReviewPanel({ bookingId, status, stationName }: {
       <div className="flex items-center justify-end gap-3">
         {stars < 1 && <span className="text-xs text-slate-500">Chọn số sao để gửi</span>}
         <button type="submit" disabled={busy || stars < 1}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-sm font-bold shadow-sm hover:opacity-90 transition disabled:opacity-40 cursor-pointer">
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary-container text-white text-sm font-bold shadow-sm hover:opacity-90 transition disabled:opacity-40 cursor-pointer">
           <Star className="w-4 h-4" />{busy ? 'Đang gửi…' : 'Gửi đánh giá'}
         </button>
       </div>

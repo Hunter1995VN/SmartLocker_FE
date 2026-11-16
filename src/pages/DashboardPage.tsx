@@ -307,7 +307,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                         <div className="relative overflow-hidden rounded-2xl bg-white shadow-xs p-4 sm:p-6 md:p-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
 
                             <div className="relative z-10 flex items-center gap-3 sm:gap-4">
-                                <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-primary text-white flex items-center justify-center font-bold text-lg overflow-hidden shrink-0">
+                                <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-primary-container text-white flex items-center justify-center font-bold text-lg overflow-hidden shrink-0">
                                     {user.avatarUrl ? (
                                         <img
                                             src={resolveAssetUrl(user.avatarUrl)}
@@ -427,7 +427,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                                     <button
                                                         type="button"
                                                         onClick={() => goDetail(activeBooking.id)}
-                                                        className="basis-full sm:basis-auto sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary-container text-white text-sm font-semibold hover:bg-primary transition-colors cursor-pointer"
+                                                        className="basis-full sm:basis-auto sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary-container text-white text-sm font-semibold hover:bg-on-primary-fixed-variant transition-colors cursor-pointer"
                                                     >
                                                         <Lock className="w-5 h-5" />
                                                         Xem vé &amp; mã mở tủ
@@ -472,7 +472,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                             <button
                                                 type="button"
                                                 onClick={goMap}
-                                                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary-container text-white text-sm font-semibold hover:bg-primary transition-colors cursor-pointer"
+                                                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary-container text-white text-sm font-semibold hover:bg-on-primary-fixed-variant transition-colors cursor-pointer"
                                             >
                                                 <MapPin className="w-4 h-4" />
                                                 Tìm trạm ngay
@@ -748,7 +748,7 @@ function NearbyStationCard({ station, onBook }: { station: Station; onBook: () =
                     className={`px-4 py-2 min-h-9 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
                         totalAvail > 0
                             ? isPrimary
-                                ? 'bg-primary-container text-white hover:bg-primary'
+                                ? 'bg-primary-container text-white hover:bg-on-primary-fixed-variant'
                                 : 'bg-surface-container-high text-on-surface hover:bg-primary-container hover:text-white'
                             : 'bg-surface-container text-on-surface-muted cursor-not-allowed'
                     }`}

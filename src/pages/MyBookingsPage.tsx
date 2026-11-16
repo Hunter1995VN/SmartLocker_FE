@@ -133,7 +133,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => onNavigate('find-station')}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-container text-white text-sm font-bold rounded-xl shadow-sm hover:bg-primary transition-all active:scale-[0.98] cursor-pointer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-container text-white text-sm font-bold rounded-xl shadow-sm hover:bg-on-primary-fixed-variant transition-all active:scale-[0.98] cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
                 <span>Book a New Locker</span>
@@ -237,7 +237,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
               const progress = Math.min(100, Math.max(0, (elapsed / total) * 100));
 
               return (
-                <div key={booking.id} className="bg-white border-2 border-primary-container/70 rounded-2xl p-5 md:p-6 shadow-sm relative overflow-hidden bg-gradient-to-b from-blue-50/30 to-white">
+ <div key={booking.id} className="bg-white border-2 border-primary-container/70 rounded-2xl p-5 md:p-6 shadow-sm relative overflow-hidden">
                   <div className="absolute top-0 left-0 right-0 h-1 bg-primary-container"></div>
                   {/* Card Header Meta */}
                   <div className="flex flex-col md:flex-row md:items-center justify-between pb-5 border-b border-outline-variant/30 gap-3">
@@ -378,7 +378,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                       {/* Primary CTA: View Digital Key */}
                       <button
                         onClick={() => onNavigate('booking-detail', { bookingId: booking.id })}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-container text-white text-sm font-bold rounded-xl shadow-sm hover:bg-primary transition-colors cursor-pointer active:scale-95"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-container text-white text-sm font-bold rounded-xl shadow-sm hover:bg-on-primary-fixed-variant transition-colors cursor-pointer active:scale-95"
                       >
                         <QrCode className="w-4 h-4" />
                         <span>View Digital Key (QR Code)</span>
@@ -443,7 +443,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
             <p className="text-sm text-secondary max-w-sm mx-auto">You currently have no ongoing locker storage sessions.</p>
             <button
               onClick={() => onNavigate('find-station')}
-              className="mt-2 px-5 py-2.5 bg-primary-container text-white text-xs font-bold rounded-xl shadow-xs hover:bg-primary cursor-pointer"
+              className="mt-2 px-5 py-2.5 bg-primary-container text-white text-xs font-bold rounded-xl shadow-xs hover:bg-on-primary-fixed-variant cursor-pointer"
             >
               Find Stations &amp; Book Now
             </button>
@@ -769,7 +769,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
             <div className="pt-2">
               <button
                 onClick={() => setCancelledDetailBooking(null)}
-                className="w-full py-2.5 rounded-xl bg-primary-container hover:bg-primary text-white text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95"
+                className="w-full py-2.5 rounded-xl bg-primary-container hover:bg-on-primary-fixed-variant text-white text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95"
               >
                 Close Receipt
               </button>

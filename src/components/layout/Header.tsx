@@ -46,14 +46,14 @@ const Header = ({ onNavigate }: HeaderProps) => {
         <div className="w-full px-4 md:px-8 max-w-7xl mx-auto flex items-center justify-between h-[72px]">
           {/* Brand Logo */}
           <a href="#" className="flex items-center gap-3 group shrink-0">
-            <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-primary-container to-primary flex items-center justify-center text-white shadow-elevation-1 group-hover:scale-105 group-hover:shadow-elevation-2 transition-all duration-200">
+ <div className="relative w-11 h-11 rounded-xl bg-primary-container flex items-center justify-center text-white shadow-elevation-1 group-hover:scale-105 group-hover:shadow-elevation-2 transition-all duration-200">
               <Lock className="w-5 h-5" />
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white animate-pulse"></div>
             </div>
             <div className="flex flex-col">
               <span className="text-lg font-bold text-on-surface flex items-center gap-2 tracking-tight leading-tight">
                 SmartLocker
-                <span className="hidden sm:inline-block px-2 py-0.5 rounded-full text-xs font-bold bg-gradient-to-r from-emerald-50 to-emerald-100 text-emerald-700 border border-emerald-200 uppercase tracking-wider">
+ <span className="hidden sm:inline-block px-2 py-0.5 rounded-full text-xs font-bold bg-tertiary-fixed/30 text-emerald-700 border border-emerald-200 uppercase tracking-wider">
                   24/7 Online
                 </span>
               </span>
@@ -99,7 +99,7 @@ const Header = ({ onNavigate }: HeaderProps) => {
             {/* Primary Action CTA */}
             <a 
               href="#booking-widget"
-              className="inline-flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap bg-primary-container hover:bg-primary text-white px-3 sm:px-5 py-2.5 rounded-xl text-sm font-bold shadow-elevation-1 hover:shadow-elevation-2 transition-all duration-200"
+              className="inline-flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap bg-primary-container hover:bg-on-primary-fixed-variant text-white px-3 sm:px-5 py-2.5 rounded-xl text-sm font-bold shadow-elevation-1 hover:shadow-elevation-2 transition-all duration-200"
               onClick={(e) => { e.preventDefault(); onNavigate?.('register'); }}
               role="button"
             >

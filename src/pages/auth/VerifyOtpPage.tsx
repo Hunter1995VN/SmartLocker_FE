@@ -218,7 +218,7 @@ export default function VerifyOtpPage({ onNavigate, email }: VerifyOtpPageProps)
                     <button
                         onClick={() => handleVerify()}
                         disabled={isLoading || code.join('').length < 6}
-                        className="w-full h-12 bg-primary-container hover:bg-primary active:scale-[0.99] text-white rounded-xl text-base font-bold flex items-center justify-center gap-2 shadow-elevation-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full h-12 bg-primary-container hover:bg-on-primary-fixed-variant active:scale-[0.99] text-white rounded-xl text-base font-bold flex items-center justify-center gap-2 shadow-elevation-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {isLoading ? (
                             <>

@@ -77,7 +77,7 @@ const Pricing = () => {
   return (
     <>
       {/* Pricing Section */}
-      <section className="py-20 md:py-28 bg-gradient-to-b from-surface to-surface-container-lowest" id="pricing">
+ <section className="py-20 md:py-28 bg-surface"id="pricing">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           {/* Section Header */}
           <div className="text-center max-w-3xl mx-auto mb-16">
@@ -103,7 +103,7 @@ const Pricing = () => {
                 {/* Popular Badge */}
                 {size.popular && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
-                    <div className="bg-gradient-to-r from-primary-container to-primary text-white px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider shadow-elevation-2 flex items-center gap-1.5">
+ <div className="bg-primary-container text-white px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider shadow-elevation-2 flex items-center gap-1.5">
                       <Star className="w-3.5 h-3.5 fill-white" />
                       Phổ biến nhất
                     </div>
@@ -202,7 +202,7 @@ const Pricing = () => {
                     }}
                     className={`w-full py-4 rounded-xl text-base font-bold transition-all flex items-center justify-center gap-2 ${
                       size.popular 
-                        ? 'bg-primary-container hover:bg-primary text-white shadow-elevation-2 hover:shadow-elevation-3' 
+                        ? 'bg-primary-container hover:bg-on-primary-fixed-variant text-white shadow-elevation-2 hover:shadow-elevation-3' 
                         : 'bg-white hover:bg-primary-container text-primary hover:text-white border-2 border-primary'
                     }`}
                   >
