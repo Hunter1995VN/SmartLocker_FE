@@ -21,3 +21,25 @@ Quy tắc:
 - Còn khoảng 48 mã hex ngoại lệ: màn hình kiosk nền tối (`#131b28`, `#354664`...), bản đồ và biểu tượng SVG. Có thể gom thành token `kiosk-*` ở bước sau.
 - Màn cảm ứng (`pointer: coarse`) tự có vùng chạm tối thiểu 44px (khối cuối phần `@layer base` trong `index.css`).
 - Kiểm tra khi đổi màu: `tests/hung/color-snap.js` chụp màu tính toán của từng phần tử trước/sau để chứng minh không đổi giao diện; `tests/hung/ui-audit.js` đo tương phản, cỡ chữ, vùng chạm.
+
+## Thành phần dùng chung (đã extract)
+
+| Thành phần | Vị trí | Dùng khi |
+|---|---|---|
+| `ModalOverlay` | `src/components/ui/ModalOverlay.tsx` | Mọi hộp thoại. Chỉ thay lớp phủ ngoài cùng, nội dung giữ nguyên. Tự có `role="dialog"`, `aria-modal`, tên lấy từ tiêu đề đầu tiên, Esc đóng, khóa cuộn trang, nhốt Tab, trả focus khi đóng. Bấm nền để đóng là tùy chọn (`closeOnBackdrop`, mặc định tắt vì nhiều hộp thoại là form). |
+| `Pagination` + `usePagination` | `src/components/admin/Pagination.tsx` | Bảng/danh sách dài ở admin, phân trang phía client. |
+| `GlobalDialogs`, `openSupport()`, `openLegal()` | `src/components/support`, `src/utils/contact.ts` | Hộp thoại Liên hệ/Chính sách mở từ bất kỳ nút nào. |
+| `useNetworkStats` | `src/utils/useNetworkStats.ts` | Số trạm/ô tủ thật thay cho con số quảng cáo viết cứng. |
+
+Cách dùng `ModalOverlay`:
+
+```tsx
+<ModalOverlay onClose={onClose}>            {/* hoặc closeOnBackdrop, className="overflow-y-auto", zClass="z-[1000]" */}
+  <div className="bg-white rounded-2xl ...">
+    <h2>Tiêu đề hộp thoại</h2>
+    ...
+  </div>
+</ModalOverlay>
+```
+
+Chưa chuyển sang `ModalOverlay` (còn tự viết lớp phủ): các hộp thoại nằm trong các view admin lớn (đồ thất lạc, lưới tủ, thiết bị IoT, RBAC, công nợ…), `CancelBookingModal`/`ExtendBookingModal` (có lớp nền riêng), `RemoteUnlockConfirmModal`, `AdminReviewDialog` (dạng panel bên phải) và các lớp phủ kiosk. Chuyển dần khi sửa từng file; mỗi cái chỉ cần đổi thẻ `div` ngoài cùng.

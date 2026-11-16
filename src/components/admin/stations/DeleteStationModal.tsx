@@ -4,6 +4,7 @@
  */
 import { AlertTriangle, Trash2, X } from 'lucide-react';
 import type { StationAdminDetailDto } from '../../../api/adminStationService';
+import ModalOverlay from '../../ui/ModalOverlay';
 
 interface DeleteStationModalProps {
     station: StationAdminDetailDto | null;
@@ -23,7 +24,7 @@ export default function DeleteStationModal({
     if (!isOpen || !station) return null;
 
     return (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+        <ModalOverlay onClose={onClose}>
             <div className="bg-white rounded-3xl max-w-md w-full border border-slate-200 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                 {/* Header */}
                 <div className="p-5 border-b border-slate-100 flex items-center justify-between">
@@ -89,6 +90,6 @@ export default function DeleteStationModal({
                     </button>
                 </div>
             </div>
-        </div>
+        </ModalOverlay>
     );
 }

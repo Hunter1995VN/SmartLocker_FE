@@ -19,6 +19,7 @@ import notificationPreferenceService, {
     DEFAULT_NOTIFICATION_PREFS,
 } from '../../api/notificationPreferenceService';
 import type { NotificationPreferenceDto } from '../../api/notificationPreferenceService';
+import ModalOverlay from '../ui/ModalOverlay';
 
 interface NotificationPreferencesModalProps {
     isOpen: boolean;
@@ -86,7 +87,7 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
     };
 
     return (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+        <ModalOverlay onClose={onClose}>
             <div className="bg-white rounded-3xl border border-surface-container max-w-lg w-full shadow-2xl overflow-hidden animate-fade-in-down">
                 {/* Header */}
                 <div className="p-5 bg-gradient-to-r from-on-surface to-[#1e3a8a] text-white flex items-center justify-between">
@@ -327,7 +328,7 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
                     </button>
                 </div>
             </div>
-        </div>
+        </ModalOverlay>
     );
 };
 

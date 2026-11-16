@@ -14,6 +14,7 @@ import {
     ShieldAlert,
 } from 'lucide-react';
 import type { UserAdminListItemDto } from '../../../api/adminUserService';
+import ModalOverlay from '../../ui/ModalOverlay';
 
 interface ResetStaffPasswordModalProps {
     isOpen: boolean;
@@ -80,7 +81,7 @@ export default function ResetStaffPasswordModal({
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+        <ModalOverlay onClose={onClose}>
             <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden">
                 <div className="px-6 py-4 border-b border-slate-100 bg-amber-50/60 flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -213,6 +214,6 @@ export default function ResetStaffPasswordModal({
                     </div>
                 </form>
             </div>
-        </div>
+        </ModalOverlay>
     );
 }

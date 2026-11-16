@@ -20,6 +20,7 @@ import {
   confirmOverduePaymentDemo,
   type CreateBookingResponse,
 } from '../../api/bookingService';
+import ModalOverlay from '../ui/ModalOverlay';
 
 export interface PayOverdueModalProps {
   isOpen: boolean;
@@ -223,7 +224,7 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
   const secs = countdownSeconds % 60;
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/65 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+    <ModalOverlay onClose={onClose} className="overflow-y-auto">
       <div className="bg-white rounded-3xl max-w-lg w-full border border-red-100 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Top Banner */}
         <div className="bg-gradient-to-r from-red-600 to-rose-600 px-6 py-4 text-white flex items-center justify-between">
@@ -464,7 +465,7 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
           <span>Instant locker release upon settlement</span>
         </div>
       </div>
-    </div>
+    </ModalOverlay>
   );
 };
 

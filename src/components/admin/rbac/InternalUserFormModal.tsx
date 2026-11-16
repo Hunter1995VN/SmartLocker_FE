@@ -23,6 +23,7 @@ import type {
     UserAdminListItemDto,
     UserRole,
 } from '../../../api/adminUserService';
+import ModalOverlay from '../../ui/ModalOverlay';
 
 interface InternalUserFormModalProps {
     isOpen: boolean;
@@ -166,7 +167,7 @@ export default function InternalUserFormModal({
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+        <ModalOverlay onClose={onClose}>
             <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden">
                 {/* Header */}
                 <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
@@ -441,6 +442,6 @@ export default function InternalUserFormModal({
                     </div>
                 </form>
             </div>
-        </div>
+        </ModalOverlay>
     );
 }

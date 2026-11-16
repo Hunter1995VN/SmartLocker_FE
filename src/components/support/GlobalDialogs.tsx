@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Check, Clock, Copy, Mail, Phone, ShieldAlert, X } from 'lucide-react';
 import { CONTACT, LEGAL_EVENT, SUPPORT_EVENT, type LegalKind } from '../../utils/contact';
+import ModalOverlay from '../ui/ModalOverlay';
 
 const LEGAL_CONTENT: Record<LegalKind, { title: string; sections: { heading: string; body: string }[] }> = {
     privacy: {
@@ -31,34 +32,20 @@ const LEGAL_CONTENT: Record<LegalKind, { title: string; sections: { heading: str
     },
 };
 
-/** Hộp thoại chung: đóng bằng Esc, bấm nền hoặc nút X; trả focus về nút mở. */
+/** Hộp thoại chung dựa trên ModalOverlay (Esc, khóa cuộn, nhốt Tab, trả focus); bấm nền để đóng. */
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
-    const closeRef = useRef<HTMLButtonElement>(null);
-    useEffect(() => {
-        const previous = document.activeElement as HTMLElement | null;
-        closeRef.current?.focus();
-        const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-        document.addEventListener('keydown', onKey);
-        const overflow = document.body.style.overflow;
-        document.body.style.overflow = 'hidden';
-        return () => {
-            document.removeEventListener('keydown', onKey);
-            document.body.style.overflow = overflow;
-            previous?.focus?.();
-        };
-    }, [onClose]);
     return (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-            <div role="dialog" aria-modal="true" aria-label={title} className="w-full max-w-lg max-h-[88vh] overflow-y-auto rounded-2xl bg-white shadow-2xl border border-slate-200">
+        <ModalOverlay onClose={onClose} closeOnBackdrop label={title} zClass="z-[1000]">
+            <div className="w-full max-w-lg max-h-[88vh] overflow-y-auto rounded-2xl bg-white shadow-2xl border border-slate-200">
                 <div className="flex items-center justify-between gap-3 px-6 pt-5 pb-3 sticky top-0 bg-white border-b border-slate-100">
                     <h2 className="text-lg font-bold text-slate-900">{title}</h2>
-                    <button ref={closeRef} type="button" onClick={onClose} aria-label="Đóng" className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 cursor-pointer">
+                    <button type="button" onClick={onClose} aria-label="Đóng" className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 cursor-pointer">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
                 <div className="px-6 py-5">{children}</div>
             </div>
-        </div>
+        </ModalOverlay>
     );
 }
 

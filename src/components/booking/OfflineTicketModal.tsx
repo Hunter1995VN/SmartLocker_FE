@@ -15,6 +15,7 @@ import {
   Info
 } from 'lucide-react';
 import type { OfflineTicketDto } from '../../api/bookingService';
+import ModalOverlay from '../ui/ModalOverlay';
 
 interface OfflineTicketModalProps {
   isOpen: boolean;
@@ -205,7 +206,7 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm animate-in fade-in duration-200">
+    <ModalOverlay onClose={onClose}>
       <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100 max-h-[92vh] flex flex-col">
         {/* Top Header Banner */}
         <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 text-white p-5 sm:p-6 shrink-0 relative overflow-hidden">
@@ -383,6 +384,6 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
           </button>
         </div>
       </div>
-    </div>
+    </ModalOverlay>
   );
 };

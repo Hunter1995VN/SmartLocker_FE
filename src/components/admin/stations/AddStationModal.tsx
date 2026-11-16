@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { X, Plus, Layers, MapPin, Navigation, Tag, Clock } from 'lucide-react';
 import type { CreateStationRequest } from '../../../api/adminStationService';
+import ModalOverlay from '../../ui/ModalOverlay';
 
 interface AddStationModalProps {
     isOpen: boolean;
@@ -121,7 +122,7 @@ export default function AddStationModal({
     };
 
     return (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+        <ModalOverlay onClose={onClose} className="overflow-y-auto">
             <div className="bg-white rounded-3xl max-w-2xl w-full border border-slate-200 shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 duration-200">
                 {/* Header */}
                 <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
@@ -396,6 +397,6 @@ export default function AddStationModal({
                     </div>
                 </form>
             </div>
-        </div>
+        </ModalOverlay>
     );
 }
