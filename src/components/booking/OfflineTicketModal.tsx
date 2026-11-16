@@ -222,7 +222,7 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
               <h3 className="text-xl sm:text-2xl font-bold tracking-tight">
                 Vé Mở Khóa Ngoại Tuyến
               </h3>
-              <p className="text-xs text-blue-100">
+              <p className="text-sm text-blue-100">
                 Chuẩn mã hóa HMAC-SHA256 (JWS RFC 7515)
               </p>
             </div>
@@ -258,7 +258,7 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
                       <MapPin className="w-3.5 h-3.5" />
                       <span>{ticket.stationName}</span>
                     </div>
-                    <p className="text-xs text-slate-500 line-clamp-1">{ticket.stationAddress}</p>
+                    <p className="text-sm text-slate-500 line-clamp-1">{ticket.stationAddress}</p>
                   </div>
                   <span className="shrink-0 px-2.5 py-1 rounded-lg bg-blue-100 text-blue-800 text-xs font-bold font-mono">
                     {ticket.bookingCode}

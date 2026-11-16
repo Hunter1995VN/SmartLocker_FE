@@ -24,7 +24,7 @@ export default function LockerBayGrid({ lockers, selectedLocker, onSelectLocker,
                 if (!items.length) return null;
                 return <div key={size}>
                     <div className="flex items-center gap-2 mb-2">
-                        <span className="w-6 h-6 rounded-lg bg-slate-900 text-white text-xs font-black flex items-center justify-center">{size}</span>
+                        <span className="w-6 h-6 rounded-lg bg-slate-900 text-white text-xs font-extrabold flex items-center justify-center">{size}</span>
                         <span className="text-xs font-bold text-slate-700">{items.length} ngăn</span>
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2.5">{items.map(locker => {
@@ -38,7 +38,7 @@ export default function LockerBayGrid({ lockers, selectedLocker, onSelectLocker,
                                 isSelected ? 'ring-2 ring-blue-600 ring-offset-1 shadow-md' : ''}`}>
                             <span title={online ? 'Thiết bị online' : 'Thiết bị offline / chưa gắn'}
                                 className={`absolute top-2.5 right-2.5 w-2 h-2 rounded-full ${online ? 'bg-emerald-500' : 'bg-slate-300'}`} />
-                            <span className="block font-mono text-sm font-black text-slate-900 pr-3 truncate">{locker.lockerCode}</span>
+                            <span className="block font-mono text-sm font-extrabold text-slate-900 pr-3 truncate">{locker.lockerCode}</span>
                             <span className={`mt-1 flex items-center gap-1 text-xs font-bold ${status.badgeText}`}><Icon className="w-3.5 h-3.5" />{status.label}</span>
                             <span className="mt-1.5 flex items-center gap-1 text-xs font-medium text-slate-500">{doorIcon(locker.doorState)}{doorLabel(locker.doorState)}</span>
                             {locker.currentBooking && <span className="mt-1 block font-mono text-xs font-bold text-blue-700 truncate">{locker.currentBooking.bookingCode}</span>}

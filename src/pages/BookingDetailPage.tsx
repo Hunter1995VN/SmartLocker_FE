@@ -312,8 +312,8 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
            <div className="p-4 rounded-xl bg-red-50 border border-red-200 flex items-start gap-3.5 shadow-xs mb-4">
              <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5 shrink-0" />
              <div className="flex-1">
-               <p className="text-xs text-red-900 font-bold">Locker Overdue</p>
-               <p className="text-xs text-red-800 mt-0.5">This locker is currently overdue. Current overdue fee: <strong>{formatCurrency(booking.currentOverdueFee || 0)} VND</strong>.</p>
+               <p className="text-sm text-red-900 font-bold">Locker Overdue</p>
+               <p className="text-sm text-red-800 mt-0.5">This locker is currently overdue. Current overdue fee: <strong>{formatCurrency(booking.currentOverdueFee || 0)} VND</strong>.</p>
              </div>
            </div>
         )}
@@ -412,7 +412,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                     <Key className="w-5 h-5 text-primary" />
                     <h2 className="text-xl font-bold text-on-surface">Digital Access Pass &amp; Unlock Key</h2>
                   </div>
-                  <p className="text-xs text-on-surface-variant">
+                  <p className="text-sm text-on-surface-variant">
                     {isLockerAssigned
                       ? `Present this QR code to the Kiosk optical scanner or enter the passcode below to release ${bayCode}.`
                       : `Present this QR code to the Kiosk optical scanner or enter the 8-digit passcode below on the touchpad to automatically assign your locker (Size ${size}) and release the door.`}
@@ -498,7 +498,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                     )}
                   </button>
                 </div>
-                <p className="text-center text-xs text-on-surface-variant">Tap &quot;Unlock Locker&quot; on the terminal screen, then type this code.</p>
+                <p className="text-center text-sm text-on-surface-variant">Tap &quot;Unlock Locker&quot; on the terminal screen, then type this code.</p>
                 {copyFailed && <p role="status">Không sao chép được. Bạn có thể nhập 8 số đang hiển thị tại Kiosk.</p>}
                 {ticketEligible && status === 'CONFIRMED' && !validPin && <div className="text-sm space-y-2">
                   <p>Vé chưa có PIN 8 số hợp lệ. Thay vé cũ sẽ làm PIN và QR online cũ hết hiệu lực.</p>
@@ -541,7 +541,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                             : 'Thời gian lưu trữ còn lại'}
                       </span>
                       {isHoldPeriod && (
-                        <p className="text-xs text-amber-800 font-medium">Giờ thuê thực tế chỉ bắt đầu tính khi bạn mở tủ tại trạm</p>
+                        <p className="text-sm text-amber-800 font-medium">Giờ thuê thực tế chỉ bắt đầu tính khi bạn mở tủ tại trạm</p>
                       )}
                     </div>
                   </div>
@@ -611,7 +611,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                       <span>Vé ngoại tuyến</span>
                       <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">HMAC JWS</span>
                     </div>
-                    <p className="text-xs text-on-surface-variant leading-relaxed">
+                    <p className="text-sm text-on-surface-variant leading-relaxed">
                       Vé ngoại tuyến được hiển thị riêng. Mã QR động phía trên chỉ dùng để xác thực trực tuyến.
                     </p>
                   </div>
@@ -669,7 +669,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                   <h3 className="text-base font-bold text-on-surface">
                     {isLockerAssigned ? 'Assigned Locker Location' : 'Station Locker Layout'}
                   </h3>
-                  <p className="text-xs text-on-surface-variant">
+                  <p className="text-sm text-on-surface-variant">
                     {isLockerAssigned ? `Ô tủ ${rawBayCode}` : `Size ${size} Tier · Assigned at Kiosk Check-in`}
                   </p>
                 </div>
@@ -779,7 +779,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
           <div className="flex flex-col sm:flex-row items-center gap-3">
             <span className="text-base text-primary font-bold">SmartLocker SLMS</span>
             <span className="hidden sm:inline-block text-outline-variant">•</span>
-            <p className="text-xs text-on-surface-variant">
+            <p className="text-sm text-on-surface-variant">
               © 2025 SmartLocker Systems Inc. Telemetry &amp; Cryptographic Access Active. All rights reserved.
             </p>
           </div>

@@ -43,3 +43,12 @@ Cách dùng `ModalOverlay`:
 ```
 
 Chưa chuyển sang `ModalOverlay` (còn tự viết lớp phủ): các hộp thoại nằm trong các view admin lớn (đồ thất lạc, lưới tủ, thiết bị IoT, RBAC, công nợ…), `CancelBookingModal`/`ExtendBookingModal` (có lớp nền riêng), `RemoteUnlockConfirmModal`, `AdminReviewDialog` (dạng panel bên phải) và các lớp phủ kiosk. Chuyển dần khi sửa từng file; mỗi cái chỉ cần đổi thẻ `div` ngoài cùng.
+
+## Chữ (typography)
+
+- Một họ chữ: **Plus Jakarta Sans** (có tiếng Việt). Tải 400/500/600/700/800 + italic 400; không tải 300 (không dùng). Không có weight 900: dùng `font-extrabold`, không dùng `font-black`.
+- `font-sans` của Tailwind đã trỏ về Plus Jakarta Sans (`--font-sans` trong `@theme`). Trước đó 12 file (đăng nhập, đăng ký, Dashboard, Hồ sơ, admin, kiosk…) dùng `font-sans` và vô tình hiển thị chữ hệ thống.
+- Vai trò và cỡ chữ: tiêu đề hero 36–60px; tiêu đề trang 24px; tiêu đề khối 16–18px semibold; **đoạn văn 14px** (`text-sm`); nhãn/siêu dữ liệu 12px (`text-xs`, tối thiểu); dữ liệu số dùng số cùng độ rộng.
+- Chữ số cùng độ rộng (`font-variant-numeric: tabular-nums`) đặt ở `body`: tiền, đồng hồ đếm ngược, bảng không nhảy khi giá trị đổi (với số tỷ lệ "1111" và "0000" từng lệch 45%). Chỉ dùng `font-mono` cho mã (mã đơn, PIN, ID), không dùng cho số tiền/giờ.
+- Ngắt dòng: `text-wrap: balance` cho h1–h3, `pretty` cho `p`, `li` (đặt ở `@layer base`).
+- Chữ in hoa kèm giãn chữ chỉ dành cho nhãn ngắn; với tiếng Việt nhiều dấu, tránh in hoa cả câu.

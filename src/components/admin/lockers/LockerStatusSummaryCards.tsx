@@ -117,7 +117,7 @@ export default function LockerStatusSummaryCards({
                         </div>
 
                         <div className="flex items-baseline gap-2">
-                            <span className="text-2xl font-black text-slate-900 tracking-tight">
+                            <span className="text-2xl font-extrabold text-slate-900 tracking-tight">
                                 {isLoading ? '—' : c.count}
                             </span>
                             <span className="text-xs font-semibold text-slate-500">

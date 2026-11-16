@@ -199,7 +199,7 @@ export default function Locker3DCanvas({
           <div className="h-8 px-3.5 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700/80 flex items-center justify-between shrink-0 shadow-inner">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm animate-pulse"></span>
-              <span className="text-xs font-black tracking-widest uppercase font-mono text-slate-200">
+              <span className="text-xs font-extrabold tracking-widest uppercase font-mono text-slate-200">
                 SMARTLOCKER PRO 24/7 • STATION HUB
               </span>
             </div>
@@ -242,7 +242,7 @@ export default function Locker3DCanvas({
                     🎒
                   </div>
                   <div className="text-left font-mono">
-                    <div className="text-xs font-black text-emerald-400 flex items-center gap-1.5">
+                    <div className="text-xs font-extrabold text-emerald-400 flex items-center gap-1.5">
                       <span>KHOANG CỠ S</span>
                       <span className="text-xs px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-sans font-bold">MỞ</span>
                     </div>
@@ -254,7 +254,7 @@ export default function Locker3DCanvas({
 
                 {/* Right: Price & Solenoid status */}
                 <div className="text-right pr-3 z-10 font-mono">
-                  <div className="text-xs font-black text-emerald-400">10.000 đ/h</div>
+                  <div className="text-xs font-extrabold text-emerald-400">10.000 đ/h</div>
                   <div className="text-xs text-slate-500">Chốt điện an toàn</div>
                 </div>
               </div>
@@ -287,7 +287,7 @@ export default function Locker3DCanvas({
                   {/* CENTER: EXQUISITE ENAMEL LETTER BADGE S (ONLY THE LETTER S) */}
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 p-1 shadow-lg ring-4 ring-emerald-500/30 flex items-center justify-center transform active:scale-95 transition-transform">
                     <div className="w-full h-full rounded-xl bg-slate-950 flex items-center justify-center border border-emerald-400/50 shadow-inner">
-                      <span className="text-2xl font-black font-sans text-emerald-400 tracking-tighter">
+                      <span className="text-2xl font-extrabold font-sans text-emerald-400 tracking-tighter">
                         S
                       </span>
                     </div>
@@ -329,7 +329,7 @@ export default function Locker3DCanvas({
                     🧳
                   </div>
                   <div className="text-left font-mono">
-                    <div className="text-xs font-black text-sky-400 flex items-center gap-1.5">
+                    <div className="text-xs font-extrabold text-sky-400 flex items-center gap-1.5">
                       <span>KHOANG CỠ M</span>
                       <span className="text-xs px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 font-sans font-bold">MỞ</span>
                     </div>
@@ -340,7 +340,7 @@ export default function Locker3DCanvas({
                 </div>
 
                 <div className="text-right pr-3 z-10 font-mono">
-                  <div className="text-xs font-black text-sky-400">15.000 đ/h</div>
+                  <div className="text-xs font-extrabold text-sky-400">15.000 đ/h</div>
                   <div className="text-xs text-slate-500">Đệm chống trầy xước</div>
                 </div>
               </div>
@@ -371,7 +371,7 @@ export default function Locker3DCanvas({
                   {/* CENTER: EXQUISITE ENAMEL LETTER BADGE M */}
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-sky-400 to-sky-600 p-1 shadow-lg ring-4 ring-sky-500/30 flex items-center justify-center transform active:scale-95 transition-transform">
                     <div className="w-full h-full rounded-xl bg-slate-950 flex items-center justify-center border border-sky-400/50 shadow-inner">
-                      <span className="text-3xl font-black font-sans text-sky-400 tracking-tighter">
+                      <span className="text-3xl font-extrabold font-sans text-sky-400 tracking-tighter">
                         M
                       </span>
                     </div>
@@ -411,7 +411,7 @@ export default function Locker3DCanvas({
                     📦
                   </div>
                   <div className="text-left font-mono">
-                    <div className="text-xs font-black text-amber-400 flex items-center gap-1.5">
+                    <div className="text-xs font-extrabold text-amber-400 flex items-center gap-1.5">
                       <span>KHOANG CỠ L</span>
                       <span className="text-xs px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-sans font-bold">MỞ</span>
                     </div>
@@ -422,7 +422,7 @@ export default function Locker3DCanvas({
                 </div>
 
                 <div className="text-right pr-3 z-10 font-mono">
-                  <div className="text-xs font-black text-amber-400">25.000 đ/h</div>
+                  <div className="text-xs font-extrabold text-amber-400">25.000 đ/h</div>
                   <div className="text-xs text-slate-500">Trợ lực giảm chấn</div>
                 </div>
               </div>
@@ -453,7 +453,7 @@ export default function Locker3DCanvas({
                   {/* CENTER: EXQUISITE ENAMEL LETTER BADGE L */}
                   <div className="w-18 h-18 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 p-1 shadow-lg ring-4 ring-amber-500/30 flex items-center justify-center transform active:scale-95 transition-transform">
                     <div className="w-full h-full rounded-xl bg-slate-950 flex items-center justify-center border border-amber-400/50 shadow-inner">
-                      <span className="text-4xl font-black font-sans text-amber-400 tracking-tighter">
+                      <span className="text-4xl font-extrabold font-sans text-amber-400 tracking-tighter">
                         L
                       </span>
                     </div>
@@ -527,13 +527,13 @@ export default function Locker3DCanvas({
               {/* Header */}
               <div className="flex items-center justify-between pb-2 mb-2.5 border-b border-slate-300 dark:border-slate-700">
                 <div className="flex items-center gap-2.5">
-                  <span className={`w-8 h-8 rounded-xl flex items-center justify-center font-black text-base font-mono text-slate-950 shadow-md ${
+                  <span className={`w-8 h-8 rounded-xl flex items-center justify-center font-extrabold text-base font-mono text-slate-950 shadow-md ${
                     selectedSize === 'S' ? 'bg-emerald-400' : selectedSize === 'M' ? 'bg-sky-400' : 'bg-amber-400'
                   }`}>
                     {selectedSize}
                   </span>
                   <div>
-                    <h4 className="text-sm font-black uppercase tracking-tight text-slate-950 dark:text-white">
+                    <h4 className="text-sm font-extrabold uppercase tracking-tight text-slate-950 dark:text-white">
                       {SIZE_SPECS[selectedSize].name[lang]}
                     </h4>
                     <span className="text-xs text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1">
@@ -548,7 +548,7 @@ export default function Locker3DCanvas({
                     setSelectedSize(null);
                     try { sounds.playKeypadTap(); } catch {}
                   }}
-                  className={`px-3 py-1 rounded-xl border text-xs font-black transition-colors ${
+                  className={`px-3 py-1 rounded-xl border text-xs font-extrabold transition-colors ${
                     outdoorMode
                       ? 'bg-slate-100 hover:bg-slate-200 text-slate-900 border-slate-400'
                       : 'bg-slate-800 hover:bg-slate-700 text-white border-slate-600'
@@ -564,7 +564,7 @@ export default function Locker3DCanvas({
                   outdoorMode ? 'bg-slate-50 border-slate-300' : 'bg-slate-900/80 border-slate-700'
                 }`}>
                   <div className="text-xs font-bold text-slate-600 dark:text-slate-500">Kích thước</div>
-                  <div className="font-black font-mono text-xs text-slate-950 dark:text-white mt-0.5">
+                  <div className="font-extrabold font-mono text-xs text-slate-950 dark:text-white mt-0.5">
                     {SIZE_SPECS[selectedSize].dimensions}
                   </div>
                 </div>
@@ -573,7 +573,7 @@ export default function Locker3DCanvas({
                   outdoorMode ? 'bg-slate-50 border-slate-300' : 'bg-slate-900/80 border-slate-700'
                 }`}>
                   <div className="text-xs font-bold text-slate-600 dark:text-slate-500">Dung tích / Tải</div>
-                  <div className="font-black font-mono text-xs text-slate-950 dark:text-white mt-0.5">
+                  <div className="font-extrabold font-mono text-xs text-slate-950 dark:text-white mt-0.5">
                     {SIZE_SPECS[selectedSize].volume} • {SIZE_SPECS[selectedSize].maxWeight}
                   </div>
                 </div>
@@ -582,7 +582,7 @@ export default function Locker3DCanvas({
                   outdoorMode ? 'bg-emerald-50 border-emerald-300' : 'bg-emerald-950/60 border-emerald-600'
                 }`}>
                   <div className="text-xs font-bold text-emerald-800 dark:text-emerald-300">Đơn giá</div>
-                  <div className="font-black font-mono text-xs text-emerald-700 dark:text-emerald-300 mt-0.5">
+                  <div className="font-extrabold font-mono text-xs text-emerald-700 dark:text-emerald-300 mt-0.5">
                     {SIZE_SPECS[selectedSize].priceHour}
                   </div>
                 </div>
@@ -592,7 +592,7 @@ export default function Locker3DCanvas({
               <div className={`p-2 rounded-xl border flex items-center gap-2 text-xs ${
                 outdoorMode ? 'bg-slate-50 border-slate-300 text-slate-950' : 'bg-slate-900/80 border-slate-700 text-slate-200'
               }`}>
-                <span className="text-emerald-600 dark:text-emerald-400 font-black shrink-0">✓ Phù hợp:</span>
+                <span className="text-emerald-600 dark:text-emerald-400 font-extrabold shrink-0">✓ Phù hợp:</span>
                 <span className="font-bold text-xs truncate">{SIZE_SPECS[selectedSize].suitableLuggage[lang]}</span>
               </div>
 

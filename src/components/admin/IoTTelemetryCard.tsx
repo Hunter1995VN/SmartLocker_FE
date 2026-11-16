@@ -85,7 +85,7 @@ export default function IoTTelemetryCard({
                                 />
                             </svg>
                             <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                                <span className="text-base font-black text-slate-900">{uptimeRate}%</span>
+                                <span className="text-base font-extrabold text-slate-900">{uptimeRate}%</span>
                                 <span className="text-xs text-slate-500 uppercase font-semibold">Uptime</span>
                             </div>
                         </div>

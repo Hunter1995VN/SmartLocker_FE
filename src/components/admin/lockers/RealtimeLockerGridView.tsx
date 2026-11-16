@@ -121,11 +121,11 @@ export default function RealtimeLockerGridView() {
                 <div>
                     <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Size {size}</p>
                     <div className="flex items-baseline gap-1.5 mt-1.5">
-                        <span className="text-2xl font-black text-slate-900 tracking-tight">{free}</span>
+                        <span className="text-2xl font-extrabold text-slate-900 tracking-tight">{free}</span>
                         <span className="text-xs font-semibold text-slate-500">/ {total} ngăn trống</span>
                     </div>
                 </div>
-                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center font-black">{size}</div>
+                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center font-extrabold">{size}</div>
             </div>
             <div className="mt-3.5 pt-3 border-t border-slate-100 grid grid-cols-2 gap-x-3 gap-y-1 text-xs font-medium text-slate-500">
                 <span>Chờ thanh toán: <b className="text-slate-800">{r?.pendingPayment ?? 0}</b></span>
@@ -150,7 +150,7 @@ export default function RealtimeLockerGridView() {
                     Vận hành trạm / <span className="text-blue-600 font-bold">Lưới ô tủ</span>
                 </div>
                 <div className="flex items-center gap-2.5 flex-wrap">
-                    <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Sơ đồ tủ thời gian thực</h1>
+                    <h1 className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight">Sơ đồ tủ thời gian thực</h1>
                     <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse motion-reduce:animate-none" />Trực tiếp
                     </span>

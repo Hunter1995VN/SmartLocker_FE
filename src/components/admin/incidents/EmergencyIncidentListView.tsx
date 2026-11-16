@@ -220,7 +220,7 @@ export default function EmergencyIncidentListView({
                             <ShieldAlert className="w-5 h-5" aria-hidden="true" />
                         </span>
                         <div>
-                            <h1 className="text-lg font-black text-slate-900 tracking-tight">
+                            <h1 className="text-lg font-extrabold text-slate-900 tracking-tight">
                                 Cứu hộ khẩn cấp &amp; Mở khoá tủ từ xa
                             </h1>
                             <p className="text-xs text-slate-500">
@@ -634,7 +634,7 @@ function CreateIncidentModal({
                         <div>
                             <h2
                                 id="create-incident-modal-title"
-                                className="text-base font-black text-slate-900 tracking-tight"
+                                className="text-base font-extrabold text-slate-900 tracking-tight"
                             >
                                 Tiếp nhận / Báo cáo sự cố mới
                             </h2>

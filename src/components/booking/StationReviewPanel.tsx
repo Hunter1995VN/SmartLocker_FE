@@ -69,7 +69,7 @@ export default function StationReviewPanel({ bookingId, status, stationName }: {
           <Star className="w-5 h-5 text-amber-500 fill-amber-400" />
           <h2 className="text-xl font-bold text-on-surface">Đánh giá trạm</h2>
         </div>
-        <p className="text-xs text-on-surface-variant">
+        <p className="text-sm text-on-surface-variant">
           {review ? 'Cảm ơn bạn đã chia sẻ trải nghiệm.' : `Trải nghiệm gửi đồ tại ${stationName || 'trạm'} thế nào? Đánh giá giúp trạm phục vụ tốt hơn.`}
         </p>
       </div>
@@ -102,7 +102,7 @@ export default function StationReviewPanel({ bookingId, status, stationName }: {
 
     {review === null && <form className="space-y-5" onSubmit={event => { event.preventDefault(); void submit(); }}>
       <div>
-        <p className="text-xs font-semibold text-on-surface-variant mb-2">Chấm điểm <span className="text-rose-500">*</span></p>
+        <p className="text-sm font-semibold text-on-surface-variant mb-2">Chấm điểm <span className="text-rose-500">*</span></p>
         <div className="flex items-center gap-3 flex-wrap">
           <div role="radiogroup" aria-label="Số sao" className="flex gap-1" onMouseLeave={() => setHover(0)}>
             {[1, 2, 3, 4, 5].map(n => <button key={n} type="button" role="radio" aria-checked={stars === n} aria-label={`${n} sao: ${STAR_LABELS[n]}`}
@@ -116,7 +116,7 @@ export default function StationReviewPanel({ bookingId, status, stationName }: {
       </div>
 
       <div>
-        <p className="text-xs font-semibold text-on-surface-variant mb-2">Điều bạn hài lòng <span className="font-normal text-slate-500">(không bắt buộc)</span></p>
+        <p className="text-sm font-semibold text-on-surface-variant mb-2">Điều bạn hài lòng <span className="font-normal text-slate-500">(không bắt buộc)</span></p>
         <div className="flex flex-wrap gap-2">
           {CRITERIA.map(({ key, label, icon: Icon }) => {
             const on = criteria.includes(key);
@@ -139,7 +139,7 @@ export default function StationReviewPanel({ bookingId, status, stationName }: {
           className="block w-full rounded-xl border border-outline-variant/50 bg-white p-3 text-sm text-on-surface placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
       </label>
 
-      <p className="text-xs text-on-surface-variant">Đánh giá sẽ hiển thị công khai dưới dạng ẩn danh. Vui lòng tránh ghi thông tin cá nhân trong góp ý.</p>
+      <p className="text-sm text-on-surface-variant">Đánh giá sẽ hiển thị công khai dưới dạng ẩn danh. Vui lòng tránh ghi thông tin cá nhân trong góp ý.</p>
       {submitError && <p role="alert" className="flex items-start gap-2 p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-700"><AlertCircle className="w-4 h-4 shrink-0" />{submitError}</p>}
 
       <div className="flex items-center justify-end gap-3">

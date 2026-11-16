@@ -467,7 +467,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold mr-3 border border-blue-200">1</div>
                   <div>
                     <h2 className="text-xl font-bold text-slate-900">Storage Timing</h2>
-                    <p className="text-xs text-slate-500 mt-0.5">When do you want to deposit your luggage?</p>
+                    <p className="text-sm text-slate-500 mt-0.5">When do you want to deposit your luggage?</p>
                   </div>
                 </div>
               </div>
@@ -512,7 +512,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                       <p className="text-base font-extrabold text-slate-900">
                         Starts Right Now <span className="text-slate-500 font-normal text-sm">({formatTimeStr(startDateObj)} Today)</span>
                       </p>
-                      <p className="text-xs text-slate-500 mt-0.5">Simply choose your rental duration below to proceed</p>
+                      <p className="text-sm text-slate-500 mt-0.5">Simply choose your rental duration below to proceed</p>
                     </div>
                   </div>
                   <span className="hidden sm:inline-block text-xs font-bold text-emerald-700 bg-white px-3 py-1 rounded-full border border-emerald-200 shadow-xs">
@@ -691,7 +691,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold mr-3 border border-blue-200">2</div>
                   <div>
                     <h2 className="text-xl font-bold text-slate-900">Choose Compartment Size</h2>
-                    <p className="text-xs text-slate-500 mt-0.5">Select a compartment tier that accommodates your luggage dimensions</p>
+                    <p className="text-sm text-slate-500 mt-0.5">Select a compartment tier that accommodates your luggage dimensions</p>
                   </div>
                 </div>
                 <div className="flex items-center text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">
@@ -892,21 +892,21 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                 <div className="bg-blue-600 p-5 text-white relative overflow-hidden">
                   <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
                   <h3 className="text-lg font-bold mb-1 relative z-10">Booking Summary</h3>
-                  <p className="text-blue-100 text-xs relative z-10">Review your storage specifications</p>
+                  <p className="text-blue-100 text-sm relative z-10">Review your storage specifications</p>
                 </div>
                 
                 <div className="p-5 space-y-4">
                   {/* Line Items */}
                   <div className="flex justify-between items-start pb-3 border-b border-slate-100">
                     <div>
-                      <p className="text-xs text-slate-500 mb-0.5">Station Location</p>
+                      <p className="text-sm text-slate-500 mb-0.5">Station Location</p>
                       <p className="text-sm font-bold text-slate-900">{currentStation.name}</p>
                     </div>
                   </div>
 
                   <div className="flex justify-between items-start pb-3 border-b border-slate-100">
                     <div>
-                      <p className="text-xs text-slate-500 mb-0.5">Kích thước đã chọn</p>
+                      <p className="text-sm text-slate-500 mb-0.5">Kích thước đã chọn</p>
                       <p className="text-sm font-bold text-blue-600 flex items-center">
                         {selectedSize === 'S' ? 'Small Unit (S)' : selectedSize === 'M' ? 'Medium Unit (M)' : selectedSize === 'L' ? 'Large Unit (L)' : 'None Selected'}
                       </p>
@@ -915,14 +915,14 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
 
                   <div className="flex justify-between items-start pb-3 border-b border-slate-100">
                     <div>
-                      <p className="text-xs text-slate-500 mb-0.5">Schedule</p>
+                      <p className="text-sm text-slate-500 mb-0.5">Schedule</p>
                       <p className="text-sm font-semibold text-slate-900">
                         {bookingMode === 'NOW' ? `Right Now (${formatTimeStr(startDateObj)})` : `${dropOffTime} (${displayStorageDate})`}
                       </p>
-                      <p className="text-xs text-slate-500 mt-0.5">Deadline: {pickUpDisplay}</p>
+                      <p className="text-sm text-slate-500 mt-0.5">Deadline: {pickUpDisplay}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-slate-500 mb-0.5">Duration</p>
+                      <p className="text-sm text-slate-500 mb-0.5">Duration</p>
                       <p className="text-sm font-bold text-blue-600">{selectedDuration} {selectedDuration === 1 ? 'Hour' : 'Hours'}</p>
                     </div>
                   </div>
@@ -973,7 +973,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                               -{formatCurrency(appliedVoucher.discountAmount)}
                             </span>
                           </div>
-                          <p className="text-xs text-emerald-700 truncate mt-0.5">{appliedVoucher.title}</p>
+                          <p className="text-sm text-emerald-700 truncate mt-0.5">{appliedVoucher.title}</p>
                         </div>
                         <button
                           type="button"
@@ -1062,12 +1062,12 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                       <p className="text-sm font-bold text-slate-900">Total Amount</p>
                       <p className="text-2xl font-extrabold text-blue-600">{formatCurrency(finalPayableAmount)}</p>
                     </div>
-                    <p className="text-xs text-slate-500 text-right">Includes VAT & station facility services</p>
+                    <p className="text-sm text-slate-500 text-right">Includes VAT & station facility services</p>
                   </div>
 
                   <div className="bg-emerald-50 p-3 rounded-lg flex items-start border border-emerald-200">
                     <CheckCircle className="w-4 h-4 text-emerald-600 mr-2 mt-0.5 shrink-0" />
-                    <p className="text-xs text-emerald-800">
+                    <p className="text-sm text-emerald-800">
                       <strong>Free cancellation</strong> up to 2 hours before scheduled drop-off time.
                     </p>
                   </div>
@@ -1171,7 +1171,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-slate-900 mb-1">Need assistance?</h4>
-                  <p className="text-xs text-slate-500 mb-2">Our support team is available 24/7 for booking inquiries.</p>
+                  <p className="text-sm text-slate-500 mb-2">Our support team is available 24/7 for booking inquiries.</p>
                   <a href="tel:+8419001234" className="text-sm font-bold text-blue-600 hover:underline">1900 1234 (Hotline)</a>
                 </div>
               </div>
@@ -1191,7 +1191,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                 <span className="text-base text-blue-600 font-extrabold tracking-tight">SmartLocker</span>
                 <span className="text-xs text-slate-500 font-medium">Smart Luggage Storage Locker System</span>
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-sm text-slate-500">
                 © 2026 SmartLocker Systems. Integrated PayOS &amp; VietQR Napas 24/7.
               </p>
             </div>

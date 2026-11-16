@@ -366,7 +366,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                   <MapPin className="text-blue-600 w-5 h-5 mt-0.5 shrink-0" />
                   <div className="min-w-0">
                     <h3 className="text-sm font-bold text-slate-900 leading-snug">{stationName}</h3>
-                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">{stationAddress}</p>
+                    <p className="text-sm text-slate-500 mt-1 leading-relaxed">{stationAddress}</p>
                   </div>
                 </div>
 
@@ -385,7 +385,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                           {size === 'S' ? 'Balo / Túi xách' : size === 'M' ? 'Vali xách tay' : 'Vali ký gửi'}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-500 mt-0.5">
+                      <p className="text-sm text-slate-500 mt-0.5">
                         {size === 'S'
                           ? 'Kích thước: 45 x 45 x 65 cm'
                           : size === 'M'
@@ -472,7 +472,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                 {/* Ghi chú nhận ô tủ */}
                 <div className="bg-blue-50/80 border border-blue-200 rounded-xl p-3 flex items-start gap-2.5">
                   <Info className="text-blue-600 w-4 h-4 mt-0.5 shrink-0" />
-                  <p className="text-xs text-blue-900 leading-relaxed">
+                  <p className="text-sm text-blue-900 leading-relaxed">
                     Sau khi thanh toán thành công, hệ thống sẽ <strong>giữ chỗ tủ cho bạn trong 30 phút</strong> để bạn di chuyển đến trạm. Thời gian thuê <strong>{duration} giờ</strong> chỉ bắt đầu tính từ lúc bạn mở tủ tại trạm.
                   </p>
                 </div>
@@ -545,7 +545,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                       {formatTimer(secondsLeft)}
                     </span>
                   </p>
-                  <p className="text-xs text-amber-800/80 mt-0.5">
+                  <p className="text-sm text-amber-800/80 mt-0.5">
                     Sau thời gian này, ô tủ sẽ tự động được giải phóng nếu chưa nhận được thanh toán.
                   </p>
                 </div>
@@ -565,7 +565,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                       <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">Thanh toán qua PayOS</h2>
                       <span className="bg-blue-100 text-blue-700 font-bold text-xs px-2 py-0.5 rounded">Cổng bảo mật</span>
                     </div>
-                    <p className="text-xs text-slate-500 mt-0.5">
+                    <p className="text-sm text-slate-500 mt-0.5">
                       Quét mã QR bằng ứng dụng của hơn 40+ ngân hàng hoặc ví điện tử
                     </p>
                   </div>
@@ -605,7 +605,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                     <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
                     <span>Số tiền chính xác: {formatCurrency(amount)} ₫</span>
                   </div>
-                  <p className="text-xs text-slate-600 font-medium">
+                  <p className="text-sm text-slate-600 font-medium">
                     Mở app ngân hàng ➔ Chọn <strong>Quét mã QR</strong> để chuyển khoản tự động
                   </p>
                 </div>
@@ -688,12 +688,12 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="text-xs font-bold text-slate-900">
+                      <p className="text-sm font-bold text-slate-900">
                         Đang đợi xác nhận thanh toán từ ngân hàng...
                       </p>
                       <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     </div>
-                    <p className="text-xs text-slate-500 mt-0.5">
+                    <p className="text-sm text-slate-500 mt-0.5">
                       Hệ thống tự động phát hiện trong 2 – 5 giây khi giao dịch thành công. Không cần tải lại trang.
                     </p>
                   </div>
@@ -758,7 +758,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
               </div>
             </div>
 
-            <p className="text-xs text-slate-500 mb-5">
+            <p className="text-sm text-slate-500 mb-5">
               Thông tin ngăn tủ và mã khóa đã được lưu vào mục quản lý đơn đặt của bạn.
             </p>
 
@@ -806,7 +806,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                 <span className="text-base text-blue-600 font-extrabold tracking-tight">SmartLocker</span>
                 <span className="text-xs text-slate-500 font-medium">Hệ thống tủ lưu trữ hành lý thông minh</span>
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-sm text-slate-500">
                 © 2026 SmartLocker Systems. Cổng thanh toán tích hợp PayOS &amp; VietQR Napas 24/7.
               </p>
             </div>

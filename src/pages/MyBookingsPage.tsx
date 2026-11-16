@@ -148,8 +148,8 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
              <div key={`notice-${b.id}`} className="p-4 rounded-xl bg-amber-50/90 border border-amber-200/80 flex items-start gap-3.5 shadow-xs">
                <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 shrink-0" />
                <div className="flex-1">
-                 <p className="text-xs text-amber-900 font-bold">Locker {b.lockerCode} Session Active</p>
-                 <p className="text-xs text-amber-800 mt-0.5">Complimentary grace period may apply. Check digital key for details.</p>
+                 <p className="text-sm text-amber-900 font-bold">Locker {b.lockerCode} Session Active</p>
+                 <p className="text-sm text-amber-800 mt-0.5">Complimentary grace period may apply. Check digital key for details.</p>
                </div>
                <button onClick={() => alert('Chính sách lưu trữ: Miễn phí 15 phút ân hạn sau giờ kết thúc. Sau 15 phút, tính phí 15,000 VND mỗi 30 phút.')} className="text-xs text-amber-900 underline hover:text-amber-950 self-center hidden sm:block cursor-pointer">
                  View Policies
@@ -165,10 +165,10 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                   <AlertCircle className="w-5 h-5 text-rose-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-900 font-bold">
+                  <p className="text-sm text-slate-900 font-bold">
                     Booking {b.bookingCode} is Overdue
                   </p>
-                  <p className="text-xs text-secondary">
+                  <p className="text-sm text-secondary">
                     Locker {b.lockerCode} ({b.stationName}). Additional accrued charge: <span className="font-semibold text-slate-900">{formatCurrency(b.currentOverdueFee || 0)} VND</span>
                   </p>
                 </div>
@@ -284,7 +284,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                         </div>
                         <div className="space-y-1">
                           <h4 className="text-sm text-slate-900 font-bold">{booking.stationName}</h4>
-                          <p className="text-xs text-secondary">{booking.stationAddress || 'Main Hub Location'}</p>
+                          <p className="text-sm text-secondary">{booking.stationAddress || 'Main Hub Location'}</p>
                           <div className="pt-1.5 flex items-center gap-3 text-xs text-primary-container font-semibold">
                             <a className="hover:underline flex items-center gap-1 min-h-11" href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}>
                               <Phone className="w-3.5 h-3.5" />
@@ -315,7 +315,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                       </div>
                       <div>
                         {booking.status === 'CONFIRMED' ? (
-                          <p className="text-xs text-amber-900 font-medium leading-relaxed bg-amber-50/80 p-2 rounded-lg border border-amber-200">
+                          <p className="text-sm text-amber-900 font-medium leading-relaxed bg-amber-50/80 p-2 rounded-lg border border-amber-200">
                             Đang giữ chỗ tủ. Thời gian thuê <strong>{booking.durationHours || 1}h</strong> chỉ bắt đầu tính khi bạn quét QR mở tủ tại trạm.
                           </p>
                         ) : (
@@ -323,7 +323,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                             <p className="text-sm text-slate-900 font-semibold">
                               {new Date(booking.checkedInAt || booking.startAt).toLocaleString('vi-VN')} – {new Date(booking.endAt).toLocaleString('vi-VN')}
                             </p>
-                            <p className="text-xs text-secondary">{booking.durationHours} Hours Storage</p>
+                            <p className="text-sm text-secondary">{booking.durationHours} Hours Storage</p>
                           </>
                         )}
                       </div>
@@ -352,7 +352,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                       <div>
                         <p className="text-xs uppercase tracking-wider text-secondary font-bold">Payment &amp; Digital Pass</p>
                         <p className="text-lg text-slate-900 font-bold mt-1">{formatCurrency(booking.baseAmount)} VND</p>
-                        <p className="text-xs text-emerald-700 flex items-center gap-1 mt-0.5 font-medium">
+                        <p className="text-sm text-emerald-700 flex items-center gap-1 mt-0.5 font-medium">
                           <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
                           Prepaid
                         </p>
@@ -363,8 +363,8 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                           <QrCode className="w-6 h-6 text-slate-900" />
                         </div>
                         <div className="overflow-hidden">
-                          <p className="text-xs text-slate-900 font-bold truncate">Quick Scan at Kiosk</p>
-                          <p className="text-xs text-secondary truncate font-mono">
+                          <p className="text-sm text-slate-900 font-bold truncate">Quick Scan at Kiosk</p>
+                          <p className="text-sm text-secondary truncate font-mono">
                             PIN: {booking.status === 'PENDING_PAYMENT' ? 'Chờ thanh toán' : (booking.accessCode ? (booking.accessCode.replace(/\s+/g, '').length === 8 ? `${booking.accessCode.replace(/\s+/g, '').slice(0, 4)} ${booking.accessCode.replace(/\s+/g, '').slice(4)}` : booking.accessCode) : 'Chưa cấp')}
                           </p>
                         </div>
@@ -440,7 +440,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
               <CheckCircle className="w-6 h-6" />
             </div>
             <h3 className="text-base font-bold text-slate-900">No Active Lockers</h3>
-            <p className="text-xs text-secondary max-w-sm mx-auto">You currently have no ongoing locker storage sessions.</p>
+            <p className="text-sm text-secondary max-w-sm mx-auto">You currently have no ongoing locker storage sessions.</p>
             <button
               onClick={() => onNavigate('find-station')}
               className="mt-2 px-5 py-2.5 bg-primary-container text-white text-xs font-bold rounded-xl shadow-xs hover:bg-primary cursor-pointer"
@@ -456,7 +456,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h2 className="text-lg font-bold text-slate-900">Recent Booking History</h2>
-                <p className="text-xs text-secondary">Verified locker drop-offs, completed stays, and electronic invoices</p>
+                <p className="text-sm text-secondary">Verified locker drop-offs, completed stays, and electronic invoices</p>
               </div>
               {/* Search & Filter Controls */}
               <div className="flex items-center gap-2">
@@ -507,7 +507,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                           <span className="text-xs text-secondary">{new Date(item.startAt).toLocaleDateString('vi-VN')}</span>
                         </div>
                         <h4 className="text-sm text-slate-900 font-bold">{item.stationName}</h4>
-                        <p className="text-xs text-secondary">
+                        <p className="text-sm text-secondary">
                           Locker: {item.size === 'S' ? 'Small' : item.size === 'M' ? 'Medium' : 'Large'} ({item.lockerCode}) · Duration: {item.durationHours} Hours
                         </p>
                       </div>
@@ -674,7 +674,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-on-surface">Cancellation &amp; Refund</h3>
-                  <p className="text-xs text-secondary font-mono">#{cancelledDetailBooking.bookingCode}</p>
+                  <p className="text-sm text-secondary font-mono">#{cancelledDetailBooking.bookingCode}</p>
                 </div>
               </div>
               <button 
@@ -794,7 +794,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
               <ShieldCheck className="w-5 h-5 text-primary" />
               <span className="text-base text-primary font-bold">SmartLocker</span>
             </div>
-            <p className="text-xs text-on-surface-variant">
+            <p className="text-sm text-on-surface-variant">
               © 2025 SmartLocker Systems Inc. Telemetry &amp; Cryptographic Access Active. All rights reserved.
             </p>
           </div>

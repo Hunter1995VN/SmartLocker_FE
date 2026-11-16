@@ -113,7 +113,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                             <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
                             <span className="text-xs text-white/90 font-semibold">Nền tảng #1 tại Việt Nam</span>
                         </div>
-                        <h1 className="text-4xl xl:text-5xl font-black text-white leading-[1.1] tracking-tight mb-5">
+                        <h1 className="text-4xl xl:text-5xl font-extrabold text-white leading-[1.1] tracking-tight mb-5">
                             Chào mừng<br />
                             <span style={{background: 'linear-gradient(90deg, #93c5fd, #c4b5fd)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
                                 trở lại!
@@ -136,7 +136,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                                     </div>
                                     <div>
                                         <p className="text-white text-sm font-semibold">{title}</p>
-                                        <p className="text-white/55 text-xs">{desc}</p>
+                                        <p className="text-white/55 text-sm">{desc}</p>
                                     </div>
                                 </div>
                             ))}
@@ -153,8 +153,8 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                                 TM
                             </div>
                             <div>
-                                <p className="text-white/80 text-xs font-semibold">Trần Minh Đức</p>
-                                <p className="text-white/45 text-xs">Freelance Designer</p>
+                                <p className="text-white/80 text-sm font-semibold">Trần Minh Đức</p>
+                                <p className="text-white/45 text-sm">Freelance Designer</p>
                             </div>
                             <div className="ml-auto flex gap-0.5">
                                 {[...Array(5)].map((_, i) => (
@@ -191,7 +191,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                     <div className="w-full max-w-[400px]">
                         {/* Header */}
                         <div className="mb-8">
-                            <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-2">
+                            <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight mb-2">
                                 Đăng nhập
                             </h2>
                             <p className="text-sm text-gray-500">
@@ -336,7 +336,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                         </form>
 
                         {/* Trust Footer */}
-                        <p className="mt-6 text-center text-xs text-gray-500 leading-relaxed">
+                        <p className="mt-6 text-center text-sm text-gray-500 leading-relaxed">
                             Bằng việc đăng nhập, bạn đồng ý với{' '}
                             <a href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }} className="text-blue-600 font-semibold hover:underline">Điều khoản dịch vụ</a>
                             {' '}và{' '}

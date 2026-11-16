@@ -185,7 +185,7 @@ export default function ConvenienceShowcase({
       <div className="flex items-center justify-between gap-2 border-b pb-3 mb-4 border-inherit">
         
         <div className="flex items-center gap-2.5">
-          <span className={`text-xs font-mono font-black px-2.5 py-1 rounded-md border tracking-wider uppercase ${badgeBg}`}>
+          <span className={`text-xs font-mono font-extrabold px-2.5 py-1 rounded-md border tracking-wider uppercase ${badgeBg}`}>
             {lang === 'VI' ? activeSlide.badgeVI : activeSlide.badgeEN}
           </span>
           <span className="text-xs font-mono text-slate-500 font-bold">
@@ -267,7 +267,7 @@ export default function ConvenienceShowcase({
         {/* Right 7 Cols: Context, Problem & Solution */}
         <div className="md:col-span-7 space-y-3">
           
-          <h4 className={`text-lg md:text-xl font-black tracking-tight uppercase leading-snug ${
+          <h4 className={`text-lg md:text-xl font-extrabold tracking-tight uppercase leading-snug ${
             outdoorMode ? 'text-slate-900' : 'text-white'
           }`}>
             {lang === 'VI' ? activeSlide.titleVI : activeSlide.titleEN}
@@ -290,7 +290,7 @@ export default function ConvenienceShowcase({
                     : 'bg-slate-900/60 border-slate-800'
                 }`}
               >
-                <div className={`text-xs md:text-sm font-black font-mono ${
+                <div className={`text-xs md:text-sm font-extrabold font-mono ${
                   outdoorMode ? 'text-sky-700' : 'text-cyan-400'
                 }`}>
                   {st.value}
@@ -355,7 +355,7 @@ export default function ConvenienceShowcase({
                   <CinemaIconBespoke className="w-5 h-5" />
                 </span>
                 <div>
-                  <h3 className="text-xl font-black uppercase font-mono tracking-wide text-white">
+                  <h3 className="text-xl font-extrabold uppercase font-mono tracking-wide text-white">
                     {lang === 'VI' ? 'TRÌNH CHIẾU TIỆN ÍCH SMARTLOCKER' : 'SMARTLOCKER CONVENIENCE SHOWCASE'}
                   </h3>
                   <p className="text-xs text-slate-500 font-mono">
@@ -393,7 +393,7 @@ export default function ConvenienceShowcase({
                   {lang === 'VI' ? activeSlide.badgeVI : activeSlide.badgeEN}
                 </span>
 
-                <h2 className="text-2xl md:text-3xl font-black uppercase text-white leading-tight">
+                <h2 className="text-2xl md:text-3xl font-extrabold uppercase text-white leading-tight">
                   {lang === 'VI' ? activeSlide.titleVI : activeSlide.titleEN}
                 </h2>
 
@@ -405,7 +405,7 @@ export default function ConvenienceShowcase({
                 <div className="grid grid-cols-3 gap-3 pt-2">
                   {activeSlide.stats.map((st, i) => (
                     <div key={i} className="p-3 rounded-2xl bg-slate-900 border border-slate-800">
-                      <div className="text-lg font-black font-mono text-cyan-400">{st.value}</div>
+                      <div className="text-lg font-extrabold font-mono text-cyan-400">{st.value}</div>
                       <div className="text-xs text-slate-500 font-mono mt-1 leading-tight">
                         {lang === 'VI' ? st.labelVI : st.labelEN}
                       </div>
@@ -444,7 +444,7 @@ export default function ConvenienceShowcase({
                 </button>
                 <button
                   onClick={handleNext}
-                  className="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-mono font-black text-xs flex items-center gap-2 shadow-[0_0_15px_rgba(6,182,212,0.4)]"
+                  className="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-mono font-extrabold text-xs flex items-center gap-2 shadow-[0_0_15px_rgba(6,182,212,0.4)]"
                 >
                   {lang === 'VI' ? 'TRANG KẾ' : 'NEXT'}
                   <NextIconBespoke className="w-4 h-4" />

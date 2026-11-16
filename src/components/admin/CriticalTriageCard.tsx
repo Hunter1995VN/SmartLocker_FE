@@ -84,7 +84,7 @@ export default function CriticalTriageCard({
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
                                         <span
-                                            className={`px-1.5 py-0.5 rounded font-black text-xs uppercase tracking-wider ${
+                                            className={`px-1.5 py-0.5 rounded font-extrabold text-xs uppercase tracking-wider ${
                                                 isCritical
                                                     ? 'bg-rose-600 text-white'
                                                     : 'bg-amber-100 text-amber-800 border border-amber-300/60'

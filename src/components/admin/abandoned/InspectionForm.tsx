@@ -427,7 +427,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                         <Package className="w-5 h-5" />
                     </div>
                     <div>
-                        <h2 className="text-base font-black text-slate-900 tracking-tight">
+                        <h2 className="text-base font-extrabold text-slate-900 tracking-tight">
                             Lập Biên Bản Kiểm Kê Tài Sản Bỏ Quên Quá Hạn 72h
                         </h2>
                         <p className="text-xs text-slate-500">

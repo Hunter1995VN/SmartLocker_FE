@@ -176,7 +176,7 @@ export default function StationManagementView() {
                         Operations / <span className="text-blue-600 font-bold">Manage Stations & Lockers</span>
                     </div>
                     <div className="flex items-center gap-2.5 flex-wrap">
-                        <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
+                        <h1 className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight">
                             Station Network & Compartment Configuration
                         </h1>
                         <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-xs font-bold tracking-wider uppercase border border-slate-200">

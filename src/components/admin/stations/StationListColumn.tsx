@@ -229,7 +229,7 @@ export default function StationListColumn({
                             >
                                 {/* Top Row: Code Badge & Status */}
                                 <div className="flex items-center justify-between gap-2 mb-2">
-                                    <span className={`px-2 py-0.5 rounded text-xs font-black tracking-tight ${
+                                    <span className={`px-2 py-0.5 rounded text-xs font-extrabold tracking-tight ${
                                         isSelected
                                             ? 'bg-blue-600 text-white'
                                             : 'bg-slate-100 text-slate-700 border border-slate-200'
