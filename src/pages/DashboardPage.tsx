@@ -286,8 +286,6 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
 
                         {/* ── WELCOME HERO ── */}
                         <div className="relative overflow-hidden rounded-2xl bg-white shadow-xs p-4 sm:p-6 md:p-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
-                            <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-primary-fixed opacity-40 blur-3xl pointer-events-none" />
-                            <div className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full bg-secondary-container opacity-30 blur-2xl pointer-events-none" />
 
                             <div className="relative z-10 flex items-center gap-3 sm:gap-4">
                                 <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-primary text-white flex items-center justify-center font-bold text-lg overflow-hidden shrink-0">
@@ -339,7 +337,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                     </div>
 
                                     {isLoadingBookings ? (
-                                        <div className="rounded-2xl bg-white p-8 flex justify-center"><RefreshCw className="w-6 h-6 animate-spin text-primary-container" /></div>
+                                        <div className="rounded-2xl bg-white p-8 flex justify-center" role="status" aria-label="Đang tải"><RefreshCw className="w-6 h-6 animate-spin motion-reduce:animate-none text-primary-container" aria-hidden="true" /></div>
                                     ) : bookingsError ? (
                                         <div className="rounded-2xl bg-white p-8 flex flex-col items-center gap-3 text-center">
                                             <p className="text-sm text-on-error-container">{bookingsError}</p>
@@ -474,7 +472,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                     </div>
                                     <div className="flex flex-col gap-2">
                                         {isLoadingBookings ? (
-                                            <div className="flex justify-center p-4"><RefreshCw className="w-5 h-5 animate-spin text-primary-container" /></div>
+                                            <div className="flex justify-center p-4" role="status" aria-label="Đang tải"><RefreshCw className="w-5 h-5 animate-spin motion-reduce:animate-none text-primary-container" aria-hidden="true" /></div>
                                         ) : bookingsError ? null : recentBookings.length > 0 ? (
                                             recentBookings.map((b) => <BookingRow key={b.id} booking={b} onOpen={() => goDetail(b.id)} />)
                                         ) : (
@@ -495,12 +493,12 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                             </span>
                                         </div>
                                         <button type="button" onClick={loadData} aria-label="Làm mới" className="p-2 rounded-lg bg-surface-container text-primary hover:bg-surface-container-high cursor-pointer shrink-0">
-                                            <RefreshCw className={`w-4 h-4 ${isLoadingStations ? 'animate-spin' : ''}`} />
+                                            <RefreshCw className={`w-4 h-4 ${isLoadingStations ? 'animate-spin motion-reduce:animate-none' : ''}`} />
                                         </button>
                                     </div>
 
                                     {isLoadingStations ? (
-                                        <div className="flex justify-center p-6"><RefreshCw className="w-5 h-5 animate-spin text-primary-container" /></div>
+                                        <div className="flex justify-center p-6" role="status" aria-label="Đang tải"><RefreshCw className="w-5 h-5 animate-spin motion-reduce:animate-none text-primary-container" aria-hidden="true" /></div>
                                     ) : stationsError ? (
                                         <div className="p-4 rounded-xl bg-error-container text-sm text-on-error-container flex items-center justify-between gap-3">
                                             <span>{stationsError}</span>
@@ -554,7 +552,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
 
                                     <div className="flex flex-col gap-2">
                                         {isLoadingStations ? (
-                                            <div className="flex justify-center p-4"><RefreshCw className="w-5 h-5 animate-spin text-primary-container" /></div>
+                                            <div className="flex justify-center p-4" role="status" aria-label="Đang tải"><RefreshCw className="w-5 h-5 animate-spin motion-reduce:animate-none text-primary-container" aria-hidden="true" /></div>
                                         ) : nearbyStations.length > 0 ? (
                                             nearbyStations.map((s) => <NearbyStationCard key={s.id} station={s} onBook={() => goBook(s.id)} />)
                                         ) : (
