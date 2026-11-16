@@ -75,11 +75,11 @@ export default function AdminSidebar({
                     <div>
                         <div className="flex items-center gap-1.5">
                             <span className="text-base font-extrabold text-slate-900 tracking-tight">SmartLocker</span>
-                            <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200/60">
+                            <span className="text-xs font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200/60">
                                 SLMS
                             </span>
                         </div>
-                        <p className="text-[11px] text-slate-400">Operations Control</p>
+                        <p className="text-xs text-slate-500">Operations Control</p>
                     </div>
                 </div>
 
@@ -87,7 +87,7 @@ export default function AdminSidebar({
                 <nav className="p-3 space-y-5 text-xs">
                     {/* Group: OVERVIEW */}
                     <div>
-                        <p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                        <p className="px-3 text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
                             Tổng quan
                         </p>
                         <div className="space-y-0.5">
@@ -100,7 +100,7 @@ export default function AdminSidebar({
                                         : 'text-slate-600 hover:bg-slate-50'
                                 }`}
                             >
-                                <LayoutDashboard className={`w-4 h-4 ${activeMenu === 'dashboard' ? 'text-white' : 'text-slate-400'}`} />
+                                <LayoutDashboard className={`w-4 h-4 ${activeMenu === 'dashboard' ? 'text-white' : 'text-slate-500'}`} />
                                 <span>Bảng điều khiển</span>
                             </button>
                         </div>
@@ -108,7 +108,7 @@ export default function AdminSidebar({
 
                     {/* Group: OPERATIONS */}
                     <div>
-                        <p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                        <p className="px-3 text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
                             Vận hành trạm
                         </p>
                         <div className="space-y-0.5 text-slate-600">
@@ -134,7 +134,7 @@ export default function AdminSidebar({
                                 }`}
                             >
                                 <span className="flex items-center gap-2.5">
-                                    <Layers className={`w-4 h-4 ${activeMenu === 'stations' ? 'text-white' : 'text-slate-400'}`} />
+                                    <Layers className={`w-4 h-4 ${activeMenu === 'stations' ? 'text-white' : 'text-slate-500'}`} />
                                     <span>Trạm & Bảng giá</span>
                                 </span>
                             </button>
@@ -149,7 +149,7 @@ export default function AdminSidebar({
                                 }`}
                             >
                                 <span className="flex items-center gap-2.5">
-                                    <Box className={`w-4 h-4 ${activeMenu === 'lockers' ? 'text-white' : 'text-slate-400'}`} />
+                                    <Box className={`w-4 h-4 ${activeMenu === 'lockers' ? 'text-white' : 'text-slate-500'}`} />
                                     <span>Lưới ô tủ</span>
                                 </span>
                             </button>
@@ -168,7 +168,7 @@ export default function AdminSidebar({
                                     <span>Lấp đầy & Vòng quay tủ</span>
                                 </span>
                                 <span
-                                    className={`px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase ${
+                                    className={`px-1.5 py-0.2 rounded text-xs font-extrabold uppercase ${
                                         activeMenu === 'occupancy'
                                             ? 'bg-white/20 text-white'
                                             : 'bg-teal-50 text-teal-700 border border-teal-200/80'
@@ -188,7 +188,7 @@ export default function AdminSidebar({
                                 }`}
                             >
                                 <span className="flex items-center gap-2.5">
-                                    <Cpu className={`w-4 h-4 ${activeMenu === 'devices' ? 'text-white' : 'text-slate-400'}`} />
+                                    <Cpu className={`w-4 h-4 ${activeMenu === 'devices' ? 'text-white' : 'text-slate-500'}`} />
                                     <span>Thiết bị IoT</span>
                                 </span>
                                 {offlineDevicesCount > 0 ? (
@@ -208,11 +208,11 @@ export default function AdminSidebar({
                                 }`}
                             >
                                 <span className="flex items-center gap-2.5">
-                                    <ShieldAlert className={`w-4 h-4 ${activeMenu === 'incidents' ? 'text-white' : 'text-slate-400'}`} />
+                                    <ShieldAlert className={`w-4 h-4 ${activeMenu === 'incidents' ? 'text-white' : 'text-slate-500'}`} />
                                     <span>Sự cố & Hỗ trợ</span>
                                 </span>
                                 {openIncidentsCount > 0 && (
-                                    <span className={`px-1.5 py-0.2 rounded-full font-bold text-[10px] border ${
+                                    <span className={`px-1.5 py-0.2 rounded-full font-bold text-xs border ${
                                         activeMenu === 'incidents'
                                             ? 'bg-white/20 text-white border-white/30'
                                             : 'bg-rose-50 text-rose-600 border-rose-200'
@@ -226,7 +226,7 @@ export default function AdminSidebar({
 
                     {/* Group: MANAGEMENT */}
                     <div>
-                        <p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                        <p className="px-3 text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
                             Quản lý & Nghiệp vụ
                         </p>
                         <div className="space-y-0.5 text-slate-600">
@@ -235,7 +235,7 @@ export default function AdminSidebar({
                                 onClick={() => onSelectMenu?.('stations')}
                                 className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-pointer text-left"
                             >
-                                <DollarSign className="w-4 h-4 text-slate-400" />
+                                <DollarSign className="w-4 h-4 text-slate-500" />
                                 <span>Bảng giá & Phụ phí</span>
                             </button>
 
@@ -253,7 +253,7 @@ export default function AdminSidebar({
                                     <span>Khuyến mãi & Voucher</span>
                                 </span>
                                 <span
-                                    className={`px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase ${
+                                    className={`px-1.5 py-0.2 rounded text-xs font-extrabold uppercase ${
                                         activeMenu === 'promotions'
                                             ? 'bg-white/20 text-white'
                                             : 'bg-emerald-50 text-emerald-700 border border-emerald-200/80'
@@ -273,7 +273,7 @@ export default function AdminSidebar({
                                 }`}
                             >
                                 <span className="flex items-center gap-2.5">
-                                    <Users className={`w-4 h-4 ${activeMenu === 'users' ? 'text-white' : 'text-slate-400'}`} />
+                                    <Users className={`w-4 h-4 ${activeMenu === 'users' ? 'text-white' : 'text-slate-500'}`} />
                                     <span>Quản lý tài khoản</span>
                                 </span>
                             </button>
@@ -302,7 +302,7 @@ export default function AdminSidebar({
                                         : 'text-slate-600 hover:bg-slate-50'
                                 }`}
                             >
-                                <CreditCard className={`w-4 h-4 ${activeMenu === 'reconciliation' ? 'text-white' : 'text-slate-400'}`} />
+                                <CreditCard className={`w-4 h-4 ${activeMenu === 'reconciliation' ? 'text-white' : 'text-slate-500'}`} />
                                 <span>Đối soát PayOS</span>
                             </button>
 
@@ -320,7 +320,7 @@ export default function AdminSidebar({
                                     <span>Duyệt hoàn tiền</span>
                                 </span>
                                 <span
-                                    className={`px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase ${
+                                    className={`px-1.5 py-0.2 rounded text-xs font-extrabold uppercase ${
                                         activeMenu === 'refunds'
                                             ? 'bg-white/20 text-white'
                                             : 'bg-purple-50 text-purple-700 border border-purple-200/80'
@@ -339,7 +339,7 @@ export default function AdminSidebar({
                                         : 'text-slate-600 hover:bg-slate-50'
                                 }`}
                             >
-                                <PackageX className={`w-4 h-4 ${activeMenu === 'abandoned' ? 'text-white' : 'text-slate-400'}`} />
+                                <PackageX className={`w-4 h-4 ${activeMenu === 'abandoned' ? 'text-white' : 'text-slate-500'}`} />
                                 <span>Hành lý quá hạn 72h</span>
                             </button>
                             <button
@@ -351,7 +351,7 @@ export default function AdminSidebar({
                                         : 'text-slate-600 hover:bg-slate-50'
                                 }`}
                             >
-                                <CreditCard className={`w-4 h-4 ${activeMenu === 'refunds' ? 'text-white' : 'text-slate-400'}`} />
+                                <CreditCard className={`w-4 h-4 ${activeMenu === 'refunds' ? 'text-white' : 'text-slate-500'}`} />
                                 <span>Refund Requests</span>
                             </button>
                         </div>
@@ -359,7 +359,7 @@ export default function AdminSidebar({
 
                     {/* Group: SECURITY & LOGS */}
                     <div>
-                        <p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                        <p className="px-3 text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
                             Bảo mật & Nhật ký
                         </p>
                         <div className="space-y-0.5 text-slate-600">
@@ -372,7 +372,7 @@ export default function AdminSidebar({
                                         : 'text-slate-600 hover:bg-slate-50'
                                 }`}
                             >
-                                <FileText className={`w-4 h-4 ${activeMenu === 'audit' ? 'text-white' : 'text-slate-400'}`} />
+                                <FileText className={`w-4 h-4 ${activeMenu === 'audit' ? 'text-white' : 'text-slate-500'}`} />
                                 <span>Nhật ký hệ thống</span>
                             </button>
 
@@ -390,7 +390,7 @@ export default function AdminSidebar({
                                     <span>Báo cáo tài chính</span>
                                 </span>
                                 <span
-                                    className={`px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase ${
+                                    className={`px-1.5 py-0.2 rounded text-xs font-extrabold uppercase ${
                                         activeMenu === 'reports'
                                             ? 'bg-white/20 text-white'
                                             : 'bg-indigo-50 text-indigo-700 border border-indigo-200/80'
@@ -416,7 +416,7 @@ export default function AdminSidebar({
                                 {user?.fullName || 'Người dùng Quản trị'}
                             </p>
                             <span
-                                className={`inline-block text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
+                                className={`inline-block text-xs font-extrabold uppercase px-1.5 py-0.5 rounded ${
                                     isAdmin
                                         ? 'bg-purple-100 text-purple-700'
                                         : isStaff
@@ -432,7 +432,7 @@ export default function AdminSidebar({
                     <button
                         type="button"
                         onClick={onLogout}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
+                        className="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
                         title="Đăng xuất"
                     >
                         <LogOut className="w-4 h-4" />

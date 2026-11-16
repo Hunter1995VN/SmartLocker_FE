@@ -55,7 +55,7 @@ export default function WalkInTabletPage() {
                   </option>
                 ))}
               </select>
-              <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[11px] font-bold">
+              <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold">
                 TABLET WALK-IN
               </span>
             </div>

@@ -84,14 +84,14 @@ export default function ResetStaffPasswordModal({
             <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden">
                 <div className="px-6 py-4 border-b border-slate-100 bg-amber-50/60 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-xs">
+                        <div className="w-10 h-10 rounded-xl bg-amber-700 text-white flex items-center justify-center shadow-xs">
                             <KeyRound className="w-5 h-5" />
                         </div>
                         <div>
                             <h3 className="text-sm font-extrabold text-slate-900">
                                 Cấp Lại Mật Khẩu Nhân Sự Nội Bộ
                             </h3>
-                            <p className="text-[11px] text-slate-500 truncate max-w-[260px]">
+                            <p className="text-xs text-slate-500 truncate max-w-[260px]">
                                 {user.fullName} ({user.email})
                             </p>
                         </div>
@@ -100,7 +100,7 @@ export default function ResetStaffPasswordModal({
                         type="button"
                         onClick={onClose}
                         disabled={isSubmitting}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+                        className="p-1.5 rounded-lg text-slate-500 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
                     >
                         <X className="w-4 h-4" />
                     </button>
@@ -131,7 +131,7 @@ export default function ResetStaffPasswordModal({
                                     type="button"
                                     onClick={() => setNewPassword(generateResetPassword())}
                                     disabled={isSubmitting}
-                                    className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer"
+                                    className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer"
                                 >
                                     <RefreshCw className="w-3 h-3" />
                                     <span>Sinh ngẫu nhiên</span>
@@ -139,7 +139,7 @@ export default function ResetStaffPasswordModal({
                                 <button
                                     type="button"
                                     onClick={handleCopy}
-                                    className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition cursor-pointer"
+                                    className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition cursor-pointer"
                                 >
                                     {copied ? (
                                         <>
@@ -168,7 +168,7 @@ export default function ResetStaffPasswordModal({
                             <button
                                 type="button"
                                 onClick={() => setShowPassword((prev) => !prev)}
-                                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 cursor-pointer"
+                                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-500 hover:text-slate-600 cursor-pointer"
                             >
                                 {showPassword ? (
                                     <EyeOff className="w-4 h-4" />

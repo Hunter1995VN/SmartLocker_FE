@@ -29,7 +29,7 @@ export default function LockerFilterBar({
         <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-white rounded-2xl border border-slate-200/90 shadow-xs mb-5 text-xs">
             {/* Left: Status Filter Pills */}
             <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider mr-1">
                     Bộ lọc:
                 </span>
 
@@ -100,7 +100,7 @@ export default function LockerFilterBar({
 
             {/* Right: Size Filter Pills */}
             <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider mr-1">
                     Kích thước:
                 </span>
 

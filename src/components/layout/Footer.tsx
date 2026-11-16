@@ -124,7 +124,7 @@ const Footer = () => {
 
             {/* Links Columns */}
             <div>
-              <h4 className="text-sm font-bold text-on-surface uppercase tracking-wider mb-4">Vị Trí & Trạm Tủ</h4>
+              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wider mb-4">Vị Trí & Trạm Tủ</h3>
               <ul className="space-y-2.5 text-sm">
                 {footerLinks.locations.map((link, index) => (
                   <li key={index}>
@@ -141,7 +141,7 @@ const Footer = () => {
             </div>
 
             <div>
-              <h4 className="text-sm font-bold text-on-surface uppercase tracking-wider mb-4">Dịch Vụ & An Toàn</h4>
+              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wider mb-4">Dịch Vụ & An Toàn</h3>
               <ul className="space-y-2.5 text-sm">
                 {footerLinks.services.map((link, index) => (
                   <li key={index}>
@@ -158,7 +158,7 @@ const Footer = () => {
             </div>
 
             <div>
-              <h4 className="text-sm font-bold text-on-surface uppercase tracking-wider mb-4">Đối Tác & Pháp Lý</h4>
+              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wider mb-4">Đối Tác & Pháp Lý</h3>
               <ul className="space-y-2.5 text-sm">
                 {footerLinks.legal.map((link, index) => (
                   <li key={index}>
@@ -185,14 +185,6 @@ const Footer = () => {
               </span>
             </div>
             <div className="flex items-center gap-4 flex-wrap justify-center">
-              <span className="flex items-center gap-1.5 text-emerald-700 font-semibold">
-                <span className="relative flex items-center justify-center">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                  <span className="absolute w-2 h-2 rounded-full bg-emerald-500 animate-ping opacity-75"></span>
-                </span>
-                99.98% Uptime
-              </span>
-              <span className="text-outline">|</span>
               <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>Chính sách bảo mật</a>
               <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }}>Điều khoản</a>
             </div>

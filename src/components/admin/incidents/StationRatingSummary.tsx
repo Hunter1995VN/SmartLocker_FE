@@ -30,7 +30,7 @@ export default function StationRatingSummary() {
         <h2 className="text-base font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
           <Star className="w-4 h-4 text-amber-500 fill-amber-400" />Đánh giá chất lượng trạm
         </h2>
-        <p className="text-[11px] text-slate-400">Điểm sao khách chấm sau khi lấy đồ. Trạm điểm thấp xếp trước để ưu tiên xử lý.</p>
+        <p className="text-xs text-slate-500">Điểm sao khách chấm sau khi lấy đồ. Trạm điểm thấp xếp trước để ưu tiên xử lý.</p>
       </div>
       <button type="button" onClick={() => void load()} disabled={loading}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 shadow-xs text-xs font-semibold text-slate-700 hover:bg-slate-50 transition disabled:opacity-50 cursor-pointer">
@@ -40,12 +40,12 @@ export default function StationRatingSummary() {
 
     {message && <p role="alert" className="flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-xs font-semibold text-rose-700"><AlertCircle className="w-4 h-4" />{message}</p>}
     {!ratings && !message && <div role="status" className="h-16 rounded-xl bg-slate-100 animate-pulse motion-reduce:animate-none" />}
-    {ratings?.length === 0 && <p className="py-6 text-center text-xs text-slate-400">Chưa có đánh giá nào được gửi.</p>}
+    {ratings?.length === 0 && <p className="py-6 text-center text-xs text-slate-500">Chưa có đánh giá nào được gửi.</p>}
 
     {!!sorted.length && <>
       <div className="flex items-baseline gap-2">
         <span className="text-2xl font-black text-slate-900 tracking-tight">{overall.toFixed(1)}</span>
-        <span className="text-xs font-semibold text-slate-400">/ 5 trung bình · {total} lượt · {sorted.length} trạm</span>
+        <span className="text-xs font-semibold text-slate-500">/ 5 trung bình · {total} lượt · {sorted.length} trạm</span>
       </div>
       <ul className="divide-y divide-slate-100">
         {sorted.map(item => <li key={item.stationId} className="py-2.5 flex items-center gap-3">
@@ -53,10 +53,10 @@ export default function StationRatingSummary() {
           <span className="hidden sm:block w-28 h-1.5 rounded-full bg-slate-100 overflow-hidden" aria-hidden="true">
             <span className="block h-full rounded-full bg-amber-400" style={{ width: `${(item.average / 5) * 100}%` }} />
           </span>
-          <span className={`shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[11px] font-bold ${tone(item.average)}`}>
+          <span className={`shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs font-bold ${tone(item.average)}`}>
             <Star className="w-3 h-3 fill-current" />{item.average.toFixed(1)}
           </span>
-          <span className="shrink-0 w-14 text-right text-[11px] text-slate-400">{item.count} lượt</span>
+          <span className="shrink-0 w-14 text-right text-xs text-slate-500">{item.count} lượt</span>
         </li>)}
       </ul>
     </>}

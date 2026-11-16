@@ -282,7 +282,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
 
   if (isLoading) {
     return (
-      <div className="bg-[#f8f9ff] min-h-screen flex items-center justify-center">
+      <div className="bg-surface-bright min-h-screen flex items-center justify-center">
         <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
@@ -298,7 +298,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
   );
 
   return (
-    <div className="bg-[#f8f9ff] text-[#0b1c30] font-body-md antialiased min-h-screen flex flex-col selection:bg-[#dbe1ff] selection:text-[#004ac6] pb-12">
+    <div className="bg-surface-bright text-on-surface font-body-md antialiased min-h-screen flex flex-col selection:bg-primary-fixed selection:text-primary pb-12">
       {/* UNIFIED CUSTOMER HEADER */}
       <CustomerHeader
         currentPage="booking-detail"
@@ -321,12 +321,12 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
         {/* BREADCRUMB & STATUS HEADER */}
         <section className="space-y-3">
           {/* Breadcrumb trail */}
-          <nav className="flex items-center gap-2 text-[#434655] text-xs">
+          <nav className="flex items-center gap-2 text-on-surface-variant text-xs">
             <button onClick={() => onNavigate('home')} className="hover:text-primary transition-colors cursor-pointer">Home</button>
             <ChevronRight className="w-3.5 h-3.5 text-outline" />
             <button onClick={() => onNavigate('my-bookings')} className="hover:text-primary transition-colors cursor-pointer">My Bookings</button>
             <ChevronRight className="w-3.5 h-3.5 text-outline" />
-            <span className="text-[#0b1c30] font-semibold">Booking #{orderId}</span>
+            <span className="text-on-surface font-semibold">Booking #{orderId}</span>
           </nav>
 
           {/* Active Status Banner & Station Meta Card */}
@@ -360,18 +360,18 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                   </span>
                 </div>
                 {/* Booking Reference ID Badge */}
-                <span className="px-2.5 py-0.5 rounded-md bg-[#e5eeff] text-xs text-secondary font-mono font-bold">ID: #{orderId}</span>
+                <span className="px-2.5 py-0.5 rounded-md bg-surface-container text-xs text-secondary font-mono font-bold">ID: #{orderId}</span>
                 <span className="hidden sm:inline-block text-outline-variant">•</span>
-                <span className="text-[#434655] text-xs flex items-center gap-1">
+                <span className="text-on-surface-variant text-xs flex items-center gap-1">
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
                   Vé xác thực tại Kiosk
                 </span>
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-[#0b1c30] tracking-tight">
+              <h1 className="text-2xl md:text-3xl font-bold text-on-surface tracking-tight">
                 {stationName}
               </h1>
-              <div className="flex flex-wrap items-center gap-y-1 gap-x-4 text-[#434655] text-xs">
-                <span className="flex items-center gap-1 text-[#0b1c30] font-medium">
+              <div className="flex flex-wrap items-center gap-y-1 gap-x-4 text-on-surface-variant text-xs">
+                <span className="flex items-center gap-1 text-on-surface font-medium">
                   <MapPin className="w-4 h-4 text-primary shrink-0" />
                   {stationAddress}
                 </span>
@@ -379,14 +379,14 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
             </div>
 
             {/* Locker Unit Identifier Pill (Elevated) */}
-            <div className="flex items-center gap-3 bg-[#eff4ff] border border-primary/20 p-3.5 rounded-xl lg:self-center shadow-xs">
+            <div className="flex items-center gap-3 bg-surface-container-low border border-primary/20 p-3.5 rounded-xl lg:self-center shadow-xs">
               <div className="w-12 h-12 rounded-lg bg-primary text-white flex items-center justify-center shadow-sm">
                 <DoorOpen className="w-6 h-6" />
               </div>
               <div>
-                <div className="text-[11px] uppercase tracking-wider text-secondary font-bold">Assigned Bay</div>
+                <div className="text-xs uppercase tracking-wider text-secondary font-bold">Assigned Bay</div>
                 <div className="text-lg text-primary font-bold">{bayCode}</div>
-                <div className="text-xs text-[#434655]">
+                <div className="text-xs text-on-surface-variant">
                   {size === 'S' ? 'Cỡ nhỏ (S)' : size === 'M' ? 'Cỡ vừa (M)' : 'Cỡ lớn (L)'}
                 </div>
               </div>
@@ -403,16 +403,16 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
           <div className="lg:col-span-7 space-y-6">
             <div className="bg-white rounded-2xl border border-outline-variant/40 shadow-sm p-6 sm:p-8 relative overflow-hidden">
               {/* Top Accent Light Bar */}
-              <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-primary to-[#2563eb]"></div>
+              <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-primary to-primary-container"></div>
 
               {/* Card Header */}
               <div className="flex items-start justify-between border-b border-outline-variant/20 pb-5 mb-6">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <Key className="w-5 h-5 text-primary" />
-                    <h2 className="text-xl font-bold text-[#0b1c30]">Digital Access Pass &amp; Unlock Key</h2>
+                    <h2 className="text-xl font-bold text-on-surface">Digital Access Pass &amp; Unlock Key</h2>
                   </div>
-                  <p className="text-xs text-[#434655]">
+                  <p className="text-xs text-on-surface-variant">
                     {isLockerAssigned
                       ? `Present this QR code to the Kiosk optical scanner or enter the passcode below to release ${bayCode}.`
                       : `Present this QR code to the Kiosk optical scanner or enter the 8-digit passcode below on the touchpad to automatically assign your locker (Size ${size}) and release the door.`}
@@ -452,30 +452,30 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                 </div>
 
                 {/* Optical Scanner Cue */}
-                <div className="flex items-center justify-center gap-2 text-[#434655] text-xs pt-1">
+                <div className="flex items-center justify-center gap-2 text-on-surface-variant text-xs pt-1">
                   <QrCode className="w-4 h-4 text-primary" />
                   <span>Hold 10–15 cm under the Station Kiosk optical scanner</span>
                 </div>
 
                 {/* Real-time Refresh Pulse Indicator */}
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#eff4ff] rounded-full text-xs font-medium text-secondary">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-surface-container-low rounded-full text-xs font-medium text-secondary">
                   <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                  <span>Token refreshes in <strong className="text-[#0b1c30]">{tokenSeconds}s</strong> (Anti-screenshot security)</span>
+                  <span>Token refreshes in <strong className="text-on-surface">{tokenSeconds}s</strong> (Anti-screenshot security)</span>
                 </div>
               </div>
 
               {/* Section B: 8-Digit Backup Access PIN Passcode */}
               <div className="mt-6 pt-6 border-t border-outline-variant/30 space-y-3">
                 <div className="text-center">
-                  <span className="text-[11px] text-secondary tracking-wider uppercase font-bold">
+                  <span className="text-xs text-secondary tracking-wider uppercase font-bold">
                     HOẶC NHẬP MÃ PIN 8 SỐ TẠI BÀN PHÍM KIOSK
                   </span>
                 </div>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                   {/* Monospace Code Field */}
-                  <div className="w-full sm:w-auto px-6 py-3 bg-[#eff4ff] border border-outline-variant/50 rounded-xl flex items-center justify-center gap-3">
+                  <div className="w-full sm:w-auto px-6 py-3 bg-surface-container-low border border-outline-variant/50 rounded-xl flex items-center justify-center gap-3">
                     <Key className="w-4 h-4 text-secondary" />
-                    <span className="font-mono text-2xl font-bold text-[#0b1c30] tracking-widest">
+                    <span className="font-mono text-2xl font-bold text-on-surface tracking-widest">
                       {passcode}
                     </span>
                   </div>
@@ -483,7 +483,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                   <button
                     onClick={handleCopyCode}
                     disabled={!validPin}
-                    className="w-full sm:w-auto h-[54px] px-5 bg-white hover:bg-[#eff4ff] border border-outline-variant rounded-xl text-sm font-semibold text-[#0b1c30] flex items-center justify-center gap-2 transition-all duration-150 active:scale-95 shadow-xs cursor-pointer"
+                    className="w-full sm:w-auto h-[54px] px-5 bg-white hover:bg-surface-container-low border border-outline-variant rounded-xl text-sm font-semibold text-on-surface flex items-center justify-center gap-2 transition-all duration-150 active:scale-95 shadow-xs cursor-pointer"
                   >
                     {copied ? (
                       <>
@@ -498,7 +498,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                     )}
                   </button>
                 </div>
-                <p className="text-center text-xs text-[#434655]">Tap &quot;Unlock Locker&quot; on the terminal screen, then type this code.</p>
+                <p className="text-center text-xs text-on-surface-variant">Tap &quot;Unlock Locker&quot; on the terminal screen, then type this code.</p>
                 {copyFailed && <p role="status">Không sao chép được. Bạn có thể nhập 8 số đang hiển thị tại Kiosk.</p>}
                 {ticketEligible && status === 'CONFIRMED' && !validPin && <div className="text-sm space-y-2">
                   <p>Vé chưa có PIN 8 số hợp lệ. Thay vé cũ sẽ làm PIN và QR online cũ hết hiệu lực.</p>
@@ -523,7 +523,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                   ? 'bg-amber-50/70 border-amber-200/80 shadow-xs'
                   : ['COMPLETED', 'COMPLETED_MANUAL'].includes(status)
                     ? 'bg-emerald-50/70 border-emerald-200 shadow-xs'
-                    : 'bg-[#eff4ff]/80 border-blue-200/80 shadow-xs'
+                    : 'bg-surface-container-low/80 border-blue-200/80 shadow-xs'
               }`}>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
@@ -533,7 +533,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                       <Timer className="w-5 h-5 text-primary" />
                     )}
                     <div>
-                      <span className="text-sm font-bold text-[#0b1c30]">
+                      <span className="text-sm font-bold text-on-surface">
                         {isHoldPeriod
                           ? 'Thời gian giữ chỗ tủ (30 phút để đến trạm)'
                           : ['COMPLETED', 'COMPLETED_MANUAL'].includes(status)
@@ -541,7 +541,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                             : 'Thời gian lưu trữ còn lại'}
                       </span>
                       {isHoldPeriod && (
-                        <p className="text-[11px] text-amber-800 font-medium">Giờ thuê thực tế chỉ bắt đầu tính khi bạn mở tủ tại trạm</p>
+                        <p className="text-xs text-amber-800 font-medium">Giờ thuê thực tế chỉ bắt đầu tính khi bạn mở tủ tại trạm</p>
                       )}
                     </div>
                   </div>
@@ -587,7 +587,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
 
                 {status === 'STORED' && (
                   <div className="pt-2 border-t border-blue-200/60 space-y-3">
-                    <div className="flex items-start gap-2 text-xs text-[#434655] leading-relaxed">
+                    <div className="flex items-start gap-2 text-xs text-on-surface-variant leading-relaxed">
                       <Info className="w-4 h-4 text-blue-600 mt-0.5 shrink-0" />
                       <span>
                         Thời gian thuê đang được tính từ khoảnh khắc bạn check-in lúc {startedText}.
@@ -607,11 +607,11 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                     <ShieldCheck className="w-5 h-5" />
                   </div>
                   <div className="space-y-0.5">
-                    <div className="text-sm font-semibold text-[#0b1c30] flex items-center gap-1.5">
+                    <div className="text-sm font-semibold text-on-surface flex items-center gap-1.5">
                       <span>Vé ngoại tuyến</span>
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">HMAC JWS</span>
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">HMAC JWS</span>
                     </div>
-                    <p className="text-xs text-[#434655] leading-relaxed">
+                    <p className="text-xs text-on-surface-variant leading-relaxed">
                       Vé ngoại tuyến được hiển thị riêng. Mã QR động phía trên chỉ dùng để xác thực trực tuyến.
                     </p>
                   </div>
@@ -632,21 +632,21 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                 <button
                   onClick={() => setShowExtendModal(true)}
                   disabled={booking?.canExtend === false}
-                  className={`h-11 px-3 bg-white border border-primary/40 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors shadow-xs ${booking?.canExtend === false ? 'opacity-50 cursor-not-allowed text-gray-500 border-gray-300' : 'hover:bg-[#eff4ff] text-primary cursor-pointer'}`}
+                  className={`h-11 px-3 bg-white border border-primary/40 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors shadow-xs ${booking?.canExtend === false ? 'opacity-50 cursor-not-allowed text-gray-500 border-gray-300' : 'hover:bg-surface-container-low text-primary cursor-pointer'}`}
                 >
                   <PlusCircle className="w-4 h-4" />
                   <span>Gia hạn thời gian</span>
                 </button>
                 <button
                   onClick={() => onNavigate('find-station', { stationId: booking?.stationId })}
-                  className="h-11 px-3 bg-white hover:bg-[#eff4ff] border border-outline-variant rounded-xl text-xs text-[#0b1c30] font-medium flex items-center justify-center gap-1.5 transition-colors shadow-xs cursor-pointer"
+                  className="h-11 px-3 bg-white hover:bg-surface-container-low border border-outline-variant rounded-xl text-xs text-on-surface font-medium flex items-center justify-center gap-1.5 transition-colors shadow-xs cursor-pointer"
                 >
                   <Navigation className="w-4 h-4 text-primary" />
                   <span>Terminal Route</span>
                 </button>
                 <a
                   href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}
-                  className="h-11 px-3 bg-white hover:bg-[#eff4ff] border border-outline-variant rounded-xl text-xs text-[#0b1c30] font-medium flex items-center justify-center gap-1.5 transition-colors shadow-xs"
+                  className="h-11 px-3 bg-white hover:bg-surface-container-low border border-outline-variant rounded-xl text-xs text-on-surface font-medium flex items-center justify-center gap-1.5 transition-colors shadow-xs"
                 >
                   <Headphones className="w-4 h-4 text-secondary" />
                   <span>Help: 1900 1234</span>
@@ -666,17 +666,17 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
             <div className="bg-white rounded-2xl border border-outline-variant/40 shadow-sm p-5 space-y-4">
               <div className="flex items-center justify-between border-b border-outline-variant/20 pb-3">
                 <div>
-                  <h3 className="text-base font-bold text-[#0b1c30]">
+                  <h3 className="text-base font-bold text-on-surface">
                     {isLockerAssigned ? 'Assigned Locker Location' : 'Station Locker Layout'}
                   </h3>
-                  <p className="text-xs text-[#434655]">
+                  <p className="text-xs text-on-surface-variant">
                     {isLockerAssigned ? `Ô tủ ${rawBayCode}` : `Size ${size} Tier · Assigned at Kiosk Check-in`}
                   </p>
                 </div>
                 <span className={`text-xs px-2.5 py-1 rounded-md font-mono font-bold ${
                   isLockerAssigned
                     ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                    : 'bg-[#e5eeff] text-secondary'
+                    : 'bg-surface-container text-secondary'
                 }`}>
                   {isLockerAssigned ? `Locker ${rawBayCode}` : `Size ${size} Tier`}
                 </span>
@@ -696,23 +696,23 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
 
             {/* Baggage & Security Ledger Details */}
             <div className="bg-white rounded-2xl border border-outline-variant/40 shadow-sm p-5 space-y-3">
-              <h3 className="text-base font-bold text-[#0b1c30]">Storage &amp; Security Audit</h3>
+              <h3 className="text-base font-bold text-on-surface">Storage &amp; Security Audit</h3>
               <div className="divide-y divide-outline-variant/20 text-xs">
                 <div className="py-2.5 flex justify-between">
-                  <span className="text-[#434655]">Thời điểm gửi đồ</span>
-                  <span className="font-mono text-[#0b1c30] font-medium">{booking?.checkedInAt ? new Date(parseServerTime(booking.checkedInAt)).toLocaleString('vi-VN') : 'Chưa gửi đồ'}</span>
+                  <span className="text-on-surface-variant">Thời điểm gửi đồ</span>
+                  <span className="font-mono text-on-surface font-medium">{booking?.checkedInAt ? new Date(parseServerTime(booking.checkedInAt)).toLocaleString('vi-VN') : 'Chưa gửi đồ'}</span>
                 </div>
                 <div className="py-2.5 flex justify-between">
-                  <span className="text-[#434655]">Kích cỡ tủ</span>
-                  <span className="text-[#0b1c30] font-medium">{size}</span>
+                  <span className="text-on-surface-variant">Kích cỡ tủ</span>
+                  <span className="text-on-surface font-medium">{size}</span>
                 </div>
                 <div className="py-2.5 flex justify-between">
-                  <span className="text-[#434655]">Mã đơn đặt tủ</span>
+                  <span className="text-on-surface-variant">Mã đơn đặt tủ</span>
                   <span className="font-mono font-semibold text-primary">{orderId}</span>
                 </div>
                 <div className="py-2.5 flex justify-between">
-                  <span className="text-[#434655]">Total Rate Billed</span>
-                  <span className="text-[#0b1c30] font-bold">{formatCurrency(amount)} VND ({booking.payments?.some(p => p.kind === 'BASE' && p.status === 'PAID') ? 'Đã thanh toán' : 'Chưa thanh toán'})</span>
+                  <span className="text-on-surface-variant">Total Rate Billed</span>
+                  <span className="text-on-surface font-bold">{formatCurrency(amount)} VND ({booking.payments?.some(p => p.kind === 'BASE' && p.status === 'PAID') ? 'Đã thanh toán' : 'Chưa thanh toán'})</span>
                 </div>
               </div>
 
@@ -767,7 +767,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
 
       {/* EXTEND SUCCESS TOAST */}
       {extendSuccessToast && (
-        <div className="fixed bottom-6 right-6 bg-[#0b1c30] text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg border border-[#334155] z-50 flex items-center gap-2 animate-fade-in-up">
+        <div className="fixed bottom-6 right-6 bg-on-surface text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg border border-slate-700 z-50 flex items-center gap-2 animate-fade-in-up">
           <Verified className="w-4 h-4 text-emerald-400" />
           <span>{extendSuccessToast}</span>
         </div>
@@ -779,14 +779,14 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
           <div className="flex flex-col sm:flex-row items-center gap-3">
             <span className="text-base text-primary font-bold">SmartLocker SLMS</span>
             <span className="hidden sm:inline-block text-outline-variant">•</span>
-            <p className="text-xs text-[#434655]">
+            <p className="text-xs text-on-surface-variant">
               © 2025 SmartLocker Systems Inc. Telemetry &amp; Cryptographic Access Active. All rights reserved.
             </p>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-[#434655]">
-            <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>Security Architecture</a>
-            <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }}>Terms of Service</a>
-            <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}>Support Telemetry</a>
+          <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-on-surface-variant">
+            <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>Bảo mật</a>
+            <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }}>Điều khoản dịch vụ</a>
+            <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}>Hỗ trợ</a>
           </div>
         </div>
       </footer>

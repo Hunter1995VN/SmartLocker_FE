@@ -244,7 +244,7 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
             </div>
           ) : !ticket ? (
             <div className="py-12 text-center space-y-3">
-              <Info className="w-10 h-10 text-slate-400 mx-auto" />
+              <Info className="w-10 h-10 text-slate-500 mx-auto" />
               <p className="text-sm text-slate-600 font-medium">Không tìm thấy vé ngoại tuyến cho đơn đặt này.</p>
             </div>
           ) : (
@@ -291,7 +291,7 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
 
               {/* Monospace 6-Digit PIN */}
               <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200/80 space-y-2 text-center">
-                <span className="text-[11px] font-bold text-blue-800 uppercase tracking-wider">
+                <span className="text-xs font-bold text-blue-800 uppercase tracking-wider">
                   HOẶC NHẬP MÃ PIN 8 SỐ TRÊN MÀN HÌNH KIOSK
                 </span>
 
@@ -326,7 +326,7 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
               <div className="space-y-2 text-xs">
                 <div className="flex items-center justify-between text-slate-500 py-1 border-b border-slate-100">
                   <span className="flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-slate-400" />
+                    <Clock className="w-3.5 h-3.5 text-slate-500" />
                     Thời hạn hiệu lực ngoại tuyến:
                   </span>
                   <span className="font-semibold text-slate-800">

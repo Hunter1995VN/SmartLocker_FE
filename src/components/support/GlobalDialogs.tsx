@@ -130,7 +130,7 @@ export default function GlobalDialogs() {
                                 <p className="leading-relaxed">{s.body}</p>
                             </section>
                         ))}
-                        <p className="text-xs text-slate-400 pt-2 border-t border-slate-100">Nội dung minh họa cho đồ án SmartLocker; cần được nhóm xác nhận trước khi dùng chính thức.</p>
+                        <p className="text-xs text-slate-500 pt-2 border-t border-slate-100">Nội dung minh họa cho đồ án SmartLocker; cần được nhóm xác nhận trước khi dùng chính thức.</p>
                     </div>
                 </Modal>
             )}

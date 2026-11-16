@@ -176,7 +176,7 @@ export default function ReviewManualRefundModal({
                                 <h3 className="text-base font-extrabold tracking-tight">
                                     Hồ sơ Lệnh Hoàn Tiền Ngoại Lệ: {item.refundCode}
                                 </h3>
-                                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-white/15">
+                                <span className="px-2 py-0.5 rounded-full text-xs font-extrabold bg-white/15">
                                     {item.status}
                                 </span>
                             </div>
@@ -207,7 +207,7 @@ export default function ReviewManualRefundModal({
                     {/* Two-column dossier comparison */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-                            <p className="font-extrabold text-slate-800 uppercase text-[11px] tracking-wider">
+                            <p className="font-extrabold text-slate-800 uppercase text-xs tracking-wider">
                                 I. Đối chiếu Giao dịch Gốc (PayOS)
                             </p>
                             <div className="flex justify-between">
@@ -239,7 +239,7 @@ export default function ReviewManualRefundModal({
                         </div>
 
                         <div className="p-4 rounded-2xl bg-purple-50/50 border border-purple-200/80 space-y-2">
-                            <p className="font-extrabold text-purple-900 uppercase text-[11px] tracking-wider">
+                            <p className="font-extrabold text-purple-900 uppercase text-xs tracking-wider">
                                 II. Đề xuất & Bằng chứng Ngoại lệ
                             </p>
                             <div className="flex justify-between">
@@ -283,7 +283,7 @@ export default function ReviewManualRefundModal({
                                 <strong>Bằng chứng hiện trường / Log:</strong> {item.evidenceNote}
                             </p>
                         )}
-                        <div className="pt-1.5 border-t border-slate-100 flex flex-wrap items-center gap-4 text-[11px] text-slate-600">
+                        <div className="pt-1.5 border-t border-slate-100 flex flex-wrap items-center gap-4 text-xs text-slate-600">
                             <span className="flex items-center gap-1">
                                 <Landmark className="w-3.5 h-3.5 text-blue-600" />
                                 Kênh nhận: <strong>{item.refundMethod}</strong>
@@ -528,12 +528,12 @@ export default function ReviewManualRefundModal({
                                       )} · Mã FT: ${item.gatewayTransferRef || '—'}`
                                     : 'LỆNH ĐÃ BỊ TỪ CHỐI'}
                             </p>
-                            <p className="text-[11px]">
+                            <p className="text-xs">
                                 Người thẩm định: <strong>{item.reviewedByName || item.reviewedByEmail}</strong> lúc{' '}
                                 {formatDateTime(item.reviewedAt)}
                             </p>
                             {item.adminDecisionNote && (
-                                <p className="text-[11px]">Ghi chú quyết định: {item.adminDecisionNote}</p>
+                                <p className="text-xs">Ghi chú quyết định: {item.adminDecisionNote}</p>
                             )}
                         </div>
                     )}

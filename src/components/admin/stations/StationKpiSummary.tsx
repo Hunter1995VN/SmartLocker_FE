@@ -45,21 +45,21 @@ export default function StationKpiSummary({ stations, isLoading }: StationKpiSum
             <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm relative overflow-hidden">
                 <div className="flex items-start justify-between">
                     <div>
-                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                             Total Stations
                         </p>
                         <div className="flex items-baseline gap-1.5 mt-1.5">
                             <span className="text-2xl font-black text-slate-900 tracking-tight">
                                 {isLoading ? '—' : totalStations}
                             </span>
-                            <span className="text-xs font-semibold text-slate-400">locations</span>
+                            <span className="text-xs font-semibold text-slate-500">locations</span>
                         </div>
                     </div>
                     <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center">
                         <Layers className="w-5 h-5" />
                     </div>
                 </div>
-                <div className="mt-3.5 pt-3 border-t border-slate-100 flex items-center gap-2.5 text-[11px] font-medium">
+                <div className="mt-3.5 pt-3 border-t border-slate-100 flex items-center gap-2.5 text-xs font-medium">
                     <span className="inline-flex items-center gap-1 text-emerald-600">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                         {onlineStations} Online
@@ -76,21 +76,21 @@ export default function StationKpiSummary({ stations, isLoading }: StationKpiSum
             <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm relative overflow-hidden">
                 <div className="flex items-start justify-between">
                     <div>
-                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                             Compartments
                         </p>
                         <div className="flex items-baseline gap-1.5 mt-1.5">
                             <span className="text-2xl font-black text-slate-900 tracking-tight">
                                 {isLoading ? '—' : totalCompartments.toLocaleString()}
                             </span>
-                            <span className="text-xs font-semibold text-slate-400">bays</span>
+                            <span className="text-xs font-semibold text-slate-500">bays</span>
                         </div>
                     </div>
                     <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100 flex items-center justify-center">
                         <Box className="w-5 h-5" />
                     </div>
                 </div>
-                <div className="mt-3.5 pt-3 border-t border-slate-100 flex items-center gap-2 text-[11px] font-bold">
+                <div className="mt-3.5 pt-3 border-t border-slate-100 flex items-center gap-2 text-xs font-bold">
                     <span className="px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-100">
                         S: {isLoading ? '—' : totalS.toLocaleString()}
                     </span>
@@ -107,22 +107,22 @@ export default function StationKpiSummary({ stations, isLoading }: StationKpiSum
             <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm relative overflow-hidden">
                 <div className="flex items-start justify-between">
                     <div>
-                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                             Applied Pricing Policies
                         </p>
                         <div className="flex items-baseline gap-1.5 mt-1.5">
                             <span className="text-2xl font-black text-slate-900 tracking-tight">
                                 {isLoading ? '—' : '03'}
                             </span>
-                            <span className="text-xs font-semibold text-slate-400">standard models</span>
+                            <span className="text-xs font-semibold text-slate-500">standard models</span>
                         </div>
                     </div>
                     <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center">
                         <Tag className="w-5 h-5" />
                     </div>
                 </div>
-                <div className="mt-3.5 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-[11px] text-slate-500 font-medium truncate">
-                    <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-semibold truncate">
+                <div className="mt-3.5 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-xs text-slate-500 font-medium truncate">
+                    <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-xs font-semibold truncate">
                         Hourly (S, M, L) · Overdue Fees · Grace Period
                     </span>
                 </div>
@@ -132,14 +132,14 @@ export default function StationKpiSummary({ stations, isLoading }: StationKpiSum
             <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm relative overflow-hidden">
                 <div className="flex items-start justify-between">
                     <div>
-                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                             Avg Occupancy Rate
                         </p>
                         <div className="flex items-baseline gap-2 mt-1.5">
                             <span className="text-2xl font-black text-slate-900 tracking-tight">
                                 {isLoading ? '—' : `${occupancyRate}%`}
                             </span>
-                            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-full border border-emerald-200">
+                            <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-full border border-emerald-200">
                                 Realtime
                             </span>
                         </div>
@@ -148,7 +148,7 @@ export default function StationKpiSummary({ stations, isLoading }: StationKpiSum
                         <PieChart className="w-5 h-5" />
                     </div>
                 </div>
-                <div className="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-medium">
+                <div className="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
                     <span>Đang sử dụng: <b className="text-slate-800">{totalOccupied}</b> ô</span>
                     <span>Trống: <b className="text-emerald-700">{totalAvailable}</b> ô</span>
                 </div>

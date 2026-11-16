@@ -52,7 +52,7 @@ export function StatusBadge({ status }: { status: string }) {
     const { label, cls, dot } = getStatusMeta(status);
     return (
         <span
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl border text-[11px] font-bold uppercase tracking-wide ${cls}`}
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl border text-xs font-bold uppercase tracking-wide ${cls}`}
         >
             <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />
             {label}
@@ -149,7 +149,7 @@ export function DetailRow({
     if (!value) return null;
     return (
         <div className="flex items-start gap-3 py-2 border-b border-slate-100 last:border-0 text-xs">
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider w-28 sm:w-36 shrink-0 mt-0.5">
+            <p className="text-xs text-slate-500 font-bold uppercase tracking-wider w-28 sm:w-36 shrink-0 mt-0.5">
                 {label}
             </p>
             <p

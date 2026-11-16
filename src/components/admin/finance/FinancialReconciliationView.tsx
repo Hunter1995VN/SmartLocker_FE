@@ -249,7 +249,7 @@ export default function FinancialReconciliationView({
                             <h1 className="text-lg font-extrabold text-slate-900 tracking-tight">
                                 Đối Soát Tài Chính Định Kỳ PayOS &amp; Cơ Sở Dữ Liệu
                             </h1>
-                            <span className="px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full bg-blue-50 text-blue-700 border border-blue-200 shrink-0">
+                            <span className="px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider rounded-full bg-blue-50 text-blue-700 border border-blue-200 shrink-0">
                                 ĐỐI SOÁT PAYOS NAPAS247
                             </span>
                         </div>
@@ -335,7 +335,7 @@ export default function FinancialReconciliationView({
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs">
                     <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                             Tổng Thu Đã Khớp PayOS
                         </span>
                         <ArrowUpRight className="w-4 h-4 text-emerald-600" />
@@ -343,14 +343,14 @@ export default function FinancialReconciliationView({
                     <p className="text-2xl font-extrabold text-slate-900 mt-1.5">
                         {grossRevenue.toLocaleString('vi-VN')} đ
                     </p>
-                    <p className="text-[11px] text-emerald-600 font-semibold mt-1">
+                    <p className="text-xs text-emerald-600 font-semibold mt-1">
                         {matchedCount} giao dịch khớp 100% Webhook
                     </p>
                 </div>
 
                 <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs">
                     <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                             Doanh Thu Thực Nhận (Net)
                         </span>
                         <CheckCircle2 className="w-4 h-4 text-blue-600" />
@@ -358,14 +358,14 @@ export default function FinancialReconciliationView({
                     <p className="text-2xl font-extrabold text-blue-600 mt-1.5">
                         {netRevenue.toLocaleString('vi-VN')} đ
                     </p>
-                    <p className="text-[11px] text-slate-500 mt-1">
+                    <p className="text-xs text-slate-500 mt-1">
                         Sau khi trừ hoàn tiền hủy đơn
                     </p>
                 </div>
 
                 <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs">
                     <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                             Tổng Tiền Hoàn Hủy (Refund)
                         </span>
                         <RotateCcw className="w-4 h-4 text-purple-600" />
@@ -373,20 +373,20 @@ export default function FinancialReconciliationView({
                     <p className="text-2xl font-extrabold text-purple-700 mt-1.5">
                         {refundTotal.toLocaleString('vi-VN')} đ
                     </p>
-                    <p className="text-[11px] text-slate-500 mt-1">
+                    <p className="text-xs text-slate-500 mt-1">
                         Áp dụng theo chính sách hoàn tiền trạm
                     </p>
                 </div>
 
                 <div className="bg-white rounded-2xl border border-amber-200/90 p-4 shadow-xs">
                     <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-amber-600">
+                        <span className="text-xs font-bold uppercase tracking-wider text-amber-600">
                             Giao Dịch Chờ Đồng Bộ
                         </span>
                         <Clock className="w-4 h-4 text-amber-600" />
                     </div>
                     <p className="text-2xl font-extrabold text-amber-600 mt-1.5">{pendingCount}</p>
-                    <p className="text-[11px] text-slate-500 mt-1">
+                    <p className="text-xs text-slate-500 mt-1">
                         Có thể bấm đồng bộ trực tiếp từng đơn
                     </p>
                 </div>
@@ -395,7 +395,7 @@ export default function FinancialReconciliationView({
             {/* Filter Bar */}
             <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs flex flex-col md:flex-row items-stretch md:items-center gap-3">
                 <div className="relative flex-1">
-                    <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                         type="text"
                         value={search}
@@ -446,7 +446,7 @@ export default function FinancialReconciliationView({
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-slate-50/90 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                            <tr className="bg-slate-50/90 border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-500">
                                 <th className="py-3 px-4">OrderCode (PayOS)</th>
                                 <th className="py-3 px-4">Đơn đặt & Khách hàng</th>
                                 <th className="py-3 px-4">Loại phí</th>
@@ -459,13 +459,13 @@ export default function FinancialReconciliationView({
                         <tbody className="divide-y divide-slate-100 text-xs">
                             {isLoading ? (
                                 <tr>
-                                    <td colSpan={7} className="py-12 text-center text-slate-400">
+                                    <td colSpan={7} className="py-12 text-center text-slate-500">
                                         Đang tải dữ liệu giao dịch và bảng đối soát PayOS...
                                     </td>
                                 </tr>
                             ) : filteredItems.length === 0 ? (
                                 <tr>
-                                    <td colSpan={7} className="py-12 text-center text-slate-400">
+                                    <td colSpan={7} className="py-12 text-center text-slate-500">
                                         Không có giao dịch nào khớp với bộ lọc hiện tại.
                                     </td>
                                 </tr>
@@ -474,7 +474,7 @@ export default function FinancialReconciliationView({
                                     <tr key={item.paymentId} className="hover:bg-slate-50/80 transition">
                                         <td className="py-3.5 px-4 whitespace-nowrap">
                                             <div className="font-mono font-bold text-slate-900">{item.orderCode}</div>
-                                            <div className="text-[11px] text-slate-400">
+                                            <div className="text-xs text-slate-500">
                                                 {new Date(item.createdAt).toLocaleString('vi-VN')}
                                             </div>
                                         </td>
@@ -482,12 +482,12 @@ export default function FinancialReconciliationView({
                                         <td className="py-3.5 px-4">
                                             <div className="font-bold text-blue-600">{item.bookingCode}</div>
                                             <div className="text-slate-700 font-medium">{item.customerName}</div>
-                                            <div className="text-[11px] text-slate-400">{item.stationName}</div>
+                                            <div className="text-xs text-slate-500">{item.stationName}</div>
                                         </td>
 
                                         <td className="py-3.5 px-4 whitespace-nowrap">
                                             <span
-                                                className={`inline-block text-[10px] font-extrabold uppercase px-2 py-0.5 rounded ${
+                                                className={`inline-block text-xs font-extrabold uppercase px-2 py-0.5 rounded ${
                                                     item.kind === 'REFUND'
                                                         ? 'bg-purple-100 text-purple-700'
                                                         : item.kind === 'EXTENSION'
@@ -508,7 +508,7 @@ export default function FinancialReconciliationView({
 
                                         <td className="py-3.5 px-4 whitespace-nowrap">
                                             <span
-                                                className={`inline-block text-[10px] font-bold uppercase px-2.5 py-1 rounded-full border ${
+                                                className={`inline-block text-xs font-bold uppercase px-2.5 py-1 rounded-full border ${
                                                     item.dbStatus === 'PAID'
                                                         ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                                                         : item.dbStatus === 'PENDING'
@@ -524,27 +524,27 @@ export default function FinancialReconciliationView({
 
                                         <td className="py-3.5 px-4 whitespace-nowrap">
                                             {item.reconciliationState === 'MATCHED_PAID' ? (
-                                                <span className="inline-flex items-center gap-1.5 text-emerald-700 font-bold text-[11px]">
+                                                <span className="inline-flex items-center gap-1.5 text-emerald-700 font-bold text-xs">
                                                     <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                                                     Khớp PayOS 100%
                                                 </span>
                                             ) : item.reconciliationState === 'DISCREPANCY' ? (
-                                                <span className="inline-flex items-center gap-1.5 text-rose-600 font-bold text-[11px]">
+                                                <span className="inline-flex items-center gap-1.5 text-rose-600 font-bold text-xs">
                                                     <AlertTriangle className="w-4 h-4" />
                                                     Lệch trạng thái đơn
                                                 </span>
                                             ) : item.reconciliationState === 'PENDING_GATEWAY' ? (
-                                                <span className="inline-flex items-center gap-1.5 text-amber-600 font-semibold text-[11px]">
+                                                <span className="inline-flex items-center gap-1.5 text-amber-600 font-semibold text-xs">
                                                     <Clock className="w-4 h-4" />
                                                     Chờ đối soát PayOS
                                                 </span>
                                             ) : item.reconciliationState === 'REFUNDED' ? (
-                                                <span className="inline-flex items-center gap-1.5 text-purple-700 font-semibold text-[11px]">
+                                                <span className="inline-flex items-center gap-1.5 text-purple-700 font-semibold text-xs">
                                                     <RotateCcw className="w-3.5 h-3.5" />
                                                     Đã hoàn tiền hợp lệ
                                                 </span>
                                             ) : (
-                                                <span className="text-slate-400 text-[11px]">Đã đóng / Hết hạn</span>
+                                                <span className="text-slate-500 text-xs">Đã đóng / Hết hạn</span>
                                             )}
                                         </td>
 
@@ -553,7 +553,7 @@ export default function FinancialReconciliationView({
                                                 type="button"
                                                 onClick={() => void handleSyncSingleOrder(item.orderCode)}
                                                 disabled={syncingOrderCode === item.orderCode}
-                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-blue-200 bg-blue-50/70 hover:bg-blue-100 text-blue-700 font-bold text-[11px] transition cursor-pointer disabled:opacity-50"
+                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-blue-200 bg-blue-50/70 hover:bg-blue-100 text-blue-700 font-bold text-xs transition cursor-pointer disabled:opacity-50"
                                             >
                                                 <RefreshCw
                                                     className={`w-3.5 h-3.5 ${

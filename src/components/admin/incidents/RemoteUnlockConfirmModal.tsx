@@ -61,7 +61,7 @@ export default function RemoteUnlockConfirmModal({
                             >
                                 Xác nhận mở khóa tủ từ xa
                             </h2>
-                            <p className="text-[11px] text-slate-500 mt-0.5">
+                            <p className="text-xs text-slate-500 mt-0.5">
                                 Thao tác này có thể tác động trực tiếp đến tài sản khách hàng.
                             </p>
                         </div>
@@ -72,7 +72,7 @@ export default function RemoteUnlockConfirmModal({
                         onClick={onCancel}
                         disabled={isSubmitting}
                         aria-label="Đóng hộp thoại xác nhận"
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition shrink-0 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+                        className="p-1.5 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition shrink-0 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                     >
                         <X className="w-4 h-4" aria-hidden="true" />
                     </button>
@@ -115,8 +115,8 @@ export default function RemoteUnlockConfirmModal({
                                 </span>
                             </label>
                             <span
-                                className={`text-[10px] font-mono font-semibold ${
-                                    isReasonValid ? 'text-emerald-600' : 'text-slate-400'
+                                className={`text-xs font-mono font-semibold ${
+                                    isReasonValid ? 'text-emerald-600' : 'text-slate-500'
                                 }`}
                             >
                                 {trimmedReason.length}/5+ ký tự
@@ -135,7 +135,7 @@ export default function RemoteUnlockConfirmModal({
 
                         {/* Quick reason chips */}
                         <div className="space-y-1.5">
-                            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                 Chọn nhanh mẫu lý do chuẩn:
                             </p>
                             <div className="flex flex-wrap gap-1.5">
@@ -145,7 +145,7 @@ export default function RemoteUnlockConfirmModal({
                                         type="button"
                                         disabled={isSubmitting}
                                         onClick={() => setReason(sample)}
-                                        className={`text-left text-[11px] px-2.5 py-1 rounded-lg border transition cursor-pointer ${
+                                        className={`text-left text-xs px-2.5 py-1 rounded-lg border transition cursor-pointer ${
                                             reason === sample
                                                 ? 'bg-rose-50 border-rose-300 text-rose-800 font-semibold'
                                                 : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600'

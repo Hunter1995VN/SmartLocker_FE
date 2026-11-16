@@ -185,10 +185,10 @@ export default function ConvenienceShowcase({
       <div className="flex items-center justify-between gap-2 border-b pb-3 mb-4 border-inherit">
         
         <div className="flex items-center gap-2.5">
-          <span className={`text-[10px] font-mono font-black px-2.5 py-1 rounded-md border tracking-wider uppercase ${badgeBg}`}>
+          <span className={`text-xs font-mono font-black px-2.5 py-1 rounded-md border tracking-wider uppercase ${badgeBg}`}>
             {lang === 'VI' ? activeSlide.badgeVI : activeSlide.badgeEN}
           </span>
-          <span className="text-[11px] font-mono text-slate-400 font-bold">
+          <span className="text-xs font-mono text-slate-500 font-bold">
             {currentIndex + 1} / {SLIDES.length}
           </span>
         </div>
@@ -295,7 +295,7 @@ export default function ConvenienceShowcase({
                 }`}>
                   {st.value}
                 </div>
-                <div className="text-[9px] text-slate-400 font-mono mt-0.5 truncate">
+                <div className="text-xs text-slate-500 font-mono mt-0.5 truncate">
                   {lang === 'VI' ? st.labelVI : st.labelEN}
                 </div>
               </div>
@@ -334,7 +334,7 @@ export default function ConvenienceShowcase({
           />
         </div>
 
-        <div className="text-[10px] font-mono text-slate-400 font-bold hidden sm:block">
+        <div className="text-xs font-mono text-slate-500 font-bold hidden sm:block">
           {isPlaying ? (lang === 'VI' ? 'Tự chuyển sau 6s' : 'Auto 6s') : (lang === 'VI' ? 'Đã tạm dừng' : 'Paused')}
         </div>
 
@@ -358,7 +358,7 @@ export default function ConvenienceShowcase({
                   <h3 className="text-xl font-black uppercase font-mono tracking-wide text-white">
                     {lang === 'VI' ? 'TRÌNH CHIẾU TIỆN ÍCH SMARTLOCKER' : 'SMARTLOCKER CONVENIENCE SHOWCASE'}
                   </h3>
-                  <p className="text-xs text-slate-400 font-mono">
+                  <p className="text-xs text-slate-500 font-mono">
                     {lang === 'VI' ? 'Nghiên cứu hành vi du khách & giải pháp IoT tại TP. Đà Nẵng' : 'Tourist behavior study & IoT solution in Da Nang'}
                   </p>
                 </div>
@@ -377,11 +377,11 @@ export default function ConvenienceShowcase({
               
               {/* Massive Graphic Preview */}
               <div className="lg:col-span-5 bg-[#050914] border-2 border-slate-800 rounded-3xl p-6 flex flex-col items-center justify-center relative shadow-inner">
-                <div className="absolute top-4 left-4 text-[10px] font-mono text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded bg-cyan-500/10">
+                <div className="absolute top-4 left-4 text-xs font-mono text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded bg-cyan-500/10">
                   SCENE 0{currentIndex + 1}
                 </div>
                 <GraphicComponent className="w-72 h-52 max-w-full drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] my-2" />
-                <span className="text-[11px] font-mono text-slate-400 text-center mt-2">
+                <span className="text-xs font-mono text-slate-500 text-center mt-2">
                   {lang === 'VI' ? 'Mô phỏng đồ họa chuyển động thời gian thực' : 'Real-time motion graphic simulation'}
                 </span>
               </div>
@@ -406,7 +406,7 @@ export default function ConvenienceShowcase({
                   {activeSlide.stats.map((st, i) => (
                     <div key={i} className="p-3 rounded-2xl bg-slate-900 border border-slate-800">
                       <div className="text-lg font-black font-mono text-cyan-400">{st.value}</div>
-                      <div className="text-[10px] text-slate-400 font-mono mt-1 leading-tight">
+                      <div className="text-xs text-slate-500 font-mono mt-1 leading-tight">
                         {lang === 'VI' ? st.labelVI : st.labelEN}
                       </div>
                     </div>

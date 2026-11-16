@@ -110,7 +110,7 @@ export default function BatchPricingModal({
                             <h3 className="text-base font-extrabold text-slate-900 tracking-tight">
                                 Áp Dụng Bảng Giá & Hoàn Tiền Hàng Loạt
                             </h3>
-                            <p className="text-[11px] text-slate-400">
+                            <p className="text-xs text-slate-500">
                                 Cập nhật đồng bộ giá thuê, phí quá hạn và tỷ lệ hoàn tiền hủy đơn
                             </p>
                         </div>
@@ -118,7 +118,7 @@ export default function BatchPricingModal({
                     <button
                         type="button"
                         onClick={onClose}
-                        className="w-8 h-8 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center transition cursor-pointer"
+                        className="w-8 h-8 rounded-xl text-slate-500 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center transition cursor-pointer"
                     >
                         <X className="w-4 h-4" />
                     </button>
@@ -185,7 +185,7 @@ export default function BatchPricingModal({
 
                         <div className="grid grid-cols-2 gap-3">
                             <div>
-                                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                                <label className="block text-xs font-semibold text-slate-600 mb-1">
                                     Ân hạn quá hạn (phút)
                                 </label>
                                 <input
@@ -199,7 +199,7 @@ export default function BatchPricingModal({
                             </div>
 
                             <div>
-                                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                                <label className="block text-xs font-semibold text-slate-600 mb-1">
                                     Mốc giờ hủy đơn (giờ trước hạn)
                                 </label>
                                 <input
@@ -213,7 +213,7 @@ export default function BatchPricingModal({
                             </div>
 
                             <div>
-                                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                                <label className="block text-xs font-semibold text-slate-600 mb-1">
                                     Hoàn tiền hủy sớm (%)
                                 </label>
                                 <input
@@ -227,7 +227,7 @@ export default function BatchPricingModal({
                             </div>
 
                             <div>
-                                <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                                <label className="block text-xs font-semibold text-slate-600 mb-1">
                                     Hoàn tiền hủy sát giờ (%)
                                 </label>
                                 <input

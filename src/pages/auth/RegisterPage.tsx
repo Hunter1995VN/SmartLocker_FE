@@ -1,4 +1,5 @@
 import { openLegal } from '../../utils/contact';
+import { useNetworkStats } from '../../utils/useNetworkStats';
 import { Lock, Eye, EyeOff, ChevronLeft, ArrowRight, AlertCircle, Check, X, Package, Zap } from 'lucide-react';
 import { useState } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
@@ -17,6 +18,7 @@ interface RegisterPageProps {
  * - Cột phải: Form đăng ký có layout 2 cột cho các trường ngắn
  */
 export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPageProps) {
+    const { stations, lockers } = useNetworkStats();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [fullName, setFullName] = useState('');
@@ -97,7 +99,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
     };
 
     return (
-        <div className="min-h-screen flex bg-[#f0f4ff] font-sans">
+        <div className="min-h-screen flex bg-surface-container-low font-sans">
             {/* LEFT SIDE */}
             <aside className="hidden lg:flex lg:w-[44%] relative overflow-hidden shrink-0" style={{background: 'linear-gradient(135deg, #0f2977 0%, #1a4ac4 40%, #2563eb 70%, #3b82f6 100%)'}}>
                 {/* Ambient blobs */}
@@ -113,7 +115,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                         </div>
                         <div>
                             <span className="text-lg font-extrabold text-white tracking-tight">SmartLocker</span>
-                            <p className="text-[11px] text-white/60 uppercase tracking-widest">Tủ hành lý thông minh</p>
+                            <p className="text-xs text-white/60 uppercase tracking-widest">Tủ hành lý thông minh</p>
                         </div>
                     </div>
 
@@ -146,7 +148,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                                     </div>
                                     <div>
                                         <p className="text-white text-xs font-semibold">{label}</p>
-                                        <p className="text-white/50 text-[11px]">{desc}</p>
+                                        <p className="text-white/50 text-xs">{desc}</p>
                                     </div>
                                 </div>
                             ))}
@@ -156,13 +158,13 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                     {/* Stats */}
                     <div className="grid grid-cols-3 gap-3">
                         {[
-                            { num: '85+', label: 'Trạm tủ' },
+                            { num: stations != null ? String(stations) : '—', label: 'Trạm tủ' },
                             { num: '24/7', label: 'Hoạt động' },
-                            { num: '20M', label: 'Bảo hiểm' },
+                            { num: lockers != null ? String(lockers) : '—', label: 'Ô tủ' },
                         ].map(({ num, label }) => (
                             <div key={label} className="text-center py-3 px-2 rounded-xl" style={{background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)'}}>
                                 <div className="text-xl font-black text-white">{num}</div>
-                                <div className="text-[11px] text-white/55 mt-0.5">{label}</div>
+                                <div className="text-xs text-white/55 mt-0.5">{label}</div>
                             </div>
                         ))}
                     </div>
@@ -236,7 +238,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                                 <div className="w-full border-t border-gray-100"></div>
                             </div>
                             <div className="relative flex justify-center">
-                                <span className="bg-white px-3 text-xs text-gray-400 uppercase tracking-widest font-semibold">
+                                <span className="bg-white px-3 text-xs text-gray-500 uppercase tracking-widest font-semibold">
                                     hoặc đăng ký bằng email
                                 </span>
                             </div>
@@ -256,7 +258,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                                     placeholder="Nguyễn Văn A"
                                     autoComplete="name"
                                     disabled={isLoading}
-                                    className="w-full h-11 px-4 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-900 text-sm placeholder:text-gray-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all disabled:opacity-50"
+                                    className="w-full h-11 px-4 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-900 text-sm placeholder:text-gray-500 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all disabled:opacity-50"
                                 />
                             </div>
 
@@ -274,7 +276,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                                         placeholder="name@example.com"
                                         autoComplete="email"
                                         disabled={isLoading}
-                                        className="w-full h-11 px-4 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-900 text-sm placeholder:text-gray-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all disabled:opacity-50"
+                                        className="w-full h-11 px-4 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-900 text-sm placeholder:text-gray-500 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all disabled:opacity-50"
                                     />
                                 </div>
                                 <div>
@@ -282,7 +284,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                                         Số điện thoại <span className="text-red-500">*</span>
                                     </label>
                                     <div className="relative">
-                                        <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 text-xs font-bold pointer-events-none select-none">
+                                        <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-500 text-xs font-bold pointer-events-none select-none">
                                             +84
                                         </span>
                                         <input
@@ -293,7 +295,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                                             placeholder="901 234 567"
                                             autoComplete="tel"
                                             disabled={isLoading}
-                                            className="w-full h-11 pl-11 pr-4 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-900 text-sm placeholder:text-gray-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all disabled:opacity-50"
+                                            className="w-full h-11 pl-11 pr-4 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-900 text-sm placeholder:text-gray-500 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all disabled:opacity-50"
                                         />
                                     </div>
                                 </div>
@@ -314,12 +316,12 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                                             placeholder="••••••••"
                                             autoComplete="new-password"
                                             disabled={isLoading}
-                                            className="w-full h-11 px-4 pr-10 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-900 text-sm placeholder:text-gray-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all disabled:opacity-50"
+                                            className="w-full h-11 px-4 pr-10 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-900 text-sm placeholder:text-gray-500 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all disabled:opacity-50"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 transition-colors"
+                                            className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-600 transition-colors"
                                             aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
                                         >
                                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -350,7 +352,8 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                                         <button
                                             type="button"
                                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                            className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 transition-colors"
+                                            aria-label={showConfirmPassword ? 'Ẩn mật khẩu xác nhận' : 'Hiện mật khẩu xác nhận'}
+                                            className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-600 transition-colors"
                                         >
                                             {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                         </button>
@@ -386,7 +389,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                                                     {check.ok
                                                         ? <Check className="w-3 h-3 text-emerald-500 shrink-0" />
                                                         : <X className="w-3 h-3 text-gray-300 shrink-0" />}
-                                                    <span className={`text-[11px] ${check.ok ? 'text-emerald-600 font-semibold' : 'text-gray-400'}`}>
+                                                    <span className={`text-xs ${check.ok ? 'text-emerald-600 font-semibold' : 'text-gray-500'}`}>
                                                         {check.label}
                                                     </span>
                                                 </div>
@@ -448,7 +451,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                             </button>
                         </form>
 
-                        <p className="mt-5 text-center text-xs text-gray-400">
+                        <p className="mt-5 text-center text-xs text-gray-500">
                             Quản lý thông tin theo{' '}
                             <a href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }} className="text-blue-600 font-semibold hover:underline">Chính sách bảo mật</a>
                         </p>

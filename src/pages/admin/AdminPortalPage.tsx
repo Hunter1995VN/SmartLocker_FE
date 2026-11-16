@@ -13,7 +13,7 @@
  * - Xuất Báo cáo Doanh thu Tài chính & Lưu lượng Giao dịch Thanh toán (UC-A10)
  * - Tra cứu Nhật ký Truy vết An ninh toàn hệ thống Audit Logs (UC-A08)
  */
-import { useState, useEffect, useCallback } from 'react';
+import { Suspense, lazy, useState, useEffect, useCallback } from 'react';
 import type { AuthResponse } from '../../api/authService';
 import adminDashboardService from '../../api/adminDashboardService';
 import type {
@@ -31,23 +31,23 @@ import RevenueChart from '../../components/admin/RevenueChart';
 import IoTTelemetryCard from '../../components/admin/IoTTelemetryCard';
 import CriticalTriageCard from '../../components/admin/CriticalTriageCard';
 import StationFleetTable from '../../components/admin/StationFleetTable';
-import StationManagementView from '../../components/admin/stations/StationManagementView';
-import PromotionVoucherManagementView from '../../components/admin/promotions/PromotionVoucherManagementView';
-import InternalUsersManagementView from '../../components/admin/users/InternalUsersManagementView';
-import CustomerDebtManagementView from '../../components/admin/users/CustomerDebtManagementView';
-import InternalRbacManagementView from '../../components/admin/rbac/InternalRbacManagementView';
-import RealtimeLockerGridView from '../../components/admin/lockers/RealtimeLockerGridView';
-import IoTDeviceFleetManagementView from '../../components/admin/devices/IoTDeviceFleetManagementView';
-import OccupancyTurnoverAnalyticsView from '../../components/admin/analytics/OccupancyTurnoverAnalyticsView';
-import AbandonedPropertyView from '../../components/admin/abandoned/AbandonedPropertyView';
-import ManualConfirmQueue from '../../components/admin/incidents/ManualConfirmQueue';
-import StationRatingSummary from '../../components/admin/incidents/StationRatingSummary';
-import ReviewManagementView from '../../components/admin/reviews/ReviewManagementView';
-import EmergencyIncidentListView from '../../components/admin/incidents/EmergencyIncidentListView';
-import FinancialReconciliationView from '../../components/admin/finance/FinancialReconciliationView';
-import FinancialRevenueReportView from '../../components/admin/finance/FinancialRevenueReportView';
-import ManualRefundManagementView from '../../components/admin/refunds/ManualRefundManagementView';
-import AuditLogView from '../../components/admin/audit/AuditLogView';
+const StationManagementView = lazy(() => import('../../components/admin/stations/StationManagementView'));
+const PromotionVoucherManagementView = lazy(() => import('../../components/admin/promotions/PromotionVoucherManagementView'));
+const InternalUsersManagementView = lazy(() => import('../../components/admin/users/InternalUsersManagementView'));
+const CustomerDebtManagementView = lazy(() => import('../../components/admin/users/CustomerDebtManagementView'));
+const InternalRbacManagementView = lazy(() => import('../../components/admin/rbac/InternalRbacManagementView'));
+const RealtimeLockerGridView = lazy(() => import('../../components/admin/lockers/RealtimeLockerGridView'));
+const IoTDeviceFleetManagementView = lazy(() => import('../../components/admin/devices/IoTDeviceFleetManagementView'));
+const OccupancyTurnoverAnalyticsView = lazy(() => import('../../components/admin/analytics/OccupancyTurnoverAnalyticsView'));
+const AbandonedPropertyView = lazy(() => import('../../components/admin/abandoned/AbandonedPropertyView'));
+const ManualConfirmQueue = lazy(() => import('../../components/admin/incidents/ManualConfirmQueue'));
+const StationRatingSummary = lazy(() => import('../../components/admin/incidents/StationRatingSummary'));
+const ReviewManagementView = lazy(() => import('../../components/admin/reviews/ReviewManagementView'));
+const EmergencyIncidentListView = lazy(() => import('../../components/admin/incidents/EmergencyIncidentListView'));
+const FinancialReconciliationView = lazy(() => import('../../components/admin/finance/FinancialReconciliationView'));
+const FinancialRevenueReportView = lazy(() => import('../../components/admin/finance/FinancialRevenueReportView'));
+const ManualRefundManagementView = lazy(() => import('../../components/admin/refunds/ManualRefundManagementView'));
+const AuditLogView = lazy(() => import('../../components/admin/audit/AuditLogView'));
 
 interface AdminPortalPageProps {
     onLogout: () => void;
@@ -196,7 +196,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
     };
 
     return (
-        <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex font-sans select-none antialiased print:bg-white">
+        <div className="min-h-screen bg-slate-50 text-slate-900 flex font-sans select-none antialiased print:bg-white">
             {/* Left Fixed Navigation Sidebar */}
             <AdminSidebar
                 user={user}
@@ -219,6 +219,8 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                     </div>
                 )}
                 <main className="p-4 sm:p-6 lg:p-7 space-y-5 max-w-7xl w-full mx-auto print:p-0 print:max-w-none">
+                  <h1 className="sr-only">Bảng điều khiển quản trị SmartLocker</h1>
+                  <Suspense fallback={<div role="status" aria-live="polite" className="py-16 text-center text-sm text-slate-500">Đang tải...</div>}>
                     {activeMenu === 'abandoned' ? (
                         <AbandonedPropertyView userRole={role} currentUser={user} />
                     ) : activeMenu === 'incidents' ? (
@@ -343,13 +345,15 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                             <StationFleetTable
                                 stations={stationOccupancies}
                                 isLoading={isLoadingStats}
+                                onInspect={() => setActiveMenu('lockers')}
                             />
                         </>
                     )}
+                  </Suspense>
                 </main>
 
                 {/* Footer */}
-                <footer className="w-full py-4 text-center text-xs text-slate-400 border-t border-slate-200/80 bg-white mt-auto print:hidden">
+                <footer className="w-full py-4 text-center text-xs text-slate-500 border-t border-slate-200/80 bg-white mt-auto print:hidden">
                     <span>SmartLocker Management System (SLMS) · Operations & Fleet Control</span>
                 </footer>
             </div>
