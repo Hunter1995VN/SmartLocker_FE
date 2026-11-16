@@ -69,15 +69,15 @@ const Security = () => {
                   <Shield className="w-7 h-7" />
                 </div>
                 <h3 className="text-xl md:text-2xl font-bold text-on-surface mb-3 leading-tight">
-                  Giám sát an ninh cảm biến 24/7
+                  Giám sát cửa từng ô tủ 24/7
                 </h3>
                 <p className="text-sm text-secondary leading-relaxed">
-                  Cảm biến hồng ngoại phát hiện vật thể bên trong ô tủ, ngăn chặn tình trạng quên đồ. Cảm biến gia tốc rung chấn cảnh báo lập tức nếu có tác động cạy phá.
+                  Mỗi ô tủ có cảm biến cửa báo trạng thái đóng hoặc mở. Hệ thống chỉ xác nhận gửi đồ hoặc lấy đồ khi cửa thật sự đã mở rồi đóng, và ghi lại mọi sự kiện cửa để nhân viên kiểm tra khi có sự cố.
                 </p>
               </div>
               <div className="mt-6 pt-4 border-t border-outline-variant/30 flex items-center gap-2 text-sm font-bold text-primary">
                 <AlertCircle className="w-4 h-4" />
-                <span>Kết nối trực tiếp trung tâm bảo vệ khu vực</span>
+                <span>Sự kiện cửa được ghi lại theo thời gian thực</span>
               </div>
             </div>
 

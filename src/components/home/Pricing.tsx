@@ -41,7 +41,7 @@ const Pricing = () => {
         'Cổng sạc pin dự phòng tích hợp trong tủ',
         'Bảo hiểm hành lý theo từng đơn',
         'Mở tủ không giới hạn số lần',
-        'Cảm biến chống cạy cửa 24/7',
+        'Cảm biến đóng/mở cửa từng ô tủ',
       ],
       popular: true,
       color: 'primary',
