@@ -61,7 +61,7 @@ const Hero = () => {
 
   const valueProps = [
     { icon: Zap, text: 'Nhận tủ trong 30s', color: 'text-amber-500', bg: 'bg-amber-50' },
-    { icon: Shield, text: 'Bảo hiểm 100% đồ đạc', color: 'text-blue-600', bg: 'bg-blue-50' },
+    { icon: Shield, text: 'Có bảo hiểm hành lý', color: 'text-blue-600', bg: 'bg-blue-50' },
     { icon: Wifi, text: 'Mở tủ Offline chuẩn JWS', color: 'text-emerald-600', bg: 'bg-emerald-50' },
     { icon: RotateCw, text: 'Hoàn tiền linh hoạt', color: 'text-indigo-600', bg: 'bg-indigo-50' },
   ];
@@ -227,7 +227,7 @@ const Hero = () => {
             </div>
             <div className="flex items-center gap-2">
               <Shield className="w-4 h-4 text-primary" />
-              <span>Bảo hiểm lên tới 20 triệu</span>
+              <span>Bảo hiểm hành lý theo từng đơn</span>
             </div>
             <div className="flex items-center gap-2">
               <Wifi className="w-4 h-4 text-primary" />
