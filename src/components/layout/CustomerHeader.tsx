@@ -151,7 +151,7 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                                 onClick={() => setUserMenuOpen(prev => !prev)}
                                 className="flex items-center gap-2.5 p-1.5 pl-2.5 rounded-xl hover:bg-surface-container-low transition-colors border border-transparent hover:border-surface-container cursor-pointer"
                             >
-                                <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs shadow-xs overflow-hidden">
+                                <div className="w-8 h-8 rounded-full bg-primary-container text-white flex items-center justify-center font-bold text-xs shadow-xs overflow-hidden">
                                     {user.avatarUrl ? (
                                         <img
                                             src={resolveAssetUrl(user.avatarUrl)}

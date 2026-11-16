@@ -85,11 +85,8 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
     return (
         <div className="min-h-screen flex bg-surface-container-low font-sans">
             {/* LEFT SIDE - Visual Branding */}
-            <aside className="hidden lg:flex lg:w-[52%] relative overflow-hidden" style={{background: 'linear-gradient(135deg, #0f2977 0%, #1a4ac4 40%, #2563eb 70%, #3b82f6 100%)'}}>
+            <aside className="hidden lg:flex lg:w-[52%] relative overflow-hidden" style={{background: '#0f2977'}}>
                 {/* Ambient blobs */}
-                <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full opacity-20" style={{background: 'radial-gradient(circle, #60a5fa 0%, transparent 70%)'}}></div>
-                <div className="absolute -bottom-40 -left-20 w-[450px] h-[450px] rounded-full opacity-15" style={{background: 'radial-gradient(circle, #a78bfa 0%, transparent 70%)'}}></div>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-5" style={{background: 'radial-gradient(circle, #ffffff 0%, transparent 70%)'}}></div>
 
                 {/* Grid overlay */}
                 <div className="absolute inset-0 grid-pattern opacity-10"></div>
@@ -115,7 +112,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                         </div>
                         <h1 className="text-4xl xl:text-5xl font-extrabold text-white leading-[1.1] tracking-tight mb-5">
                             Chào mừng<br />
-                            <span style={{background: 'linear-gradient(90deg, #93c5fd, #c4b5fd)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
+                            <span style={{color: '#93c5fd'}}>
                                 trở lại!
                             </span>
                         </h1>
@@ -149,7 +146,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                             "SmartLocker giúp chuyến công tác của tôi nhẹ nhàng hơn rất nhiều. Mở tủ trong tích tắc!"
                         </p>
                         <div className="flex items-center gap-2.5 mt-3">
-                            <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{background: 'linear-gradient(135deg, #a78bfa, #60a5fa)'}}>
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{background: '#60a5fa'}}>
                                 TM
                             </div>
                             <div>
@@ -313,7 +310,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                                 disabled={isLoading}
                                 className="w-full h-12 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2"
                                 style={{
-                                    background: isLoading ? '#93c5fd' : 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+                                    background: isLoading ? '#93c5fd' : '#2563eb',
                                     color: 'white',
                                     boxShadow: isLoading ? 'none' : '0 4px 15px rgba(37, 99, 235, 0.35)',
                                 }}

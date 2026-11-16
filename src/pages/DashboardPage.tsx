@@ -291,7 +291,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                             <div className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full bg-secondary-container opacity-30 blur-2xl pointer-events-none" />
 
                             <div className="relative z-10 flex items-center gap-4">
-                                <div className="w-14 h-14 rounded-full bg-primary text-white flex items-center justify-center font-bold text-lg overflow-hidden shrink-0">
+                                <div className="w-14 h-14 rounded-full bg-primary-container text-white flex items-center justify-center font-bold text-lg overflow-hidden shrink-0">
                                     {user.avatarUrl ? (
                                         <img
                                             src={resolveAssetUrl(user.avatarUrl)}

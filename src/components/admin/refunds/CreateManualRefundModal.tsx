@@ -241,7 +241,7 @@ export default function CreateManualRefundModal({
         <ModalOverlay onClose={onClose}>
             <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden">
                 {/* Header */}
-                <div className="px-6 py-4 bg-gradient-to-r from-purple-700 to-indigo-600 text-white flex items-center justify-between">
+ <div className="px-6 py-4 bg-primary-container text-white flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center">
                             <RotateCcw className="w-5 h-5" />

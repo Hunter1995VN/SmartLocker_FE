@@ -209,7 +209,7 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
     <ModalOverlay onClose={onClose}>
       <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100 max-h-[92vh] flex flex-col">
         {/* Top Header Banner */}
-        <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 text-white p-5 sm:p-6 shrink-0 relative overflow-hidden">
+ <div className="bg-primary-container text-white p-5 sm:p-6 shrink-0 relative overflow-hidden">
           {/* Subtle background glow */}
           <div className="absolute -top-12 -right-12 w-40 h-40 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
 
@@ -361,7 +361,7 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
           <button
             onClick={handleDownloadPass}
             disabled={!ticket || isDownloading}
-            className="w-full sm:flex-1 py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-md shadow-blue-500/20 flex items-center justify-center gap-2 transition-all active:scale-[0.99] disabled:opacity-50 cursor-pointer"
+ className="w-full sm:flex-1 py-3 px-4 bg-primary-container hover:bg-on-primary-fixed-variant text-white rounded-xl text-xs sm:text-sm font-bold shadow-md shadow-blue-500/20 flex items-center justify-center gap-2 transition-all active:scale-[0.99] disabled:opacity-50 cursor-pointer"
           >
             {isDownloading ? (
               <>

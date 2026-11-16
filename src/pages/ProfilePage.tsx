@@ -409,7 +409,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
 
                                 <div className="flex flex-col items-center text-center">
-                                    <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-primary to-[#3b82f6] text-white flex items-center justify-center font-bold text-3xl shadow-md border-4 border-white mb-4 overflow-hidden">
+ <div className="w-24 h-24 rounded-full bg-primary-container text-white flex items-center justify-center font-bold text-3xl shadow-md border-4 border-white mb-4 overflow-hidden">
                                         {profile.avatarUrl ? (
                                             <img
                                                 src={resolveAssetUrl(profile.avatarUrl)}
@@ -594,7 +594,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                         <button
                                             type="submit"
                                             disabled={updatingProfile}
-                                            className="px-6 py-2.5 bg-primary hover:bg-[#003896] text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-blue-500/15 disabled:opacity-60 flex items-center gap-2 cursor-pointer"
+                                            className="px-6 py-2.5 bg-primary-container hover:bg-[#003896] text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-blue-500/15 disabled:opacity-60 flex items-center gap-2 cursor-pointer"
                                         >
                                             <Save className="w-3.5 h-3.5" />
                                             <span>{updatingProfile ? 'Đang lưu...' : 'Lưu thay đổi'}</span>
@@ -707,8 +707,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                         {/* Financial Standing Banner */}
                         <div className={`p-6 sm:p-8 rounded-3xl border shadow-xs relative overflow-hidden ${
                             hasOverdueDebt
-                                ? 'bg-gradient-to-r from-rose-50 to-orange-50 border-rose-200'
-                                : 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200'
+ ? 'bg-error-container/40 border-rose-200'
+ : 'bg-tertiary-fixed/30 border-emerald-200'
                         }`}>
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                                 <div className="flex items-start gap-4">

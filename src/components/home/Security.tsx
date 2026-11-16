@@ -24,7 +24,7 @@ const Security = () => {
           {/* Bento Grid Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Card 1: Large (col-span-7) - Offline Token */}
-            <div className={`lg:col-span-7 bg-gradient-to-br from-primary-container via-primary to-primary rounded-3xl p-8 md:p-10 shadow-elevation-3 flex flex-col justify-between text-white relative overflow-hidden`}>
+ <div className={`lg:col-span-7 bg-primary-container rounded-3xl p-8 md:p-10 shadow-elevation-3 flex flex-col justify-between text-white relative overflow-hidden`}>
               {/* Decorative elements */}
               <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-32 translate-x-32"></div>
               <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-2xl translate-y-24 -translate-x-24"></div>
@@ -107,7 +107,7 @@ const Security = () => {
             </div>
 
             {/* Card 4: Large (col-span-7) - Refund */}
-            <div className={`lg:col-span-7 bg-gradient-to-br from-emerald-50 via-white to-blue-50 rounded-3xl p-8 md:p-10 border border-emerald-200/50 shadow-elevation-1 flex flex-col justify-between relative overflow-hidden`}>
+ <div className={`lg:col-span-7 bg-tertiary-fixed/30 rounded-3xl p-8 md:p-10 border border-emerald-200/50 shadow-elevation-1 flex flex-col justify-between relative overflow-hidden`}>
               <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-200/30 rounded-full blur-3xl"></div>
               
               <div className="relative z-10">

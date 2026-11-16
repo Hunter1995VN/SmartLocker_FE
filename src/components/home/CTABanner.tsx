@@ -16,7 +16,7 @@ const CTABanner = ({ onNavigate }: CTABannerProps) => {
       {/* CTA Banner Section */}
       <section className="py-20 md:py-28 relative overflow-hidden">
         {/* Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-container via-primary to-primary-fixed-dim"></div>
+ <div className="absolute inset-0 bg-primary-container"></div>
         
         {/* Decorative elements */}
         <div className="absolute -right-40 -top-40 w-[500px] h-[500px] bg-white/10 rounded-full blur-3xl pointer-events-none"></div>

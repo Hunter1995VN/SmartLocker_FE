@@ -75,7 +75,7 @@ const Hero = () => {
   return (
     <>
       {/* Hero Section - Improved */}
-      <section className="relative pt-12 pb-20 md:pt-20 md:pb-32 overflow-hidden bg-gradient-to-b from-surface-bright via-background to-background">
+ <section className="relative pt-12 pb-20 md:pt-20 md:pb-32 overflow-hidden bg-surface-bright">
         {/* Layered Background Effects */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[600px] bg-primary/8 rounded-full blur-3xl pointer-events-none -z-10"></div>
         <div className="absolute top-40 right-0 w-[500px] h-[500px] bg-primary-container/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
@@ -210,7 +210,7 @@ const Hero = () => {
                 </div>
                 <button 
                   type="submit"
-                  className="w-full sm:w-auto px-8 h-14 bg-primary-container hover:bg-primary active:bg-on-primary-fixed-variant text-on-primary rounded-xl text-base font-bold flex items-center justify-center gap-2 shadow-elevation-2 hover:shadow-elevation-3 transition-all active:scale-[0.98]"
+                  className="w-full sm:w-auto px-8 h-14 bg-primary-container hover:bg-on-primary-fixed-variant active:bg-on-primary-fixed-variant text-on-primary rounded-xl text-base font-bold flex items-center justify-center gap-2 shadow-elevation-2 hover:shadow-elevation-3 transition-all active:scale-[0.98]"
                 >
                   <Search className="w-5 h-5" />
                   <span>Tìm tủ trống ngay</span>
@@ -244,7 +244,7 @@ const Hero = () => {
             <div className="relative rounded-3xl overflow-hidden bg-white border border-outline-variant/40 shadow-elevation-4">
               <div className="relative aspect-video max-h-[560px]">
                 {/* Hero Image Placeholder với thiết kế đẹp */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary-container via-primary to-primary-fixed-dim">
+ <div className="absolute inset-0 bg-primary-container">
                   {/* Decorative circles */}
                   <div className="absolute top-10 left-10 w-40 h-40 rounded-full bg-white/10 blur-2xl"></div>
                   <div className="absolute bottom-10 right-10 w-60 h-60 rounded-full bg-white/5 blur-3xl"></div>

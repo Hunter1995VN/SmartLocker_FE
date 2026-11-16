@@ -578,7 +578,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
               </div>
 
               {/* KHUNG HIỂN THỊ MÃ VIETQR CHUẨN PAYOS */}
-              <div className="my-5 flex flex-col items-center justify-center p-5 bg-gradient-to-b from-slate-50 to-white rounded-2xl border border-slate-200">
+ <div className="my-5 flex flex-col items-center justify-center p-5 bg-surface-bright rounded-2xl border border-slate-200">
                 <div className="p-3.5 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center">
                   {vietQrImgUrl && !useFallbackQr ? (
                     <img
