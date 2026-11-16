@@ -114,7 +114,7 @@ export default function StationDetailPanel({
                     }`}
                 >
                     <MapPin className="w-4 h-4" />
-                    <span>1. Station Info & GPS</span>
+                    <span>1. Thông tin trạm & GPS</span>
                 </button>
 
                 <button

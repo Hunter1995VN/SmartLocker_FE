@@ -34,7 +34,7 @@ export default function CriticalTriageCard({
                         <span className="p-1.5 rounded-lg bg-rose-50 text-rose-600 border border-rose-200/60">
                             <ShieldAlert className="w-4 h-4" />
                         </span>
-                        <h2 className="text-sm font-bold text-slate-900 tracking-tight">Real-time Critical Triage</h2>
+                        <h2 className="text-sm font-bold text-slate-900 tracking-tight">Sự cố nghiêm trọng thời gian thực</h2>
                     </div>
 
                     <div className="flex items-center gap-1.5">
@@ -131,7 +131,7 @@ export default function CriticalTriageCard({
             {/* Footer Notice */}
             <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
                 <span className="text-xs">Cơ chế cứu hộ từ xa sẵn sàng qua phân hệ Incident Center</span>
-                <span className="text-xs font-semibold text-blue-600">Incident Triage v2.1</span>
+                <span className="text-xs font-semibold text-blue-600">Phân loại sự cố v2.1</span>
             </div>
         </div>
     );

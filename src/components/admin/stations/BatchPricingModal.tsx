@@ -1,5 +1,5 @@
 /**
- * AD-FE-03: UC-A04 — Batch Apply Pricing & Cancellation Refund Policies Modal
+ * AD-FE-03: UC-A04 — Áp dụng giá hàng loạt & Cancellation Refund Policies Modal
  * Modal cho phép Admin áp dụng bảng giá, phí phạt quá hạn và tỷ lệ hoàn tiền khi hủy đơn
  * hàng loạt (Batch Pricing) cho toàn bộ hoặc các trạm đang hoạt động.
  */

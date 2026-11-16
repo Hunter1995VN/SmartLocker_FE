@@ -63,7 +63,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // Step 2: Live PayOS VietQR payment state
+  // Bước 2: Live PayOS VietQR payment state
   const [paymentData, setPaymentData] = useState<CreateBookingResponse | null>(null);
   const [isCheckingPayment, setIsCheckingPayment] = useState<boolean>(false);
   const [isPaidSuccess, setIsPaidSuccess] = useState<boolean>(false);
@@ -138,7 +138,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
     setSelectedHours(val);
   };
 
-  // Step 1 -> Step 2: Create real extension payment via Backend & PayOS
+  // Step 1 -> Bước 2: Create real extension payment via Backend & PayOS
   const handleCreateExtensionPayment = async () => {
     if (isSubmitting) return;
     setErrorMsg(null);
@@ -180,7 +180,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
     }
   };
 
-  // Automatic polling while on Step 2 (VietQR screen)
+  // Automatic polling while on Bước 2 (VietQR screen)
   useEffect(() => {
     if (!isOpen || !paymentData || !bookingId || isPaidSuccess) return;
 
@@ -206,7 +206,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
     return () => clearInterval(interval);
   }, [isOpen, paymentData, bookingId, isPaidSuccess]);
 
-  // Manual verify button on Step 2
+  // Manual verify button on Bước 2
   const handleVerifyPaymentNow = async () => {
     if (!bookingId || !paymentData) return;
     setIsCheckingPayment(true);
@@ -239,7 +239,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
     : currentEndTime || 'Hôm nay';
 
   const sizeLabel =
-    size === 'S' ? 'Small (S)' : size === 'L' ? 'Large (L)' : 'Medium (M)';
+    size === 'S' ? 'Nhỏ (S)' : size === 'L' ? 'Lớn (L)' : 'Vừa (M)';
 
   const vietQrImgUrl =
     paymentData?.bin && paymentData?.accountNumber
@@ -281,7 +281,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            aria-label="Close modal"
+            aria-label="Đóng hộp thoại"
             className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
@@ -307,7 +307,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
               </div>
             </div>
             <div className="flex sm:flex-col items-center sm:items-end justify-between border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-200/60 shrink-0">
-              <span className="text-xs text-slate-500 font-medium">Current Expiration</span>
+              <span className="text-xs text-slate-500 font-medium">Hết hạn hiện tại</span>
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold mt-0.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
                 <span>{displayCurrentExpiry}</span>
@@ -352,7 +352,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                     ) : vietQrImgUrl ? (
                       <img loading="lazy" decoding="async"
                         src={vietQrImgUrl}
-                        alt="VietQR Extension"
+                        alt="Gia hạn qua VietQR"
                         className="w-40 h-40 object-contain"
                       />
                     ) : (
@@ -449,10 +449,10 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
               <div>
                 <div className="flex items-center justify-between mb-2.5">
                   <label className="block text-xs font-bold text-slate-900 uppercase tracking-wider">
-                    Select Extension Duration
+                    Chọn thời lượng gia hạn
                   </label>
                   <span className="text-xs text-slate-500">
-                    Max allowed: {maxHours}h total (up to +{maxAdditionalHours}h)
+                    Tối đa: {maxHours} giờ (thêm tối đa +{maxAdditionalHours} giờ)
                   </span>
                 </div>
 
@@ -566,7 +566,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                 </div>
 
                 <div className="pt-2.5 border-t border-slate-100 flex items-baseline justify-between">
-                  <span className="text-sm font-bold text-slate-900">Total Additional Fee</span>
+                  <span className="text-sm font-bold text-slate-900">Tổng phụ phí gia hạn</span>
                   <div className="text-right">
                     <span className="text-xl font-extrabold text-blue-600 tracking-tight">
                       {formatCurrency(totalPayable)} VND
@@ -648,13 +648,13 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Generating PayOS VietQR...</span>
+                    <span>Đang tạo mã VietQR PayOS...</span>
                   </>
                 ) : (
                   <>
                     <QrCode className="w-4 h-4" />
                     <span>
-                      Proceed to Payment ({formatCurrency(totalPayable)} VND)
+                      Tiếp tục thanh toán ({formatCurrency(totalPayable)} VND)
                     </span>
                   </>
                 )}

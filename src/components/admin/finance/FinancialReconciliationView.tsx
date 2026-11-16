@@ -449,7 +449,7 @@ export default function FinancialReconciliationView({
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-slate-50/90 border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-500">
-                                <th className="py-3 px-4">OrderCode (PayOS)</th>
+                                <th className="py-3 px-4">Mã đơn (PayOS)</th>
                                 <th className="py-3 px-4">Đơn đặt & Khách hàng</th>
                                 <th className="py-3 px-4">Loại phí</th>
                                 <th className="py-3 px-4">Số tiền</th>

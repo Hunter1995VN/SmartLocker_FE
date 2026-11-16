@@ -1,5 +1,5 @@
 /**
- * Nhật ký truy vết an ninh toàn hệ thống (Audit Logs)
+ * Nhật ký truy vết an ninh toàn hệ thống (Nhật ký kiểm tra)
  * Giao diện tra cứu bất biến (Immutable Security Audit Trail) cho Admin & Staff.
  */
 import { useState, useEffect, useCallback } from 'react';
@@ -214,7 +214,7 @@ export default function AuditLogView() {
                     <div>
                         <div className="flex items-center gap-2 flex-wrap">
                             <h1 className="text-lg font-extrabold text-slate-900">
-                                Nhật Ký Truy Vết Hệ Thống (Audit Logs)
+                                Nhật Ký Truy Vết Hệ Thống (Nhật ký kiểm tra)
                             </h1>
                             <span className="px-2 py-0.5 text-xs font-bold uppercase tracking-wider rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                                 BẢN GHI BẤT BIẾN

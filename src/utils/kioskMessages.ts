@@ -353,7 +353,27 @@ const messages = {
   , payFee: ['Thanh toán phụ phí', 'Pay overdue fee', '超過料金を支払う', '초과 요금 결제', '支付超时费用'],
   paymentPageQr: ['Quét mã để mở trang thanh toán. Chờ hệ thống xác minh trước khi lấy đồ.', 'Scan to open the payment page. Wait for server confirmation before pickup.', '読み取って支払いページを開き、確認が完了するまでお待ちください。', '스캔하여 결제 페이지를 여세요. 서버 확인 후 찾을 수 있습니다.', '扫码打开付款页面，等待系统确认后再取件。'],
   confirmPickupOffline: ['Xác nhận đã lấy hành lý (Ngoại tuyến)', 'Confirm luggage collected (offline)', '荷物の受け取りを確認（オフライン）', '짐 수령 확인 (오프라인)', '确认已取行李（离线）'],
-  tabletTitle: ['Máy tính bảng đặt tủ tại trạm', 'Station booking tablet', 'ステーション予約タブレット', '보관소 예약 태블릿', '站点预订平板']
+  tabletTitle: ['Máy tính bảng đặt tủ tại trạm', 'Station booking tablet', 'ステーション予約タブレット', '보관소 예약 태블릿', '站点预订平板'],
+  onlineMode: ['Trực tuyến', 'Online', 'オンライン', '온라인', '在线'],
+  offlineMode: ['Ngoại tuyến', 'Offline', 'オフライン', '오프라인', '离线'],
+  previous: ['Trước', 'Previous', '前へ', '이전', '上一个'],
+  next: ['Sau', 'Next', '次へ', '다음', '下一个'],
+  offlineToggle: ['Bật/tắt chế độ ngoại tuyến (lấy hành lý khi mất Internet)', 'Toggle offline mode (collect luggage without Internet)', 'オフラインモード切替（ネット不要で荷物を受け取り）', '오프라인 모드 전환(인터넷 없이 짐 찾기)', '切换离线模式（无网络取行李）'],
+  compartmentSize: ['KHOANG CỠ', 'COMPARTMENT SIZE', 'ロッカーサイズ', '보관함 크기', '格口尺寸'],
+  openShort: ['Mở', 'Open', '開', '열림', '开'],
+  tapDoorToOpen: ['Chạm cánh tủ 3D để mở', 'Tap the 3D door to open', '3Dの扉をタップして開く', '3D 문을 눌러 열기', '点击3D柜门开启'],
+  doorOpenReady: ['Cửa 3D đang mở • Khoang sẵn sàng', '3D door open • Compartment ready', '3Dドア開放 • 利用可能', '3D 문 열림 • 사용 가능', '3D柜门已开 • 格口就绪'],
+  closeDoor: ['✕ Đóng cửa', '✕ Close door', '✕ 閉じる', '✕ 문 닫기', '✕ 关门'],
+  volumeLoad: ['Dung tích / Tải', 'Volume / Load', '容量 / 荷重', '용량 / 하중', '容量 / 载重'],
+  unitPrice: ['Đơn giá', 'Rate', '料金', '요금', '单价'],
+  suitableFor: ['✓ Phù hợp:', '✓ Suitable for:', '✓ 対応:', '✓ 적합:', '✓ 适合:'],
+  tapDoorTip: ['💡 Chạm vào cánh tủ S, M hoặc L để mở cửa 3D và xem thông tin khoang', '💡 Tap door S, M or L to open the 3D door and see compartment info', '💡 S・M・Lの扉をタップして3Dドアを開き詳細を表示', '💡 S, M, L 문을 눌러 3D 문을 열고 정보를 확인하세요', '💡 点击S、M或L柜门开启3D门并查看格口信息'],
+  literUnit: ['Lít', 'L', 'L', 'L', '升'],
+  perHour: ['/giờ', '/hr', '/時間', '/시간', '/小时'],
+  perDay: ['/ngày', '/day', '/日', '/일', '/天'],
+  latchSafe: ['Chốt điện an toàn', 'Safe electric latch', '安全な電気ロック', '안전 전기 걸쇠', '安全电控锁'],
+  scratchCushion: ['Đệm chống trầy xước', 'Scratch-proof cushion', '傷防止クッション', '스크래치 방지 쿠션', '防刮垫'],
+  shockAssist: ['Trợ lực giảm chấn', 'Shock-absorbing assist', '衝撃吸収アシスト', '충격 흡수 보조', '缓冲助力'],
 } as const;
 
 export const kioskLocales: Record<KioskLanguage, string> = { VI: 'vi-VN', EN: 'en-US', JA: 'ja-JP', KO: 'ko-KR', ZH: 'zh-CN' };

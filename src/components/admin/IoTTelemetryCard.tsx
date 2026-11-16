@@ -95,7 +95,7 @@ export default function IoTTelemetryCard({
                             <div className="flex items-center justify-between">
                                 <span className="flex items-center gap-2 text-slate-600">
                                     <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                                    <span>Online Nodes</span>
+                                    <span>Thiết bị đang kết nối</span>
                                 </span>
                                 <span className="font-bold text-slate-900">{onlineDevices}</span>
                             </div>
@@ -103,7 +103,7 @@ export default function IoTTelemetryCard({
                             <div className="flex items-center justify-between">
                                 <span className="flex items-center gap-2 text-slate-600">
                                     <span className="w-2 h-2 rounded-full bg-rose-500" />
-                                    <span>Offline Disconnected</span>
+                                    <span>Thiết bị mất kết nối</span>
                                 </span>
                                 <span className={`font-bold ${offlineDevicesCount > 0 ? 'text-rose-600' : 'text-slate-900'}`}>
                                     {offlineDevicesCount}

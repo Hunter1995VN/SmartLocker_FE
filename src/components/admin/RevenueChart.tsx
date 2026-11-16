@@ -1,7 +1,7 @@
 /**
  * AD-FE-02: UC-A02 — Operations Dashboard
  * Component biểu đồ doanh thu tương tác SVG phong cách sáng (Light enterprise).
- * Đồng bộ phong cách thiết kế với mockup SmartLocker Operations Control.
+ * Đồng bộ phong cách thiết kế với mockup SmartLocker Điều hành trạm.
  */
 import { useState, useId } from 'react';
 import { TrendingUp, AlertCircle, RefreshCw, Calendar, DollarSign } from 'lucide-react';

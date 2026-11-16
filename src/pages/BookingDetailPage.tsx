@@ -206,7 +206,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
       const minutes = Math.floor(holdRemaining / 60000);
       const seconds = Math.floor((holdRemaining % 60000) / 1000);
 
-      const holdExpiresText = new Date(holdExpiresTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      const holdExpiresText = new Date(holdExpiresTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
 
       return {
         isHoldPeriod: true,
@@ -224,8 +224,8 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
       : (booking?.startAt ? new Date(parseServerTime(booking.startAt)).getTime() : now);
     const endTime = booking?.endAt ? new Date(parseServerTime(booking.endAt)).getTime() : startTime + duration * 3600000;
 
-    const startedText = new Date(startTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date(startTime).toLocaleDateString('en-US');
-    const expiresText = new Date(endTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date(endTime).toLocaleDateString('en-US');
+    const startedText = new Date(startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date(startTime).toLocaleDateString('vi-VN');
+    const expiresText = new Date(endTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date(endTime).toLocaleDateString('vi-VN');
 
     if (now >= endTime) {
       return { isHoldPeriod: false, remainingText: '0m remaining (Overdue)', progress: 100, startedText, expiresText };
@@ -312,8 +312,8 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
            <div className="p-4 rounded-xl bg-red-50 border border-red-200 flex items-start gap-3.5 shadow-xs mb-4">
              <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5 shrink-0" />
              <div className="flex-1">
-               <p className="text-sm text-red-900 font-bold">Locker Overdue</p>
-               <p className="text-sm text-red-800 mt-0.5">This locker is currently overdue. Current overdue fee: <strong>{formatCurrency(booking.currentOverdueFee || 0)} VND</strong>.</p>
+               <p className="text-sm text-red-900 font-bold">Tủ đã quá hạn</p>
+               <p className="text-sm text-red-800 mt-0.5">Tủ này đang quá hạn. Phí quá hạn hiện tại: <strong>{formatCurrency(booking.currentOverdueFee || 0)} VND</strong>.</p>
              </div>
            </div>
         )}
@@ -322,9 +322,9 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
         <section className="space-y-3">
           {/* Breadcrumb trail */}
           <nav className="flex items-center gap-2 text-on-surface-variant text-xs">
-            <button onClick={() => onNavigate('home')} className="link-target hover:text-primary transition-colors cursor-pointer">Home</button>
+            <button onClick={() => onNavigate('home')} className="link-target hover:text-primary transition-colors cursor-pointer">Trang chủ</button>
             <ChevronRight className="w-3.5 h-3.5 text-outline" />
-            <button onClick={() => onNavigate('my-bookings')} className="link-target hover:text-primary transition-colors cursor-pointer">My Bookings</button>
+            <button onClick={() => onNavigate('my-bookings')} className="link-target hover:text-primary transition-colors cursor-pointer">Đơn đặt chỗ của tôi</button>
             <ChevronRight className="w-3.5 h-3.5 text-outline" />
             <span className="text-on-surface font-semibold">Booking #{orderId}</span>
           </nav>
@@ -384,7 +384,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                 <DoorOpen className="w-6 h-6" />
               </div>
               <div>
-                <div className="text-xs uppercase tracking-wider text-secondary font-bold">Assigned Bay</div>
+                <div className="text-xs uppercase tracking-wider text-secondary font-bold">Ngăn tủ được gán</div>
                 <div className="text-lg text-primary font-bold">{bayCode}</div>
                 <div className="text-xs text-on-surface-variant">
                   {size === 'S' ? 'Cỡ nhỏ (S)' : size === 'M' ? 'Cỡ vừa (M)' : 'Cỡ lớn (L)'}
@@ -410,7 +410,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <Key className="w-5 h-5 text-primary" />
-                    <h2 className="text-xl font-bold text-on-surface">Digital Access Pass &amp; Unlock Key</h2>
+                    <h2 className="text-xl font-bold text-on-surface">Vé số &amp; mã mở tủ</h2>
                   </div>
                   <p className="text-sm text-on-surface-variant">
                     {isLockerAssigned
@@ -453,13 +453,13 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                 {/* Optical Scanner Cue */}
                 <div className="flex items-center justify-center gap-2 text-on-surface-variant text-xs pt-1">
                   <QrCode className="w-4 h-4 text-primary" />
-                  <span>Hold 10–15 cm under the Station Kiosk optical scanner</span>
+                  <span>Đưa mã cách camera kiosk 10–15 cm</span>
                 </div>
 
                 {/* Real-time Refresh Pulse Indicator */}
                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-surface-container-low rounded-full text-xs font-medium text-secondary">
                   <span className="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span>
-                  <span>Token refreshes in <strong className="text-on-surface">{tokenSeconds}s</strong> (Anti-screenshot security)</span>
+                  <span>Mã đổi sau <strong className="text-on-surface">{tokenSeconds}s</strong> (Anti-screenshot security)</span>
                 </div>
               </div>
 
@@ -492,12 +492,12 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                     ) : (
                       <>
                         <Copy className="w-4 h-4 text-primary" />
-                        <span>Copy Code</span>
+                        <span>Sao chép mã</span>
                       </>
                     )}
                   </button>
                 </div>
-                <p className="text-center text-sm text-on-surface-variant">Tap &quot;Unlock Locker&quot; on the terminal screen, then type this code.</p>
+                <p className="text-center text-sm text-on-surface-variant">Bấm &quot;Mở tủ&quot; trên màn hình kiosk, rồi nhập mã này.</p>
                 {copyFailed && <p role="status">Không sao chép được. Bạn có thể nhập 8 số đang hiển thị tại Kiosk.</p>}
                 {ticketEligible && status === 'CONFIRMED' && !validPin && <div className="text-sm space-y-2">
                   <p>Vé chưa có PIN 8 số hợp lệ. Thay vé cũ sẽ làm PIN và QR online cũ hết hiệu lực.</p>
@@ -641,14 +641,14 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                   className="h-11 px-3 bg-white hover:bg-surface-container-low border border-outline-variant rounded-xl text-xs text-on-surface font-medium flex items-center justify-center gap-1.5 transition-colors shadow-xs cursor-pointer"
                 >
                   <Navigation className="w-4 h-4 text-primary" />
-                  <span>Terminal Route</span>
+                  <span>Đường đến kiosk</span>
                 </button>
                 <a
                   href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}
                   className="h-11 px-3 bg-white hover:bg-surface-container-low border border-outline-variant rounded-xl text-xs text-on-surface font-medium flex items-center justify-center gap-1.5 transition-colors shadow-xs"
                 >
                   <Headphones className="w-4 h-4 text-secondary" />
-                  <span>Help: 1900 1234</span>
+                  <span>Hỗ trợ: 1900 1234</span>
                 </a>
               </div>
             </div>
@@ -710,7 +710,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                   <span className="font-mono font-semibold text-primary">{orderId}</span>
                 </div>
                 <div className="py-2.5 flex justify-between">
-                  <span className="text-on-surface-variant">Total Rate Billed</span>
+                  <span className="text-on-surface-variant">Tổng tiền đã tính</span>
                   <span className="text-on-surface font-bold">{formatCurrency(amount)} VND ({booking.payments?.some(p => p.kind === 'BASE' && p.status === 'PAID') ? 'Đã thanh toán' : 'Chưa thanh toán'})</span>
                 </div>
               </div>
@@ -779,7 +779,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
             <span className="text-base text-primary font-bold">SmartLocker SLMS</span>
             <span className="hidden sm:inline-block text-outline-variant">•</span>
             <p className="text-sm text-on-surface-variant">
-              © 2025 SmartLocker Systems Inc. Telemetry &amp; Cryptographic Access Active. All rights reserved.
+              © {new Date().getFullYear()} SmartLocker. Bản quyền thuộc về SmartLocker.
             </p>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-on-surface-variant">
