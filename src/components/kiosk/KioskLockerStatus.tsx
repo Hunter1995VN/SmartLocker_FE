@@ -34,14 +34,14 @@ export default function KioskLockerStatus({ status, lang, activeLockerId }: {
 
   return <section aria-label={t.title} className="w-full p-5 space-y-4">
     <header className="flex items-center justify-between gap-3">
-      <h2 className="text-lg font-black">{t.title}</h2>
+      <h2 className="text-lg font-extrabold">{t.title}</h2>
       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${online ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`}>
         <span className={`w-2 h-2 rounded-full ${online ? 'bg-emerald-500 animate-pulse motion-reduce:animate-none' : 'bg-amber-500'}`} />
         {label(status?.connectivityStatus || 'UNKNOWN')}
       </span>
     </header>
 
-    <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-slate-400" aria-hidden="true">
+    <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-slate-500" aria-hidden="true">
       {(['free', 'booked', 'inUse', 'blocked'] as const).map(tone => <li key={tone} className="flex items-center gap-1.5">
         <span className={`w-3 h-3 rounded-[4px] ${toneStyle[tone].dot}`} />{t[tone]}
       </li>)}
@@ -63,7 +63,7 @@ export default function KioskLockerStatus({ status, lang, activeLockerId }: {
 
       return <article key={size} style={{ animationDelay: `${200 + index * 70}ms` }}
         className="kiosk-enter rounded-2xl border border-slate-200 dark:border-slate-800 p-3.5 flex gap-3.5 items-start">
-        <span className={`shrink-0 grid place-items-center w-12 h-12 rounded-xl text-2xl font-black ${busy ? 'bg-sky-600 text-white' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200'}`}>
+        <span className={`shrink-0 grid place-items-center w-12 h-12 rounded-xl text-2xl font-extrabold ${busy ? 'bg-sky-600 text-white' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200'}`}>
           {size}
         </span>
 
@@ -72,7 +72,7 @@ export default function KioskLockerStatus({ status, lang, activeLockerId }: {
             {chips.map(chip => <span key={chip.tone} title={chip.title}
               className={`inline-flex items-center gap-1.5 pl-1.5 pr-2.5 py-0.5 rounded-full text-sm font-bold tabular-nums ${chip.n > 0 ? 'bg-slate-100 dark:bg-slate-800' : 'opacity-40'}`}>
               <span className={`w-2.5 h-2.5 rounded-full ${toneStyle[chip.tone].dot}`} />
-              {chip.n}<span className="font-medium text-slate-500 dark:text-slate-400">{t[chip.tone]}</span>
+              {chip.n}<span className="font-medium text-slate-500 dark:text-slate-500">{t[chip.tone]}</span>
             </span>)}
           </div>
 
@@ -93,7 +93,7 @@ export default function KioskLockerStatus({ status, lang, activeLockerId }: {
                 </span>;
               })}
             </div>
-            : <p className="text-xs text-slate-400">{t.noLockers}</p>}
+            : <p className="text-xs text-slate-500">{t.noLockers}</p>}
         </div>
       </article>;
     })}

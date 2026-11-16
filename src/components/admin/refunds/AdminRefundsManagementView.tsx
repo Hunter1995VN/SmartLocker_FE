@@ -141,7 +141,7 @@ export default function AdminRefundsManagementView() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+              <tr className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
                 <th className="py-3 px-4">Booking / Reference</th>
                 <th className="py-3 px-4">Customer</th>
                 <th className="py-3 px-4">Station &amp; Compartment</th>
@@ -154,17 +154,17 @@ export default function AdminRefundsManagementView() {
             <tbody className="divide-y divide-slate-100">
               {isLoading ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-400">
+                  <td colSpan={7} className="py-12 text-center text-slate-500">
                     <RefreshCw className="w-6 h-6 animate-spin mx-auto text-blue-600 mb-2" />
                     <p className="font-medium">Loading refund requests...</p>
                   </td>
                 </tr>
               ) : refunds.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-400">
+                  <td colSpan={7} className="py-12 text-center text-slate-500">
                     <ShieldCheck className="w-8 h-8 mx-auto text-slate-300 mb-2" />
                     <p className="font-semibold text-slate-600">No refund requests found</p>
-                    <p className="text-[11px]">There are no cancellation refund records matching current criteria.</p>
+                    <p className="text-xs">There are no cancellation refund records matching current criteria.</p>
                   </td>
                 </tr>
               ) : (
@@ -177,30 +177,30 @@ export default function AdminRefundsManagementView() {
                     <tr key={ref.paymentId} className="hover:bg-slate-50/70 transition-colors">
                       <td className="py-3.5 px-4">
                         <span className="font-mono font-bold text-slate-900 block">#{ref.bookingCode}</span>
-                        <span className="text-[10px] text-slate-400 font-mono block">{ref.orderCode}</span>
-                        <span className="text-[10px] text-slate-400 block mt-0.5">
+                        <span className="text-xs text-slate-500 font-mono block">{ref.orderCode}</span>
+                        <span className="text-xs text-slate-500 block mt-0.5">
                           {new Date(ref.requestedAt).toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })}
                         </span>
                       </td>
 
                       <td className="py-3.5 px-4">
                         <span className="font-semibold text-slate-900 block">{ref.userFullName}</span>
-                        <span className="text-[11px] text-slate-500 block">{ref.userEmail}</span>
+                        <span className="text-xs text-slate-500 block">{ref.userEmail}</span>
                         {ref.userPhoneNumber && (
-                          <span className="text-[10px] text-slate-400 block">{ref.userPhoneNumber}</span>
+                          <span className="text-xs text-slate-500 block">{ref.userPhoneNumber}</span>
                         )}
                       </td>
 
                       <td className="py-3.5 px-4">
                         <span className="font-medium text-slate-800 block truncate max-w-[180px]">{ref.stationName}</span>
-                        <span className="text-[11px] text-slate-500 font-mono block">{ref.lockerCode}</span>
+                        <span className="text-xs text-slate-500 font-mono block">{ref.lockerCode}</span>
                       </td>
 
                       <td className="py-3.5 px-4">
                         <span className="font-mono font-extrabold text-rose-600 text-sm block">
                           {formatVnd(ref.refundAmount)}
                         </span>
-                        <span className="text-[10px] text-slate-400 block">
+                        <span className="text-xs text-slate-500 block">
                           Paid: {formatVnd(ref.originalAmount)}
                         </span>
                       </td>
@@ -209,13 +209,13 @@ export default function AdminRefundsManagementView() {
                         <span className="text-slate-700 block truncate font-medium" title={ref.cancellationReason}>
                           {ref.cancellationReason || 'No reason specified'}
                         </span>
-                        <span className="text-[10px] text-slate-400 block">
+                        <span className="text-xs text-slate-500 block">
                           Policy: {ref.cancelPolicyRate ? `${ref.cancelPolicyRate * 100}% Refund` : 'Custom'}
                         </span>
                       </td>
 
                       <td className="py-3.5 px-4">
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${
                           isApproved
                             ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                             : isPending
@@ -224,7 +224,7 @@ export default function AdminRefundsManagementView() {
                         }`}>
                           {isPending && <Clock className="w-3 h-3 animate-spin text-amber-600" />}
                           {isApproved && <CheckCircle2 className="w-3 h-3 text-emerald-600" />}
-                          {isRejected && <XCircle className="w-3 h-3 text-slate-400" />}
+                          {isRejected && <XCircle className="w-3 h-3 text-slate-500" />}
                           <span>{isApproved ? 'Approved' : isPending ? 'Pending' : 'Rejected'}</span>
                         </span>
                       </td>
@@ -235,7 +235,7 @@ export default function AdminRefundsManagementView() {
                             <button
                               onClick={() => handleApprove(ref.paymentId, ref.bookingCode)}
                               disabled={actionInProgressId === ref.paymentId}
-                              className="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors disabled:opacity-50"
+                              className="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 cursor-pointer transition-colors disabled:opacity-50"
                               title="Approve refund"
                             >
                               <Check className="w-3 h-3" />
@@ -244,7 +244,7 @@ export default function AdminRefundsManagementView() {
                             <button
                               onClick={() => handleReject(ref.paymentId, ref.bookingCode)}
                               disabled={actionInProgressId === ref.paymentId}
-                              className="px-2.5 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors disabled:opacity-50"
+                              className="px-2.5 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs flex items-center gap-1 cursor-pointer transition-colors disabled:opacity-50"
                               title="Reject refund"
                             >
                               <X className="w-3 h-3" />
@@ -252,7 +252,7 @@ export default function AdminRefundsManagementView() {
                             </button>
                           </div>
                         ) : (
-                          <span className="text-[11px] text-slate-400 italic">Completed</span>
+                          <span className="text-xs text-slate-500 italic">Completed</span>
                         )}
                       </td>
                     </tr>

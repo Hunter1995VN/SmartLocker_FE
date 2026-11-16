@@ -183,7 +183,7 @@ export default function VerifyOtpPage({ onNavigate, email }: VerifyOtpPageProps)
                     {error && (
                         <div className="mb-5 p-3 rounded-xl bg-red-50 border border-red-200 flex items-start gap-2">
                             <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-                            <p className="text-xs text-red-700">{error}</p>
+                            <p className="text-sm text-red-700">{error}</p>
                         </div>
                     )}
 
@@ -209,7 +209,7 @@ export default function VerifyOtpPage({ onNavigate, email }: VerifyOtpPageProps)
                                 />
                             ))}
                         </div>
-                        <p className="text-xs text-secondary text-center mt-3">
+                        <p className="text-sm text-secondary text-center mt-3">
                             Dán trực tiếp hoặc nhập từng số. Mã gồm 6 chữ số.
                         </p>
                     </div>
@@ -250,7 +250,7 @@ export default function VerifyOtpPage({ onNavigate, email }: VerifyOtpPageProps)
                                 Gửi lại mã OTP
                             </button>
                         )}
-                        <p className="text-xs text-secondary mt-2">
+                        <p className="text-sm text-secondary mt-2">
                             Không nhận được email? Kiểm tra hộp thư rác (Spam).
                         </p>
                     </div>
@@ -258,7 +258,7 @@ export default function VerifyOtpPage({ onNavigate, email }: VerifyOtpPageProps)
 
                 {/* Help */}
                 <div className="mt-6 text-center">
-                    <p className="text-xs text-secondary">
+                    <p className="text-sm text-secondary">
                         Gặp vấn đề?{' '}
                         <a href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }} className="text-primary font-semibold hover:underline">
                             Gọi 1900 1234

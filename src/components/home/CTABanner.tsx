@@ -1,4 +1,5 @@
 import { ArrowRight } from 'lucide-react';
+import { useNetworkStats } from '../../utils/useNetworkStats';
 
 /**
  * CTABanner Component - Phần banner kêu gọi hành động cuối trang
@@ -9,6 +10,7 @@ interface CTABannerProps {
 }
 
 const CTABanner = ({ onNavigate }: CTABannerProps) => {
+  const { stations, lockers } = useNetworkStats();
   return (
     <>
       {/* CTA Banner Section */}
@@ -44,11 +46,11 @@ const CTABanner = ({ onNavigate }: CTABannerProps) => {
               {/* Stats Row */}
               <div className="grid grid-cols-3 gap-4 md:gap-6 mb-8 max-w-xl">
                 <div>
-                  <div className="text-2xl md:text-3xl font-bold">85+</div>
+                  <div className="text-2xl md:text-3xl font-bold">{stations ?? "—"}</div>
                   <div className="text-xs text-white/70 mt-1">Trạm tủ</div>
                 </div>
                 <div>
-                  <div className="text-2xl md:text-3xl font-bold">450+</div>
+                  <div className="text-2xl md:text-3xl font-bold">{lockers ?? "—"}</div>
                   <div className="text-xs text-white/70 mt-1">Ô tủ</div>
                 </div>
                 <div>

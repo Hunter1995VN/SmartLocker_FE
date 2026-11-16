@@ -323,7 +323,7 @@ export default function CustomerDebtManagementView({
         <div className="space-y-4">
             {/* Top Breadcrumb & Page Header */}
             <div>
-                <nav className="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1.5">
+                <nav className="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-1.5">
                     <span>Quản trị</span>
                     <span>/</span>
                     <span>Quản trị hệ thống</span>
@@ -337,7 +337,7 @@ export default function CustomerDebtManagementView({
                             <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
                                 Quản Lý Dư Nợ & Quyền Đặt Tủ
                             </h1>
-                            <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-amber-100 text-amber-800 border border-amber-200">
+                            <span className="px-2 py-0.5 rounded-md text-xs font-extrabold uppercase bg-amber-100 text-amber-800 border border-amber-200">
                                 CHỈ TÍNH TRAVELERS (KHÁCH THUÊ TỦ)
                             </span>
                         </div>
@@ -355,7 +355,7 @@ export default function CustomerDebtManagementView({
                                 className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition cursor-pointer"
                             >
                                 <span>Quản lý tài khoản toàn hệ thống</span>
-                                <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
+                                <ArrowRight className="w-3.5 h-3.5 text-slate-500" />
                             </button>
                         )}
 
@@ -415,7 +415,7 @@ export default function CustomerDebtManagementView({
                     <button
                         type="button"
                         onClick={() => setNotification(null)}
-                        className="text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+                        className="text-slate-500 hover:text-slate-600 p-1 cursor-pointer"
                     >
                         <X className="w-4 h-4" />
                     </button>
@@ -427,17 +427,17 @@ export default function CustomerDebtManagementView({
                 {/* KPI 1: Tổng dư nợ */}
                 <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs">
                     <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                             Tổng Dư Nợ Cước Quá Hạn
                         </span>
                         <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
                             <Receipt className="w-4 h-4" />
                         </div>
                     </div>
-                    <p className="text-xl sm:text-2xl font-black text-rose-600 mt-2 font-mono">
+                    <p className="text-xl sm:text-2xl font-extrabold text-rose-600 mt-2 font-mono">
                         {kpis.totalOverdueDebt.toLocaleString('vi-VN')} đ
                     </p>
-                    <p className="text-[11px] text-slate-400 mt-1">
+                    <p className="text-xs text-slate-500 mt-1">
                         Cước phạt & phụ phí quá hạn chưa thu
                     </p>
                 </div>
@@ -445,7 +445,7 @@ export default function CustomerDebtManagementView({
                 {/* KPI 2: Khách hàng nợ cước */}
                 <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs">
                     <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                             Khách Hàng Đang Nợ Cước
                         </span>
                         <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
@@ -453,12 +453,12 @@ export default function CustomerDebtManagementView({
                         </div>
                     </div>
                     <div className="flex items-baseline gap-2 mt-2">
-                        <p className="text-xl sm:text-2xl font-black text-slate-900">
+                        <p className="text-xl sm:text-2xl font-extrabold text-slate-900">
                             {kpis.debtorCount}
                         </p>
-                        <span className="text-xs text-slate-400 font-medium">/ {kpis.totalTravelers} khách</span>
+                        <span className="text-xs text-slate-500 font-medium">/ {kpis.totalTravelers} khách</span>
                     </div>
-                    <p className="text-[11px] text-amber-600 font-semibold mt-1">
+                    <p className="text-xs text-amber-600 font-semibold mt-1">
                         {kpis.debtorCount > 0 ? 'Cần đôn đốc nộp phạt / thanh toán' : 'Không có khách nợ cước'}
                     </p>
                 </div>
@@ -466,17 +466,17 @@ export default function CustomerDebtManagementView({
                 {/* KPI 3: Tạm khóa đặt tủ */}
                 <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs">
                     <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                             Tạm Khóa Quyền Đặt Tủ
                         </span>
                         <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
                             <Lock className="w-4 h-4" />
                         </div>
                     </div>
-                    <p className="text-xl sm:text-2xl font-black text-rose-600 mt-2">
+                    <p className="text-xl sm:text-2xl font-extrabold text-rose-600 mt-2">
                         {kpis.debtorCount}
                     </p>
-                    <p className="text-[11px] text-slate-400 mt-1">
+                    <p className="text-xs text-slate-500 mt-1">
                         Tự động chặn theo luật BR-P08
                     </p>
                 </div>
@@ -484,17 +484,17 @@ export default function CustomerDebtManagementView({
                 {/* KPI 4: Tỷ lệ đủ điều kiện */}
                 <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs">
                     <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                             Đủ Điều Kiện Thuê Tủ
                         </span>
                         <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
                             <CheckCircle2 className="w-4 h-4" />
                         </div>
                     </div>
-                    <p className="text-xl sm:text-2xl font-black text-emerald-600 mt-2 font-mono">
+                    <p className="text-xl sm:text-2xl font-extrabold text-emerald-600 mt-2 font-mono">
                         {kpis.eligibleRate}%
                     </p>
-                    <p className="text-[11px] text-slate-400 mt-1">
+                    <p className="text-xs text-slate-500 mt-1">
                         Sạch nợ & được phép đặt tủ ngay
                     </p>
                 </div>
@@ -504,7 +504,7 @@ export default function CustomerDebtManagementView({
             <div className="bg-white rounded-2xl p-3 border border-slate-200/80 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
                 {/* Search */}
                 <div className="relative flex-1">
-                    <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                         type="text"
                         value={searchQuery}
@@ -579,7 +579,7 @@ export default function CustomerDebtManagementView({
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="bg-slate-50/70 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+                                <tr className="bg-slate-50/70 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100">
                                     <th className="py-3 px-4">Khách hàng</th>
                                     <th className="py-3 px-4">Dư nợ cước quá hạn</th>
                                     <th className="py-3 px-4">Quyền đặt tủ (Booking)</th>
@@ -591,7 +591,7 @@ export default function CustomerDebtManagementView({
                             <tbody className="divide-y divide-slate-100 text-xs">
                                 {isLoading ? (
                                     <tr>
-                                        <td colSpan={6} className="py-12 text-center text-slate-400">
+                                        <td colSpan={6} className="py-12 text-center text-slate-500">
                                             <div className="flex flex-col items-center justify-center gap-2">
                                                 <RotateCw className="w-6 h-6 animate-spin text-blue-600" />
                                                 <span>Đang tải danh sách công nợ khách hàng...</span>
@@ -600,7 +600,7 @@ export default function CustomerDebtManagementView({
                                     </tr>
                                 ) : filteredTravelers.length === 0 ? (
                                     <tr>
-                                        <td colSpan={6} className="py-12 text-center text-slate-400">
+                                        <td colSpan={6} className="py-12 text-center text-slate-500">
                                             <div className="flex flex-col items-center justify-center gap-2">
                                                 <CheckCircle2 className="w-8 h-8 text-emerald-500" />
                                                 <p className="font-semibold text-slate-700">
@@ -641,16 +641,16 @@ export default function CustomerDebtManagementView({
                                                                     {user.fullName || 'Khách tại kiosk'}
                                                                 </span>
                                                                 {isSelected && (
-                                                                    <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-blue-600 text-white">
+                                                                    <span className="px-1.5 py-0.2 rounded text-xs font-bold bg-blue-600 text-white">
                                                                         ĐANG CHỌN
                                                                     </span>
                                                                 )}
                                                             </div>
-                                                            <div className="text-[11px] text-slate-400 truncate font-mono">
+                                                            <div className="text-xs text-slate-500 truncate font-mono">
                                                                 {user.email}
                                                             </div>
                                                             {user.phone && (
-                                                                <div className="text-[10px] text-slate-400 font-mono">
+                                                                <div className="text-xs text-slate-500 font-mono">
                                                                     {user.phone}
                                                                 </div>
                                                             )}
@@ -661,7 +661,7 @@ export default function CustomerDebtManagementView({
                                                 {/* Overdue Debt */}
                                                 <td className="py-3 px-4 whitespace-nowrap">
                                                     {hasDebt ? (
-                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-black bg-rose-100 text-rose-700 border border-rose-200 font-mono">
+                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-extrabold bg-rose-100 text-rose-700 border border-rose-200 font-mono">
                                                             <AlertTriangle className="w-3.5 h-3.5 text-rose-600 shrink-0" />
                                                             <span>{debtAmount.toLocaleString('vi-VN')} đ</span>
                                                         </span>
@@ -697,7 +697,7 @@ export default function CustomerDebtManagementView({
                                                 </td>
 
                                                 {/* Created At */}
-                                                <td className="py-3 px-4 whitespace-nowrap text-slate-500 font-mono text-[11px]">
+                                                <td className="py-3 px-4 whitespace-nowrap text-slate-500 font-mono text-xs">
                                                     {formatDate(user.createdAt)}
                                                 </td>
 
@@ -748,18 +748,18 @@ export default function CustomerDebtManagementView({
                             {/* Drawer Header */}
                             <div className="flex items-start justify-between pb-3 border-b border-slate-100">
                                 <div>
-                                    <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                                    <span className="text-xs font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
                                         HỒ SƠ CÔNG NỢ KHÁCH HÀNG
                                     </span>
                                     <h3 className="text-base font-extrabold text-slate-900 mt-1">
                                         {selectedCustomer.fullName || 'Khách tại kiosk'}
                                     </h3>
-                                    <p className="text-xs text-slate-400 font-mono">{selectedCustomer.email}</p>
+                                    <p className="text-xs text-slate-500 font-mono">{selectedCustomer.email}</p>
                                 </div>
                                 <button
                                     type="button"
                                     onClick={() => setSelectedCustomer(null)}
-                                    className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition cursor-pointer"
+                                    className="p-1 text-slate-500 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition cursor-pointer"
                                 >
                                     <X className="w-4 h-4" />
                                 </button>
@@ -768,22 +768,22 @@ export default function CustomerDebtManagementView({
                             {/* Customer Profile Mini Card */}
                             <div className="space-y-2 text-xs bg-slate-50 p-3 rounded-xl border border-slate-100">
                                 <div className="flex items-center gap-2 text-slate-600">
-                                    <User className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                                    <User className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                                     <span>Họ tên:</span>
                                     <strong className="text-slate-800 ml-auto">
                                         {selectedCustomer.fullName || 'Chưa cập nhật'}
                                     </strong>
                                 </div>
                                 <div className="flex items-center gap-2 text-slate-600">
-                                    <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                                    <Mail className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                                     <span>Email:</span>
-                                    <span className="text-slate-800 ml-auto font-mono text-[11px] truncate max-w-[180px]">
+                                    <span className="text-slate-800 ml-auto font-mono text-xs truncate max-w-[180px]">
                                         {selectedCustomer.email}
                                     </span>
                                 </div>
                                 {selectedCustomer.phone && (
                                     <div className="flex items-center gap-2 text-slate-600">
-                                        <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                                        <Phone className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                                         <span>Điện thoại:</span>
                                         <strong className="text-slate-800 ml-auto font-mono">
                                             {selectedCustomer.phone}
@@ -791,9 +791,9 @@ export default function CustomerDebtManagementView({
                                     </div>
                                 )}
                                 <div className="flex items-center gap-2 text-slate-600">
-                                    <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                                    <Calendar className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                                     <span>Ngày tạo:</span>
-                                    <span className="text-slate-800 ml-auto font-mono text-[11px]">
+                                    <span className="text-slate-800 ml-auto font-mono text-xs">
                                         {formatDate(selectedCustomer.createdAt)}
                                     </span>
                                 </div>
@@ -807,17 +807,17 @@ export default function CustomerDebtManagementView({
                                         <span>Quyền đặt tủ (Booking)</span>
                                     </span>
                                     {Number(selectedCustomer.overdueDebt || 0) > 0 ? (
-                                        <span className="px-2 py-0.5 rounded text-[11px] font-extrabold bg-rose-100 text-rose-700 border border-rose-200">
+                                        <span className="px-2 py-0.5 rounded text-xs font-extrabold bg-rose-100 text-rose-700 border border-rose-200">
                                             TẠM KHÓA ĐẶT TỦ (DO NỢ CƯỚC)
                                         </span>
                                     ) : (
-                                        <span className="px-2 py-0.5 rounded text-[11px] font-extrabold bg-emerald-100 text-emerald-700 border border-emerald-200">
+                                        <span className="px-2 py-0.5 rounded text-xs font-extrabold bg-emerald-100 text-emerald-700 border border-emerald-200">
                                             ĐƯỢC PHÉP ĐẶT TỦ
                                         </span>
                                     )}
                                 </div>
 
-                                <p className="text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-100 leading-relaxed">
+                                <p className="text-xs text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-100 leading-relaxed">
                                     {Number(selectedCustomer.overdueDebt || 0) > 0
                                         ? 'Khách hàng này đang bị tạm dừng quyền tạo đơn đặt tủ mới theo quy tắc BR-P08 do có nợ cước. Tài khoản vẫn duy trì ACTIVE để khách đăng nhập quét VietQR PayOS thanh toán online.'
                                         : 'Khách hàng không có nợ quá hạn và hoàn toàn đủ điều kiện tạo đơn đặt tủ mới tại mọi trạm trong hệ thống.'}
@@ -850,7 +850,7 @@ export default function CustomerDebtManagementView({
                                         <span>Dư nợ cước hiện tại</span>
                                     </span>
                                     <span
-                                        className={`px-2 py-0.5 rounded text-[11px] font-extrabold font-mono ${
+                                        className={`px-2 py-0.5 rounded text-xs font-extrabold font-mono ${
                                             Number(selectedCustomer.overdueDebt || 0) > 0
                                                 ? 'bg-rose-100 text-rose-700'
                                                 : 'bg-emerald-100 text-emerald-700'
@@ -860,7 +860,7 @@ export default function CustomerDebtManagementView({
                                     </span>
                                 </div>
 
-                                <div className="p-2.5 rounded-lg bg-amber-50/70 border border-amber-200/80 text-[11px] text-amber-900 space-y-1">
+                                <div className="p-2.5 rounded-lg bg-amber-50/70 border border-amber-200/80 text-xs text-amber-900 space-y-1">
                                     <p className="font-bold flex items-center gap-1">
                                         <ShieldAlert className="w-3.5 h-3.5 text-amber-600" />
                                         <span>Quy tắc kiến trúc BR-P08:</span>
@@ -880,14 +880,14 @@ export default function CustomerDebtManagementView({
                                             <button
                                                 type="button"
                                                 onClick={() => setDebtInput('0')}
-                                                className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 hover:bg-emerald-200 text-emerald-700 transition cursor-pointer"
+                                                className="px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 hover:bg-emerald-200 text-emerald-700 transition cursor-pointer"
                                             >
                                                 0 đ (Sạch nợ)
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={() => setDebtInput(String(Math.max(0, Number(debtInput || 0)) + 30000))}
-                                                className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 hover:bg-rose-200 text-rose-700 transition cursor-pointer"
+                                                className="px-2 py-0.5 rounded text-xs font-bold bg-rose-100 hover:bg-rose-200 text-rose-700 transition cursor-pointer"
                                             >
                                                 +30.000 đ
                                             </button>
@@ -959,7 +959,7 @@ export default function CustomerDebtManagementView({
                                     {Number(debtToClearCustomer.overdueDebt || 0).toLocaleString('vi-VN')} đ
                                 </strong>
                             </div>
-                            <p className="text-[11px] text-emerald-700 leading-relaxed">
+                            <p className="text-xs text-emerald-700 leading-relaxed">
                                 Khi bấm xác nhận, hệ thống sẽ gạch nợ đưa số dư về <strong>0 đ</strong> và tự động <strong>mở lại quyền đặt tủ mới</strong> cho khách hàng theo đúng quy tắc BR-P08.
                             </p>
                         </div>

@@ -95,7 +95,7 @@ export default function StationDetailPanel({
                                 {isOnline ? 'Active (Online)' : station.status}
                             </span>
                         </div>
-                        <p className="text-[11px] text-slate-400 mt-1 font-mono">
+                        <p className="text-xs text-slate-500 mt-1 font-mono">
                             Kiosk Gateway ID: <span className="text-slate-600 font-semibold">GW-{shortId}-STM32</span> · Firmware: <span className="text-slate-600 font-semibold">v4.8.2-prod</span>
                         </p>
                     </div>

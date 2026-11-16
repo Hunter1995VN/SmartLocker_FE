@@ -427,7 +427,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                         <Package className="w-5 h-5" />
                     </div>
                     <div>
-                        <h2 className="text-base font-black text-slate-900 tracking-tight">
+                        <h2 className="text-base font-extrabold text-slate-900 tracking-tight">
                             Lập Biên Bản Kiểm Kê Tài Sản Bỏ Quên Quá Hạn 72h
                         </h2>
                         <p className="text-xs text-slate-500">
@@ -438,7 +438,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                 <button
                     type="button"
                     onClick={onCancel}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+                    className="p-1.5 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
                 >
                     <X className="w-5 h-5" />
                 </button>
@@ -451,7 +451,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                         <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                         <div>
                             <p className="font-bold">Lỗi xử lý hệ thống</p>
-                            <p className="text-[11px] mt-0.5">{apiError}</p>
+                            <p className="text-xs mt-0.5">{apiError}</p>
                         </div>
                     </div>
                 )}
@@ -464,7 +464,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                             <span>1. Chọn đơn đặt tủ quá hạn 72h chờ kiểm kê</span>
                         </h3>
                         {candidates.length > 0 && (
-                            <span className="text-[11px] font-semibold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
+                            <span className="text-xs font-semibold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
                                 {candidates.length} đơn chờ xử lý
                             </span>
                         )}
@@ -492,15 +492,15 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                                         <span className="font-mono font-bold text-slate-900 text-xs">
                                             #{c.bookingCode} · Ô {c.lockerCode}
                                         </span>
-                                        <span className="text-[10px] font-bold text-rose-600 font-mono bg-rose-50 px-1.5 py-0.5 rounded">
+                                        <span className="text-xs font-bold text-rose-600 font-mono bg-rose-50 px-1.5 py-0.5 rounded">
                                             +{c.overdueHours}h quá hạn
                                         </span>
                                     </div>
-                                    <p className="text-[11px] text-slate-600 truncate mt-1">
+                                    <p className="text-xs text-slate-600 truncate mt-1">
                                         {c.customerName || 'Khách hàng'} · {c.stationName}
                                     </p>
                                     {c.overdueDebt ? (
-                                        <p className="text-[10px] text-rose-600 font-bold mt-1">
+                                        <p className="text-xs text-rose-600 font-bold mt-1">
                                             Nợ cước: {c.overdueDebt.toLocaleString('vi-VN')} đ
                                         </p>
                                     ) : null}
@@ -536,7 +536,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                                 placeholder="Nhập hoặc chọn Booking ID..."
                                 className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-mono text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
                             />
-                            {errors.bookingId && <p className="text-rose-600 text-[10px] mt-0.5 font-bold">{errors.bookingId}</p>}
+                            {errors.bookingId && <p className="text-rose-600 text-xs mt-0.5 font-bold">{errors.bookingId}</p>}
                         </div>
                         <div>
                             <label className="block font-bold text-slate-700 mb-1">
@@ -549,7 +549,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                                 placeholder="Nhập hoặc chọn Locker ID..."
                                 className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-mono text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
                             />
-                            {errors.lockerId && <p className="text-rose-600 text-[10px] mt-0.5 font-bold">{errors.lockerId}</p>}
+                            {errors.lockerId && <p className="text-rose-600 text-xs mt-0.5 font-bold">{errors.lockerId}</p>}
                         </div>
                         <div>
                             <label className="block font-bold text-slate-700 mb-1">
@@ -562,7 +562,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                                 placeholder="Nhập hoặc chọn Station ID..."
                                 className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-mono text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
                             />
-                            {errors.stationId && <p className="text-rose-600 text-[10px] mt-0.5 font-bold">{errors.stationId}</p>}
+                            {errors.stationId && <p className="text-rose-600 text-xs mt-0.5 font-bold">{errors.stationId}</p>}
                         </div>
                     </div>
                 </div>
@@ -586,7 +586,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                                 placeholder="VD: SL-SEAL-2026-1042..."
                                 className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-mono font-bold text-blue-700 text-xs focus:ring-1 focus:ring-blue-500 focus:outline-none"
                             />
-                            {errors.sealCode && <p className="text-rose-600 text-[10px] mt-0.5">{errors.sealCode}</p>}
+                            {errors.sealCode && <p className="text-rose-600 text-xs mt-0.5">{errors.sealCode}</p>}
                         </div>
 
                         <div>
@@ -594,7 +594,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                                 <label className="block font-bold text-slate-700 text-xs">
                                     Tải trọng cân thực địa
                                 </label>
-                                <span className="text-[10px] text-slate-500 font-medium">
+                                <span className="text-xs text-slate-500 font-medium">
                                     (Tối đa ô Size {inferredSize}: <strong>{maxWeightLimit} kg</strong>)
                                 </span>
                             </div>
@@ -612,18 +612,18 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                                             : 'border-slate-300 bg-white text-slate-800 focus:ring-blue-500'
                                     }`}
                                 />
-                                <span className="absolute right-3 top-2 text-xs font-bold text-slate-400 pointer-events-none">
+                                <span className="absolute right-3 top-2 text-xs font-bold text-slate-500 pointer-events-none">
                                     kg
                                 </span>
                             </div>
                             {Number(fields.measuredWeight) > maxWeightLimit && (
-                                <p className="text-amber-700 text-[10px] mt-1 font-semibold flex items-center gap-1">
+                                <p className="text-amber-700 text-xs mt-1 font-semibold flex items-center gap-1">
                                     <AlertTriangle className="w-3 h-3 shrink-0 text-amber-600" />
                                     Cảnh báo: Tải trọng {fields.measuredWeight} kg vượt định mức {maxWeightLimit} kg của ô {inferredSize}!
                                 </p>
                             )}
                             {errors.measuredWeight && (
-                                <p className="text-rose-600 text-[10px] mt-1 font-bold">{errors.measuredWeight}</p>
+                                <p className="text-rose-600 text-xs mt-1 font-bold">{errors.measuredWeight}</p>
                             )}
                         </div>
 
@@ -638,11 +638,11 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                                     value={fields.overdueHours}
                                     className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-100 font-mono text-xs text-slate-600 cursor-not-allowed select-none"
                                 />
-                                <span className="absolute right-3 top-2 text-[11px] font-bold text-slate-400 pointer-events-none">
+                                <span className="absolute right-3 top-2 text-xs font-bold text-slate-500 pointer-events-none">
                                     giờ
                                 </span>
                             </div>
-                            <p className="text-[10px] text-slate-400 mt-0.5">Tự động tính từ mốc kết thúc đơn thuê</p>
+                            <p className="text-xs text-slate-500 mt-0.5">Tự động tính từ mốc kết thúc đơn thuê</p>
                         </div>
                     </div>
 
@@ -689,7 +689,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                     <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-3">
                         <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
                             <div>
-                                <label className="block text-[11px] font-bold text-slate-600 mb-1">Danh mục</label>
+                                <label className="block text-xs font-bold text-slate-600 mb-1">Danh mục</label>
                                 <select
                                     value={itemInput.category}
                                     onChange={(e) => setItemInput((p) => ({ ...p, category: e.target.value }))}
@@ -703,7 +703,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                                 </select>
                             </div>
                             <div className="sm:col-span-2">
-                                <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                                <label className="block text-xs font-bold text-slate-600 mb-1">
                                     Mô tả tài sản <span className="text-rose-500">*</span>
                                 </label>
                                 <input
@@ -715,7 +715,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                                 />
                             </div>
                             <div>
-                                <label className="block text-[11px] font-bold text-slate-600 mb-1">Số lượng</label>
+                                <label className="block text-xs font-bold text-slate-600 mb-1">Số lượng</label>
                                 <input
                                     type="number"
                                     min="1"
@@ -730,7 +730,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                             <div>
-                                <label className="block text-[11px] font-bold text-slate-600 mb-1">Tình trạng</label>
+                                <label className="block text-xs font-bold text-slate-600 mb-1">Tình trạng</label>
                                 <select
                                     value={itemInput.condition}
                                     onChange={(e) => setItemInput((p) => ({ ...p, condition: e.target.value }))}
@@ -744,7 +744,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-[11px] font-bold text-slate-600 mb-1">Ghi chú thêm</label>
+                                <label className="block text-xs font-bold text-slate-600 mb-1">Ghi chú thêm</label>
                                 <input
                                     type="text"
                                     value={itemInput.note}
@@ -755,7 +755,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                             </div>
                         </div>
 
-                        {itemError && <p className="text-rose-600 text-[11px] font-semibold">{itemError}</p>}
+                        {itemError && <p className="text-rose-600 text-xs font-semibold">{itemError}</p>}
 
                         <div className="flex justify-end gap-2 pt-1">
                             {editingItemId && (
@@ -795,10 +795,10 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                                 <tbody className="divide-y divide-slate-100">
                                     {items.map((it, idx) => (
                                         <tr key={it.id} className="hover:bg-slate-50/80">
-                                            <td className="p-2.5 text-center font-bold text-slate-400">{idx + 1}</td>
+                                            <td className="p-2.5 text-center font-bold text-slate-500">{idx + 1}</td>
                                             <td className="p-2.5">
                                                 <p className="font-semibold text-slate-900">{it.description}</p>
-                                                {it.note && <p className="text-[11px] text-slate-400 mt-0.5">{it.note}</p>}
+                                                {it.note && <p className="text-xs text-slate-500 mt-0.5">{it.note}</p>}
                                             </td>
                                             <td className="p-2.5 text-slate-600">{it.category}</td>
                                             <td className="p-2.5 text-center font-mono font-bold text-slate-900">{it.quantity}</td>
@@ -808,7 +808,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                                                     <button
                                                         type="button"
                                                         onClick={() => handleEditItem(it)}
-                                                        className="p-1 rounded text-slate-400 hover:text-blue-600 hover:bg-blue-50 cursor-pointer"
+                                                        className="p-1 rounded text-slate-500 hover:text-blue-600 hover:bg-blue-50 cursor-pointer"
                                                         title="Sửa"
                                                     >
                                                         <Edit2 className="w-3.5 h-3.5" />
@@ -816,7 +816,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                                                     <button
                                                         type="button"
                                                         onClick={() => handleRemoveItem(it.id)}
-                                                        className="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
+                                                        className="p-1 rounded text-slate-500 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
                                                         title="Xóa"
                                                     >
                                                         <Trash2 className="w-3.5 h-3.5" />
@@ -829,7 +829,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                             </table>
                         </div>
                     ) : (
-                        <div className="p-4 rounded-xl border border-dashed border-slate-300 text-center text-slate-400">
+                        <div className="p-4 rounded-xl border border-dashed border-slate-300 text-center text-slate-500">
                             Chưa có tài sản nào trong danh mục. Hãy nhập thông tin phía trên và nhấn &quot;Thêm vào danh mục&quot;.
                         </div>
                     )}
@@ -853,7 +853,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                         className="hidden"
                     />
 
-                    {photoError && <p className="text-rose-600 text-[11px] font-semibold">{photoError}</p>}
+                    {photoError && <p className="text-rose-600 text-xs font-semibold">{photoError}</p>}
 
                     {/* Image thumbnails */}
                     {photoUrls.length > 0 && (

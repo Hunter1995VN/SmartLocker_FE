@@ -27,7 +27,7 @@ interface PaginationProps {
 /** Thanh phân trang: "Hiển thị 1–8 / 25", nút trước/sau và các số trang (rút gọn bằng dấu …). */
 export default function Pagination({ page, totalPages, total, from, to, onPageChange, label = 'mục' }: PaginationProps) {
     if (total === 0 || totalPages <= 1) {
-        return total > 0 ? <p className="mt-3 text-[11px] text-slate-400">Hiển thị {from}–{to} / {total} {label}</p> : null;
+        return total > 0 ? <p className="mt-3 text-xs text-slate-500">Hiển thị {from}–{to} / {total} {label}</p> : null;
     }
 
     const pages: (number | 'gap-left' | 'gap-right')[] = [];
@@ -40,7 +40,7 @@ export default function Pagination({ page, totalPages, total, from, to, onPageCh
     const btn = 'min-w-8 h-8 px-2 rounded-lg text-xs font-semibold border transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed';
     return (
         <nav aria-label="Phân trang" className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-            <p className="text-[11px] text-slate-500">Hiển thị <strong>{from}–{to}</strong> / {total} {label}</p>
+            <p className="text-xs text-slate-500">Hiển thị <strong>{from}–{to}</strong> / {total} {label}</p>
             <div className="flex items-center gap-1">
                 <button type="button" aria-label="Trang trước" disabled={page <= 1} onClick={() => onPageChange(page - 1)} className={`${btn} border-slate-200 text-slate-600 hover:bg-slate-50`}>
                     <ChevronLeft className="w-4 h-4" />
@@ -57,7 +57,7 @@ export default function Pagination({ page, totalPages, total, from, to, onPageCh
                             {p}
                         </button>
                     ) : (
-                        <span key={`${p}-${i}`} className="px-1 text-slate-400 text-xs">…</span>
+                        <span key={`${p}-${i}`} className="px-1 text-slate-500 text-xs">…</span>
                     ),
                 )}
                 <button type="button" aria-label="Trang sau" disabled={page >= totalPages} onClick={() => onPageChange(page + 1)} className={`${btn} border-slate-200 text-slate-600 hover:bg-slate-50`}>

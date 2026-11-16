@@ -67,9 +67,9 @@ export default function StationReviewPanel({ bookingId, status, stationName }: {
       <div>
         <div className="flex items-center gap-2 mb-1">
           <Star className="w-5 h-5 text-amber-500 fill-amber-400" />
-          <h2 className="text-xl font-bold text-[#0b1c30]">Đánh giá trạm</h2>
+          <h2 className="text-xl font-bold text-on-surface">Đánh giá trạm</h2>
         </div>
-        <p className="text-xs text-[#434655]">
+        <p className="text-sm text-on-surface-variant">
           {review ? 'Cảm ơn bạn đã chia sẻ trải nghiệm.' : `Trải nghiệm gửi đồ tại ${stationName || 'trạm'} thế nào? Đánh giá giúp trạm phục vụ tốt hơn.`}
         </p>
       </div>
@@ -89,20 +89,20 @@ export default function StationReviewPanel({ bookingId, status, stationName }: {
       {justSent && <p role="status" className="flex items-center gap-2 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800"><CheckCircle2 className="w-4 h-4" />Đã ghi nhận đánh giá của bạn.</p>}
       <div className="flex items-center gap-3">
         <Stars value={review.stars} size="w-7 h-7" />
-        <span className="text-sm font-bold text-[#0b1c30]">{review.stars}/5 · {STAR_LABELS[review.stars]}</span>
+        <span className="text-sm font-bold text-on-surface">{review.stars}/5 · {STAR_LABELS[review.stars]}</span>
       </div>
       {review.criteria && <div className="flex flex-wrap gap-2">
         {CRITERIA.filter(c => review.criteria.split(',').includes(c.key)).map(({ key, label, icon: Icon }) =>
           <span key={key} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-xs font-semibold text-amber-800"><Icon className="w-3.5 h-3.5" />{label}</span>)}
       </div>}
-      {review.comment && <blockquote className="flex gap-2 p-3.5 rounded-xl bg-slate-50 border border-outline-variant/30 text-sm text-[#434655]">
-        <MessageSquareText className="w-4 h-4 shrink-0 mt-0.5 text-slate-400" /><span className="whitespace-pre-line">{review.comment}</span>
+      {review.comment && <blockquote className="flex gap-2 p-3.5 rounded-xl bg-slate-50 border border-outline-variant/30 text-sm text-on-surface-variant">
+        <MessageSquareText className="w-4 h-4 shrink-0 mt-0.5 text-slate-500" /><span className="whitespace-pre-line">{review.comment}</span>
       </blockquote>}
     </div>}
 
     {review === null && <form className="space-y-5" onSubmit={event => { event.preventDefault(); void submit(); }}>
       <div>
-        <p className="text-xs font-semibold text-[#434655] mb-2">Chấm điểm <span className="text-rose-500">*</span></p>
+        <p className="text-sm font-semibold text-on-surface-variant mb-2">Chấm điểm <span className="text-rose-500">*</span></p>
         <div className="flex items-center gap-3 flex-wrap">
           <div role="radiogroup" aria-label="Số sao" className="flex gap-1" onMouseLeave={() => setHover(0)}>
             {[1, 2, 3, 4, 5].map(n => <button key={n} type="button" role="radio" aria-checked={stars === n} aria-label={`${n} sao: ${STAR_LABELS[n]}`}
@@ -111,18 +111,18 @@ export default function StationReviewPanel({ bookingId, status, stationName }: {
               <Star className={`w-9 h-9 transition-colors ${n <= shown ? 'fill-amber-400 text-amber-400' : 'text-slate-200'}`} />
             </button>)}
           </div>
-          <span className={`text-sm font-bold min-w-24 ${shown ? 'text-amber-600' : 'text-slate-400'}`}>{shown ? STAR_LABELS[shown] : 'Chọn số sao'}</span>
+          <span className={`text-sm font-bold min-w-24 ${shown ? 'text-amber-600' : 'text-slate-500'}`}>{shown ? STAR_LABELS[shown] : 'Chọn số sao'}</span>
         </div>
       </div>
 
       <div>
-        <p className="text-xs font-semibold text-[#434655] mb-2">Điều bạn hài lòng <span className="font-normal text-slate-400">(không bắt buộc)</span></p>
+        <p className="text-sm font-semibold text-on-surface-variant mb-2">Điều bạn hài lòng <span className="font-normal text-slate-500">(không bắt buộc)</span></p>
         <div className="flex flex-wrap gap-2">
           {CRITERIA.map(({ key, label, icon: Icon }) => {
             const on = criteria.includes(key);
             return <button key={key} type="button" aria-pressed={on} onClick={() => toggle(key)}
               className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-xs font-semibold transition cursor-pointer ${
-                on ? 'bg-amber-50 border-amber-300 text-amber-800 shadow-xs' : 'bg-white border-outline-variant/50 text-[#434655] hover:border-amber-300'}`}>
+                on ? 'bg-amber-50 border-amber-300 text-amber-800 shadow-xs' : 'bg-white border-outline-variant/50 text-on-surface-variant hover:border-amber-300'}`}>
               <Icon className="w-3.5 h-3.5" />{label}{on && <CheckCircle2 className="w-3.5 h-3.5" />}
             </button>;
           })}
@@ -130,20 +130,20 @@ export default function StationReviewPanel({ bookingId, status, stationName }: {
       </div>
 
       <label className="block">
-        <span className="flex justify-between text-xs font-semibold text-[#434655] mb-2">
-          <span>Góp ý thêm <span className="font-normal text-slate-400">(không bắt buộc)</span></span>
-          <span className="font-mono font-normal text-slate-400">{comment.length}/{MAX_COMMENT}</span>
+        <span className="flex justify-between text-xs font-semibold text-on-surface-variant mb-2">
+          <span>Góp ý thêm <span className="font-normal text-slate-500">(không bắt buộc)</span></span>
+          <span className="font-mono font-normal text-slate-500">{comment.length}/{MAX_COMMENT}</span>
         </span>
         <textarea rows={3} maxLength={MAX_COMMENT} value={comment} onChange={event => setComment(event.target.value)}
           placeholder="Chia sẻ điều bạn thích hoặc điều trạm nên cải thiện…"
-          className="block w-full rounded-xl border border-outline-variant/50 bg-white p-3 text-sm text-[#0b1c30] placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+          className="block w-full rounded-xl border border-outline-variant/50 bg-white p-3 text-sm text-on-surface placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
       </label>
 
-      <p className="text-xs text-[#434655]">Đánh giá sẽ hiển thị công khai dưới dạng ẩn danh. Vui lòng tránh ghi thông tin cá nhân trong góp ý.</p>
+      <p className="text-sm text-on-surface-variant">Đánh giá sẽ hiển thị công khai dưới dạng ẩn danh. Vui lòng tránh ghi thông tin cá nhân trong góp ý.</p>
       {submitError && <p role="alert" className="flex items-start gap-2 p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-700"><AlertCircle className="w-4 h-4 shrink-0" />{submitError}</p>}
 
       <div className="flex items-center justify-end gap-3">
-        {stars < 1 && <span className="text-xs text-slate-400">Chọn số sao để gửi</span>}
+        {stars < 1 && <span className="text-xs text-slate-500">Chọn số sao để gửi</span>}
         <button type="submit" disabled={busy || stars < 1}
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-sm font-bold shadow-sm hover:opacity-90 transition disabled:opacity-40 cursor-pointer">
           <Star className="w-4 h-4" />{busy ? 'Đang gửi…' : 'Gửi đánh giá'}

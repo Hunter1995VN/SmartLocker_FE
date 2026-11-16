@@ -23,6 +23,7 @@ import type {
     UserAdminListItemDto,
     UserRole,
 } from '../../../api/adminUserService';
+import ModalOverlay from '../../ui/ModalOverlay';
 
 interface InternalUserFormModalProps {
     isOpen: boolean;
@@ -166,7 +167,7 @@ export default function InternalUserFormModal({
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+        <ModalOverlay onClose={onClose}>
             <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden">
                 {/* Header */}
                 <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
@@ -188,7 +189,7 @@ export default function InternalUserFormModal({
                                     ? 'Tạo Tài Khoản Nhân Sự Nội Bộ Mới'
                                     : 'Cập Nhật Hồ Sơ & Vai Trò Nhân Sự Nội Bộ'}
                             </h3>
-                            <p className="text-[11px] text-slate-500">
+                            <p className="text-xs text-slate-500">
                                 {mode === 'CREATE'
                                     ? 'Cấp tài khoản truy cập cổng vận hành Admin / Staff theo mô hình RBAC'
                                     : `Đang chỉnh sửa tài khoản: ${initialUser?.email || ''}`}
@@ -199,7 +200,7 @@ export default function InternalUserFormModal({
                         type="button"
                         onClick={onClose}
                         disabled={isSubmitting}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+                        className="p-1.5 rounded-lg text-slate-500 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
                     >
                         <X className="w-4 h-4" />
                     </button>
@@ -275,7 +276,7 @@ export default function InternalUserFormModal({
                                         type="button"
                                         onClick={() => setPassword(generateStrongPassword())}
                                         disabled={isSubmitting}
-                                        className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition cursor-pointer"
+                                        className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition cursor-pointer"
                                     >
                                         <RefreshCw className="w-3 h-3" />
                                         <span>Tạo mật khẩu mạnh</span>
@@ -283,7 +284,7 @@ export default function InternalUserFormModal({
                                     <button
                                         type="button"
                                         onClick={handleCopyCredentials}
-                                        className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition cursor-pointer"
+                                        className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition cursor-pointer"
                                     >
                                         {copiedCredentials ? (
                                             <>
@@ -312,7 +313,7 @@ export default function InternalUserFormModal({
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword((prev) => !prev)}
-                                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 cursor-pointer"
+                                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-500 hover:text-slate-600 cursor-pointer"
                                 >
                                     {showPassword ? (
                                         <EyeOff className="w-4 h-4" />
@@ -321,7 +322,7 @@ export default function InternalUserFormModal({
                                     )}
                                 </button>
                             </div>
-                            <p className="text-[11px] text-slate-500">
+                            <p className="text-xs text-slate-500">
                                 Mật khẩu được băm bảo mật chuẩn BCrypt trước khi lưu trữ. Hãy sao chép thông tin đăng nhập để bàn giao cho nhân sự.
                             </p>
                         </div>
@@ -352,7 +353,7 @@ export default function InternalUserFormModal({
                                         <CheckCircle2 className="w-4 h-4 text-teal-600" />
                                     )}
                                 </div>
-                                <p className="text-[11px] text-slate-600 leading-relaxed">
+                                <p className="text-xs text-slate-600 leading-relaxed">
                                     Giám sát lưới tủ, xử lý sự cố hiện trường, lập biên bản 72h & mở khóa cứu hộ theo quy trình.
                                 </p>
                             </button>
@@ -376,14 +377,14 @@ export default function InternalUserFormModal({
                                         <CheckCircle2 className="w-4 h-4 text-purple-600" />
                                     )}
                                 </div>
-                                <p className="text-[11px] text-slate-600 leading-relaxed">
+                                <p className="text-xs text-slate-600 leading-relaxed">
                                     Toàn quyền cấu hình giá/phạt, phân quyền RBAC, duyệt 4 mắt tài sản 72h, đối soát PayOS & Audit.
                                 </p>
                             </button>
                         </div>
 
                         {mode === 'EDIT' && isSelf && (
-                            <p className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5 font-medium">
+                            <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5 font-medium">
                                 Đang chỉnh sửa tài khoản của chính bạn: Hệ thống khóa thay đổi vai trò để tránh tự thu hồi quyền Super Admin.
                             </p>
                         )}
@@ -441,6 +442,6 @@ export default function InternalUserFormModal({
                     </div>
                 </form>
             </div>
-        </div>
+        </ModalOverlay>
     );
 }

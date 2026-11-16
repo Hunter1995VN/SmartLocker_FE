@@ -50,8 +50,25 @@
   --color-background: #f8f9ff;
   --color-on-background: #0b1c30;
 
+  /* Semantic additions used across the app (kept next to the Material-style set above) */
+  /* Secondary/metadata text: ≥4.5:1 on white and on surface-container tints (outline #737686 is only for borders/icons) */
+  --color-on-surface-muted: #5c5f70;
+  /* Soft input/card borders */
+  --color-outline-soft: #dce3f1;
+  /* Caution / non-blocking notices (e.g. location blocked) */
+  --color-warning-container: #fff6d6;
+  --color-on-warning-container: #6b4a00;
+
+  /* Kiosk (màn hình tối tại trạm) */
+  --color-kiosk-bg: #131b28;
+  --color-kiosk-surface: #253247;
+  --color-kiosk-surface-high: #2a384f;
+  --color-kiosk-border: #354664;
+
   /* Font Family */
   --font-family-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  /* Tailwind's font-sans utility reads --font-sans: point it at the brand face so pages using font-sans do not fall back to the system font */
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 
   /* Border Radius */
   --radius-sm: 0.25rem;
@@ -91,7 +108,59 @@
     @apply bg-background text-on-surface;
     font-family: var(--font-family-sans);
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    /* Chữ số cùng độ rộng: tiền, giờ đếm ngược, bảng không bị nhảy khi giá trị đổi (1111 và 0000 từng lệch 45%) */
+    font-variant-numeric: tabular-nums;
   }
+
+  /* Ngắt dòng: tiêu đề cân bằng, đoạn văn tránh dòng cuối chỉ có một từ */
+  h1, h2, h3 {
+    text-wrap: balance;
+  }
+  p, li {
+    text-wrap: pretty;
+  }
+}
+
+/*
+ * Touch targets: chỉ áp dụng cho thiết bị cảm ứng (pointer: coarse) nên giao diện máy tính giữ nguyên mật độ.
+ * Mục tiêu 44px (WCAG 2.5.8 yêu cầu tối thiểu 24px; 44px là mức nên đạt cho ngón tay cái).
+ * Đặt trong @layer base để các class tiện ích (hidden, md:inline-flex) vẫn ghi đè được display;
+ * min-height và min-width vẫn thắng các class chiều cao/chiều rộng cố định nên mục tiêu chạm không bị thu nhỏ lại.
+ */
+@media (pointer: coarse) {
+  @layer base {
+  button,
+  [role="button"],
+  [role="tab"],
+  summary,
+  select {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  /* Nút chỉ có biểu tượng: đủ rộng để chạm */
+  button:has(> svg:only-child),
+  button[aria-label]:not(:has(> :not(svg))):not(:has(span)) {
+    min-width: 44px;
+  }
+  /* Liên kết đứng riêng (menu, chân trang, hàng liên kết), không phải liên kết nằm trong đoạn văn */
+  nav a[href],
+  footer a[href],
+  li > a[href],
+  a[href][role="button"] {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]),
+  textarea {
+    min-height: 44px;
+  }
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-width: 24px;
+    min-height: 24px;
+  }
+}
 }
 
 /* Custom utilities */
@@ -140,12 +209,9 @@
     background-size: 24px 24px;
   }
 
-  /* Gradient text */
+  /* Emphasis text: solid brand colour (gradient text removed; emphasis comes from colour and weight) */
   .text-gradient {
-    background: linear-gradient(135deg, #2563eb 0%, #004ac6 50%, #0053db 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--color-primary);
   }
   
   /* Glass effect */

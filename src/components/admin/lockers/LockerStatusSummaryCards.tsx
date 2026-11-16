@@ -107,7 +107,7 @@ export default function LockerStatusSummaryCards({
                         }`}
                     >
                         <div className="flex items-center justify-between gap-2 mb-2">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
                                 <span className={`w-2 h-2 rounded-full ${c.dotBg}`} />
                                 <span className="truncate">{c.title}</span>
                             </span>
@@ -117,7 +117,7 @@ export default function LockerStatusSummaryCards({
                         </div>
 
                         <div className="flex items-baseline gap-2">
-                            <span className="text-2xl font-black text-slate-900 tracking-tight">
+                            <span className="text-2xl font-extrabold text-slate-900 tracking-tight">
                                 {isLoading ? '—' : c.count}
                             </span>
                             <span className="text-xs font-semibold text-slate-500">

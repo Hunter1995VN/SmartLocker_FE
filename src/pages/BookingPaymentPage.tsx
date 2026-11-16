@@ -279,7 +279,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
   const effectiveQrCode = qrCodeData || bookingData?.paymentUrl || `https://pay.payos.vn/web/${orderCode}`;
 
   return (
-    <div className="bg-[#F8FAFC] text-[#0F172A] min-h-screen flex flex-col justify-between selection:bg-blue-100 selection:text-blue-900 pb-12">
+    <div className="bg-slate-50 text-slate-900 min-h-screen flex flex-col justify-between selection:bg-blue-100 selection:text-blue-900 pb-12">
       {/* UNIFIED CUSTOMER HEADER */}
       <CustomerHeader
         currentPage="booking-payment"
@@ -300,7 +300,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                 <Check className="w-4 h-4 stroke-[3]" />
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Bước 1</span>
+                <span className="text-xs uppercase font-bold text-slate-500 tracking-wider">Bước 1</span>
                 <span className="text-sm font-semibold text-slate-700 truncate group-hover:text-blue-600 transition-colors">
                   Chọn trạm &amp; Tủ
                 </span>
@@ -313,18 +313,18 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                 2
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="text-[10px] uppercase font-bold text-blue-600 tracking-wider">Bước 2 (Đang thực hiện)</span>
+                <span className="text-xs uppercase font-bold text-blue-600 tracking-wider">Bước 2 (Đang thực hiện)</span>
                 <span className="text-sm font-bold text-blue-600 truncate">Thanh toán PayOS</span>
               </div>
             </div>
 
             {/* Bước 3 */}
             <div className="flex items-center gap-2 sm:gap-3 justify-end sm:justify-start opacity-70">
-              <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-400 border border-slate-200 flex items-center justify-center font-bold text-xs shrink-0">
+              <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 border border-slate-200 flex items-center justify-center font-bold text-xs shrink-0">
                 3
               </div>
               <div className="hidden sm:flex flex-col min-w-0">
-                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Bước 3</span>
+                <span className="text-xs uppercase font-bold text-slate-500 tracking-wider">Bước 3</span>
                 <span className="text-sm font-medium text-slate-500 truncate">Nhận mã mở tủ</span>
               </div>
             </div>
@@ -354,7 +354,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                   >
                     Thay đổi
                   </button>
-                  <span className="bg-amber-50 text-amber-700 text-[11px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-md border border-amber-200">
+                  <span className="bg-amber-50 text-amber-700 text-xs font-bold uppercase tracking-wide px-2.5 py-1 rounded-md border border-amber-200">
                     Chờ thanh toán
                   </span>
                 </div>
@@ -366,7 +366,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                   <MapPin className="text-blue-600 w-5 h-5 mt-0.5 shrink-0" />
                   <div className="min-w-0">
                     <h3 className="text-sm font-bold text-slate-900 leading-snug">{stationName}</h3>
-                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">{stationAddress}</p>
+                    <p className="text-sm text-slate-500 mt-1 leading-relaxed">{stationAddress}</p>
                   </div>
                 </div>
 
@@ -381,11 +381,11 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                         <span className="text-sm font-bold text-slate-900">
                           {size === 'S' ? 'Ngăn Nhỏ (S)' : size === 'M' ? 'Ngăn Vừa (M)' : 'Ngăn Lớn (L)'}
                         </span>
-                        <span className="bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase px-2 py-0.5 rounded border border-emerald-200">
+                        <span className="bg-emerald-50 text-emerald-700 text-xs font-bold uppercase px-2 py-0.5 rounded border border-emerald-200">
                           {size === 'S' ? 'Balo / Túi xách' : size === 'M' ? 'Vali xách tay' : 'Vali ký gửi'}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-500 mt-0.5">
+                      <p className="text-sm text-slate-500 mt-0.5">
                         {size === 'S'
                           ? 'Kích thước: 45 x 45 x 65 cm'
                           : size === 'M'
@@ -395,7 +395,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                     </div>
                   </div>
                   <div className="text-right shrink-0">
-                    <span className="text-[11px] font-semibold text-slate-400 block">Số ô tủ</span>
+                    <span className="text-xs font-semibold text-slate-500 block">Số ô tủ</span>
                     <span className="text-xs text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
                       Cấp tự động
                     </span>
@@ -405,14 +405,14 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                 {/* Thời gian lưu trữ */}
                 <div className="grid grid-cols-2 gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
                   <div>
-                    <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Thời lượng</span>
+                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Thời lượng</span>
                     <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5 mt-1">
                       <Clock className="w-3.5 h-3.5 text-blue-600" />
                       {duration} Giờ
                     </span>
                   </div>
                   <div>
-                    <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Khung giờ sử dụng</span>
+                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Khung giờ sử dụng</span>
                     <span className="text-xs font-bold text-slate-900 mt-1 block">
                       {storageDate}, {dropOffTime}
                     </span>
@@ -432,7 +432,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                       <span className="flex items-center gap-1.5">
                         Voucher giảm giá
                         {voucherCode && (
-                          <span className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-1.5 py-0.5 rounded font-mono text-[10px] font-bold">
+                          <span className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-1.5 py-0.5 rounded font-mono text-xs font-bold">
                             {voucherCode}
                           </span>
                         )}
@@ -458,7 +458,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                   <div className="pt-3 border-t border-slate-200 flex justify-between items-baseline">
                     <div>
                       <span className="text-sm font-bold text-slate-900">Tổng thanh toán</span>
-                      <span className="block text-[11px] text-slate-400">Đã bao gồm thuế GTGT (VAT)</span>
+                      <span className="block text-xs text-slate-500">Đã bao gồm thuế GTGT (VAT)</span>
                     </div>
                     <div className="text-right">
                       <span className="font-mono text-2xl font-extrabold text-blue-600 tracking-tight">
@@ -472,7 +472,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                 {/* Ghi chú nhận ô tủ */}
                 <div className="bg-blue-50/80 border border-blue-200 rounded-xl p-3 flex items-start gap-2.5">
                   <Info className="text-blue-600 w-4 h-4 mt-0.5 shrink-0" />
-                  <p className="text-xs text-blue-900 leading-relaxed">
+                  <p className="text-sm text-blue-900 leading-relaxed">
                     Sau khi thanh toán thành công, hệ thống sẽ <strong>giữ chỗ tủ cho bạn trong 30 phút</strong> để bạn di chuyển đến trạm. Thời gian thuê <strong>{duration} giờ</strong> chỉ bắt đầu tính từ lúc bạn mở tủ tại trạm.
                   </p>
                 </div>
@@ -489,18 +489,18 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
                 <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 sm:col-span-2">
-                  <span className="text-slate-400 block text-[11px]">Họ và tên người sử dụng</span>
+                  <span className="text-slate-500 block text-xs">Họ và tên người sử dụng</span>
                   <span className="font-bold text-slate-800 mt-0.5 block truncate">{travelerName}</span>
                 </div>
                 <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
-                  <span className="text-slate-400 block text-[11px] flex items-center gap-1">
+                  <span className="text-slate-500 block text-xs flex items-center gap-1">
                     <MessageSquare className="w-3 h-3 text-emerald-600" />
                     Số điện thoại nhận mã
                   </span>
                   <span className="font-mono font-bold text-slate-800 mt-0.5 block">{travelerPhone}</span>
                 </div>
                 <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
-                  <span className="text-slate-400 block text-[11px] flex items-center gap-1">
+                  <span className="text-slate-500 block text-xs flex items-center gap-1">
                     <Mail className="w-3 h-3 text-blue-600" />
                     Email nhận biên lai
                   </span>
@@ -523,7 +523,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                   <span className="text-blue-600 font-semibold hover:underline">Chính sách sử dụng tủ SmartLocker</span>.
                 </span>
               </label>
-              <div className="text-[11px] text-slate-500 leading-relaxed pl-6 space-y-1">
+              <div className="text-xs text-slate-500 leading-relaxed pl-6 space-y-1">
                 <p>• <strong>Hủy miễn phí:</strong> Được hỗ trợ hủy trước 2 giờ so với thời điểm nhận tủ.</p>
                 <p>• <strong>An toàn:</strong> Nghiêm cấm lưu trữ chất dễ cháy nổ, đồ tươi sống hoặc hàng cấm.</p>
               </div>
@@ -545,7 +545,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                       {formatTimer(secondsLeft)}
                     </span>
                   </p>
-                  <p className="text-[11px] text-amber-800/80 mt-0.5">
+                  <p className="text-sm text-amber-800/80 mt-0.5">
                     Sau thời gian này, ô tủ sẽ tự động được giải phóng nếu chưa nhận được thanh toán.
                   </p>
                 </div>
@@ -563,17 +563,17 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                   <div>
                     <div className="flex items-center gap-2">
                       <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">Thanh toán qua PayOS</h2>
-                      <span className="bg-blue-100 text-blue-700 font-bold text-[10px] px-2 py-0.5 rounded">Cổng bảo mật</span>
+                      <span className="bg-blue-100 text-blue-700 font-bold text-xs px-2 py-0.5 rounded">Cổng bảo mật</span>
                     </div>
-                    <p className="text-xs text-slate-500 mt-0.5">
+                    <p className="text-sm text-slate-500 mt-0.5">
                       Quét mã QR bằng ứng dụng của hơn 40+ ngân hàng hoặc ví điện tử
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-1.5 self-start sm:self-center shrink-0">
-                  <span className="bg-[#003B7A] text-white font-bold text-[10px] px-2 py-1 rounded shadow-xs">VIETQR</span>
-                  <span className="bg-[#D9251D] text-white font-bold text-[10px] px-2 py-1 rounded shadow-xs">NAPAS 247</span>
+                  <span className="bg-[#003B7A] text-white font-bold text-xs px-2 py-1 rounded shadow-xs">VIETQR</span>
+                  <span className="bg-[#D9251D] text-white font-bold text-xs px-2 py-1 rounded shadow-xs">NAPAS 247</span>
                 </div>
               </div>
 
@@ -605,7 +605,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                     <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
                     <span>Số tiền chính xác: {formatCurrency(amount)} ₫</span>
                   </div>
-                  <p className="text-xs text-slate-600 font-medium">
+                  <p className="text-sm text-slate-600 font-medium">
                     Mở app ngân hàng ➔ Chọn <strong>Quét mã QR</strong> để chuyển khoản tự động
                   </p>
                 </div>
@@ -627,7 +627,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                     {accountNumber && (
                       <button
                         onClick={() => handleCopy(accountNumber, 'Số tài khoản')}
-                        className="bg-white hover:bg-slate-100 border border-slate-300 text-blue-600 font-semibold px-2 py-0.5 rounded text-[11px] flex items-center gap-1 transition-colors active:scale-95"
+                        className="bg-white hover:bg-slate-100 border border-slate-300 text-blue-600 font-semibold px-2 py-0.5 rounded text-xs flex items-center gap-1 transition-colors active:scale-95"
                       >
                         <Copy className="w-3 h-3" />
                         <span>Sao chép</span>
@@ -646,7 +646,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                 <div className="p-3 flex items-center justify-between gap-2 bg-blue-50/50">
                   <div>
                     <span className="text-blue-900 font-semibold block">Nội dung chuyển khoản:</span>
-                    <span className="text-[11px] text-blue-700/80">Bắt buộc để hệ thống tự động nhận diện</span>
+                    <span className="text-xs text-blue-700/80">Bắt buộc để hệ thống tự động nhận diện</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="font-mono text-xs font-extrabold text-blue-700 bg-white px-2 py-1 rounded border border-blue-200">
@@ -654,7 +654,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                     </span>
                     <button
                       onClick={() => handleCopy(`Dat tu ${orderCode}`, 'Nội dung chuyển khoản')}
-                      className="bg-white hover:bg-blue-50 border border-blue-300 text-blue-600 font-bold px-2 py-1 rounded text-[11px] flex items-center gap-1 transition-colors active:scale-95"
+                      className="bg-white hover:bg-blue-50 border border-blue-300 text-blue-600 font-bold px-2 py-1 rounded text-xs flex items-center gap-1 transition-colors active:scale-95"
                     >
                       <Copy className="w-3 h-3" />
                       <span>Sao chép</span>
@@ -667,7 +667,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
               <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 mb-5">
                 <div className="text-left">
                   <span className="text-xs font-bold text-slate-800 block">Bạn muốn thanh toán trên trình duyệt riêng?</span>
-                  <span className="text-[11px] text-slate-500">Hỗ trợ thanh toán qua cổng PayOS hoặc thẻ ngân hàng</span>
+                  <span className="text-xs text-slate-500">Hỗ trợ thanh toán qua cổng PayOS hoặc thẻ ngân hàng</span>
                 </div>
                 <button
                   onClick={handleOpenPayOS}
@@ -688,12 +688,12 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="text-xs font-bold text-slate-900">
+                      <p className="text-sm font-bold text-slate-900">
                         Đang đợi xác nhận thanh toán từ ngân hàng...
                       </p>
                       <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     </div>
-                    <p className="text-[11px] text-slate-500 mt-0.5">
+                    <p className="text-sm text-slate-500 mt-0.5">
                       Hệ thống tự động phát hiện trong 2 – 5 giây khi giao dịch thành công. Không cần tải lại trang.
                     </p>
                   </div>
@@ -752,13 +752,13 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                   {successData?.accessCode ? (successData.accessCode.replace(/\s+/g, '').length === 6 ? `${successData.accessCode.replace(/\s+/g, '').slice(0, 3)} ${successData.accessCode.replace(/\s+/g, '').slice(3)}` : successData.accessCode) : 'Chưa cấp'}
                 </span>
               </div>
-              <div className="pt-2 border-t border-blue-200/60 space-y-1 text-[11px] text-blue-900 leading-relaxed">
+              <div className="pt-2 border-t border-blue-200/60 space-y-1 text-xs text-blue-900 leading-relaxed">
                 <p>⏱️ <strong>Giữ chỗ 30 phút:</strong> Bạn có 30 phút để đến trạm nhận tủ.</p>
                 <p>🔒 <strong>Tính giờ:</strong> Thời gian thuê <strong>{duration} tiếng</strong> chỉ bắt đầu đếm khi bạn quét mã QR/nhập PIN mở tủ tại trạm.</p>
               </div>
             </div>
 
-            <p className="text-xs text-slate-500 mb-5">
+            <p className="text-sm text-slate-500 mb-5">
               Thông tin ngăn tủ và mã khóa đã được lưu vào mục quản lý đơn đặt của bạn.
             </p>
 
@@ -806,7 +806,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                 <span className="text-base text-blue-600 font-extrabold tracking-tight">SmartLocker</span>
                 <span className="text-xs text-slate-500 font-medium">Hệ thống tủ lưu trữ hành lý thông minh</span>
               </div>
-              <p className="text-xs text-slate-400">
+              <p className="text-sm text-slate-500">
                 © 2026 SmartLocker Systems. Cổng thanh toán tích hợp PayOS &amp; VietQR Napas 24/7.
               </p>
             </div>

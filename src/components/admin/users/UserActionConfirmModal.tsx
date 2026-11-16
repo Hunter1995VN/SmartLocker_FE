@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { AlertTriangle, Lock, Unlock, Shield, X } from 'lucide-react';
 import type { UserAdminListItemDto, UserRole } from '../../../api/adminUserService';
 import { getRoleConfig } from './userConstants';
+import ModalOverlay from '../../ui/ModalOverlay';
 
 export type ActionType = 'LOCK' | 'ACTIVATE' | 'CHANGE_ROLE';
 
@@ -46,7 +47,7 @@ export default function UserActionConfirmModal({
     const isTraveler = user.role === 'TRAVELER';
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+        <ModalOverlay onClose={onClose}>
             <div className="bg-white rounded-2xl max-w-md w-full border border-slate-200 shadow-2xl overflow-hidden flex flex-col">
                 {/* Header */}
                 <div className="p-5 border-b border-slate-100 flex items-center justify-between">
@@ -81,7 +82,7 @@ export default function UserActionConfirmModal({
                         type="button"
                         onClick={onClose}
                         disabled={isProcessing}
-                        className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+                        className="p-1 rounded-lg text-slate-500 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
                     >
                         <X className="w-4 h-4" />
                     </button>
@@ -102,7 +103,7 @@ export default function UserActionConfirmModal({
                                     : 'Tài khoản này sẽ ngay lập tức bị thu hồi quyền truy cập Admin Portal và các chức năng vận hành trạm.'}
                             </p>
                             {isTraveler && (
-                                <p className="text-[11px] text-amber-700 font-medium bg-amber-50/80 p-2 rounded-lg border border-amber-200">
+                                <p className="text-xs text-amber-700 font-medium bg-amber-50/80 p-2 rounded-lg border border-amber-200">
                                     💡 <strong>Mẹo:</strong> Nếu chỉ muốn chặn khách hàng đặt tủ mới do nợ cước (vẫn để họ đăng nhập trả tiền qua PayOS), hãy sử dụng nút <strong>Khóa đặt tủ</strong> bên trang <em>Quản lý dư nợ</em>.
                                 </p>
                             )}
@@ -152,7 +153,7 @@ export default function UserActionConfirmModal({
                     )}
 
                     {/* User credentials summary */}
-                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-slate-500 text-[11px]">
+                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-slate-500 text-xs">
                         <span>ID người dùng:</span>
                         <span className="font-mono text-slate-700">{user.id.slice(0, 16)}...</span>
                     </div>
@@ -190,6 +191,6 @@ export default function UserActionConfirmModal({
                     </div>
                 </form>
             </div>
-        </div>
+        </ModalOverlay>
     );
 }

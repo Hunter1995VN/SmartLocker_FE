@@ -15,6 +15,7 @@ import {
   Info
 } from 'lucide-react';
 import type { OfflineTicketDto } from '../../api/bookingService';
+import ModalOverlay from '../ui/ModalOverlay';
 
 interface OfflineTicketModalProps {
   isOpen: boolean;
@@ -205,7 +206,7 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm animate-in fade-in duration-200">
+    <ModalOverlay onClose={onClose}>
       <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100 max-h-[92vh] flex flex-col">
         {/* Top Header Banner */}
         <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 text-white p-5 sm:p-6 shrink-0 relative overflow-hidden">
@@ -221,7 +222,7 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
               <h3 className="text-xl sm:text-2xl font-bold tracking-tight">
                 Vé Mở Khóa Ngoại Tuyến
               </h3>
-              <p className="text-xs text-blue-100">
+              <p className="text-sm text-blue-100">
                 Chuẩn mã hóa HMAC-SHA256 (JWS RFC 7515)
               </p>
             </div>
@@ -244,7 +245,7 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
             </div>
           ) : !ticket ? (
             <div className="py-12 text-center space-y-3">
-              <Info className="w-10 h-10 text-slate-400 mx-auto" />
+              <Info className="w-10 h-10 text-slate-500 mx-auto" />
               <p className="text-sm text-slate-600 font-medium">Không tìm thấy vé ngoại tuyến cho đơn đặt này.</p>
             </div>
           ) : (
@@ -257,7 +258,7 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
                       <MapPin className="w-3.5 h-3.5" />
                       <span>{ticket.stationName}</span>
                     </div>
-                    <p className="text-xs text-slate-500 line-clamp-1">{ticket.stationAddress}</p>
+                    <p className="text-sm text-slate-500 line-clamp-1">{ticket.stationAddress}</p>
                   </div>
                   <span className="shrink-0 px-2.5 py-1 rounded-lg bg-blue-100 text-blue-800 text-xs font-bold font-mono">
                     {ticket.bookingCode}
@@ -291,7 +292,7 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
 
               {/* Monospace 6-Digit PIN */}
               <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200/80 space-y-2 text-center">
-                <span className="text-[11px] font-bold text-blue-800 uppercase tracking-wider">
+                <span className="text-xs font-bold text-blue-800 uppercase tracking-wider">
                   HOẶC NHẬP MÃ PIN 8 SỐ TRÊN MÀN HÌNH KIOSK
                 </span>
 
@@ -326,7 +327,7 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
               <div className="space-y-2 text-xs">
                 <div className="flex items-center justify-between text-slate-500 py-1 border-b border-slate-100">
                   <span className="flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-slate-400" />
+                    <Clock className="w-3.5 h-3.5 text-slate-500" />
                     Thời hạn hiệu lực ngoại tuyến:
                   </span>
                   <span className="font-semibold text-slate-800">
@@ -383,6 +384,6 @@ export const OfflineTicketModal: React.FC<OfflineTicketModalProps> = ({
           </button>
         </div>
       </div>
-    </div>
+    </ModalOverlay>
   );
 };

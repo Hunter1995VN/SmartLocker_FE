@@ -165,7 +165,7 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                             <Cpu className="w-5 h-5" />
                         </span>
                         <div>
-                            <h1 className="text-xl font-black text-slate-900 tracking-tight">
+                            <h1 className="text-xl font-extrabold text-slate-900 tracking-tight">
                                 Quản lý & Giám sát Thiết bị IoT (ESP32 Fleet)
                             </h1>
                             <p className="text-xs text-slate-500">
@@ -188,42 +188,42 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
             {/* KPI Cards Row */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
                         Trạm có mạch phần cứng
                     </span>
                     <div className="flex items-baseline gap-2 mt-1">
-                        <span className="text-2xl font-black text-slate-900">{provisionedCount}</span>
+                        <span className="text-2xl font-extrabold text-slate-900">{provisionedCount}</span>
                         <span className="text-xs text-slate-500 font-medium">/ {totalCount} trạm</span>
                     </div>
                 </div>
 
                 <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs">
-                    <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider block">
+                    <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider block">
                         Đang kết nối (Online)
                     </span>
                     <div className="flex items-baseline gap-2 mt-1">
-                        <span className="text-2xl font-black text-emerald-600">{onlineCount}</span>
+                        <span className="text-2xl font-extrabold text-emerald-600">{onlineCount}</span>
                         <span className="text-xs text-emerald-700 font-medium">thiết bị</span>
                     </div>
                 </div>
 
                 <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs">
-                    <span className="text-[10px] font-bold text-rose-500 uppercase tracking-wider block">
+                    <span className="text-xs font-bold text-rose-500 uppercase tracking-wider block">
                         Mất kết nối (Offline)
                     </span>
                     <div className="flex items-baseline gap-2 mt-1">
-                        <span className="text-2xl font-black text-rose-600">{offlineCount}</span>
+                        <span className="text-2xl font-extrabold text-rose-600">{offlineCount}</span>
                         <span className="text-xs text-rose-500 font-medium">thiết bị</span>
                     </div>
                 </div>
 
                 <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
                         Chưa gắn phần cứng
                     </span>
                     <div className="flex items-baseline gap-2 mt-1">
-                        <span className="text-2xl font-black text-slate-600">{unprovisionedCount}</span>
-                        <span className="text-xs text-slate-400 font-medium">chưa lắp đặt</span>
+                        <span className="text-2xl font-extrabold text-slate-600">{unprovisionedCount}</span>
+                        <span className="text-xs text-slate-500 font-medium">chưa lắp đặt</span>
                     </div>
                 </div>
             </div>
@@ -231,7 +231,7 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
             {/* Filter and Search Bar */}
             <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs flex flex-wrap items-center justify-between gap-3">
                 <div className="relative min-w-[280px] flex-1 max-w-md">
-                    <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                         type="text"
                         value={searchQuery}
@@ -277,7 +277,7 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
             <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs">
-                        <thead className="bg-slate-50/80 border-b border-slate-200 text-slate-500 uppercase text-[10px] tracking-wider font-bold">
+                        <thead className="bg-slate-50/80 border-b border-slate-200 text-slate-500 uppercase text-xs tracking-wider font-bold">
                             <tr>
                                 <th className="px-5 py-3.5">Mã thiết bị / Trạm liên kết</th>
                                 <th className="px-4 py-3.5">Trạng thái kết nối</th>
@@ -290,17 +290,17 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                         <tbody className="divide-y divide-slate-100 font-medium">
                             {isLoading ? (
                                 <tr>
-                                    <td colSpan={6} className="py-12 text-center text-slate-400">
+                                    <td colSpan={6} className="py-12 text-center text-slate-500">
                                         <div className="w-7 h-7 border-2 border-blue-500/20 border-t-blue-500 rounded-full animate-spin mx-auto mb-2" />
                                         <p className="text-xs">Đang tải danh sách thiết bị vi điều khiển...</p>
                                     </td>
                                 </tr>
                             ) : filteredDevices.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="py-12 text-center text-slate-400">
+                                    <td colSpan={6} className="py-12 text-center text-slate-500">
                                         <Cpu className="w-8 h-8 text-slate-300 mx-auto mb-2 stroke-[1.5]" />
                                         <p className="text-xs font-semibold text-slate-600">Không tìm thấy thiết bị IoT nào</p>
-                                        <p className="text-[11px] text-slate-400 mt-0.5">Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc</p>
+                                        <p className="text-xs text-slate-500 mt-0.5">Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc</p>
                                     </td>
                                 </tr>
                             ) : (
@@ -317,7 +317,7 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                                                 <div className="flex items-center gap-3">
                                                     <div className={`p-2 rounded-xl shrink-0 border ${
                                                         isUnprovisioned
-                                                            ? 'bg-slate-100 text-slate-400 border-slate-200'
+                                                            ? 'bg-slate-100 text-slate-500 border-slate-200'
                                                             : 'bg-blue-50 text-blue-600 border-blue-100'
                                                     }`}>
                                                         <Radio className="w-4 h-4" />
@@ -325,20 +325,20 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                                                     <div>
                                                         <div className="flex items-center gap-1.5">
                                                             <span className={`font-mono text-xs font-bold ${
-                                                                isUnprovisioned ? 'text-slate-400' : 'text-slate-900'
+                                                                isUnprovisioned ? 'text-slate-500' : 'text-slate-900'
                                                             }`}>
                                                                 {isUnprovisioned ? 'CHƯA_GẮN_MẠCH' : device.deviceCode}
                                                             </span>
                                                             {!isUnprovisioned && (
-                                                                <span className="text-[10px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200 font-mono">
+                                                                <span className="text-xs px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200 font-mono">
                                                                     v{device.firmwareVersion}
                                                                 </span>
                                                             )}
                                                         </div>
-                                                        <p className="text-[11px] text-slate-700 font-semibold mt-0.5">
+                                                        <p className="text-xs text-slate-700 font-semibold mt-0.5">
                                                             {device.stationName}
                                                         </p>
-                                                        <p className="text-[10px] text-slate-400 truncate max-w-xs">
+                                                        <p className="text-xs text-slate-500 truncate max-w-xs">
                                                             {device.stationAddress}
                                                         </p>
                                                     </div>
@@ -348,7 +348,7 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                                             {/* Status */}
                                             <td className="px-4 py-4">
                                                 <span
-                                                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border ${
+                                                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${
                                                         isOnline
                                                             ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                                                             : isReboot
@@ -376,17 +376,17 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                                             {/* Wi-Fi & Spec */}
                                             <td className="px-4 py-4">
                                                 {isUnprovisioned ? (
-                                                    <span className="text-[11px] text-slate-400 font-mono">-- (Chưa lắp đặt)</span>
+                                                    <span className="text-xs text-slate-500 font-mono">-- (Chưa lắp đặt)</span>
                                                 ) : (
                                                     <div className="space-y-0.5 text-xs text-slate-600">
                                                         <div className="flex items-center gap-1.5">
-                                                            <Wifi className={`w-3.5 h-3.5 ${isOnline ? 'text-emerald-600' : 'text-slate-400'} shrink-0`} />
-                                                            <span className="font-mono font-bold text-[11px]">
+                                                            <Wifi className={`w-3.5 h-3.5 ${isOnline ? 'text-emerald-600' : 'text-slate-500'} shrink-0`} />
+                                                            <span className="font-mono font-bold text-xs">
                                                                 {device.wifiRssi ? `${device.wifiRssi} dBm` : 'Mất tín hiệu'}
                                                             </span>
-                                                            {isOnline && <span className="text-[10px] text-emerald-600 font-semibold">(Tốt)</span>}
+                                                            {isOnline && <span className="text-xs text-emerald-600 font-semibold">(Tốt)</span>}
                                                         </div>
-                                                        <p className="text-[10px] text-slate-400 font-mono">
+                                                        <p className="text-xs text-slate-500 font-mono">
                                                             Loại: <span className="text-slate-600 font-bold">{device.deviceType}</span>
                                                         </p>
                                                     </div>
@@ -396,10 +396,10 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                                             {/* Uptime */}
                                             <td className="px-4 py-4 font-mono text-slate-600 text-xs">
                                                 {isUnprovisioned ? (
-                                                    <span className="text-slate-400">--</span>
+                                                    <span className="text-slate-500">--</span>
                                                 ) : (
                                                     <div className="flex items-center gap-1.5">
-                                                        <Clock className="w-3.5 h-3.5 text-slate-400" />
+                                                        <Clock className="w-3.5 h-3.5 text-slate-500" />
                                                         <span>
                                                             {device.uptimeSeconds
                                                                 ? `${Math.floor(device.uptimeSeconds / 60)} phút ${device.uptimeSeconds % 60}s`
@@ -412,25 +412,25 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                                             {/* Last Seen */}
                                             <td className="px-4 py-4 text-slate-500 text-xs">
                                                 {isUnprovisioned ? (
-                                                    <span className="text-slate-400">Chưa kích hoạt</span>
+                                                    <span className="text-slate-500">Chưa kích hoạt</span>
                                                 ) : device.lastSeenAt ? (
                                                     <span>{new Date(device.lastSeenAt).toLocaleString('vi-VN')}</span>
                                                 ) : (
-                                                    <span className="text-slate-400">Chưa có dữ liệu</span>
+                                                    <span className="text-slate-500">Chưa có dữ liệu</span>
                                                 )}
                                             </td>
 
                                             {/* Actions */}
                                             <td className="px-5 py-4 text-right">
                                                 {isUnprovisioned ? (
-                                                    <span className="text-[11px] text-slate-400 italic">Cần gắn mạch để điều khiển</span>
+                                                    <span className="text-xs text-slate-500 italic">Cần gắn mạch để điều khiển</span>
                                                 ) : (
                                                     <div className="flex items-center justify-end gap-2">
                                                         <button
                                                             type="button"
                                                             onClick={() => handleRunSelfTest(device)}
                                                             disabled={testingDeviceId === device.id || isReboot}
-                                                            className="px-2.5 py-1.5 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200/80 font-bold text-[11px] transition flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                                                            className="px-2.5 py-1.5 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200/80 font-bold text-xs transition flex items-center gap-1 cursor-pointer disabled:opacity-50"
                                                             title="Kích hoạt chu trình chẩn đoán tự động (UC-S07)"
                                                         >
                                                             <Activity className={`w-3.5 h-3.5 ${testingDeviceId === device.id ? 'animate-spin' : ''}`} />
@@ -441,7 +441,7 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                                                             type="button"
                                                             onClick={() => setSelectedDeviceForReboot(device)}
                                                             disabled={isReboot}
-                                                            className="px-2.5 py-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-amber-50 hover:text-amber-800 hover:border-amber-200 border border-slate-200 font-bold text-[11px] transition flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                                                            className="px-2.5 py-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-amber-50 hover:text-amber-800 hover:border-amber-200 border border-slate-200 font-bold text-xs transition flex items-center gap-1 cursor-pointer disabled:opacity-50"
                                                             title="Khởi động lại ESP32 từ xa qua MQTT (UC-S09)"
                                                         >
                                                             <RotateCw className="w-3.5 h-3.5" />
@@ -472,7 +472,7 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                                     <h3 className="text-sm font-bold text-slate-900">
                                         Báo cáo Chẩn đoán Phần cứng (UC-S07)
                                     </h3>
-                                    <p className="text-[11px] text-slate-400 font-mono">
+                                    <p className="text-xs text-slate-500 font-mono">
                                         Thiết bị: {diagnosticsModal.device.deviceCode} · Trạm: {diagnosticsModal.device.stationName}
                                     </p>
                                 </div>
@@ -480,7 +480,7 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                             <button
                                 type="button"
                                 onClick={() => setDiagnosticsModal(null)}
-                                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 text-sm cursor-pointer"
+                                className="p-1 rounded-lg text-slate-500 hover:text-slate-600 text-sm cursor-pointer"
                             >
                                 ✕
                             </button>
@@ -500,10 +500,10 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                         {/* Relays & Sensors Grid */}
                         <div className="grid grid-cols-2 gap-3 text-xs">
                             <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-                                <span className="font-bold text-slate-700 uppercase text-[10px] tracking-wider block">
+                                <span className="font-bold text-slate-700 uppercase text-xs tracking-wider block">
                                     Rơ-le khóa Solenoid
                                 </span>
-                                <div className="space-y-1 font-mono text-[11px]">
+                                <div className="space-y-1 font-mono text-xs">
                                     <div className="flex justify-between">
                                         <span>Rơ-le S (GPIO 26):</span>
                                         <span className="text-emerald-600 font-bold">OK (200ms)</span>
@@ -520,10 +520,10 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                             </div>
 
                             <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-                                <span className="font-bold text-slate-700 uppercase text-[10px] tracking-wider block">
+                                <span className="font-bold text-slate-700 uppercase text-xs tracking-wider block">
                                     Cảm biến hành trình cửa
                                 </span>
-                                <div className="space-y-1 font-mono text-[11px]">
+                                <div className="space-y-1 font-mono text-xs">
                                     <div className="flex justify-between">
                                         <span>Cửa S (GPIO 27):</span>
                                         <span className="text-slate-800 font-bold">CLOSED</span>
@@ -588,7 +588,7 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                                 type="button"
                                 onClick={handleConfirmReboot}
                                 disabled={isRebooting}
-                                className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition shadow-xs cursor-pointer disabled:opacity-50"
+                                className="px-3.5 py-1.5 rounded-xl bg-amber-700 hover:bg-amber-800 text-white text-xs font-bold transition shadow-xs cursor-pointer disabled:opacity-50"
                             >
                                 {isRebooting ? 'Đang gửi...' : 'Xác nhận Reboot'}
                             </button>

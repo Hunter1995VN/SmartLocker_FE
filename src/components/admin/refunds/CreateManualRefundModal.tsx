@@ -20,6 +20,7 @@ import type {
     CreateManualRefundRequest,
     ExceptionRefundCategory,
 } from '../../../api/adminManualRefundService';
+import ModalOverlay from '../../ui/ModalOverlay';
 
 interface CreateManualRefundModalProps {
     isOpen: boolean;
@@ -237,7 +238,7 @@ export default function CreateManualRefundModal({
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/55 backdrop-blur-xs p-4">
+        <ModalOverlay onClose={onClose}>
             <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden">
                 {/* Header */}
                 <div className="px-6 py-4 bg-gradient-to-r from-purple-700 to-indigo-600 text-white flex items-center justify-between">
@@ -280,7 +281,7 @@ export default function CreateManualRefundModal({
                                 1. Chọn giao dịch gốc đã thanh toán (PAID) <span className="text-rose-500">*</span>
                             </label>
                             <div className="relative w-full sm:w-64">
-                                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                                <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                                 <input
                                     type="text"
                                     value={searchKw}
@@ -315,13 +316,13 @@ export default function CreateManualRefundModal({
                         {selectedCandidate && (
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
                                 <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                                    <p className="text-[10px] text-slate-400 uppercase font-bold">Thực thu gốc</p>
+                                    <p className="text-xs text-slate-500 uppercase font-bold">Thực thu gốc</p>
                                     <p className="text-sm font-extrabold text-slate-900">
                                         {formatVnd(selectedCandidate.paidAmount)}
                                     </p>
                                 </div>
                                 <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                                    <p className="text-[10px] text-slate-400 uppercase font-bold">Đã hoàn / Chờ duyệt</p>
+                                    <p className="text-xs text-slate-500 uppercase font-bold">Đã hoàn / Chờ duyệt</p>
                                     <p className="text-sm font-extrabold text-amber-600">
                                         {formatVnd(
                                             selectedCandidate.alreadyRefundedAmount +
@@ -330,7 +331,7 @@ export default function CreateManualRefundModal({
                                     </p>
                                 </div>
                                 <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200">
-                                    <p className="text-[10px] text-emerald-700 uppercase font-bold">
+                                    <p className="text-xs text-emerald-700 uppercase font-bold">
                                         Trần hoàn tối đa còn
                                     </p>
                                     <p className="text-sm font-extrabold text-emerald-700">
@@ -338,7 +339,7 @@ export default function CreateManualRefundModal({
                                     </p>
                                 </div>
                                 <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                                    <p className="text-[10px] text-slate-400 uppercase font-bold">Trạng thái đơn</p>
+                                    <p className="text-xs text-slate-500 uppercase font-bold">Trạng thái đơn</p>
                                     <p className="text-xs font-extrabold text-blue-700 truncate">
                                         {selectedCandidate.bookingStatus}{' '}
                                         {selectedCandidate.lockerCode ? `· Ô ${selectedCandidate.lockerCode}` : ''}
@@ -373,7 +374,7 @@ export default function CreateManualRefundModal({
                                         <p className={`font-bold ${active ? 'text-purple-800' : 'text-slate-800'}`}>
                                             {cat.label}
                                         </p>
-                                        <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">{cat.desc}</p>
+                                        <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{cat.desc}</p>
                                     </button>
                                 );
                             })}
@@ -397,7 +398,7 @@ export default function CreateManualRefundModal({
                                             key={btn.label}
                                             type="button"
                                             onClick={() => applyPercentPreset(btn.pct)}
-                                            className="px-2 py-0.5 rounded bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-[10px] font-extrabold cursor-pointer"
+                                            className="px-2 py-0.5 rounded bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs font-extrabold cursor-pointer"
                                         >
                                             {btn.label}
                                         </button>
@@ -418,7 +419,7 @@ export default function CreateManualRefundModal({
 
                         <div>
                             <label className="block font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-                                <Wrench className="w-3.5 h-3.5 text-slate-400" />
+                                <Wrench className="w-3.5 h-3.5 text-slate-500" />
                                 <span>Mã biên bản sự cố IoT liên quan (nếu có)</span>
                             </label>
                             <input
@@ -532,7 +533,7 @@ export default function CreateManualRefundModal({
                                 <p className="font-bold text-slate-800">
                                     Đồng thời Hủy đơn & Xử lý trạng thái Ngăn tủ khi duyệt
                                 </p>
-                                <p className="text-[11px] text-slate-500">
+                                <p className="text-xs text-slate-500">
                                     Tự động chuyển ngăn lỗi sang MAINTENANCE (nếu kẹt khóa) hoặc mở lại AVAILABLE
                                 </p>
                             </div>
@@ -550,7 +551,7 @@ export default function CreateManualRefundModal({
                                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                                     Miễn trừ dư nợ quá hạn phát sinh do sự cố kỹ thuật
                                 </p>
-                                <p className="text-[11px] text-slate-500">
+                                <p className="text-xs text-slate-500">
                                     Xóa nợ quá hạn bị tính oan khi khách không mở được tủ đúng hạn
                                 </p>
                             </div>
@@ -607,6 +608,6 @@ export default function CreateManualRefundModal({
                     </div>
                 </form>
             </div>
-        </div>
+        </ModalOverlay>
     );
 }

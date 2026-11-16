@@ -250,7 +250,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
     <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 md:p-6 animate-fade-in-up">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-[#0b1c30]/50 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-on-surface/50 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
@@ -270,7 +270,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                     ? 'Scan VietQR to Complete Extension'
                     : 'Extend Locker Rental Duration (UC-T14)'}
               </h2>
-              <p className="text-slate-500 text-xs mt-0.5">
+              <p className="text-slate-500 text-sm mt-0.5">
                 {isPaidSuccess
                   ? 'Your locker expiration time and QR access key have been updated'
                   : paymentData
@@ -282,7 +282,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
           <button
             onClick={onClose}
             aria-label="Close modal"
-            className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
+            className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -297,7 +297,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                 <span className="text-sm sm:text-base text-slate-900 font-bold">
                   {lockerCode.startsWith('Locker') ? lockerCode : `Locker ${lockerCode}`}
                 </span>
-                <span className="text-[11px] px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 font-semibold">
+                <span className="text-xs px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 font-semibold">
                   {sizeLabel} · {formatCurrency(effectiveHourlyRate)}đ/h
                 </span>
               </div>
@@ -307,7 +307,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
               </div>
             </div>
             <div className="flex sm:flex-col items-center sm:items-end justify-between border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-200/60 shrink-0">
-              <span className="text-[11px] text-slate-400 font-medium">Current Expiration</span>
+              <span className="text-xs text-slate-500 font-medium">Current Expiration</span>
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold mt-0.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
                 <span>{displayCurrentExpiry}</span>
@@ -325,7 +325,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                 <h3 className="text-lg font-extrabold text-slate-900">
                   Đã gia hạn thêm +{selectedHours} giờ thành công!
                 </h3>
-                <p className="text-xs text-slate-500">
+                <p className="text-sm text-slate-500">
                   Hạn trả tủ mới của bạn đã được cập nhật thành{' '}
                   <strong className="text-emerald-700">{formatDateTime(newEndDateObj)}</strong>.
                 </p>
@@ -342,8 +342,8 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                   {/* Real Scannable QR Box */}
                   <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-xs flex flex-col items-center justify-center shrink-0">
                     <div className="w-full flex justify-between items-center mb-1.5 px-0.5">
-                      <span className="font-extrabold text-[10px] text-blue-700">VIETQR</span>
-                      <span className="font-bold text-[9px] text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
+                      <span className="font-extrabold text-xs text-blue-700">VIETQR</span>
+                      <span className="font-bold text-xs text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
                         PayOS 24/7
                       </span>
                     </div>
@@ -358,7 +358,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                     ) : (
                       <QRCodeSVG value={paymentData.paymentUrl} size={156} level="M" />
                     )}
-                    <span className="text-[10px] text-slate-400 font-semibold mt-1.5">
+                    <span className="text-xs text-slate-500 font-semibold mt-1.5">
                       Quét bằng mọi App Ngân hàng
                     </span>
                   </div>
@@ -451,7 +451,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                   <label className="block text-xs font-bold text-slate-900 uppercase tracking-wider">
                     Select Extension Duration
                   </label>
-                  <span className="text-[11px] text-slate-500">
+                  <span className="text-xs text-slate-500">
                     Max allowed: {maxHours}h total (up to +{maxAdditionalHours}h)
                   </span>
                 </div>
@@ -481,7 +481,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                         }`}
                       >
                         {hrs === 3 && (
-                          <span className="absolute -top-2 right-2 px-1.5 py-0.2 bg-blue-600 text-white rounded text-[9px] font-bold uppercase">
+                          <span className="absolute -top-2 right-2 px-1.5 py-0.2 bg-blue-600 text-white rounded text-xs font-bold uppercase">
                             Popular
                           </span>
                         )}
@@ -491,7 +491,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                         <span className="text-xs font-bold text-blue-600 mt-1">
                           {formatCurrency(priceForHrs)} đ
                         </span>
-                        <span className="text-[10px] text-slate-500 mt-0.5 truncate">
+                        <span className="text-xs text-slate-500 mt-0.5 truncate">
                           → {endForHrs.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </button>
@@ -534,7 +534,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                     <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
                     <span>New End Time: {formatDateTime(newEndDateObj)}</span>
                   </div>
-                  <span className="text-[11px] text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full font-bold">
+                  <span className="text-xs text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full font-bold">
                     +{selectedHours} {selectedHours === 1 ? 'Hour' : 'Hours'}
                   </span>
                 </div>
@@ -571,7 +571,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                     <span className="text-xl font-extrabold text-blue-600 tracking-tight">
                       {formatCurrency(totalPayable)} VND
                     </span>
-                    <div className="text-slate-400 text-[11px]">Thanh toán qua PayOS VietQR</div>
+                    <div className="text-slate-500 text-xs">Thanh toán qua PayOS VietQR</div>
                   </div>
                 </div>
               </div>

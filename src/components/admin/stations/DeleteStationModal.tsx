@@ -4,6 +4,7 @@
  */
 import { AlertTriangle, Trash2, X } from 'lucide-react';
 import type { StationAdminDetailDto } from '../../../api/adminStationService';
+import ModalOverlay from '../../ui/ModalOverlay';
 
 interface DeleteStationModalProps {
     station: StationAdminDetailDto | null;
@@ -23,7 +24,7 @@ export default function DeleteStationModal({
     if (!isOpen || !station) return null;
 
     return (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+        <ModalOverlay onClose={onClose}>
             <div className="bg-white rounded-3xl max-w-md w-full border border-slate-200 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                 {/* Header */}
                 <div className="p-5 border-b border-slate-100 flex items-center justify-between">
@@ -35,13 +36,13 @@ export default function DeleteStationModal({
                             <h3 className="text-base font-extrabold text-slate-900 tracking-tight">
                                 Ngưng Hoạt Động Trạm Tủ?
                             </h3>
-                            <p className="text-[11px] text-slate-400">Xác nhận chuyển trạng thái INACTIVE</p>
+                            <p className="text-xs text-slate-500">Xác nhận chuyển trạng thái INACTIVE</p>
                         </div>
                     </div>
                     <button
                         type="button"
                         onClick={onClose}
-                        className="w-8 h-8 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center transition cursor-pointer"
+                        className="w-8 h-8 rounded-xl text-slate-500 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center transition cursor-pointer"
                     >
                         <X className="w-4 h-4" />
                     </button>
@@ -53,7 +54,7 @@ export default function DeleteStationModal({
                         Bạn có chắc chắn muốn ngưng hoạt động trạm tủ{' '}
                         <b className="text-slate-900 font-bold">"{station.name}"</b>?
                     </p>
-                    <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-[11px] text-amber-800 space-y-1">
+                    <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-800 space-y-1">
                         <p className="font-bold flex items-center gap-1.5">
                             <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
                             <span>Lưu ý quan trọng:</span>
@@ -89,6 +90,6 @@ export default function DeleteStationModal({
                     </button>
                 </div>
             </div>
-        </div>
+        </ModalOverlay>
     );
 }

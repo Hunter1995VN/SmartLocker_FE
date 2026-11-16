@@ -139,11 +139,11 @@ export default function AdminLoginPage({ onLoginSuccess, onNavigateHome }: Admin
                     <div>
                         <div className="flex items-center gap-2">
                             <span className="text-base font-extrabold text-white tracking-tight">SmartLocker</span>
-                            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                            <span className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
                                 Admin Portal
                             </span>
                         </div>
-                        <p className="text-[11px] text-slate-400">Hệ thống quản trị & vận hành trạm tủ</p>
+                        <p className="text-xs text-slate-500">Hệ thống quản trị & vận hành trạm tủ</p>
                     </div>
                 </div>
 
@@ -151,7 +151,7 @@ export default function AdminLoginPage({ onLoginSuccess, onNavigateHome }: Admin
                     <button
                         type="button"
                         onClick={onNavigateHome}
-                        className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-slate-800/60 border border-transparent hover:border-slate-700/80 cursor-pointer"
+                        className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-slate-800/60 border border-transparent hover:border-slate-700/80 cursor-pointer"
                     >
                         <ArrowLeft className="w-3.5 h-3.5" />
                         <span>Trang chủ khách hàng</span>
@@ -176,7 +176,7 @@ export default function AdminLoginPage({ onLoginSuccess, onNavigateHome }: Admin
                     <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
                         <div className="mb-6 text-center">
                             <h1 className="text-2xl font-bold text-white tracking-tight">Đăng nhập Quản trị</h1>
-                            <p className="text-xs text-slate-400 mt-1.5">
+                            <p className="text-xs text-slate-500 mt-1.5">
                                 Vui lòng nhập thông tin xác thực để truy cập hệ thống
                             </p>
                         </div>
@@ -302,7 +302,7 @@ export default function AdminLoginPage({ onLoginSuccess, onNavigateHome }: Admin
 
                         {/* Allowed Roles Description Footer */}
                         <div className="mt-6 pt-5 border-t border-slate-800/80">
-                            <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2 text-center">
+                            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 text-center">
                                 Vai trò được hỗ trợ truy cập
                             </p>
                             <div className="grid grid-cols-2 gap-2 text-xs">
@@ -310,14 +310,14 @@ export default function AdminLoginPage({ onLoginSuccess, onNavigateHome }: Admin
                                     <Shield className="w-3.5 h-3.5 text-blue-400 shrink-0 mt-0.5" />
                                     <div>
                                         <p className="font-semibold text-slate-200">Admin</p>
-                                        <p className="text-[10px] text-slate-400">Quản trị viên toàn hệ thống</p>
+                                        <p className="text-xs text-slate-500">Quản trị viên toàn hệ thống</p>
                                     </div>
                                 </div>
                                 <div className="p-2.5 rounded-xl bg-slate-950/40 border border-slate-800/60 flex items-start gap-2">
                                     <Wrench className="w-3.5 h-3.5 text-teal-400 shrink-0 mt-0.5" />
                                     <div>
                                         <p className="font-semibold text-slate-200">Staff</p>
-                                        <p className="text-[10px] text-slate-400">Nhân viên kỹ thuật & trạm</p>
+                                        <p className="text-xs text-slate-500">Nhân viên kỹ thuật & trạm</p>
                                     </div>
                                 </div>
                             </div>

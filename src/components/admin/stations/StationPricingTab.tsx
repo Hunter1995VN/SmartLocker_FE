@@ -282,7 +282,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                         <Tag className="w-4 h-4 text-blue-600" />
                         <span>Chế độ định giá (Pricing Model)</span>
                     </h4>
-                    <p className="text-[11px] text-slate-400 mt-0.5">
+                    <p className="text-xs text-slate-500 mt-0.5">
                         Lựa chọn áp dụng đơn vị tính block thời gian thuê tủ cho S, M, L
                     </p>
                 </div>
@@ -319,7 +319,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
             <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
                 <table className="w-full text-left border-collapse">
                     <thead>
-                        <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                        <tr className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
                             <th className="py-3 px-4">Kích thước (Size)</th>
                             <th className="py-3 px-4">
                                 {pricingMode === 'hourly' ? 'Giá theo giờ (VNĐ / block)' : 'Giá theo ngày (VNĐ / block)'}
@@ -333,12 +333,12 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                         <tr className="hover:bg-slate-50/50">
                             <td className="py-3.5 px-4">
                                 <div className="flex items-center gap-2">
-                                    <span className="w-7 h-7 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 font-black flex items-center justify-center">
+                                    <span className="w-7 h-7 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 font-extrabold flex items-center justify-center">
                                         S
                                     </span>
                                     <div>
                                         <p className="font-bold text-slate-800">Small (Tủ nhỏ)</p>
-                                        <p className="text-[10px] text-slate-400">Balo, túi xách cá nhân</p>
+                                        <p className="text-xs text-slate-500">Balo, túi xách cá nhân</p>
                                     </div>
                                 </div>
                             </td>
@@ -360,7 +360,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                                                 : 'border-slate-200 focus:ring-blue-200'
                                         }`}
                                     />
-                                    {errors.priceS && <p className="text-[10px] text-rose-500 mt-0.5">{errors.priceS}</p>}
+                                    {errors.priceS && <p className="text-xs text-rose-500 mt-0.5">{errors.priceS}</p>}
                                 </div>
                             </td>
                             <td className="py-3.5 px-4">
@@ -374,7 +374,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                                         className="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-mono font-semibold text-rose-700 bg-rose-50/30 focus:outline-none focus:ring-2 focus:ring-rose-200"
                                     />
                                     {errors.overdueFeeS && (
-                                        <p className="text-[10px] text-rose-500 mt-0.5">{errors.overdueFeeS}</p>
+                                        <p className="text-xs text-rose-500 mt-0.5">{errors.overdueFeeS}</p>
                                     )}
                                 </div>
                             </td>
@@ -382,7 +382,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                                 <div className="font-bold text-blue-600">
                                     {Number(priceS || 0).toLocaleString('vi-VN')} đ / {pricingMode === 'hourly' ? 'giờ' : 'ngày'}
                                 </div>
-                                <div className="text-[10px] text-rose-600 font-semibold">
+                                <div className="text-xs text-rose-600 font-semibold">
                                     Quá hạn: +{Number(overdueFeeS || 0).toLocaleString('vi-VN')} đ/giờ
                                 </div>
                             </td>
@@ -392,12 +392,12 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                         <tr className="hover:bg-slate-50/50">
                             <td className="py-3.5 px-4">
                                 <div className="flex items-center gap-2">
-                                    <span className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 font-black flex items-center justify-center">
+                                    <span className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 font-extrabold flex items-center justify-center">
                                         M
                                     </span>
                                     <div>
                                         <p className="font-bold text-slate-800">Medium (Tủ vừa)</p>
-                                        <p className="text-[10px] text-slate-400">Vali cabin, túi hành lý 20-inch</p>
+                                        <p className="text-xs text-slate-500">Vali cabin, túi hành lý 20-inch</p>
                                     </div>
                                 </div>
                             </td>
@@ -419,7 +419,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                                                 : 'border-slate-200 focus:ring-blue-200'
                                         }`}
                                     />
-                                    {errors.priceM && <p className="text-[10px] text-rose-500 mt-0.5">{errors.priceM}</p>}
+                                    {errors.priceM && <p className="text-xs text-rose-500 mt-0.5">{errors.priceM}</p>}
                                 </div>
                             </td>
                             <td className="py-3.5 px-4">
@@ -433,7 +433,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                                         className="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-mono font-semibold text-rose-700 bg-rose-50/30 focus:outline-none focus:ring-2 focus:ring-rose-200"
                                     />
                                     {errors.overdueFeeM && (
-                                        <p className="text-[10px] text-rose-500 mt-0.5">{errors.overdueFeeM}</p>
+                                        <p className="text-xs text-rose-500 mt-0.5">{errors.overdueFeeM}</p>
                                     )}
                                 </div>
                             </td>
@@ -441,7 +441,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                                 <div className="font-bold text-indigo-600">
                                     {Number(priceM || 0).toLocaleString('vi-VN')} đ / {pricingMode === 'hourly' ? 'giờ' : 'ngày'}
                                 </div>
-                                <div className="text-[10px] text-rose-600 font-semibold">
+                                <div className="text-xs text-rose-600 font-semibold">
                                     Quá hạn: +{Number(overdueFeeM || 0).toLocaleString('vi-VN')} đ/giờ
                                 </div>
                             </td>
@@ -451,12 +451,12 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                         <tr className="hover:bg-slate-50/50">
                             <td className="py-3.5 px-4">
                                 <div className="flex items-center gap-2">
-                                    <span className="w-7 h-7 rounded-lg bg-purple-50 text-purple-700 border border-purple-200 font-black flex items-center justify-center">
+                                    <span className="w-7 h-7 rounded-lg bg-purple-50 text-purple-700 border border-purple-200 font-extrabold flex items-center justify-center">
                                         L
                                     </span>
                                     <div>
                                         <p className="font-bold text-slate-800">Large (Tủ lớn)</p>
-                                        <p className="text-[10px] text-slate-400">Vali cỡ lớn 28-inch, kiện hàng nặng</p>
+                                        <p className="text-xs text-slate-500">Vali cỡ lớn 28-inch, kiện hàng nặng</p>
                                     </div>
                                 </div>
                             </td>
@@ -478,7 +478,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                                                 : 'border-slate-200 focus:ring-blue-200'
                                         }`}
                                     />
-                                    {errors.priceL && <p className="text-[10px] text-rose-500 mt-0.5">{errors.priceL}</p>}
+                                    {errors.priceL && <p className="text-xs text-rose-500 mt-0.5">{errors.priceL}</p>}
                                 </div>
                             </td>
                             <td className="py-3.5 px-4">
@@ -492,7 +492,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                                         className="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-mono font-semibold text-rose-700 bg-rose-50/30 focus:outline-none focus:ring-2 focus:ring-rose-200"
                                     />
                                     {errors.overdueFeeL && (
-                                        <p className="text-[10px] text-rose-500 mt-0.5">{errors.overdueFeeL}</p>
+                                        <p className="text-xs text-rose-500 mt-0.5">{errors.overdueFeeL}</p>
                                     )}
                                 </div>
                             </td>
@@ -500,7 +500,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                                 <div className="font-bold text-purple-600">
                                     {Number(priceL || 0).toLocaleString('vi-VN')} đ / {pricingMode === 'hourly' ? 'giờ' : 'ngày'}
                                 </div>
-                                <div className="text-[10px] text-rose-600 font-semibold">
+                                <div className="text-xs text-rose-600 font-semibold">
                                     Quá hạn: +{Number(overdueFeeL || 0).toLocaleString('vi-VN')} đ/giờ
                                 </div>
                             </td>
@@ -517,11 +517,11 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                             <RotateCcw className="w-4 h-4 text-blue-600" />
                             <span>Chính Sách Phí Phạt Quá Hạn & Tỷ Lệ Hoàn Tiền Khi Hủy Đơn</span>
                         </h4>
-                        <p className="text-[11px] text-slate-500 mt-0.5">
+                        <p className="text-xs text-slate-500 mt-0.5">
                             Cấu hình ngưỡng ân hạn quá hạn, mốc giờ hủy đơn tiêu chuẩn và tỷ lệ % hoàn tiền theo thời gian giữ chỗ
                         </p>
                     </div>
-                    <span className="px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-blue-50 text-blue-700 border border-blue-200 shrink-0">
+                    <span className="px-2.5 py-1 rounded-lg text-xs font-extrabold bg-blue-50 text-blue-700 border border-blue-200 shrink-0">
                         ÁP DỤNG S • M • L
                     </span>
                 </div>
@@ -535,11 +535,11 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                                 <Timer className="w-3.5 h-3.5 text-amber-600" />
                                 <span>Thời gian ân hạn trễ giờ (Grace Period)</span>
                             </label>
-                            <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                            <span className="text-xs font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
                                 Miễn phạt đầu giờ
                             </span>
                         </div>
-                        <p className="text-[11px] text-slate-500">
+                        <p className="text-xs text-slate-500">
                             Số phút khách được phép trễ sau khi hết hạn thuê trước khi hệ thống tính phí phạt quá hạn.
                         </p>
                         <div className="flex items-center gap-2 pt-1">
@@ -554,7 +554,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                             <span className="text-xs font-semibold text-slate-600">phút</span>
                         </div>
                         {errors.graceMinutes && (
-                            <p className="text-[10px] text-rose-500">{errors.graceMinutes}</p>
+                            <p className="text-xs text-rose-500">{errors.graceMinutes}</p>
                         )}
                     </div>
 
@@ -565,11 +565,11 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                                 <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
                                 <span>Thời gian giữ chỗ tối đa trước No-Show</span>
                             </label>
-                            <span className="text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+                            <span className="text-xs font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
                                 Giải phóng tủ tự động
                             </span>
                         </div>
-                        <p className="text-[11px] text-slate-500">
+                        <p className="text-xs text-slate-500">
                             Thời gian tối đa kể từ giờ bắt đầu đặt trước mà khách chưa mở tủ bỏ đồ trước khi tính No-Show.
                         </p>
                         <div className="flex items-center gap-2 pt-1">
@@ -584,7 +584,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                             <span className="text-xs font-semibold text-slate-600">phút</span>
                         </div>
                         {errors.noShowWindowMinutes && (
-                            <p className="text-[10px] text-rose-500">{errors.noShowWindowMinutes}</p>
+                            <p className="text-xs text-rose-500">{errors.noShowWindowMinutes}</p>
                         )}
                     </div>
 
@@ -595,11 +595,11 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                                 <Clock className="w-3.5 h-3.5 text-blue-600" />
                                 <span>Mốc hủy đơn trong thời gian giữ chỗ ({noShowWindowMinutes || 30} phút)</span>
                             </label>
-                            <span className="text-[10px] font-bold text-blue-700 bg-blue-100/80 px-2 py-0.5 rounded">
+                            <span className="text-xs font-bold text-blue-700 bg-blue-100/80 px-2 py-0.5 rounded">
                                 Theo thời gian giữ chỗ
                             </span>
                         </div>
-                        <p className="text-[11px] text-slate-500">
+                        <p className="text-xs text-slate-500">
                             Dựa trên tổng thời gian giữ chỗ chờ nhận tủ ({noShowWindowMinutes || 30} phút). Ví dụ nếu khách đổi ý hủy trong 15 phút đầu sẽ được coi là hủy sớm.
                         </p>
                         <div className="flex items-center gap-2 pt-1">
@@ -615,7 +615,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                             <span className="text-xs font-semibold text-slate-600">phút đầu (Mốc hủy sớm)</span>
                         </div>
                         {errors.refundCutoffHours && (
-                            <p className="text-[10px] text-rose-500">{errors.refundCutoffHours}</p>
+                            <p className="text-xs text-rose-500">{errors.refundCutoffHours}</p>
                         )}
                     </div>
 
@@ -626,14 +626,14 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                                 <Percent className="w-3.5 h-3.5 text-emerald-600" />
                                 <span>Tỷ lệ hoàn tiền khi hủy đơn</span>
                             </label>
-                            <span className="text-[10px] font-bold text-purple-700 bg-purple-100/90 px-2 py-0.5 rounded border border-purple-200">
+                            <span className="text-xs font-bold text-purple-700 bg-purple-100/90 px-2 py-0.5 rounded border border-purple-200">
                                 Admin duyệt giải ngân
                             </span>
                         </div>
 
                         <div className="grid grid-cols-2 gap-3 pt-1">
                             <div>
-                                <span className="block text-[11px] font-semibold text-slate-600 mb-1">
+                                <span className="block text-xs font-semibold text-slate-600 mb-1">
                                     Hủy trong {refundCutoffHours || 15} phút đầu:
                                 </span>
                                 <div className="flex items-center gap-1.5">
@@ -648,12 +648,12 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                                     <span className="text-xs font-bold text-emerald-700">% hoàn</span>
                                 </div>
                                 {errors.refundRateEarlyPct && (
-                                    <p className="text-[10px] text-rose-500 mt-0.5">{errors.refundRateEarlyPct}</p>
+                                    <p className="text-xs text-rose-500 mt-0.5">{errors.refundRateEarlyPct}</p>
                                 )}
                             </div>
 
                             <div>
-                                <span className="block text-[11px] font-semibold text-slate-600 mb-1">
+                                <span className="block text-xs font-semibold text-slate-600 mb-1">
                                     Hủy từ phút {refundCutoffHours || 15} - {noShowWindowMinutes || 30}:
                                 </span>
                                 <div className="flex items-center gap-1.5">
@@ -668,7 +668,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                                     <span className="text-xs font-bold text-amber-700">% hoàn</span>
                                 </div>
                                 {errors.refundRateLatePct && (
-                                    <p className="text-[10px] text-rose-500 mt-0.5">{errors.refundRateLatePct}</p>
+                                    <p className="text-xs text-rose-500 mt-0.5">{errors.refundRateLatePct}</p>
                                 )}
                             </div>
                         </div>
@@ -681,7 +681,7 @@ export default function StationPricingTab({ station, onPricingUpdated, onShowToa
                         <p className="font-bold text-slate-200">
                             Tóm tắt quy tắc áp dụng thực tế tại trạm:
                         </p>
-                        <p className="text-[11px] text-slate-300">
+                        <p className="text-xs text-slate-300">
                             • Thời gian giữ chỗ chờ nhận tủ: <strong>{noShowWindowMinutes || 30} phút</strong> &nbsp;|&nbsp;
                             Hủy trong <strong>{refundCutoffHours || 15} phút đầu</strong>: Đề xuất hoàn <strong>{refundRateEarlyPct || 100}%</strong> &nbsp;|&nbsp;
                             Hủy từ phút <strong>{refundCutoffHours || 15} - {noShowWindowMinutes || 30}</strong>: Đề xuất hoàn <strong>{refundRateLatePct || 50}%</strong> &nbsp;|&nbsp;

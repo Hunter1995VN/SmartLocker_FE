@@ -77,7 +77,7 @@ export default function UserFilterBar({
                             >
                                 <span>{tab.label}</span>
                                 <span
-                                    className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                                    className={`px-1.5 py-0.2 rounded-full text-xs font-bold ${
                                         isSelected
                                             ? 'bg-white/20 text-white'
                                             : tab.id === 'BOOKING_BLOCKED' && tab.count > 0
@@ -123,7 +123,7 @@ export default function UserFilterBar({
             <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5">
                 {/* Search Input */}
                 <div className="relative flex-1">
-                    <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                         type="text"
                         value={searchQuery}
@@ -137,7 +137,7 @@ export default function UserFilterBar({
                 <div className="flex items-center gap-2 shrink-0 flex-wrap">
                     {/* Role Filter */}
                     <div className="flex items-center gap-1 bg-slate-50 border border-slate-200/80 rounded-xl px-2 py-1">
-                        <span className="text-[11px] font-semibold text-slate-500 hidden sm:inline">Vai trò:</span>
+                        <span className="text-xs font-semibold text-slate-500 hidden sm:inline">Vai trò:</span>
                         <select
                             value={roleFilter}
                             onChange={(e) => onRoleFilterChange(e.target.value)}

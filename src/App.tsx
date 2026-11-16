@@ -2,24 +2,33 @@
  * SmartLocker - Ứng dụng Frontend
  * Hệ thống quản lý tủ đồ thông minh
  */
-import { useState, useEffect } from 'react';
+import { Suspense, lazy, useState, useEffect } from 'react';
 import Homepage from './pages/Homepage';
-import LoginPage from './pages/auth/LoginPage';
-import RegisterPage from './pages/auth/RegisterPage';
-import VerifyOtpPage from './pages/auth/VerifyOtpPage';
-import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
-import DashboardPage from './pages/DashboardPage';
-import FindStationPage from './pages/FindStationPage';
-import StationBookingPage from './pages/StationBookingPage';
-import BookingPaymentPage from './pages/BookingPaymentPage';
-import BookingDetailPage from './pages/BookingDetailPage';
-import MyBookingsPage from './pages/MyBookingsPage';
-import ProfilePage from './pages/ProfilePage';
-import AdminLoginPage from './pages/admin/AdminLoginPage';
-import AdminPortalPage from './pages/admin/AdminPortalPage';
-import KioskPage from './pages/kiosk/KioskPage';
-import WalkInTabletPage from './pages/kiosk/WalkInTabletPage';
+const LoginPage = lazy(() => import('./pages/auth/LoginPage'));
+const RegisterPage = lazy(() => import('./pages/auth/RegisterPage'));
+const VerifyOtpPage = lazy(() => import('./pages/auth/VerifyOtpPage'));
+const ForgotPasswordPage = lazy(() => import('./pages/auth/ForgotPasswordPage'));
+const DashboardPage = lazy(() => import('./pages/DashboardPage'));
+const FindStationPage = lazy(() => import('./pages/FindStationPage'));
+const StationBookingPage = lazy(() => import('./pages/StationBookingPage'));
+const BookingPaymentPage = lazy(() => import('./pages/BookingPaymentPage'));
+const BookingDetailPage = lazy(() => import('./pages/BookingDetailPage'));
+const MyBookingsPage = lazy(() => import('./pages/MyBookingsPage'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+const AdminLoginPage = lazy(() => import('./pages/admin/AdminLoginPage'));
+const AdminPortalPage = lazy(() => import('./pages/admin/AdminPortalPage'));
+const KioskPage = lazy(() => import('./pages/kiosk/KioskPage'));
+const WalkInTabletPage = lazy(() => import('./pages/kiosk/WalkInTabletPage'));
 import GlobalDialogs from './components/support/GlobalDialogs';
+
+/** Hiển thị khi một trang được tải theo yêu cầu (chia gói JS theo trang). */
+function PageFallback() {
+    return (
+        <div role="status" aria-live="polite" className="min-h-screen flex items-center justify-center bg-background text-on-surface-muted text-sm">
+            Đang tải...
+        </div>
+    );
+}
 
 /** Các trang có trong hệ thống */
 type Page =
@@ -244,7 +253,7 @@ function App() {
     };
 
     return (
-        <>
+        <Suspense fallback={<PageFallback />}>
             {currentPage === 'home' && (
                 <Homepage onNavigate={(mode) => {
                     if (mode === 'login') navigateTo('login');
@@ -370,7 +379,7 @@ function App() {
             )}
 
             <GlobalDialogs />
-        </>
+        </Suspense>
     );
 }
 

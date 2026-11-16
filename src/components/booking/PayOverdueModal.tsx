@@ -20,6 +20,7 @@ import {
   confirmOverduePaymentDemo,
   type CreateBookingResponse,
 } from '../../api/bookingService';
+import ModalOverlay from '../ui/ModalOverlay';
 
 export interface PayOverdueModalProps {
   isOpen: boolean;
@@ -223,7 +224,7 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
   const secs = countdownSeconds % 60;
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/65 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+    <ModalOverlay onClose={onClose} className="overflow-y-auto">
       <div className="bg-white rounded-3xl max-w-lg w-full border border-red-100 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Top Banner */}
         <div className="bg-gradient-to-r from-red-600 to-rose-600 px-6 py-4 text-white flex items-center justify-between">
@@ -232,7 +233,7 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
               <AlertTriangle className="w-5 h-5 text-white" />
             </div>
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded-full">
+              <span className="text-xs font-bold uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded-full">
                 Overdue Fee Settlement
               </span>
               <h3 className="text-base font-bold mt-0.5">Pay Overdue Surcharge</h3>
@@ -277,7 +278,7 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
             </div>
             <div className="flex items-center justify-between pt-2 border-t border-rose-200/80">
               <span className="text-sm font-bold text-slate-900">Total Overdue Fee Due:</span>
-              <span className="text-xl font-black text-rose-600 font-mono">
+              <span className="text-xl font-extrabold text-rose-600 font-mono">
                 {formatVnd(finalOverdueAmount)}
               </span>
             </div>
@@ -287,7 +288,7 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
           {step === 'LOADING' && (
             <div className="py-10 flex flex-col items-center justify-center space-y-3 text-center">
               <div className="w-10 h-10 border-4 border-rose-600 border-t-transparent rounded-full animate-spin" />
-              <p className="text-xs font-semibold text-slate-600">
+              <p className="text-sm font-semibold text-slate-600">
                 Generating PayOS VietQR code for overdue fee settlement...
               </p>
             </div>
@@ -345,21 +346,21 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
                   )}
                 </div>
 
-                <p className="text-[11px] text-slate-500 mt-2.5 text-center">
+                <p className="text-sm text-slate-500 mt-2.5 text-center">
                   Scan with any Banking App. Payment is verified automatically within <strong>1–2 seconds</strong>.
                 </p>
 
                 {/* Bank Account Info */}
                 {paymentData.accountNumber && (
-                  <div className="w-full mt-3 pt-3 border-t border-slate-200/80 grid grid-cols-2 gap-2 text-[11px]">
+                  <div className="w-full mt-3 pt-3 border-t border-slate-200/80 grid grid-cols-2 gap-2 text-xs">
                     <div>
-                      <span className="text-slate-400 block">Account Holder:</span>
+                      <span className="text-slate-500 block">Account Holder:</span>
                       <span className="font-bold text-slate-800 truncate block">
                         {paymentData.accountName || 'SMARTLOCKER PAYOS'}
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-slate-400 block">Account Number:</span>
+                      <span className="text-slate-500 block">Account Number:</span>
                       <button
                         onClick={() => {
                           navigator.clipboard.writeText(paymentData.accountNumber || '');
@@ -426,7 +427,7 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
               </div>
               <div>
                 <h4 className="text-lg font-bold text-slate-900">Overdue Fee Settled!</h4>
-                <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                <p className="text-sm text-slate-600 mt-1 leading-relaxed">
                   Overdue status has been cleared and a <strong>15-minute grace window</strong> has been granted to retrieve your luggage.
                 </p>
               </div>
@@ -456,7 +457,7 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+        <div className="px-6 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
           <span className="flex items-center gap-1">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
             Secured by PayOS VietQR
@@ -464,7 +465,7 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
           <span>Instant locker release upon settlement</span>
         </div>
       </div>
-    </div>
+    </ModalOverlay>
   );
 };
 

@@ -4,6 +4,7 @@
  */
 import { AlertTriangle, Wrench, X } from 'lucide-react';
 import type { LockerGridItemDto, UpdateLockerStatusRequest } from '../../../api/adminStationService';
+import ModalOverlay from '../../ui/ModalOverlay';
 
 interface LockerStatusConfirmModalProps {
     locker: LockerGridItemDto | null;
@@ -28,7 +29,7 @@ export default function LockerStatusConfirmModal({
     const isMaintenance = targetStatus === 'MAINTENANCE';
 
     return (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+        <ModalOverlay onClose={onClose}>
             <div className="bg-white rounded-3xl max-w-md w-full border border-slate-200 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                 {/* Header */}
                 <div className="p-5 border-b border-slate-100 flex items-center justify-between">
@@ -42,7 +43,7 @@ export default function LockerStatusConfirmModal({
                             <h3 className="text-base font-extrabold text-slate-900 tracking-tight">
                                 Xác nhận chuyển trạng thái
                             </h3>
-                            <p className="text-[11px] text-slate-400">
+                            <p className="text-xs text-slate-500">
                                 Áp dụng thay đổi cho ngăn tủ <b>{locker.lockerCode}</b>
                             </p>
                         </div>
@@ -50,7 +51,7 @@ export default function LockerStatusConfirmModal({
                     <button
                         type="button"
                         onClick={onClose}
-                        className="w-8 h-8 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center transition cursor-pointer"
+                        className="w-8 h-8 rounded-xl text-slate-500 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center transition cursor-pointer"
                     >
                         <X className="w-4 h-4" />
                     </button>
@@ -60,29 +61,29 @@ export default function LockerStatusConfirmModal({
                 <div className="p-5 space-y-3.5 text-xs text-slate-600 leading-relaxed">
                     <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1.5">
                         <div className="flex justify-between">
-                            <span className="text-slate-400">Ngăn tủ:</span>
+                            <span className="text-slate-500">Ngăn tủ:</span>
                             <span className="font-mono font-bold text-slate-900">{locker.lockerCode} (Size {locker.size})</span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="text-slate-400">Trạng thái hiện tại:</span>
+                            <span className="text-slate-500">Trạng thái hiện tại:</span>
                             <span className="font-bold text-slate-700">{locker.businessStatus}</span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="text-slate-400">Chuyển sang:</span>
+                            <span className="text-slate-500">Chuyển sang:</span>
                             <span className={`font-bold ${isMaintenance ? 'text-amber-600' : 'text-blue-600'}`}>
                                 {targetStatus}
                             </span>
                         </div>
                         {pendingRequest.reason && (
-                            <div className="pt-1.5 border-t border-slate-200 text-[11px]">
-                                <span className="text-slate-400 block mb-0.5">Lý do & ghi chú:</span>
+                            <div className="pt-1.5 border-t border-slate-200 text-xs">
+                                <span className="text-slate-500 block mb-0.5">Lý do & ghi chú:</span>
                                 <span className="font-semibold text-slate-800">{pendingRequest.reason}</span>
                             </div>
                         )}
                     </div>
 
                     {isMaintenance && (
-                        <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-[11px] text-amber-800">
+                        <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-800">
                             <b>Lưu ý:</b> Ngăn tủ này sẽ được cách ly ngay khỏi hệ thống phân bổ đặt chỗ. Khách hàng sẽ không thể đặt hoặc sử dụng ô tủ này cho đến khi được mở lại.
                         </div>
                     )}
@@ -117,6 +118,6 @@ export default function LockerStatusConfirmModal({
                     </button>
                 </div>
             </div>
-        </div>
+        </ModalOverlay>
     );
 }

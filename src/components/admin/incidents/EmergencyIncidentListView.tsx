@@ -99,7 +99,7 @@ function statusChip(status: string) {
     const cfg = map[upper] ?? { label: status, cls: 'bg-slate-100 text-slate-600 border-slate-200' };
     return (
         <span
-            className={`inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border ${cfg.cls}`}
+            className={`inline-block px-1.5 py-0.5 rounded text-xs font-bold uppercase tracking-wider border ${cfg.cls}`}
         >
             {cfg.label}
         </span>
@@ -220,7 +220,7 @@ export default function EmergencyIncidentListView({
                             <ShieldAlert className="w-5 h-5" aria-hidden="true" />
                         </span>
                         <div>
-                            <h1 className="text-lg font-black text-slate-900 tracking-tight">
+                            <h1 className="text-lg font-extrabold text-slate-900 tracking-tight">
                                 Cứu hộ khẩn cấp &amp; Mở khoá tủ từ xa
                             </h1>
                             <p className="text-xs text-slate-500">
@@ -290,7 +290,7 @@ export default function EmergencyIncidentListView({
                             {key !== 'ALL' && (
                                 <span
                                     className={`ml-1 font-mono ${
-                                        filter === key ? 'text-blue-100' : 'text-slate-400'
+                                        filter === key ? 'text-blue-100' : 'text-slate-500'
                                     }`}
                                 >
                                     (
@@ -308,8 +308,8 @@ export default function EmergencyIncidentListView({
 
                 {/* Severity Filter */}
                 <div className="flex items-center gap-2 bg-white border border-slate-200/90 rounded-xl px-3 py-1.5 w-fit">
-                    <Filter className="w-3.5 h-3.5 text-slate-400 shrink-0" aria-hidden="true" />
-                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                    <Filter className="w-3.5 h-3.5 text-slate-500 shrink-0" aria-hidden="true" />
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                         Mức độ:
                     </span>
                     <div className="flex items-center gap-1">
@@ -326,7 +326,7 @@ export default function EmergencyIncidentListView({
                                 key={key}
                                 type="button"
                                 onClick={() => setSeverityFilter(key)}
-                                className={`px-2 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer ${
+                                className={`px-2 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
                                     severityFilter === key
                                         ? key === 'CRITICAL'
                                             ? 'bg-rose-600 text-white'
@@ -356,7 +356,7 @@ export default function EmergencyIncidentListView({
                                 Danh sách sự cố
                             </h2>
                             {!isLoading && (
-                                <span className="text-[11px] text-slate-400 font-mono">
+                                <span className="text-xs text-slate-500 font-mono">
                                     {visibleIncidents.length} sự cố
                                 </span>
                             )}
@@ -401,13 +401,13 @@ export default function EmergencyIncidentListView({
                         />
                     ) : (
                         <div className="bg-white border border-slate-200/90 rounded-2xl shadow-xs flex flex-col items-center justify-center min-h-[300px] text-center p-10">
-                            <span className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-slate-400 mb-4">
+                            <span className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-slate-500 mb-4">
                                 <ShieldAlert className="w-8 h-8" aria-hidden="true" />
                             </span>
                             <h3 className="text-sm font-bold text-slate-700 mb-1">
                                 Chưa chọn sự cố
                             </h3>
-                            <p className="text-xs text-slate-400 max-w-xs">
+                            <p className="text-xs text-slate-500 max-w-xs">
                                 Chọn một sự cố từ danh sách bên trái để xem chi tiết, cập nhật biên bản xử lý hoặc mở khóa tủ từ xa.
                             </p>
                         </div>
@@ -634,11 +634,11 @@ function CreateIncidentModal({
                         <div>
                             <h2
                                 id="create-incident-modal-title"
-                                className="text-base font-black text-slate-900 tracking-tight"
+                                className="text-base font-extrabold text-slate-900 tracking-tight"
                             >
                                 Tiếp nhận / Báo cáo sự cố mới
                             </h2>
-                            <p className="text-[11px] text-slate-500 mt-0.5">
+                            <p className="text-xs text-slate-500 mt-0.5">
                                 Tạo phiếu Incident Ticket để theo dõi xử lý kẹt tủ, lỗi cảm biến hoặc cảnh báo an ninh.
                             </p>
                         </div>
@@ -649,7 +649,7 @@ function CreateIncidentModal({
                         onClick={onClose}
                         disabled={isSubmitting}
                         aria-label="Đóng hộp thoại tạo sự cố"
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition shrink-0 cursor-pointer"
+                        className="p-1.5 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition shrink-0 cursor-pointer"
                     >
                         <X className="w-4 h-4" aria-hidden="true" />
                     </button>
@@ -671,8 +671,8 @@ function CreateIncidentModal({
                                 Trạm tủ (Station) <span className="text-rose-500">*</span>
                             </label>
                             {isLoadingStations ? (
-                                <div className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-400 font-medium flex items-center gap-2">
-                                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-slate-400" />
+                                <div className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-500 font-medium flex items-center gap-2">
+                                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-slate-500" />
                                     <span>Đang tải danh sách trạm...</span>
                                 </div>
                             ) : stations.length > 0 ? (
@@ -704,8 +704,8 @@ function CreateIncidentModal({
                                 Ô tủ gặp sự cố (Locker) <span className="text-rose-500">*</span>
                             </label>
                             {isLoadingLockers ? (
-                                <div className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-400 font-medium flex items-center gap-2">
-                                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-slate-400" />
+                                <div className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-500 font-medium flex items-center gap-2">
+                                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-slate-500" />
                                     <span>Đang tải danh sách ô tủ...</span>
                                 </div>
                             ) : lockers.length > 0 ? (
@@ -722,7 +722,7 @@ function CreateIncidentModal({
                                     ))}
                                 </select>
                             ) : (
-                                <div className="w-full px-3 py-2 rounded-xl border border-amber-200 bg-amber-50 text-amber-700 font-medium text-[11px]">
+                                <div className="w-full px-3 py-2 rounded-xl border border-amber-200 bg-amber-50 text-amber-700 font-medium text-xs">
                                     Trạm này hiện chưa có ô tủ nào sẵn sàng.
                                 </div>
                             )}
@@ -735,11 +735,11 @@ function CreateIncidentModal({
                             <div>
                                 <span className="font-bold text-blue-700">Đơn thuê liên kết: </span>
                                 <span className="font-mono font-bold">#{matchedLocker.currentBooking.bookingCode}</span>
-                                <p className="text-[11px] text-blue-600 mt-0.5">
+                                <p className="text-xs text-blue-600 mt-0.5">
                                     Khách: {matchedLocker.currentBooking.customerName} ({matchedLocker.currentBooking.customerPhone || 'Không có SĐT'})
                                 </p>
                             </div>
-                            <span className="px-2 py-0.5 rounded-lg bg-blue-600 text-white font-bold text-[10px]">
+                            <span className="px-2 py-0.5 rounded-lg bg-blue-600 text-white font-bold text-xs">
                                 Đang lưu đồ
                             </span>
                         </div>
@@ -814,7 +814,7 @@ function CreateIncidentModal({
                                         setEvidenceImage(null);
                                         if (fileInputRef.current) fileInputRef.current.value = '';
                                     }}
-                                    className="text-[11px] text-rose-600 hover:text-rose-800 font-semibold flex items-center gap-1 cursor-pointer"
+                                    className="text-xs text-rose-600 hover:text-rose-800 font-semibold flex items-center gap-1 cursor-pointer"
                                 >
                                     <Trash2 className="w-3 h-3" />
                                     Xóa ảnh
@@ -833,7 +833,7 @@ function CreateIncidentModal({
                         />
 
                         {evidenceError && (
-                            <p className="text-rose-600 text-[11px] font-semibold mb-2">{evidenceError}</p>
+                            <p className="text-rose-600 text-xs font-semibold mb-2">{evidenceError}</p>
                         )}
 
                         {evidenceImage ? (
@@ -848,13 +848,13 @@ function CreateIncidentModal({
                                         <Camera className="w-3.5 h-3.5 text-blue-600" />
                                         Đã đính kèm ảnh bằng chứng
                                     </p>
-                                    <p className="text-[11px] text-slate-500 mt-0.5">
+                                    <p className="text-xs text-slate-500 mt-0.5">
                                         Ảnh sẽ được lưu vào biên bản sự cố để kiểm tra đối chiếu an ninh.
                                     </p>
                                     <button
                                         type="button"
                                         onClick={() => fileInputRef.current?.click()}
-                                        className="mt-1 text-[11px] text-blue-600 hover:text-blue-800 font-semibold cursor-pointer"
+                                        className="mt-1 text-xs text-blue-600 hover:text-blue-800 font-semibold cursor-pointer"
                                     >
                                         Đổi ảnh khác
                                     </button>
@@ -872,7 +872,7 @@ function CreateIncidentModal({
                                     <span className="font-bold text-slate-700 text-xs">
                                         {isReadingPhoto ? 'Đang xử lý ảnh...' : 'Bấm để tải ảnh lên'}
                                     </span>
-                                    <p className="text-[11px] text-slate-400 mt-0.5">
+                                    <p className="text-xs text-slate-500 mt-0.5">
                                         Hỗ trợ PNG, JPG, JPEG, WEBP (Tối đa 5MB)
                                     </p>
                                 </div>
@@ -955,23 +955,23 @@ function IncidentRow({
                     )}
                 </div>
 
-                <p className="text-[11px] text-slate-600 flex items-center gap-1 truncate">
+                <p className="text-xs text-slate-600 flex items-center gap-1 truncate">
                     <span className="font-mono font-semibold text-blue-700">
                         {incident.lockerCode}
                     </span>
-                    <span className="text-slate-400">·</span>
+                    <span className="text-slate-500">·</span>
                     <span className="truncate">{incident.stationName}</span>
                 </p>
 
                 <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                     {statusChip(resolved ? 'RESOLVED' : incident.status)}
                     {incident.evidenceImageUrl && (
-                        <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-blue-700 bg-blue-50 border border-blue-200/80 px-1.5 py-0.5 rounded">
+                        <span className="inline-flex items-center gap-0.5 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200/80 px-1.5 py-0.5 rounded">
                             <Camera className="w-2.5 h-2.5" />
                             Có ảnh
                         </span>
                     )}
-                    <span className="text-[10px] text-slate-400 flex items-center gap-1">
+                    <span className="text-xs text-slate-500 flex items-center gap-1">
                         <Clock className="w-2.5 h-2.5" aria-hidden="true" />
                         {new Date(incident.createdAt).toLocaleTimeString('vi-VN', {
                             hour: '2-digit',
@@ -1004,7 +1004,7 @@ function LoadingRows() {
                     </div>
                 </div>
             ))}
-            <p className="px-4 py-3 text-center text-xs text-slate-400" role="status">
+            <p className="px-4 py-3 text-center text-xs text-slate-500" role="status">
                 Đang tải danh sách sự cố...
             </p>
         </>
@@ -1014,11 +1014,11 @@ function LoadingRows() {
 function EmptyState() {
     return (
         <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-            <span className="p-3 rounded-2xl bg-slate-50 border border-slate-200 text-slate-400 mb-3">
+            <span className="p-3 rounded-2xl bg-slate-50 border border-slate-200 text-slate-500 mb-3">
                 <Inbox className="w-7 h-7" aria-hidden="true" />
             </span>
             <p className="text-sm font-bold text-slate-600">Không có sự cố nào</p>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-slate-500 mt-1">
                 Không tìm thấy sự cố phù hợp với bộ lọc hiện tại.
             </p>
         </div>

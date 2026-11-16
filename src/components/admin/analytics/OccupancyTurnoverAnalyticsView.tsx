@@ -331,7 +331,7 @@ export default function OccupancyTurnoverAnalyticsView({
                         <p className="text-xs font-extrabold uppercase tracking-wider text-slate-700">
                             HỆ THỐNG QUẢN TRỊ VẬN HÀNH TỦ THÔNG MINH SMARTLOCKER (SLMS)
                         </p>
-                        <h1 className="text-xl font-black text-slate-900 mt-1">
+                        <h1 className="text-xl font-extrabold text-slate-900 mt-1">
                             BÁO CÁO PHÂN TÍCH TỶ LỆ LẤP ĐẦY & TẦN SUẤT XOAY VÒNG NGĂN TỦ
                         </h1>
                         <p className="text-xs text-slate-600 mt-0.5">
@@ -364,7 +364,7 @@ export default function OccupancyTurnoverAnalyticsView({
                     <button
                         type="button"
                         onClick={() => setToast(null)}
-                        className="text-[11px] font-bold underline cursor-pointer shrink-0"
+                        className="text-xs font-bold underline cursor-pointer shrink-0"
                     >
                         Đóng
                     </button>
@@ -382,10 +382,10 @@ export default function OccupancyTurnoverAnalyticsView({
                             <h1 className="text-lg font-extrabold text-slate-900">
                                 Phân Tích Tỷ Lệ Lấp Đầy & Tần Suất Xoay Vòng Ngăn Tủ
                             </h1>
-                            <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full bg-teal-50 text-teal-700 border border-teal-200">
+                            <span className="px-2 py-0.5 text-xs font-bold uppercase tracking-wider rounded-full bg-teal-50 text-teal-700 border border-teal-200">
                                 OCCUPANCY & TURNOVER
                             </span>
-                            <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center gap-1">
+                            <span className="px-2 py-0.5 text-xs font-bold uppercase tracking-wider rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center gap-1">
                                 <ShieldCheck className="w-3 h-3" />
                                 LOCKER-HOURS CHUẨN HÓA
                             </span>
@@ -447,7 +447,7 @@ export default function OccupancyTurnoverAnalyticsView({
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                     {/* Quick Date Presets */}
                     <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[11px] font-bold text-slate-500 flex items-center gap-1 mr-1">
+                        <span className="text-xs font-bold text-slate-500 flex items-center gap-1 mr-1">
                             <Calendar className="w-3.5 h-3.5 text-teal-600" />
                             Kỳ phân tích:
                         </span>
@@ -477,7 +477,7 @@ export default function OccupancyTurnoverAnalyticsView({
 
                     {/* Granularity Switcher */}
                     <div className="flex items-center gap-1.5">
-                        <span className="text-[11px] font-bold text-slate-500 mr-1">Chu kỳ gom nhóm:</span>
+                        <span className="text-xs font-bold text-slate-500 mr-1">Chu kỳ gom nhóm:</span>
                         {(
                             [
                                 { id: 'DAY', label: 'Theo Ngày' },
@@ -504,7 +504,7 @@ export default function OccupancyTurnoverAnalyticsView({
                 {/* Date Inputs + Station + Locker Size */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-slate-100">
                     <div>
-                        <label className="block text-[11px] font-bold text-slate-500 mb-1">
+                        <label className="block text-xs font-bold text-slate-500 mb-1">
                             Từ ngày (00:00 ICT)
                         </label>
                         <input
@@ -520,7 +520,7 @@ export default function OccupancyTurnoverAnalyticsView({
                     </div>
 
                     <div>
-                        <label className="block text-[11px] font-bold text-slate-500 mb-1">
+                        <label className="block text-xs font-bold text-slate-500 mb-1">
                             Đến ngày (23:59 ICT)
                         </label>
                         <input
@@ -536,8 +536,8 @@ export default function OccupancyTurnoverAnalyticsView({
                     </div>
 
                     <div>
-                        <label className="block text-[11px] font-bold text-slate-500 mb-1 flex items-center gap-1">
-                            <Building2 className="w-3 h-3 text-slate-400" />
+                        <label className="block text-xs font-bold text-slate-500 mb-1 flex items-center gap-1">
+                            <Building2 className="w-3 h-3 text-slate-500" />
                             Trạm SmartLocker
                         </label>
                         <select
@@ -555,7 +555,7 @@ export default function OccupancyTurnoverAnalyticsView({
                     </div>
 
                     <div>
-                        <label className="block text-[11px] font-bold text-slate-500 mb-1">
+                        <label className="block text-xs font-bold text-slate-500 mb-1">
                             Phân khúc Kích cỡ Ngăn tủ
                         </label>
                         <div className="grid grid-cols-4 gap-1">
@@ -604,17 +604,17 @@ export default function OccupancyTurnoverAnalyticsView({
                 {/* 1. Time-Weighted Occupancy Rate */}
                 <div className="bg-gradient-to-br from-teal-600 to-emerald-700 rounded-2xl p-4 text-white shadow-sm">
                     <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-teal-100">
+                        <span className="text-xs font-bold uppercase tracking-wider text-teal-100">
                             Tỷ Lệ Lấp Đầy Theo Giờ (Occupancy)
                         </span>
                         <div className="w-8 h-8 rounded-xl bg-white/15 flex items-center justify-center">
                             <Gauge className="w-4 h-4 text-white" />
                         </div>
                     </div>
-                    <p className="text-2xl font-black mt-2 tracking-tight">
+                    <p className="text-2xl font-extrabold mt-2 tracking-tight">
                         {isLoading ? '...' : `${(data?.timeWeightedOccupancyPercent ?? 0).toFixed(2)}%`}
                     </p>
-                    <div className="mt-2.5 flex items-center justify-between gap-2 text-[11px]">
+                    <div className="mt-2.5 flex items-center justify-between gap-2 text-xs">
                         <span
                             className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-bold ${
                                 occDelta >= 0
@@ -639,7 +639,7 @@ export default function OccupancyTurnoverAnalyticsView({
                 {/* 2. Locker Turnover Frequency */}
                 <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs">
                     <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                             Tần Suất Xoay Vòng Ngăn Tủ
                         </span>
                         <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
@@ -647,12 +647,12 @@ export default function OccupancyTurnoverAnalyticsView({
                         </div>
                     </div>
                     <div className="flex items-baseline gap-2 mt-2">
-                        <p className="text-2xl font-black text-slate-900 tracking-tight">
+                        <p className="text-2xl font-extrabold text-slate-900 tracking-tight">
                             {isLoading ? '...' : (data?.periodTurnoverPerLocker ?? 0).toFixed(2)}
                         </p>
                         <span className="text-xs font-bold text-blue-700">vòng / tủ (trong kỳ)</span>
                     </div>
-                    <div className="mt-2.5 flex items-center justify-between text-[11px] text-slate-500">
+                    <div className="mt-2.5 flex items-center justify-between text-xs text-slate-500">
                         <span>
                             TB ngày:{' '}
                             <strong className="text-slate-800">
@@ -673,7 +673,7 @@ export default function OccupancyTurnoverAnalyticsView({
                 {/* 3. Average Storage Duration & Turnaround Idle Time */}
                 <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs">
                     <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                             Chu Kỳ Lưu Trữ & Chờ Khách TB
                         </span>
                         <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
@@ -681,12 +681,12 @@ export default function OccupancyTurnoverAnalyticsView({
                         </div>
                     </div>
                     <div className="flex items-baseline gap-2 mt-2">
-                        <p className="text-2xl font-black text-slate-900 tracking-tight">
+                        <p className="text-2xl font-extrabold text-slate-900 tracking-tight">
                             {isLoading ? '...' : `${(data?.averageStorageDurationHours ?? 0).toFixed(1)}h`}
                         </p>
                         <span className="text-xs font-semibold text-slate-500">/ lượt gửi đồ</span>
                     </div>
-                    <div className="mt-2.5 flex items-center justify-between text-[11px] text-slate-500">
+                    <div className="mt-2.5 flex items-center justify-between text-xs text-slate-500">
                         <span>
                             Trống giữa 2 lượt:{' '}
                             <strong className="text-slate-800">
@@ -702,17 +702,17 @@ export default function OccupancyTurnoverAnalyticsView({
                 {/* 4. RevPAL & RevPOLH */}
                 <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs">
                     <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                             Doanh Thu / Tủ Khả Dụng (RevPAL)
                         </span>
                         <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
                             <Sparkles className="w-4 h-4" />
                         </div>
                     </div>
-                    <p className="text-2xl font-black text-indigo-700 mt-2 tracking-tight">
+                    <p className="text-2xl font-extrabold text-indigo-700 mt-2 tracking-tight">
                         {isLoading ? '...' : formatVnd(data?.revenuePerAvailableLocker ?? 0)}
                     </p>
-                    <div className="mt-2.5 flex items-center justify-between text-[11px] text-slate-500">
+                    <div className="mt-2.5 flex items-center justify-between text-xs text-slate-500">
                         <span>
                             RevPOLH:{' '}
                             <strong className="text-slate-800">
@@ -730,7 +730,7 @@ export default function OccupancyTurnoverAnalyticsView({
             <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs space-y-3">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 text-xs">
                     <div className="flex items-center gap-2 flex-wrap">
-                        <span className="px-2 py-0.5 rounded bg-teal-50 text-teal-700 border border-teal-200 font-extrabold text-[10px] uppercase">
+                        <span className="px-2 py-0.5 rounded bg-teal-50 text-teal-700 border border-teal-200 font-extrabold text-xs uppercase">
                             TRẠNG THÁI VẬT LÝ TỨC THỜI (LIVE SNAPSHOT)
                         </span>
                         <span className="text-slate-600">
@@ -743,7 +743,7 @@ export default function OccupancyTurnoverAnalyticsView({
                         </span>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-3 text-[11px]">
+                    <div className="flex flex-wrap items-center gap-3 text-xs">
                         <span className="text-slate-600">
                             Giờ cao điểm:{' '}
                             <strong className="text-teal-700">{data?.peakOccupancyHourLabel || '—'}</strong>
@@ -787,7 +787,7 @@ export default function OccupancyTurnoverAnalyticsView({
                     )}
                 </div>
 
-                <div className="flex flex-wrap items-center gap-4 text-[11px] text-slate-600">
+                <div className="flex flex-wrap items-center gap-4 text-xs text-slate-600">
                     <span className="flex items-center gap-1.5">
                         <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
                         Trống sẵn sàng: <strong>{data?.availableNowLockers ?? 0} ô</strong>
@@ -915,7 +915,7 @@ export default function OccupancyTurnoverAnalyticsView({
                                         {selectedPoint.availableLockerHours.toFixed(0)} giờ-tủ)
                                     </span>
                                 </div>
-                                <div className="flex flex-wrap items-center gap-4 text-[11px]">
+                                <div className="flex flex-wrap items-center gap-4 text-xs">
                                     <span className="text-slate-600">
                                         Số lượt xoay vòng:{' '}
                                         <strong className="text-blue-700">{selectedPoint.totalCycles} lượt</strong>
@@ -939,7 +939,7 @@ export default function OccupancyTurnoverAnalyticsView({
 
                         {/* Bars */}
                         {timeSeries.length === 0 ? (
-                            <div className="h-52 flex items-center justify-center text-xs text-slate-400">
+                            <div className="h-52 flex items-center justify-center text-xs text-slate-500">
                                 Không có dữ liệu chuỗi thời gian cho bộ lọc này.
                             </div>
                         ) : (
@@ -989,7 +989,7 @@ export default function OccupancyTurnoverAnalyticsView({
                                         );
                                     })}
                                 </div>
-                                <div className="flex items-center justify-between text-[10px] font-semibold text-slate-400 pt-2 min-w-[640px] px-1">
+                                <div className="flex items-center justify-between text-xs font-semibold text-slate-500 pt-2 min-w-[640px] px-1">
                                     <span>{timeSeries[0]?.label}</span>
                                     {timeSeries.length > 4 && (
                                         <span>{timeSeries[Math.floor(timeSeries.length / 2)]?.label}</span>
@@ -1013,7 +1013,7 @@ export default function OccupancyTurnoverAnalyticsView({
                                         Xác định khung giờ chạm ngưỡng quá tải (&ge;80%) và nhịp Check-in / Check-out tại Kiosk.
                                     </p>
                                 </div>
-                                <div className="flex items-center gap-2 text-[10px] font-bold">
+                                <div className="flex items-center gap-2 text-xs font-bold">
                                     <span className="flex items-center gap-1 text-rose-600">
                                         <span className="w-2 h-2 rounded-xs bg-rose-500" /> &ge;80% Quá tải
                                     </span>
@@ -1048,7 +1048,7 @@ export default function OccupancyTurnoverAnalyticsView({
                                                 className="h-full flex flex-col justify-end items-center gap-1 group"
                                                 title={`${h.hourLabel}: Lấp đầy TB ${h.estimatedOccupancyPercent.toFixed(1)}% (${h.avgActiveLockers.toFixed(1)} ô) · Gửi vào: ${h.checkInCount} · Lấy ra: ${h.checkOutCount}`}
                                             >
-                                                <span className="text-[9px] font-bold text-slate-500 opacity-0 group-hover:opacity-100 transition">
+                                                <span className="text-xs font-bold text-slate-500 opacity-0 group-hover:opacity-100 transition">
                                                     {Math.round(h.estimatedOccupancyPercent)}%
                                                 </span>
                                                 <div className="w-full h-full flex items-end justify-center">
@@ -1057,7 +1057,7 @@ export default function OccupancyTurnoverAnalyticsView({
                                                         style={{ height: `${Math.min(100, pct)}%` }}
                                                     />
                                                 </div>
-                                                <span className="text-[9px] font-semibold text-slate-400">
+                                                <span className="text-xs font-semibold text-slate-500">
                                                     {String(h.hour).padStart(2, '0')}h
                                                 </span>
                                             </div>
@@ -1083,7 +1083,7 @@ export default function OccupancyTurnoverAnalyticsView({
                                     <div key={dow.dayIndex} className="space-y-1">
                                         <div className="flex items-center justify-between text-xs">
                                             <span className="font-bold text-slate-800">{dow.dayLabel}</span>
-                                            <span className="text-[11px] text-slate-600">
+                                            <span className="text-xs text-slate-600">
                                                 <strong className="text-teal-700">
                                                     {dow.avgOccupancyPercent.toFixed(1)}%
                                                 </strong>{' '}
@@ -1129,7 +1129,7 @@ export default function OccupancyTurnoverAnalyticsView({
                         >
                             <div className="flex items-start justify-between gap-2">
                                 <div>
-                                    <span className="px-2.5 py-0.5 rounded-lg bg-teal-50 text-teal-700 border border-teal-200 text-[10px] font-extrabold">
+                                    <span className="px-2.5 py-0.5 rounded-lg bg-teal-50 text-teal-700 border border-teal-200 text-xs font-extrabold">
                                         SIZE {sz.size}
                                     </span>
                                     <h3 className="text-xs font-extrabold text-slate-900 mt-1.5">
@@ -1143,18 +1143,18 @@ export default function OccupancyTurnoverAnalyticsView({
 
                             <div className="grid grid-cols-2 gap-2.5 pt-1">
                                 <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase block">
+                                    <span className="text-xs font-bold text-slate-500 uppercase block">
                                         Lấp đầy theo giờ
                                     </span>
-                                    <span className="text-base font-black text-teal-700">
+                                    <span className="text-base font-extrabold text-teal-700">
                                         {sz.timeWeightedOccupancyPercent.toFixed(1)}%
                                     </span>
                                 </div>
                                 <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase block">
+                                    <span className="text-xs font-bold text-slate-500 uppercase block">
                                         Hệ số xoay vòng
                                     </span>
-                                    <span className="text-base font-black text-blue-700">
+                                    <span className="text-base font-extrabold text-blue-700">
                                         {sz.turnoverPerLocker.toFixed(2)} vòng/tủ
                                     </span>
                                 </div>
@@ -1169,7 +1169,7 @@ export default function OccupancyTurnoverAnalyticsView({
                                 />
                             </div>
 
-                            <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-100">
+                            <div className="flex items-center justify-between text-xs text-slate-500 pt-1 border-t border-slate-100">
                                 <span>
                                     Tổng: <strong className="text-slate-800">{sz.totalCycles} lượt</strong> · TB{' '}
                                     {sz.avgDurationHours.toFixed(1)}h
@@ -1198,7 +1198,7 @@ export default function OccupancyTurnoverAnalyticsView({
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse text-xs">
                             <thead>
-                                <tr className="bg-slate-50/90 text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200/80">
+                                <tr className="bg-slate-50/90 text-slate-500 font-bold uppercase text-xs tracking-wider border-b border-slate-200/80">
                                     <th className="py-3 px-4">Trạm SmartLocker</th>
                                     <th className="py-3 px-3 text-center">Tủ Khả Dụng</th>
                                     <th className="py-3 px-3 text-right">Lấp Đầy Live</th>
@@ -1212,7 +1212,7 @@ export default function OccupancyTurnoverAnalyticsView({
                             <tbody className="divide-y divide-slate-100">
                                 {(data?.stationBreakdown ?? []).length === 0 ? (
                                     <tr>
-                                        <td colSpan={8} className="py-8 text-center text-slate-400">
+                                        <td colSpan={8} className="py-8 text-center text-slate-500">
                                             Chưa có dữ liệu trạm.
                                         </td>
                                     </tr>
@@ -1223,7 +1223,7 @@ export default function OccupancyTurnoverAnalyticsView({
                                             <tr key={st.stationId} className="hover:bg-slate-50/70 transition">
                                                 <td className="py-3.5 px-4">
                                                     <p className="font-bold text-slate-900">{st.stationName}</p>
-                                                    <p className="text-[11px] text-slate-400 truncate max-w-[220px]">
+                                                    <p className="text-xs text-slate-500 truncate max-w-[220px]">
                                                         {st.address}
                                                     </p>
                                                 </td>
@@ -1233,14 +1233,14 @@ export default function OccupancyTurnoverAnalyticsView({
                                                     </span>
                                                     /{st.totalLockers}
                                                     {st.outOfServiceLockers > 0 && (
-                                                        <span className="block text-[10px] text-rose-600">
+                                                        <span className="block text-xs text-rose-600">
                                                             ({st.outOfServiceLockers} bảo trì)
                                                         </span>
                                                     )}
                                                 </td>
                                                 <td className="py-3.5 px-3 text-right font-bold text-slate-800">
                                                     {st.liveOccupancyPercent.toFixed(1)}%
-                                                    <span className="block text-[10px] font-normal text-slate-400">
+                                                    <span className="block text-xs font-normal text-slate-500">
                                                         ({st.liveOccupiedCount} ô bận)
                                                     </span>
                                                 </td>
@@ -1272,7 +1272,7 @@ export default function OccupancyTurnoverAnalyticsView({
                                                     <span className="font-extrabold text-blue-700">
                                                         {st.turnoverPerLocker.toFixed(2)}
                                                     </span>
-                                                    <span className="block text-[10px] text-slate-400">
+                                                    <span className="block text-xs text-slate-500">
                                                         {st.totalCycles} lượt ({st.dailyTurnoverRate.toFixed(2)}/ngày)
                                                     </span>
                                                 </td>
@@ -1284,11 +1284,11 @@ export default function OccupancyTurnoverAnalyticsView({
                                                 </td>
                                                 <td className="py-3.5 px-4 max-w-xs">
                                                     <span
-                                                        className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-extrabold border mb-1 ${capBadge.cls}`}
+                                                        className={`inline-block px-2 py-0.5 rounded-full text-xs font-extrabold border mb-1 ${capBadge.cls}`}
                                                     >
                                                         {capBadge.label}
                                                     </span>
-                                                    <p className="text-[11px] text-slate-600 leading-snug">
+                                                    <p className="text-xs text-slate-600 leading-snug">
                                                         {st.capacityRecommendation}
                                                     </p>
                                                 </td>
@@ -1319,7 +1319,7 @@ export default function OccupancyTurnoverAnalyticsView({
 
                         <div className="flex flex-wrap items-center gap-2">
                             <div className="relative">
-                                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                                <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                                 <input
                                     type="text"
                                     value={unitSearch}
@@ -1347,7 +1347,7 @@ export default function OccupancyTurnoverAnalyticsView({
                     <div className="overflow-x-auto max-h-[540px]">
                         <table className="w-full text-left border-collapse text-xs">
                             <thead className="sticky top-0 bg-slate-50 z-10 shadow-2xs">
-                                <tr className="text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                                <tr className="text-slate-500 font-bold uppercase text-xs tracking-wider border-b border-slate-200">
                                     <th className="py-3 px-4">Mã Ngăn Tủ</th>
                                     <th className="py-3 px-3">Trạm SmartLocker</th>
                                     <th className="py-3 px-3 text-center">Cỡ</th>
@@ -1363,7 +1363,7 @@ export default function OccupancyTurnoverAnalyticsView({
                             <tbody className="divide-y divide-slate-100">
                                 {filteredUnits.length === 0 ? (
                                     <tr>
-                                        <td colSpan={10} className="py-10 text-center text-slate-400">
+                                        <td colSpan={10} className="py-10 text-center text-slate-500">
                                             Không tìm thấy ngăn tủ nào khớp điều kiện lọc.
                                         </td>
                                     </tr>
@@ -1380,7 +1380,7 @@ export default function OccupancyTurnoverAnalyticsView({
                                                     {u.stationName}
                                                 </td>
                                                 <td className="py-3 px-3 text-center">
-                                                    <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-800 font-extrabold text-[11px]">
+                                                    <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-800 font-extrabold text-xs">
                                                         {u.size}
                                                     </span>
                                                 </td>
@@ -1388,11 +1388,11 @@ export default function OccupancyTurnoverAnalyticsView({
                                                     <span className="font-bold text-slate-800">
                                                         {u.businessStatus}
                                                     </span>
-                                                    <span className="block text-[10px] text-slate-400">
+                                                    <span className="block text-xs text-slate-500">
                                                         IoT: {u.healthStatus}
                                                     </span>
                                                 </td>
-                                                <td className="py-3 px-3 text-right font-black text-blue-700">
+                                                <td className="py-3 px-3 text-right font-extrabold text-blue-700">
                                                     {u.cycleCount} lượt
                                                 </td>
                                                 <td className="py-3 px-3 text-right font-semibold text-slate-700">
@@ -1412,13 +1412,13 @@ export default function OccupancyTurnoverAnalyticsView({
                                                             {u.occupancyRatePercent.toFixed(1)}%
                                                         </span>
                                                     </div>
-                                                    <span className="text-[10px] text-slate-400">
+                                                    <span className="text-xs text-slate-500">
                                                         {u.occupiedHours.toFixed(1)} giờ lấp đầy
                                                     </span>
                                                 </td>
-                                                <td className="py-3 px-3 text-right text-[11px] text-slate-600">
+                                                <td className="py-3 px-3 text-right text-xs text-slate-600">
                                                     <p>Gửi: {u.avgDurationHours.toFixed(1)}h</p>
-                                                    <p className="text-slate-400">
+                                                    <p className="text-slate-500">
                                                         Trống: {u.avgIdleGapHours.toFixed(1)}h
                                                     </p>
                                                 </td>
@@ -1427,7 +1427,7 @@ export default function OccupancyTurnoverAnalyticsView({
                                                 </td>
                                                 <td className="py-3 px-4">
                                                     <span
-                                                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold border ${tier.cls}`}
+                                                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-extrabold border ${tier.cls}`}
                                                     >
                                                         <TierIcon className="w-3 h-3" />
                                                         {tier.label}
@@ -1452,7 +1452,7 @@ export default function OccupancyTurnoverAnalyticsView({
                         <div className="bg-white rounded-2xl border border-teal-200/90 p-5 shadow-xs flex flex-col justify-between gap-4">
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between">
-                                    <span className="px-2.5 py-1 rounded-lg bg-teal-50 text-teal-700 border border-teal-200 text-[10px] font-extrabold uppercase">
+                                    <span className="px-2.5 py-1 rounded-lg bg-teal-50 text-teal-700 border border-teal-200 text-xs font-extrabold uppercase">
                                         BÁO CÁO QUẢN TRỊ ĐỘI TỦ
                                     </span>
                                     <FileSpreadsheet className="w-6 h-6 text-teal-600" />
@@ -1490,7 +1490,7 @@ export default function OccupancyTurnoverAnalyticsView({
                         <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs flex flex-col justify-between gap-4">
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between">
-                                    <span className="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-extrabold uppercase">
+                                    <span className="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 text-xs font-extrabold uppercase">
                                         DỮ LIỆU BẢO TRÌ DỰ ĐOÁN
                                     </span>
                                     <FileText className="w-6 h-6 text-blue-600" />
@@ -1517,7 +1517,7 @@ export default function OccupancyTurnoverAnalyticsView({
                         <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs flex flex-col justify-between gap-4">
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between">
-                                    <span className="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] font-extrabold uppercase">
+                                    <span className="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs font-extrabold uppercase">
                                         BIỂU MẪU HỌP GIAO BAN VẬN HÀNH
                                     </span>
                                     <Printer className="w-6 h-6 text-indigo-600" />
@@ -1543,7 +1543,7 @@ export default function OccupancyTurnoverAnalyticsView({
                         <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs flex flex-col justify-between gap-4">
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between">
-                                    <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 text-[10px] font-extrabold uppercase">
+                                    <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 text-xs font-extrabold uppercase">
                                         BI / CAPACITY PLANNING JSON
                                     </span>
                                     <FileJson className="w-6 h-6 text-slate-700" />
@@ -1629,17 +1629,17 @@ export default function OccupancyTurnoverAnalyticsView({
             <div className="hidden print:grid grid-cols-3 gap-6 pt-8 mt-6 border-t border-slate-300 text-center text-xs">
                 <div>
                     <p className="font-bold text-slate-900 uppercase">Người lập báo cáo</p>
-                    <p className="text-[11px] text-slate-500 italic">(Ký, ghi rõ họ tên)</p>
+                    <p className="text-xs text-slate-500 italic">(Ký, ghi rõ họ tên)</p>
                     <div className="h-20" />
                 </div>
                 <div>
                     <p className="font-bold text-slate-900 uppercase">Phụ trách Vận hành Trạm</p>
-                    <p className="text-[11px] text-slate-500 italic">(Xác nhận hiện trạng ngăn tủ)</p>
+                    <p className="text-xs text-slate-500 italic">(Xác nhận hiện trạng ngăn tủ)</p>
                     <div className="h-20" />
                 </div>
                 <div>
                     <p className="font-bold text-slate-900 uppercase">Quản trị viên phê duyệt</p>
-                    <p className="text-[11px] text-slate-500 italic">(Ký, đóng dấu xác nhận)</p>
+                    <p className="text-xs text-slate-500 italic">(Ký, đóng dấu xác nhận)</p>
                     <div className="h-20" />
                 </div>
             </div>

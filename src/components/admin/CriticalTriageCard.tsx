@@ -39,11 +39,11 @@ export default function CriticalTriageCard({
 
                     <div className="flex items-center gap-1.5">
                         {criticalCount > 0 && (
-                            <span className="px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 font-bold text-[10px] border border-rose-200">
+                            <span className="px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 font-bold text-xs border border-rose-200">
                                 {criticalCount} P1 Critical
                             </span>
                         )}
-                        <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-bold text-[10px] border border-amber-200">
+                        <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-bold text-xs border border-amber-200">
                             {incidents.length} Active
                         </span>
                     </div>
@@ -56,13 +56,13 @@ export default function CriticalTriageCard({
             {isLoading ? (
                 <div className="py-12 flex flex-col items-center justify-center space-y-2">
                     <div className="w-7 h-7 rounded-full border-2 border-rose-500/20 border-t-rose-500 animate-spin" />
-                    <p className="text-xs text-slate-400">Đang quét danh sách sự cố...</p>
+                    <p className="text-xs text-slate-500">Đang quét danh sách sự cố...</p>
                 </div>
             ) : incidents.length === 0 && maintenanceLockers === 0 ? (
                 <div className="my-6 p-6 rounded-xl bg-emerald-50/70 border border-emerald-200/80 text-center">
                     <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
                     <p className="text-xs font-bold text-emerald-800">Không ghi nhận sự cố hoạt động</p>
-                    <p className="text-[11px] text-emerald-600 mt-0.5">
+                    <p className="text-xs text-emerald-600 mt-0.5">
                         Tất cả các trạm và ô tủ đang hoạt động ổn định, không có phiếu cảnh báo.
                     </p>
                 </div>
@@ -84,7 +84,7 @@ export default function CriticalTriageCard({
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
                                         <span
-                                            className={`px-1.5 py-0.5 rounded font-black text-[9px] uppercase tracking-wider ${
+                                            className={`px-1.5 py-0.5 rounded font-extrabold text-xs uppercase tracking-wider ${
                                                 isCritical
                                                     ? 'bg-rose-600 text-white'
                                                     : 'bg-amber-100 text-amber-800 border border-amber-300/60'
@@ -93,22 +93,22 @@ export default function CriticalTriageCard({
                                             {item.severity || 'ELEVATED'}
                                         </span>
                                         <span className="font-bold text-slate-800">{item.type || 'Lỗi ô tủ'}</span>
-                                        <span className="text-[11px] text-slate-500 font-mono">
+                                        <span className="text-xs text-slate-500 font-mono">
                                             {item.lockerCode ? `Bay: ${item.lockerCode}` : ''}
                                         </span>
                                     </div>
-                                    <span className="text-[10px] text-slate-400 font-mono">
+                                    <span className="text-xs text-slate-500 font-mono">
                                         {item.createdAt ? new Date(item.createdAt).toLocaleTimeString('vi-VN') : ''}
                                     </span>
                                 </div>
 
-                                <div className="flex items-center gap-2 text-slate-500 text-[11px]">
-                                    <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+                                <div className="flex items-center gap-2 text-slate-500 text-xs">
+                                    <MapPin className="w-3 h-3 text-slate-500 shrink-0" />
                                     <span className="truncate">{item.stationName || 'Trạm SmartLocker'}</span>
                                 </div>
 
                                 {item.description && (
-                                    <p className="text-[11px] text-slate-600 bg-white p-2 rounded-lg border border-slate-200/80">
+                                    <p className="text-xs text-slate-600 bg-white p-2 rounded-lg border border-slate-200/80">
                                         {item.description}
                                     </p>
                                 )}
@@ -130,8 +130,8 @@ export default function CriticalTriageCard({
 
             {/* Footer Notice */}
             <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                <span className="text-[11px]">Cơ chế cứu hộ từ xa sẵn sàng qua phân hệ Incident Center</span>
-                <span className="text-[11px] font-semibold text-blue-600">Incident Triage v2.1</span>
+                <span className="text-xs">Cơ chế cứu hộ từ xa sẵn sàng qua phân hệ Incident Center</span>
+                <span className="text-xs font-semibold text-blue-600">Incident Triage v2.1</span>
             </div>
         </div>
     );

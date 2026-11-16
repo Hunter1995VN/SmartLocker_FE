@@ -60,7 +60,7 @@ export default function KpiSummaryRow({ stats, isLoading }: KpiSummaryRowProps) 
             iconBg: 'bg-emerald-50 text-emerald-600 border-emerald-200/60',
             value: activeStations,
             subtext: maintenanceStations > 0 ? `${maintenanceStations} trạm cần bảo trì` : '100% trạm hoạt động',
-            subtextColor: maintenanceStations > 0 ? 'text-amber-600 font-semibold' : 'text-slate-400',
+            subtextColor: maintenanceStations > 0 ? 'text-amber-600 font-semibold' : 'text-slate-500',
         },
         {
             title: 'READY LOCKERS',
@@ -111,7 +111,7 @@ export default function KpiSummaryRow({ stats, isLoading }: KpiSummaryRowProps) 
     ];
 
     return (
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 2xl:grid-cols-8 gap-3">
             {cards.map((card, i) => {
                 const Icon = card.icon;
                 return (
@@ -120,7 +120,7 @@ export default function KpiSummaryRow({ stats, isLoading }: KpiSummaryRowProps) 
                         className="bg-white border border-slate-200/90 rounded-2xl p-3.5 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow"
                     >
                         <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold text-slate-500 tracking-wider uppercase">
+                            <span className="text-xs font-bold text-slate-500 tracking-wide uppercase leading-tight break-words">
                                 {card.title}
                             </span>
                             <span className={`w-6 h-6 rounded-lg border flex items-center justify-center ${card.iconBg}`}>
@@ -132,11 +132,11 @@ export default function KpiSummaryRow({ stats, isLoading }: KpiSummaryRowProps) 
                             {isLoading ? (
                                 <div className="h-6 w-16 bg-slate-100 rounded animate-pulse" />
                             ) : (
-                                <p className={`text-xl font-black tracking-tight ${card.valueColor || 'text-slate-900'}`}>
+                                <p className={`text-xl font-extrabold tracking-tight ${card.valueColor || 'text-slate-900'}`}>
                                     {card.value}
                                 </p>
                             )}
-                            <p className={`text-[10px] mt-1 truncate ${card.subtextColor || 'text-slate-400'}`} title={card.subtext}>
+                            <p className={`text-xs mt-1 truncate ${card.subtextColor || 'text-slate-500'}`} title={card.subtext}>
                                 {card.subtext}
                             </p>
                         </div>

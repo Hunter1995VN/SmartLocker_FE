@@ -46,7 +46,7 @@ export default function WalkInTabletPage() {
                   setStationId(e.target.value);
                   localStorage.setItem('kiosk_station_id', e.target.value);
                 }}
-                className="text-sm font-black tracking-tight uppercase bg-transparent border-0 outline-none cursor-pointer text-slate-900"
+                className="text-sm font-extrabold tracking-tight uppercase bg-transparent border-0 outline-none cursor-pointer text-slate-900"
                 title={x('selectStation')}
               >
                 {stations.map((st) => (
@@ -55,7 +55,7 @@ export default function WalkInTabletPage() {
                   </option>
                 ))}
               </select>
-              <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[11px] font-bold">
+              <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold">
                 TABLET WALK-IN
               </span>
             </div>

@@ -307,7 +307,7 @@ export default function FinancialRevenueReportView({
                         <p className="text-xs font-extrabold uppercase tracking-wider text-slate-700">
                             HỆ THỐNG TỦ ĐỒ THÔNG MINH SMARTLOCKER (SLMS)
                         </p>
-                        <h1 className="text-xl font-black text-slate-900 mt-1">
+                        <h1 className="text-xl font-extrabold text-slate-900 mt-1">
                             BÁO CÁO DOANH THU TÀI CHÍNH & LƯU LƯỢNG GIAO DỊCH THANH TOÁN
                         </h1>
                         <p className="text-xs text-slate-600 mt-0.5">
@@ -339,7 +339,7 @@ export default function FinancialRevenueReportView({
                     <button
                         type="button"
                         onClick={() => setToastMessage(null)}
-                        className="text-[11px] font-bold underline cursor-pointer shrink-0"
+                        className="text-xs font-bold underline cursor-pointer shrink-0"
                     >
                         Đóng
                     </button>
@@ -357,10 +357,10 @@ export default function FinancialRevenueReportView({
                             <h1 className="text-lg font-extrabold text-slate-900">
                                 Báo Cáo Doanh Thu Tài Chính & Lưu Lượng Thanh Toán
                             </h1>
-                            <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+                            <span className="px-2 py-0.5 text-xs font-bold uppercase tracking-wider rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
                                 KẾ TOÁN & BI ANALYTICS
                             </span>
-                            <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                            <span className="px-2 py-0.5 text-xs font-bold uppercase tracking-wider rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
                                 <ShieldCheck className="w-3 h-3" />
                                 AUDIT TRACKED
                             </span>
@@ -424,7 +424,7 @@ export default function FinancialRevenueReportView({
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                     {/* Quick Date Presets */}
                     <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[11px] font-bold text-slate-500 flex items-center gap-1 mr-1">
+                        <span className="text-xs font-bold text-slate-500 flex items-center gap-1 mr-1">
                             <Calendar className="w-3.5 h-3.5 text-indigo-500" />
                             Kỳ nhanh:
                         </span>
@@ -454,7 +454,7 @@ export default function FinancialRevenueReportView({
 
                     {/* Granularity Switcher */}
                     <div className="flex items-center gap-1.5">
-                        <span className="text-[11px] font-bold text-slate-500 mr-1">Độ mịn chuỗi thời gian:</span>
+                        <span className="text-xs font-bold text-slate-500 mr-1">Độ mịn chuỗi thời gian:</span>
                         {(
                             [
                                 { id: 'DAY', label: 'Theo Ngày' },
@@ -481,7 +481,7 @@ export default function FinancialRevenueReportView({
                 {/* Custom Date Inputs + Station + PaymentKind */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-slate-100">
                     <div>
-                        <label className="block text-[11px] font-bold text-slate-500 mb-1">
+                        <label className="block text-xs font-bold text-slate-500 mb-1">
                             Từ ngày (00:00 ICT)
                         </label>
                         <input
@@ -497,7 +497,7 @@ export default function FinancialRevenueReportView({
                     </div>
 
                     <div>
-                        <label className="block text-[11px] font-bold text-slate-500 mb-1">
+                        <label className="block text-xs font-bold text-slate-500 mb-1">
                             Đến ngày (23:59 ICT)
                         </label>
                         <input
@@ -513,8 +513,8 @@ export default function FinancialRevenueReportView({
                     </div>
 
                     <div>
-                        <label className="block text-[11px] font-bold text-slate-500 mb-1 flex items-center gap-1">
-                            <Building2 className="w-3 h-3 text-slate-400" />
+                        <label className="block text-xs font-bold text-slate-500 mb-1 flex items-center gap-1">
+                            <Building2 className="w-3 h-3 text-slate-500" />
                             Phạm vi Trạm SmartLocker
                         </label>
                         <select
@@ -532,8 +532,8 @@ export default function FinancialRevenueReportView({
                     </div>
 
                     <div>
-                        <label className="block text-[11px] font-bold text-slate-500 mb-1 flex items-center gap-1">
-                            <Filter className="w-3 h-3 text-slate-400" />
+                        <label className="block text-xs font-bold text-slate-500 mb-1 flex items-center gap-1">
+                            <Filter className="w-3 h-3 text-slate-500" />
                             Nghiệp vụ dòng tiền
                         </label>
                         <select
@@ -570,17 +570,17 @@ export default function FinancialRevenueReportView({
                 {/* 1. Net Revenue */}
                 <div className="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-2xl p-4 text-white shadow-sm relative overflow-hidden">
                     <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-100">
+                        <span className="text-xs font-bold uppercase tracking-wider text-indigo-100">
                             Doanh Thu Thuần Thực Nhận
                         </span>
                         <div className="w-8 h-8 rounded-xl bg-white/15 flex items-center justify-center">
                             <DollarSign className="w-4 h-4 text-white" />
                         </div>
                     </div>
-                    <p className="text-2xl font-black mt-2 tracking-tight">
+                    <p className="text-2xl font-extrabold mt-2 tracking-tight">
                         {isLoading ? '...' : formatVnd(report?.netRevenue ?? 0)}
                     </p>
-                    <div className="mt-2.5 flex items-center justify-between gap-2 text-[11px]">
+                    <div className="mt-2.5 flex items-center justify-between gap-2 text-xs">
                         <span
                             className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-bold ${
                                 isPositiveGrowth
@@ -605,31 +605,31 @@ export default function FinancialRevenueReportView({
                 {/* 2. Gross Revenue Breakdown */}
                 <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs">
                     <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                             Tổng Doanh Thu Gộp (Gross)
                         </span>
                         <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
                             <TrendingUp className="w-4 h-4" />
                         </div>
                     </div>
-                    <p className="text-2xl font-black text-slate-900 mt-2 tracking-tight">
+                    <p className="text-2xl font-extrabold text-slate-900 mt-2 tracking-tight">
                         {isLoading ? '...' : formatVnd(report?.grossRevenue ?? 0)}
                     </p>
-                    <div className="mt-2.5 grid grid-cols-3 gap-1.5 text-[10px]">
+                    <div className="mt-2.5 grid grid-cols-3 gap-1.5 text-xs">
                         <div className="bg-slate-50 rounded-lg px-2 py-1 border border-slate-100">
-                            <span className="text-slate-400 block">Cơ bản</span>
+                            <span className="text-slate-500 block">Cơ bản</span>
                             <span className="font-bold text-slate-800">
                                 {formatCompactVnd(report?.baseBookingRevenue ?? 0)}
                             </span>
                         </div>
                         <div className="bg-slate-50 rounded-lg px-2 py-1 border border-slate-100">
-                            <span className="text-slate-400 block">Gia hạn</span>
+                            <span className="text-slate-500 block">Gia hạn</span>
                             <span className="font-bold text-indigo-700">
                                 {formatCompactVnd(report?.extensionRevenue ?? 0)}
                             </span>
                         </div>
                         <div className="bg-slate-50 rounded-lg px-2 py-1 border border-slate-100">
-                            <span className="text-slate-400 block">Quá hạn</span>
+                            <span className="text-slate-500 block">Quá hạn</span>
                             <span className="font-bold text-amber-700">
                                 {formatCompactVnd(report?.overduePenaltyRevenue ?? 0)}
                             </span>
@@ -640,17 +640,17 @@ export default function FinancialRevenueReportView({
                 {/* 3. Refunds & Voucher Subsidy */}
                 <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs">
                     <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                             Hoàn Tiền & Trợ Giá Voucher
                         </span>
                         <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
                             <RotateCcw className="w-4 h-4" />
                         </div>
                     </div>
-                    <p className="text-2xl font-black text-purple-700 mt-2 tracking-tight">
+                    <p className="text-2xl font-extrabold text-purple-700 mt-2 tracking-tight">
                         {isLoading ? '...' : formatVnd(report?.totalRefundedAmount ?? 0)}
                     </p>
-                    <div className="mt-2.5 flex items-center justify-between text-[11px] text-slate-500">
+                    <div className="mt-2.5 flex items-center justify-between text-xs text-slate-500">
                         <span>
                             Tỷ lệ hoàn:{' '}
                             <strong className="text-purple-700">
@@ -658,7 +658,7 @@ export default function FinancialRevenueReportView({
                             </strong>{' '}
                             ({report?.refundTransactionCount ?? 0} lệnh)
                         </span>
-                        <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-bold text-[10px]">
+                        <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-bold text-xs">
                             Voucher: {formatCompactVnd(report?.totalVoucherDiscountSubsidy ?? 0)}
                         </span>
                     </div>
@@ -667,17 +667,17 @@ export default function FinancialRevenueReportView({
                 {/* 4. AOV & Outstanding Overdue Receivable */}
                 <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs">
                     <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                             Giá Trị Đơn TB (AOV) & Công Nợ
                         </span>
                         <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
                             <CreditCard className="w-4 h-4" />
                         </div>
                     </div>
-                    <p className="text-2xl font-black text-slate-900 mt-2 tracking-tight">
+                    <p className="text-2xl font-extrabold text-slate-900 mt-2 tracking-tight">
                         {isLoading ? '...' : formatVnd(report?.averageOrderValue ?? 0)}
                     </p>
-                    <div className="mt-2.5 flex items-center justify-between text-[11px] text-slate-500">
+                    <div className="mt-2.5 flex items-center justify-between text-xs text-slate-500">
                         <span>Trên mỗi GD thành công</span>
                         <span className="text-amber-700 font-bold">
                             Nợ treo: {formatCompactVnd(report?.outstandingOverdueReceivable ?? 0)}
@@ -693,7 +693,7 @@ export default function FinancialRevenueReportView({
                         <Activity className="w-5 h-5" />
                     </div>
                     <div>
-                        <p className="text-[11px] font-bold text-slate-400 uppercase">
+                        <p className="text-xs font-bold text-slate-500 uppercase">
                             Tổng lưu lượng lệnh PayOS
                         </p>
                         <p className="text-lg font-extrabold text-slate-900">
@@ -709,7 +709,7 @@ export default function FinancialRevenueReportView({
                     </div>
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                            <p className="text-[11px] font-bold text-slate-400 uppercase">
+                            <p className="text-xs font-bold text-slate-500 uppercase">
                                 Tỷ lệ quét QR thành công
                             </p>
                             <span className="text-xs font-extrabold text-emerald-600">
@@ -735,7 +735,7 @@ export default function FinancialRevenueReportView({
                         <Clock className="w-5 h-5" />
                     </div>
                     <div>
-                        <p className="text-[11px] font-bold text-slate-400 uppercase">
+                        <p className="text-xs font-bold text-slate-500 uppercase">
                             Chờ quét / Hết hạn QR
                         </p>
                         <p className="text-sm font-extrabold text-slate-900">
@@ -753,7 +753,7 @@ export default function FinancialRevenueReportView({
                         <Zap className="w-5 h-5" />
                     </div>
                     <div>
-                        <p className="text-[11px] font-bold text-slate-400 uppercase">
+                        <p className="text-xs font-bold text-slate-500 uppercase">
                             Tốc độ TT & Giờ cao điểm
                         </p>
                         <p className="text-sm font-extrabold text-slate-900">
@@ -872,7 +872,7 @@ export default function FinancialRevenueReportView({
                                         </strong>
                                     </span>
                                 </div>
-                                <div className="flex flex-wrap items-center gap-4 text-[11px]">
+                                <div className="flex flex-wrap items-center gap-4 text-xs">
                                     <span className="flex items-center gap-1.5 text-slate-600">
                                         <span className="w-2.5 h-2.5 rounded-xs bg-blue-600 inline-block" />
                                         Cơ bản: <strong>{formatVnd(selectedPoint.baseRevenue)}</strong>
@@ -898,7 +898,7 @@ export default function FinancialRevenueReportView({
 
                         {/* Bar Chart Viewport */}
                         {timeSeries.length === 0 ? (
-                            <div className="h-56 flex items-center justify-center text-xs text-slate-400">
+                            <div className="h-56 flex items-center justify-center text-xs text-slate-500">
                                 Chưa có dữ liệu chuỗi thời gian cho bộ lọc đã chọn.
                             </div>
                         ) : (
@@ -1033,7 +1033,7 @@ export default function FinancialRevenueReportView({
                                 </div>
 
                                 {/* X-Axis Labels */}
-                                <div className="flex items-center justify-between text-[10px] font-semibold text-slate-400 pt-2 min-w-[640px] px-1">
+                                <div className="flex items-center justify-between text-xs font-semibold text-slate-500 pt-2 min-w-[640px] px-1">
                                     <span>{timeSeries[0]?.label}</span>
                                     {timeSeries.length > 4 && (
                                         <span>{timeSeries[Math.floor(timeSeries.length / 2)]?.label}</span>
@@ -1076,7 +1076,7 @@ export default function FinancialRevenueReportView({
                                             className="h-full flex flex-col justify-end items-center gap-1 group"
                                             title={`${h.hourLabel}: ${h.totalAttemptCount} lệnh tạo (${h.paidCount} PAID · ${formatVnd(h.paidVolumeAmount)})`}
                                         >
-                                            <span className="text-[9px] font-bold text-slate-500 opacity-0 group-hover:opacity-100 transition">
+                                            <span className="text-xs font-bold text-slate-500 opacity-0 group-hover:opacity-100 transition">
                                                 {h.totalAttemptCount}
                                             </span>
                                             <div className="w-full h-full flex items-end justify-center">
@@ -1093,7 +1093,7 @@ export default function FinancialRevenueReportView({
                                                     style={{ height: `${pct}%` }}
                                                 />
                                             </div>
-                                            <span className="text-[9px] font-semibold text-slate-400">
+                                            <span className="text-xs font-semibold text-slate-500">
                                                 {String(h.hour).padStart(2, '0')}h
                                             </span>
                                         </div>
@@ -1125,7 +1125,7 @@ export default function FinancialRevenueReportView({
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse text-xs">
                             <thead>
-                                <tr className="bg-slate-50/90 text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200/80">
+                                <tr className="bg-slate-50/90 text-slate-500 font-bold uppercase text-xs tracking-wider border-b border-slate-200/80">
                                     <th className="py-3 px-4">#</th>
                                     <th className="py-3 px-4">Trạm SmartLocker</th>
                                     <th className="py-3 px-3 text-right">Đơn đặt</th>
@@ -1140,19 +1140,19 @@ export default function FinancialRevenueReportView({
                             <tbody className="divide-y divide-slate-100">
                                 {(report?.stationBreakdown ?? []).length === 0 ? (
                                     <tr>
-                                        <td colSpan={9} className="py-8 text-center text-slate-400">
+                                        <td colSpan={9} className="py-8 text-center text-slate-500">
                                             Chưa có dữ liệu trạm trong kỳ báo cáo.
                                         </td>
                                     </tr>
                                 ) : (
                                     (report?.stationBreakdown ?? []).map((st, index) => (
                                         <tr key={st.stationId} className="hover:bg-slate-50/70 transition">
-                                            <td className="py-3 px-4 font-extrabold text-slate-400">
+                                            <td className="py-3 px-4 font-extrabold text-slate-500">
                                                 #{index + 1}
                                             </td>
                                             <td className="py-3 px-4">
                                                 <p className="font-bold text-slate-900">{st.stationName}</p>
-                                                <p className="text-[11px] text-slate-400 truncate max-w-xs">
+                                                <p className="text-xs text-slate-500 truncate max-w-xs">
                                                     {st.address}
                                                 </p>
                                             </td>
@@ -1184,13 +1184,13 @@ export default function FinancialRevenueReportView({
                                                             }}
                                                         />
                                                     </div>
-                                                    <span className="text-[11px] font-bold text-slate-700 w-11 text-right">
+                                                    <span className="text-xs font-bold text-slate-700 w-11 text-right">
                                                         {st.revenueSharePercent.toFixed(1)}%
                                                     </span>
                                                 </div>
                                             </td>
                                             <td className="py-3 px-4 text-right">
-                                                <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                                     {st.paymentSuccessRatePercent.toFixed(1)}%
                                                 </span>
                                             </td>
@@ -1225,7 +1225,7 @@ export default function FinancialRevenueReportView({
                                         <span className="text-xs font-extrabold text-slate-800">
                                             {sz.sizeLabel}
                                         </span>
-                                        <span className="text-xs font-black text-indigo-700">
+                                        <span className="text-xs font-extrabold text-indigo-700">
                                             {formatVnd(sz.grossRevenue)} ({sz.revenueSharePercent.toFixed(1)}%)
                                         </span>
                                     </div>
@@ -1235,7 +1235,7 @@ export default function FinancialRevenueReportView({
                                             style={{ width: `${Math.min(100, sz.revenueSharePercent)}%` }}
                                         />
                                     </div>
-                                    <div className="flex items-center justify-between text-[11px] text-slate-500">
+                                    <div className="flex items-center justify-between text-xs text-slate-500">
                                         <span>Số giao dịch PAID: {sz.paidTransactions} lệnh</span>
                                         <span>Đơn giá bình quân: {formatVnd(sz.averageTicket)}</span>
                                     </div>
@@ -1265,18 +1265,18 @@ export default function FinancialRevenueReportView({
                                     >
                                         <div className="space-y-1">
                                             <span
-                                                className={`inline-block px-2 py-0.5 rounded text-[10px] font-extrabold border ${badge.cls}`}
+                                                className={`inline-block px-2 py-0.5 rounded text-xs font-extrabold border ${badge.cls}`}
                                             >
                                                 {kb.kind}
                                             </span>
                                             <p className="text-xs font-bold text-slate-800">{kb.kindLabel}</p>
-                                            <p className="text-[11px] text-slate-500">
+                                            <p className="text-xs text-slate-500">
                                                  Khối lượng: <strong>{kb.transactionCount}</strong> giao dịch hoàn tất
                                             </p>
                                         </div>
                                         <div className="text-right">
                                             <p
-                                                className={`text-sm font-black ${
+                                                className={`text-sm font-extrabold ${
                                                     kb.kind === 'REFUND'
                                                         ? 'text-purple-700'
                                                         : 'text-slate-900'
@@ -1286,7 +1286,7 @@ export default function FinancialRevenueReportView({
                                                 {formatVnd(kb.totalAmount)}
                                             </p>
                                             {kb.kind !== 'REFUND' && (
-                                                <span className="text-[11px] font-bold text-emerald-700">
+                                                <span className="text-xs font-bold text-emerald-700">
                                                     {kb.sharePercent.toFixed(1)}% DT Gộp
                                                 </span>
                                             )}
@@ -1316,7 +1316,7 @@ export default function FinancialRevenueReportView({
 
                         <div className="flex flex-wrap items-center gap-2">
                             <div className="relative">
-                                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                                <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                                 <input
                                     type="text"
                                     value={ledgerSearch}
@@ -1343,7 +1343,7 @@ export default function FinancialRevenueReportView({
                     <div className="overflow-x-auto max-h-[540px]">
                         <table className="w-full text-left border-collapse text-xs">
                             <thead className="sticky top-0 bg-slate-50 z-10 shadow-2xs">
-                                <tr className="text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                                <tr className="text-slate-500 font-bold uppercase text-xs tracking-wider border-b border-slate-200">
                                     <th className="py-3 px-4">OrderCode / Ngân hàng</th>
                                     <th className="py-3 px-3">Mã Đặt Tủ & Trạm</th>
                                     <th className="py-3 px-3">Khách hàng</th>
@@ -1357,7 +1357,7 @@ export default function FinancialRevenueReportView({
                             <tbody className="divide-y divide-slate-100">
                                 {filteredLedgerItems.length === 0 ? (
                                     <tr>
-                                        <td colSpan={8} className="py-10 text-center text-slate-400">
+                                        <td colSpan={8} className="py-10 text-center text-slate-500">
                                             Không tìm thấy giao dịch nào khớp điều kiện lọc trong kỳ này.
                                         </td>
                                     </tr>
@@ -1371,13 +1371,13 @@ export default function FinancialRevenueReportView({
                                                     <p className="font-mono font-bold text-slate-900">
                                                         #{row.orderCode}
                                                     </p>
-                                                    <p className="text-[10px] text-slate-400 font-mono">
+                                                    <p className="text-xs text-slate-500 font-mono">
                                                         {row.gateway} · {row.gatewayTxnId || 'Chưa có mã FT'}
                                                     </p>
                                                 </td>
                                                 <td className="py-3 px-3">
                                                     <p className="font-bold text-indigo-700">{row.bookingCode}</p>
-                                                    <p className="text-[11px] text-slate-500">
+                                                    <p className="text-xs text-slate-500">
                                                         {row.stationName} · Tủ {row.lockerSize}
                                                     </p>
                                                 </td>
@@ -1385,25 +1385,25 @@ export default function FinancialRevenueReportView({
                                                     <p className="font-semibold text-slate-800">
                                                         {row.customerName}
                                                     </p>
-                                                    <p className="text-[11px] text-slate-400">
+                                                    <p className="text-xs text-slate-500">
                                                         {row.customerEmail}
                                                     </p>
                                                 </td>
                                                 <td className="py-3 px-3">
                                                     <span
-                                                        className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold border ${kindMeta.cls}`}
+                                                        className={`inline-block px-2 py-0.5 rounded text-xs font-bold border ${kindMeta.cls}`}
                                                     >
                                                         {kindMeta.label}
                                                     </span>
                                                 </td>
                                                 <td className="py-3 px-3">
                                                     <span
-                                                        className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold border ${statusMeta.cls}`}
+                                                        className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold border ${statusMeta.cls}`}
                                                     >
                                                         {statusMeta.label}
                                                     </span>
                                                 </td>
-                                                <td className="py-3 px-3 text-[11px] text-slate-600">
+                                                <td className="py-3 px-3 text-xs text-slate-600">
                                                     <p>Tạo: {formatDateTimeVi(row.createdAt)}</p>
                                                     {row.settledAt && (
                                                         <p className="text-emerald-700 font-semibold">
@@ -1424,7 +1424,7 @@ export default function FinancialRevenueReportView({
                                                             {formatVnd(row.signedNetImpact)}
                                                         </span>
                                                     ) : (
-                                                        <span className="text-slate-400">0đ</span>
+                                                        <span className="text-slate-500">0đ</span>
                                                     )}
                                                 </td>
                                             </tr>
@@ -1447,7 +1447,7 @@ export default function FinancialRevenueReportView({
                         <div className="bg-white rounded-2xl border border-emerald-200/90 p-5 shadow-xs flex flex-col justify-between gap-4">
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between">
-                                    <span className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-extrabold uppercase">
+                                    <span className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-extrabold uppercase">
                                         KHUYÊN DÙNG CHO KẾ TOÁN TRƯỞNG
                                     </span>
                                     <FileSpreadsheet className="w-6 h-6 text-emerald-600" />
@@ -1493,7 +1493,7 @@ export default function FinancialRevenueReportView({
                         <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs flex flex-col justify-between gap-4">
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between">
-                                    <span className="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-extrabold uppercase">
+                                    <span className="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 text-xs font-extrabold uppercase">
                                         CHUẨN NHẬP LIỆU MISA / ERP
                                     </span>
                                     <FileText className="w-6 h-6 text-blue-600" />
@@ -1525,7 +1525,7 @@ export default function FinancialRevenueReportView({
                         <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs flex flex-col justify-between gap-4">
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between">
-                                    <span className="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] font-extrabold uppercase">
+                                    <span className="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs font-extrabold uppercase">
                                         CHỨNG TỪ KÝ DUYỆT LƯU TRỮ
                                     </span>
                                     <Printer className="w-6 h-6 text-indigo-600" />
@@ -1552,7 +1552,7 @@ export default function FinancialRevenueReportView({
                         <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs flex flex-col justify-between gap-4">
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between">
-                                    <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 text-[10px] font-extrabold uppercase">
+                                    <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 text-xs font-extrabold uppercase">
                                         TÍCH HỢP DATA WAREHOUSE / AUDIT
                                     </span>
                                     <FileJson className="w-6 h-6 text-slate-700" />
@@ -1633,17 +1633,17 @@ export default function FinancialRevenueReportView({
             <div className="hidden print:grid grid-cols-3 gap-6 pt-8 mt-6 border-t border-slate-300 text-center text-xs">
                 <div>
                     <p className="font-bold text-slate-900 uppercase">Người lập biểu</p>
-                    <p className="text-[11px] text-slate-500 italic">(Ký, ghi rõ họ tên)</p>
+                    <p className="text-xs text-slate-500 italic">(Ký, ghi rõ họ tên)</p>
                     <div className="h-20" />
                 </div>
                 <div>
                     <p className="font-bold text-slate-900 uppercase">Kế toán đối soát</p>
-                    <p className="text-[11px] text-slate-500 italic">(Ký, kiểm tra sao kê PayOS)</p>
+                    <p className="text-xs text-slate-500 italic">(Ký, kiểm tra sao kê PayOS)</p>
                     <div className="h-20" />
                 </div>
                 <div>
                     <p className="font-bold text-slate-900 uppercase">Quản trị viên phê duyệt</p>
-                    <p className="text-[11px] text-slate-500 italic">(Ký, đóng dấu xác nhận)</p>
+                    <p className="text-xs text-slate-500 italic">(Ký, đóng dấu xác nhận)</p>
                     <div className="h-20" />
                 </div>
             </div>

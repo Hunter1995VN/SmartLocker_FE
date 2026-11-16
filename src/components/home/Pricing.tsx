@@ -1,4 +1,4 @@
-import { Check, Star, Ruler, Shield, Battery, ShieldCheck, Award, Tag } from 'lucide-react';
+import { Check, Star, Ruler, Shield, Battery, ShieldCheck, Award } from 'lucide-react';
 import { SELECT_SIZE_EVENT } from './Hero';
 
 /**
@@ -84,10 +84,6 @@ const Pricing = () => {
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           {/* Section Header */}
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <div className="inline-flex items-center gap-1.5 text-primary text-xs font-bold uppercase tracking-wider mb-3 px-3 py-1.5 rounded-full bg-primary-container/10 border border-primary/20">
-              <Tag className="w-3.5 h-3.5" />
-              Chi Phí Hợp Lý
-            </div>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-on-surface tracking-tight leading-tight mb-4 text-balance">
               Kích Cỡ Tủ & <span className="text-gradient">Bảng Giá Minh Bạch</span>
             </h2>
@@ -146,7 +142,7 @@ const Pricing = () => {
                       </span>
                       <span className="text-base text-secondary">/ giờ</span>
                     </div>
-                    <p className="text-xs text-secondary mt-1">
+                    <p className="text-sm text-secondary mt-1">
                       hoặc gói trọn ngày <strong className="text-on-surface">{size.priceDay.toLocaleString()}đ</strong>/24h
                     </p>
                     <div className="mt-3 flex items-center gap-1.5 text-xs">
@@ -215,7 +211,7 @@ const Pricing = () => {
                   >
                     Chọn {size.name}
                   </button>
-                  <p className="text-xs text-center text-secondary mt-3">
+                  <p className="text-sm text-center text-secondary mt-3">
                     Thanh toán linh hoạt • Hủy miễn phí trước 2h
                   </p>
                 </div>

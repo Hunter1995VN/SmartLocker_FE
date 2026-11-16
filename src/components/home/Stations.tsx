@@ -112,10 +112,6 @@ const Stations = () => {
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
             <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-1.5 text-primary text-xs font-bold uppercase tracking-wider mb-3">
-                <MapPin className="w-4 h-4" />
-                Hệ thống phủ sóng rộng khắp
-              </div>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-on-surface tracking-tight leading-tight">
                 Mạng Lưới Trạm Tủ<br className="hidden md:block" />
                 <span className="text-gradient"> Thông Minh Toàn Quốc</span>
@@ -326,7 +322,7 @@ const Stations = () => {
                           )}
                         </div>
                         <h3 className="font-bold text-on-surface text-base leading-tight">{station.name}</h3>
-                        <p className="text-xs text-secondary mt-0.5">{station.address}</p>
+                        <p className="text-sm text-secondary mt-0.5">{station.address}</p>
 
                         <div className="grid grid-cols-3 gap-2 mt-4">
                           {(['S', 'M', 'L'] as const).map((size) => (

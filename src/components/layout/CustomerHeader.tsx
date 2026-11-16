@@ -78,7 +78,7 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
 
     return (
         <>
-            <header className="h-16 bg-white border-b border-[#e5eeff] sticky top-0 z-40 shrink-0 shadow-[0_1px_3px_rgba(15,23,42,0.05)]">
+            <header className="h-16 bg-white border-b border-surface-container sticky top-0 z-40 shrink-0 shadow-[0_1px_3px_rgba(15,23,42,0.05)]">
                 <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
                     {/* 1. Brand Logo & Primary Nav */}
                     <div className="flex items-center gap-6 lg:gap-8">
@@ -87,11 +87,11 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                             className="flex items-center gap-2.5 transition-transform active:scale-[0.98] cursor-pointer"
                             title="Về trang tổng quan"
                         >
-                            <div className="w-9 h-9 rounded-xl bg-[#2563eb] flex items-center justify-center shadow-sm">
+                            <div className="w-9 h-9 rounded-xl bg-primary-container flex items-center justify-center shadow-sm">
                                 <Lock className="w-[18px] h-[18px] text-white" />
                             </div>
-                            <span className="font-bold text-lg tracking-tight text-[#0b1c30]">
-                                Smart<span className="text-[#2563eb]">Locker</span>
+                            <span className="font-bold text-lg tracking-tight text-on-surface">
+                                Smart<span className="text-primary-container">Locker</span>
                             </span>
                         </button>
 
@@ -101,8 +101,8 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                                 onClick={() => onNavigate('dashboard')}
                                 className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
                                     isTabActive('dashboard')
-                                        ? 'bg-[#eff4ff] text-[#2563eb]'
-                                        : 'text-[#434655] hover:text-[#0b1c30] hover:bg-[#f0f4ff]'
+                                        ? 'bg-surface-container-low text-primary-container'
+                                        : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low'
                                 }`}
                             >
                                 <LayoutDashboard className="w-4 h-4" />
@@ -113,8 +113,8 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                                 onClick={() => onNavigate('find-station')}
                                 className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
                                     isTabActive('find-station')
-                                        ? 'bg-[#eff4ff] text-[#2563eb]'
-                                        : 'text-[#434655] hover:text-[#0b1c30] hover:bg-[#f0f4ff]'
+                                        ? 'bg-surface-container-low text-primary-container'
+                                        : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low'
                                 }`}
                             >
                                 <Compass className="w-4 h-4" />
@@ -125,8 +125,8 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                                 onClick={() => onNavigate('my-bookings')}
                                 className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
                                     isTabActive('my-bookings')
-                                        ? 'bg-[#eff4ff] text-[#2563eb]'
-                                        : 'text-[#434655] hover:text-[#0b1c30] hover:bg-[#f0f4ff]'
+                                        ? 'bg-surface-container-low text-primary-container'
+                                        : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low'
                                 }`}
                             >
                                 <Clock className="w-4 h-4" />
@@ -135,7 +135,7 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
 
                             <a
                                 href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}
-                                className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-sm font-semibold text-[#434655] hover:text-[#0b1c30] hover:bg-[#f0f4ff] transition-all"
+                                className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-sm font-semibold text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all"
                             >
                                 <Headphones className="w-4 h-4" />
                                 <span>Hỗ trợ</span>
@@ -149,9 +149,9 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                         <div className="relative" ref={dropdownRef}>
                             <button
                                 onClick={() => setUserMenuOpen(prev => !prev)}
-                                className="flex items-center gap-2.5 p-1.5 pl-2.5 rounded-xl hover:bg-[#eff4ff] transition-colors border border-transparent hover:border-[#e5eeff] cursor-pointer"
+                                className="flex items-center gap-2.5 p-1.5 pl-2.5 rounded-xl hover:bg-surface-container-low transition-colors border border-transparent hover:border-surface-container cursor-pointer"
                             >
-                                <div className="w-8 h-8 rounded-full bg-[#004ac6] text-white flex items-center justify-center font-bold text-xs shadow-xs overflow-hidden">
+                                <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs shadow-xs overflow-hidden">
                                     {user.avatarUrl ? (
                                         <img
                                             src={resolveAssetUrl(user.avatarUrl)}
@@ -162,73 +162,73 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                                     ) : initials}
                                 </div>
                                 <div className="hidden lg:flex flex-col text-left">
-                                    <span className="text-xs font-bold text-[#0b1c30] truncate max-w-[140px] leading-tight">
+                                    <span className="text-xs font-bold text-on-surface truncate max-w-[140px] leading-tight">
                                         {userName}
                                     </span>
-                                    <span className="text-[10px] text-[#737686] uppercase tracking-wide font-medium leading-none mt-0.5">
+                                    <span className="text-xs text-on-surface-muted uppercase tracking-wide font-medium leading-none mt-0.5">
                                         Khách hàng
                                     </span>
                                 </div>
-                                <ChevronDown className="w-3.5 h-3.5 text-[#737686]" />
+                                <ChevronDown className="w-3.5 h-3.5 text-on-surface-muted" />
                             </button>
 
                             {/* Dropdown Menu */}
                             {userMenuOpen && (
-                                <div className="absolute right-0 top-full mt-2 w-60 bg-white rounded-2xl shadow-xl border border-[#e5eeff] py-1.5 z-50 animate-fade-in-down">
-                                    <div className="px-4 py-2.5 border-b border-[#f0f4ff]">
-                                        <p className="text-xs font-bold text-[#0b1c30] truncate">{userName}</p>
-                                        <p className="text-[11px] text-[#737686] truncate">{user.email || 'traveler@smartlocker.vn'}</p>
+                                <div className="absolute right-0 top-full mt-2 w-60 bg-white rounded-2xl shadow-xl border border-surface-container py-1.5 z-50 animate-fade-in-down">
+                                    <div className="px-4 py-2.5 border-b border-surface-container-low">
+                                        <p className="text-sm font-bold text-on-surface truncate">{userName}</p>
+                                        <p className="text-sm text-on-surface-muted truncate">{user.email || 'traveler@smartlocker.vn'}</p>
                                     </div>
 
                                     <button
                                         onClick={() => { setUserMenuOpen(false); onNavigate('dashboard'); }}
-                                        className="w-full text-left px-4 py-2.5 text-xs font-medium text-[#434655] hover:bg-[#eff4ff] hover:text-[#2563eb] flex items-center gap-2.5 transition-colors cursor-pointer"
+                                        className="w-full text-left px-4 py-2.5 text-xs font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-primary-container flex items-center gap-2.5 transition-colors cursor-pointer"
                                     >
-                                        <LayoutDashboard className="w-4 h-4 text-[#2563eb]" />
+                                        <LayoutDashboard className="w-4 h-4 text-primary-container" />
                                         <span>Trang tổng quan (Dashboard)</span>
                                     </button>
 
                                     <button
                                         onClick={() => { setUserMenuOpen(false); onNavigate('find-station'); }}
-                                        className="w-full text-left px-4 py-2.5 text-xs font-medium text-[#434655] hover:bg-[#eff4ff] hover:text-[#2563eb] flex items-center gap-2.5 transition-colors cursor-pointer"
+                                        className="w-full text-left px-4 py-2.5 text-xs font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-primary-container flex items-center gap-2.5 transition-colors cursor-pointer"
                                     >
-                                        <Compass className="w-4 h-4 text-[#2563eb]" />
+                                        <Compass className="w-4 h-4 text-primary-container" />
                                         <span>Tìm trạm & Đặt tủ</span>
                                     </button>
 
                                     <button
                                         onClick={() => { setUserMenuOpen(false); onNavigate('my-bookings'); }}
-                                        className="w-full text-left px-4 py-2.5 text-xs font-medium text-[#434655] hover:bg-[#eff4ff] hover:text-[#2563eb] flex items-center gap-2.5 transition-colors cursor-pointer"
+                                        className="w-full text-left px-4 py-2.5 text-xs font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-primary-container flex items-center gap-2.5 transition-colors cursor-pointer"
                                     >
-                                        <Clock className="w-4 h-4 text-[#2563eb]" />
+                                        <Clock className="w-4 h-4 text-primary-container" />
                                         <span>Lịch sử đơn đặt</span>
                                     </button>
 
                                     <button
                                         onClick={() => { setUserMenuOpen(false); onNavigate('profile', { tab: 'info' }); }}
-                                        className="w-full text-left px-4 py-2.5 text-xs font-medium text-[#434655] hover:bg-[#eff4ff] hover:text-[#2563eb] flex items-center gap-2.5 transition-colors cursor-pointer"
+                                        className="w-full text-left px-4 py-2.5 text-xs font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-primary-container flex items-center gap-2.5 transition-colors cursor-pointer"
                                     >
-                                        <User className="w-4 h-4 text-[#2563eb]" />
+                                        <User className="w-4 h-4 text-primary-container" />
                                         <span>Thông tin cá nhân</span>
                                     </button>
 
                                     <button
                                         onClick={() => { setUserMenuOpen(false); onNavigate('profile', { tab: 'debt' }); }}
-                                        className="w-full text-left px-4 py-2.5 text-xs font-medium text-[#434655] hover:bg-[#eff4ff] hover:text-[#2563eb] flex items-center gap-2.5 transition-colors cursor-pointer"
+                                        className="w-full text-left px-4 py-2.5 text-xs font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-primary-container flex items-center gap-2.5 transition-colors cursor-pointer"
                                     >
-                                        <DollarSign className="w-4 h-4 text-[#2563eb]" />
+                                        <DollarSign className="w-4 h-4 text-primary-container" />
                                         <span>Tra cứu dư nợ quá hạn</span>
                                     </button>
 
                                     <button
                                         onClick={() => { setUserMenuOpen(false); setNotifPrefsOpen(true); }}
-                                        className="w-full text-left px-4 py-2.5 text-xs font-medium text-[#434655] hover:bg-[#eff4ff] hover:text-[#2563eb] flex items-center gap-2.5 transition-colors cursor-pointer"
+                                        className="w-full text-left px-4 py-2.5 text-xs font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-primary-container flex items-center gap-2.5 transition-colors cursor-pointer"
                                     >
-                                        <Bell className="w-4 h-4 text-[#2563eb]" />
+                                        <Bell className="w-4 h-4 text-primary-container" />
                                         <span>Kênh nhận thông báo</span>
                                     </button>
 
-                                    <hr className="my-1 border-[#f0f4ff]" />
+                                    <hr className="my-1 border-surface-container-low" />
 
                                     <button
                                         onClick={handleLogout}

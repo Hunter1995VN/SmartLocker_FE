@@ -1,4 +1,5 @@
 import { openLegal } from '../../utils/contact';
+import { useNetworkStats } from '../../utils/useNetworkStats';
 import { Lock, Eye, EyeOff, ArrowRight, ChevronLeft, AlertCircle, Shield, Sparkles, Package } from 'lucide-react';
 import { useState } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
@@ -17,6 +18,7 @@ interface LoginPageProps {
  * - Cột phải: Form đăng nhập gọn đẹp
  */
 export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps) {
+    const { stations } = useNetworkStats();
     const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
     const [email, setEmail] = useState('');
@@ -81,7 +83,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
     };
 
     return (
-        <div className="min-h-screen flex bg-[#f0f4ff] font-sans">
+        <div className="min-h-screen flex bg-surface-container-low font-sans">
             {/* LEFT SIDE - Visual Branding */}
             <aside className="hidden lg:flex lg:w-[52%] relative overflow-hidden" style={{background: 'linear-gradient(135deg, #0f2977 0%, #1a4ac4 40%, #2563eb 70%, #3b82f6 100%)'}}>
                 {/* Ambient blobs */}
@@ -101,7 +103,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                         </div>
                         <div>
                             <span className="text-lg font-extrabold text-white tracking-tight">SmartLocker</span>
-                            <p className="text-[11px] text-white/60 uppercase tracking-widest">Tủ hành lý thông minh</p>
+                            <p className="text-xs text-white/60 uppercase tracking-widest">Tủ hành lý thông minh</p>
                         </div>
                     </div>
 
@@ -111,7 +113,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                             <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
                             <span className="text-xs text-white/90 font-semibold">Nền tảng #1 tại Việt Nam</span>
                         </div>
-                        <h1 className="text-4xl xl:text-5xl font-black text-white leading-[1.1] tracking-tight mb-5">
+                        <h1 className="text-4xl xl:text-5xl font-extrabold text-white leading-[1.1] tracking-tight mb-5">
                             Chào mừng<br />
                             <span style={{background: 'linear-gradient(90deg, #93c5fd, #c4b5fd)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
                                 trở lại!
@@ -125,7 +127,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                         <div className="mt-10 space-y-3">
                             {[
                                 { icon: Shield, title: 'Bảo mật chuẩn ngân hàng', desc: 'Mã hóa JWS & BCrypt' },
-                                { icon: Package, title: '85+ trạm tủ toàn quốc', desc: 'Sân bay, metro, phố đi bộ' },
+                                { icon: Package, title: stations != null ? `${stations} trạm tủ đang hoạt động` : 'Mạng lưới trạm tủ', desc: 'Sân bay, metro, phố đi bộ' },
                                 { icon: Sparkles, title: 'Hoạt động 24/7', desc: 'Hỗ trợ kỹ thuật liên tục' },
                             ].map(({ icon: Icon, title, desc }, i) => (
                                 <div key={i} className="flex items-center gap-3.5 p-3.5 rounded-2xl" style={{background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', backdropFilter: 'blur(8px)'}}>
@@ -134,7 +136,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                                     </div>
                                     <div>
                                         <p className="text-white text-sm font-semibold">{title}</p>
-                                        <p className="text-white/55 text-xs">{desc}</p>
+                                        <p className="text-white/55 text-sm">{desc}</p>
                                     </div>
                                 </div>
                             ))}
@@ -151,8 +153,8 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                                 TM
                             </div>
                             <div>
-                                <p className="text-white/80 text-xs font-semibold">Trần Minh Đức</p>
-                                <p className="text-white/45 text-[10px]">Freelance Designer</p>
+                                <p className="text-white/80 text-sm font-semibold">Trần Minh Đức</p>
+                                <p className="text-white/45 text-sm">Freelance Designer</p>
                             </div>
                             <div className="ml-auto flex gap-0.5">
                                 {[...Array(5)].map((_, i) => (
@@ -168,7 +170,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
             <main className="w-full lg:w-[48%] flex flex-col bg-white">
                 {/* Top navigation bar */}
                 <div className="flex items-center justify-between px-8 py-5 border-b border-gray-100">
-                    <a href="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-blue-600 transition-colors group">
+                    <a href="/" className="inline-flex items-center gap-1.5 min-h-11 text-sm font-semibold text-gray-500 hover:text-blue-600 transition-colors group">
                         <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
                         Về trang chủ
                     </a>
@@ -189,7 +191,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                     <div className="w-full max-w-[400px]">
                         {/* Header */}
                         <div className="mb-8">
-                            <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-2">
+                            <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight mb-2">
                                 Đăng nhập
                             </h2>
                             <p className="text-sm text-gray-500">
@@ -206,7 +208,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                         )}
 
                         {/* Social Login */}
-                        <div className="grid grid-cols-2 gap-3 mb-6">
+                        <div className="grid grid-cols-1 gap-3 mb-6">
                             <button
                                 type="button"
                                 onClick={() => handleGoogleLogin()}
@@ -221,12 +223,6 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                                 </svg>
                                 Google
                             </button>
-                            <button type="button" className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-sm font-semibold transition-all hover:border-gray-300 hover:shadow-sm">
-                                <svg className="w-4.5 h-4.5" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M16.365 1.43c0 1.14-.493 2.27-1.177 3.08-.744.9-1.99 1.57-2.987 1.57-.12-1.03.35-2.09 1.012-2.86C13.755 4.34 14.785 3.66 16.365 1.43zm3.495 16.74c-.6 1.41-.84 2.04-1.59 3.27-1.04 1.71-2.5 3.84-4.32 3.85-1.6.02-2.02-1.04-4.2-1.04-2.18 0-2.62 1.02-4.21 1.06-1.81.04-3.18-1.84-4.21-3.55-2.99-4.96-3.31-10.79-1.46-13.88 1.31-2.18 3.39-3.45 5.34-3.45 1.95 0 3.18 1.07 4.79 1.07 1.55 0 2.5-1.07 4.79-1.07 1.7 0 3.51 1.18 4.79 3.21-4.21 2.31-3.52 8.34.69 10.46z"/>
-                                </svg>
-                                Apple
-                            </button>
                         </div>
 
                         {/* Divider */}
@@ -235,7 +231,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                                 <div className="w-full border-t border-gray-100"></div>
                             </div>
                             <div className="relative flex justify-center">
-                                <span className="bg-white px-3 text-xs text-gray-400 uppercase tracking-widest font-semibold">
+                                <span className="bg-white px-3 text-xs text-gray-500 uppercase tracking-widest font-semibold">
                                     hoặc đăng nhập với email
                                 </span>
                             </div>
@@ -256,7 +252,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                                     placeholder="nguyenvana@example.com"
                                     autoComplete="email"
                                     disabled={isLoading}
-                                    className="w-full h-12 px-4 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-900 text-sm placeholder:text-gray-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all disabled:opacity-50"
+                                    className="w-full h-12 px-4 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-900 text-sm placeholder:text-gray-500 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all disabled:opacity-50"
                                 />
                             </div>
 
@@ -283,12 +279,12 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                                         placeholder="Nhập mật khẩu..."
                                         autoComplete="current-password"
                                         disabled={isLoading}
-                                        className="w-full h-12 px-4 pr-12 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-900 text-sm placeholder:text-gray-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all disabled:opacity-50"
+                                        className="w-full h-12 px-4 pr-12 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-900 text-sm placeholder:text-gray-500 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all disabled:opacity-50"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 hover:text-gray-600 transition-colors"
+                                        className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500 hover:text-gray-600 transition-colors"
                                         aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
                                     >
                                         {showPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
@@ -340,7 +336,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                         </form>
 
                         {/* Trust Footer */}
-                        <p className="mt-6 text-center text-xs text-gray-400 leading-relaxed">
+                        <p className="mt-6 text-center text-sm text-gray-500 leading-relaxed">
                             Bằng việc đăng nhập, bạn đồng ý với{' '}
                             <a href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }} className="text-blue-600 font-semibold hover:underline">Điều khoản dịch vụ</a>
                             {' '}và{' '}

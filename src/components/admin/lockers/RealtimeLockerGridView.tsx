@@ -119,15 +119,15 @@ export default function RealtimeLockerGridView() {
         return <div key={size} className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm">
             <div className="flex items-start justify-between">
                 <div>
-                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Size {size}</p>
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Size {size}</p>
                     <div className="flex items-baseline gap-1.5 mt-1.5">
-                        <span className="text-2xl font-black text-slate-900 tracking-tight">{free}</span>
-                        <span className="text-xs font-semibold text-slate-400">/ {total} ngăn trống</span>
+                        <span className="text-2xl font-extrabold text-slate-900 tracking-tight">{free}</span>
+                        <span className="text-xs font-semibold text-slate-500">/ {total} ngăn trống</span>
                     </div>
                 </div>
-                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center font-black">{size}</div>
+                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center font-extrabold">{size}</div>
             </div>
-            <div className="mt-3.5 pt-3 border-t border-slate-100 grid grid-cols-2 gap-x-3 gap-y-1 text-[11px] font-medium text-slate-500">
+            <div className="mt-3.5 pt-3 border-t border-slate-100 grid grid-cols-2 gap-x-3 gap-y-1 text-xs font-medium text-slate-500">
                 <span>Chờ thanh toán: <b className="text-slate-800">{r?.pendingPayment ?? 0}</b></span>
                 <span>Chờ gửi: <b className="text-slate-800">{r?.awaitingDeposit ?? 0}</b></span>
                 <span>Chưa cấp ngăn: <b className="text-slate-800">{r?.unassignedReservations ?? 0}</b></span>
@@ -146,12 +146,12 @@ export default function RealtimeLockerGridView() {
 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-                <div className="text-[11px] font-semibold text-slate-400 mb-1">
+                <div className="text-xs font-semibold text-slate-500 mb-1">
                     Vận hành trạm / <span className="text-blue-600 font-bold">Lưới ô tủ</span>
                 </div>
                 <div className="flex items-center gap-2.5 flex-wrap">
-                    <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Sơ đồ tủ thời gian thực</h1>
-                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">
+                    <h1 className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight">Sơ đồ tủ thời gian thực</h1>
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse motion-reduce:animate-none" />Trực tiếp
                     </span>
                 </div>
@@ -159,7 +159,7 @@ export default function RealtimeLockerGridView() {
             </div>
             <div className="flex items-center gap-2.5 flex-wrap">
                 <label className="flex items-center gap-2 text-xs font-semibold text-slate-500">
-                    <Box className="w-4 h-4 text-slate-400" />
+                    <Box className="w-4 h-4 text-slate-500" />
                     <select aria-label="Trạm điều khiển" value={stationId} onChange={e => changeStation(e.target.value)}
                         className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 shadow-xs focus:outline-none focus:ring-2 focus:ring-blue-500/30">
                         {!stations.length && <option value="">Chưa có trạm</option>}
@@ -214,7 +214,7 @@ export default function RealtimeLockerGridView() {
             </div>
         </div>
 
-        <p className="text-[11px] text-slate-400">
+        <p className="text-xs text-slate-500">
             Lần đọc gần nhất: {lastRead?.toLocaleTimeString('vi-VN') || 'chưa có'}. "Trống" chưa chắc đặt được ngay: còn phụ thuộc sức khỏe ngăn, cửa và kết nối thiết bị.
         </p>
         <LockerStatusConfirmModal locker={pendingLocker} pendingRequest={pending?.request || null} isOpen={!!pending} onClose={() => setPending(null)} onConfirm={confirm} isUpdating={updating} />
