@@ -38,6 +38,7 @@ import type {
 import adminIncidentService from '../../../api/adminIncidentService';
 import RemoteUnlockConfirmModal from './RemoteUnlockConfirmModal';
 import { parseIncidentType } from './EmergencyIncidentListView';
+import ModalOverlay from '../../ui/ModalOverlay';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -662,10 +663,7 @@ export default function IncidentDetailPanel({
 
             {/* Lightbox Image Preview Modal */}
             {showImageLightbox && incident.evidenceImageUrl && (
-                <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
-                    onClick={() => setShowImageLightbox(false)}
-                >
+                <ModalOverlay onClose={() => setShowImageLightbox(false)} closeOnBackdrop scrim="dark">
                     <div
                         className="relative max-w-4xl max-h-[90vh] bg-white rounded-2xl overflow-hidden shadow-2xl p-2 w-full"
                         onClick={(e) => e.stopPropagation()}
@@ -691,7 +689,7 @@ export default function IncidentDetailPanel({
                             />
                         </div>
                     </div>
-                </div>
+                </ModalOverlay>
             )}
         </>
     );
