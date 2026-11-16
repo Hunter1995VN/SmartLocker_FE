@@ -20,6 +20,7 @@ import notificationPreferenceService, {
 } from '../../api/notificationPreferenceService';
 import type { NotificationPreferenceDto } from '../../api/notificationPreferenceService';
 import ModalOverlay from '../ui/ModalOverlay';
+import { useT } from '../../i18n';
 
 interface NotificationPreferencesModalProps {
     isOpen: boolean;
@@ -30,6 +31,7 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
     isOpen,
     onClose,
 }) => {
+    const t = useT();
     const [prefs, setPrefs] = useState<NotificationPreferenceDto>(DEFAULT_NOTIFICATION_PREFS);
     const [isLoading, setIsLoading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -97,13 +99,13 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
                         </div>
                         <div>
                             <div className="flex items-center gap-2">
-                                <h2 className="text-base font-bold">Thiết Lập Kênh Nhận Thông Báo</h2>
+                                <h2 className="text-base font-bold">{t('Thiết Lập Kênh Nhận Thông Báo')}</h2>
                                 <span className="text-xs font-bold uppercase px-2 py-0.5 rounded-full bg-blue-500/30 text-blue-100 border border-blue-400/30">
-                                    THIẾT LẬP THÔNG BÁO
+                                    {t('THIẾT LẬP THÔNG BÁO')}
                                 </span>
                             </div>
                             <p className="text-xs text-blue-200 mt-0.5">
-                                Tùy chỉnh nhận mã PIN mở tủ, nhắc hẹn check-in & cảnh báo quá hạn
+                                {t('Tùy chỉnh nhận mã PIN mở tủ, nhắc hẹn check-in & cảnh báo quá hạn')}
                             </p>
                         </div>
                     </div>
@@ -121,14 +123,14 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
                 <div className="p-5 space-y-5 max-h-[78vh] overflow-y-auto">
                     {isLoading ? (
                         <div className="py-8 text-center text-xs text-slate-500">
-                            Đang tải cấu hình thông báo của bạn...
+                            {t('Đang tải cấu hình thông báo của bạn...')}
                         </div>
                     ) : (
                         <>
                             {/* Section 1: 3 Kênh nhận thông báo (Email, SMS, WebPush) */}
                             <div>
                                 <p className="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-2.5">
-                                    1. Kênh Nhận Thông Báo (Channels)
+                                    {t('1. Kênh Nhận Thông Báo (Channels)')}
                                 </p>
                                 <div className="space-y-2.5">
                                     {/* Email Channel */}
@@ -152,10 +154,10 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
                                             </div>
                                             <div>
                                                 <p className="text-xs font-bold text-slate-900">
-                                                    Email Điện Tử (Gmail SMTP)
+                                                    {t('Email Điện Tử (Gmail SMTP)')}
                                                 </p>
                                                 <p className="text-xs text-slate-500">
-                                                    Nhận vé QR, mã PIN 6 số, hóa đơn điện tử & biên bản thanh toán
+                                                    {t('Nhận vé QR, mã PIN 6 số, hóa đơn điện tử & biên bản thanh toán')}
                                                 </p>
                                             </div>
                                         </div>
@@ -188,10 +190,10 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
                                             </div>
                                             <div>
                                                 <p className="text-xs font-bold text-slate-900">
-                                                    Tin Nhắn SMS Di Động
+                                                    {t('Tin Nhắn SMS Di Động')}
                                                 </p>
                                                 <p className="text-xs text-slate-500">
-                                                    Nhận mã mở tủ khẩn cấp khi đi vào vùng mất kết nối 4G/Wi-Fi
+                                                    {t('Nhận mã mở tủ khẩn cấp khi đi vào vùng mất kết nối 4G/Wi-Fi')}
                                                 </p>
                                             </div>
                                         </div>
@@ -224,10 +226,10 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
                                             </div>
                                             <div>
                                                 <p className="text-xs font-bold text-slate-900">
-                                                    Thông Báo Đẩy Trình Duyệt (WebPush)
+                                                    {t('Thông Báo Đẩy Trình Duyệt (WebPush)')}
                                                 </p>
                                                 <p className="text-xs text-slate-500">
-                                                    Thông báo tức thì trên trình duyệt khi cửa tủ đóng/mở hoặc thanh toán xong
+                                                    {t('Thông báo tức thì trên trình duyệt khi cửa tủ đóng/mở hoặc thanh toán xong')}
                                                 </p>
                                             </div>
                                         </div>
@@ -244,13 +246,13 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
                             {/* Section 2: Loại sự kiện thông báo */}
                             <div>
                                 <p className="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-2.5">
-                                    2. Tùy Chọn Loại Sự Kiện Cảnh Báo
+                                    {t('2. Tùy Chọn Loại Sự Kiện Cảnh Báo')}
                                 </p>
                                 <div className="bg-slate-50 rounded-2xl border border-slate-200/80 divide-y divide-slate-200/70 text-xs">
                                     <label className="p-3 flex items-center justify-between cursor-pointer">
                                         <span className="flex items-center gap-2.5 font-semibold text-slate-800">
                                             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                                            Xác nhận đặt tủ & Cấp mã PIN 6 số
+                                            {t('Xác nhận đặt tủ & Cấp mã PIN 6 số')}
                                         </span>
                                         <input
                                             type="checkbox"
@@ -263,7 +265,7 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
                                     <label className="p-3 flex items-center justify-between cursor-pointer">
                                         <span className="flex items-center gap-2.5 font-semibold text-slate-800">
                                             <Clock className="w-4 h-4 text-blue-600" />
-                                            Nhắc nhở thời gian giữ chỗ 30 phút & Sắp hết giờ thuê
+                                            {t('Nhắc nhở thời gian giữ chỗ 30 phút & Sắp hết giờ thuê')}
                                         </span>
                                         <input
                                             type="checkbox"
@@ -276,17 +278,17 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
                                     <div className="p-3 flex items-center justify-between bg-amber-50/50">
                                         <span className="flex items-center gap-2.5 font-semibold text-slate-800">
                                             <ShieldAlert className="w-4 h-4 text-amber-600" />
-                                            Cảnh báo quá hạn lưu trữ & Niêm phong 72h (Bắt buộc)
+                                            {t('Cảnh báo quá hạn lưu trữ & Niêm phong 72h (Bắt buộc)')}
                                         </span>
                                         <span className="text-xs font-bold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-800">
-                                            Luôn bật
+                                            {t('Luôn bật')}
                                         </span>
                                     </div>
 
                                     <label className="p-3 flex items-center justify-between cursor-pointer">
                                         <span className="flex items-center gap-2.5 font-semibold text-slate-800">
                                             <Sparkles className="w-4 h-4 text-purple-600" />
-                                            Nhận mã giảm giá & Ưu đãi trạm mới
+                                            {t('Nhận mã giảm giá & Ưu đãi trạm mới')}
                                         </span>
                                         <input
                                             type="checkbox"
@@ -315,7 +317,7 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
                         onClick={onClose}
                         className="px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold transition cursor-pointer"
                     >
-                        Đóng
+                        {t('Đóng')}
                     </button>
                     <button
                         type="button"
@@ -324,7 +326,7 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
                         className="px-4 py-2 rounded-xl bg-primary-container hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition cursor-pointer disabled:opacity-50"
                     >
                         <Save className="w-4 h-4" />
-                        <span>{isSaving ? 'Đang lưu...' : 'Lưu Thiết Lập Thông Báo'}</span>
+                        <span>{isSaving ? t('Đang lưu...') : t('Lưu Thiết Lập Thông Báo')}</span>
                     </button>
                 </div>
             </div>

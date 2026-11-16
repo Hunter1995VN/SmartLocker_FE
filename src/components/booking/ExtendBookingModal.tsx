@@ -20,6 +20,7 @@ import {
   syncPayment,
   type CreateBookingResponse
 } from '../../api/bookingService';
+import { useT } from '../../i18n';
 
 interface ExtendBookingModalProps {
   isOpen: boolean;
@@ -56,6 +57,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
   onExtended,
   onSuccess
 }) => {
+    const t = useT();
   const [selectedHours, setSelectedHours] = useState<number>(3);
   const [customHoursInput, setCustomHoursInput] = useState<string>('3');
   const [isCustom, setIsCustom] = useState<boolean>(false);
@@ -106,7 +108,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
     const now = new Date();
     const isSameDay = d.toDateString() === now.toDateString();
     const timeStr = d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-    if (isSameDay) return `${timeStr} Hôm nay`;
+    if (isSameDay) return `${timeStr} ${t('Hôm nay')}`;
     return `${timeStr} (${d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })})`;
   };
 
@@ -144,7 +146,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
     setErrorMsg(null);
 
     if (selectedHours > maxAdditionalHours) {
-      setErrorMsg(`Tổng thời gian lưu trữ tối đa là ${maxHours} giờ (còn có thể gia hạn tối đa +${maxAdditionalHours} giờ).`);
+      setErrorMsg(t('Tổng thời gian lưu trữ tối đa là {maxHours} giờ (còn có thể gia hạn tối đa +{extra} giờ).', { maxHours, extra: maxAdditionalHours }));
       return;
     }
 
@@ -167,13 +169,13 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
       if (res.success && res.data) {
         setPaymentData(res.data);
       } else {
-        setErrorMsg(res.message || 'Không thể khởi tạo giao dịch gia hạn. Vui lòng thử lại.');
+        setErrorMsg(res.message || t('Không thể khởi tạo giao dịch gia hạn. Vui lòng thử lại.'));
       }
     } catch (err: any) {
       setErrorMsg(
         err.response?.data?.message ||
           err.message ||
-          'Lỗi kết nối khi tạo yêu cầu gia hạn.'
+          t('Lỗi kết nối khi tạo yêu cầu gia hạn.')
       );
     } finally {
       setIsSubmitting(false);
@@ -224,9 +226,9 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
           return;
         }
       }
-      setStatusNote('Hệ thống đang chờ ngân hàng xác nhận giao dịch. Vui lòng đợi vài giây sau khi chuyển khoản.');
+      setStatusNote(t('Hệ thống đang chờ ngân hàng xác nhận giao dịch. Vui lòng đợi vài giây sau khi chuyển khoản.'));
     } catch {
-      setStatusNote('Không thể kiểm tra trạng thái lúc này. Vui lòng thử lại.');
+      setStatusNote(t('Không thể kiểm tra trạng thái lúc này. Vui lòng thử lại.'));
     } finally {
       setIsCheckingPayment(false);
     }
@@ -236,10 +238,10 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
 
   const displayCurrentExpiry = currentEndAt
     ? formatDateTime(baseEndDate)
-    : currentEndTime || 'Hôm nay';
+    : currentEndTime || t('Hôm nay');
 
   const sizeLabel =
-    size === 'S' ? 'Nhỏ (S)' : size === 'L' ? 'Lớn (L)' : 'Vừa (M)';
+    size === 'S' ? t('Nhỏ (S)') : size === 'L' ? t('Lớn (L)') : t('Vừa (M)');
 
   const vietQrImgUrl =
     paymentData?.bin && paymentData?.accountNumber
@@ -281,7 +283,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            aria-label="Đóng hộp thoại"
+            aria-label={t('Đóng hộp thoại')}
             className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
@@ -298,7 +300,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                   {lockerCode.startsWith('Locker') ? lockerCode : `Locker ${lockerCode}`}
                 </span>
                 <span className="text-xs px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 font-semibold">
-                  {sizeLabel} · {formatCurrency(effectiveHourlyRate)}đ/h
+                  {sizeLabel} · {formatCurrency(effectiveHourlyRate)}{t('đ/h')}
                 </span>
               </div>
               <div className="flex items-center gap-1.5 text-slate-500 text-xs">
@@ -307,7 +309,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
               </div>
             </div>
             <div className="flex sm:flex-col items-center sm:items-end justify-between border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-200/60 shrink-0">
-              <span className="text-xs text-slate-500 font-medium">Hết hạn hiện tại</span>
+              <span className="text-xs text-slate-500 font-medium">{t('Hết hạn hiện tại')}</span>
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold mt-0.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
                 <span>{displayCurrentExpiry}</span>
@@ -323,15 +325,15 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
               </div>
               <div className="space-y-1">
                 <h3 className="text-lg font-extrabold text-slate-900">
-                  Đã gia hạn thêm +{selectedHours} giờ thành công!
+                  {t('Đã gia hạn thêm +')}{selectedHours} {t('giờ thành công!')}
                 </h3>
                 <p className="text-sm text-slate-500">
-                  Hạn trả tủ mới của bạn đã được cập nhật thành{' '}
+                  {t('Hạn trả tủ mới của bạn đã được cập nhật thành')}{' '}
                   <strong className="text-emerald-700">{formatDateTime(newEndDateObj)}</strong>.
                 </p>
               </div>
               <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-xs text-emerald-900 max-w-md mx-auto">
-                Mã QR và mã PIN 6 số mở tủ của bạn đã được tự động gia hạn hiệu lực đến thời điểm mới.
+                {t('Mã QR và mã PIN 6 số mở tủ của bạn đã được tự động gia hạn hiệu lực đến thời điểm mới.')}
               </div>
             </div>
           ) : paymentData ? (
@@ -352,36 +354,36 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                     ) : vietQrImgUrl ? (
                       <img loading="lazy" decoding="async"
                         src={vietQrImgUrl}
-                        alt="Gia hạn qua VietQR"
+                        alt={t('Gia hạn qua VietQR')}
                         className="w-40 h-40 object-contain"
                       />
                     ) : (
                       <QRCodeSVG value={paymentData.paymentUrl} size={156} level="M" />
                     )}
                     <span className="text-xs text-slate-500 font-semibold mt-1.5">
-                      Quét bằng mọi App Ngân hàng
+                      {t('Quét bằng mọi App Ngân hàng')}
                     </span>
                   </div>
 
                   {/* Transfer Details */}
                   <div className="flex-1 w-full space-y-2.5 text-xs">
                     <div className="flex items-center justify-between py-1.5 border-b border-slate-200/70">
-                      <span className="text-slate-500">Gia hạn thêm:</span>
+                      <span className="text-slate-500">{t('Gia hạn thêm:')}</span>
                       <span className="font-bold text-slate-900">
-                        +{selectedHours} giờ (đến {formatDateTime(newEndDateObj)})
+                        +{selectedHours} {t('giờ (đến')} {formatDateTime(newEndDateObj)})
                       </span>
                     </div>
 
                     {paymentData.accountName && (
                       <div className="flex items-center justify-between py-1.5 border-b border-slate-200/70">
-                        <span className="text-slate-500">Chủ tài khoản:</span>
+                        <span className="text-slate-500">{t('Chủ tài khoản:')}</span>
                         <span className="font-bold text-slate-900">{paymentData.accountName}</span>
                       </div>
                     )}
 
                     {paymentData.accountNumber && (
                       <div className="flex items-center justify-between py-1.5 border-b border-slate-200/70">
-                        <span className="text-slate-500">Số tài khoản:</span>
+                        <span className="text-slate-500">{t('Số tài khoản:')}</span>
                         <div className="flex items-center gap-1.5">
                           <span className="font-mono font-bold text-slate-900">
                             {paymentData.accountNumber}
@@ -402,14 +404,14 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                     )}
 
                     <div className="flex items-center justify-between py-1.5 border-b border-slate-200/70">
-                      <span className="text-slate-500">Số tiền thanh toán:</span>
+                      <span className="text-slate-500">{t('Số tiền thanh toán:')}</span>
                       <span className="text-base font-extrabold text-blue-600">
                         {formatCurrency(paymentData.amount || totalPayable)} VND
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between pt-1">
-                      <span className="text-slate-500">Mã đơn PayOS:</span>
+                      <span className="text-slate-500">{t('Mã đơn PayOS:')}</span>
                       <span className="font-mono font-bold text-slate-800">
                         #{paymentData.orderCode || paymentData.bookingCode}
                       </span>
@@ -422,7 +424,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                   <div className="mt-3 pt-3 border-t border-blue-200/60 flex items-center justify-between text-xs">
                     <span className="text-slate-500 flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-                      Tự động cập nhật ngay khi chuyển khoản
+                      {t('Tự động cập nhật ngay khi chuyển khoản')}
                     </span>
                     <a
                       href={paymentData.paymentUrl}
@@ -430,7 +432,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                       rel="noreferrer"
                       className="inline-flex items-center gap-1 text-blue-600 hover:underline font-bold"
                     >
-                      <span>Mở trang cổng PayOS</span>
+                      <span>{t('Mở trang cổng PayOS')}</span>
                       <ExternalLink className="w-3.5 h-3.5" />
                     </a>
                   </div>
@@ -449,10 +451,10 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
               <div>
                 <div className="flex items-center justify-between mb-2.5">
                   <label className="block text-xs font-bold text-slate-900 uppercase tracking-wider">
-                    Chọn thời lượng gia hạn
+                    {t('Chọn thời lượng gia hạn')}
                   </label>
                   <span className="text-xs text-slate-500">
-                    Tối đa: {maxHours} giờ (thêm tối đa +{maxAdditionalHours} giờ)
+                    {t('Tối đa:')} {maxHours} {t('giờ (thêm tối đa +')}{maxAdditionalHours} {t('giờ)')}
                   </span>
                 </div>
 
@@ -489,7 +491,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                           +{hrs} {hrs === 1 ? 'Hour' : 'Hours'}
                         </span>
                         <span className="text-xs font-bold text-blue-600 mt-1">
-                          {formatCurrency(priceForHrs)} đ
+                          {formatCurrency(priceForHrs)} {t('đ')}
                         </span>
                         <span className="text-xs text-slate-500 mt-0.5 truncate">
                           → {endForHrs.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
@@ -502,7 +504,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                 {/* Custom Hours Row */}
                 <div className="mt-3 flex items-center justify-between bg-slate-50 border border-slate-200/80 rounded-xl px-3.5 py-2.5">
                   <span className="text-xs font-semibold text-slate-700">
-                    Hoặc nhập số giờ muốn gia hạn thêm:
+                    {t('Hoặc nhập số giờ muốn gia hạn thêm:')}
                   </span>
                   <div className="flex items-center gap-2">
                     <input
@@ -522,7 +524,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                       onBlur={handleApplyCustomHours}
                       className="w-16 h-8 rounded-lg border border-slate-300 bg-white text-center text-xs font-bold text-blue-600 focus:outline-none focus:border-blue-600"
                     />
-                    <span className="text-xs text-slate-500 font-medium">giờ</span>
+                    <span className="text-xs text-slate-500 font-medium">{t('giờ')}</span>
                   </div>
                 </div>
               </div>
@@ -542,7 +544,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                 <div className="space-y-1.5 text-xs text-slate-600">
                   <div className="flex justify-between">
                     <span>
-                      Phí gia hạn (+{selectedHours} giờ × {formatCurrency(effectiveHourlyRate)} đ/h)
+                      {t('Phí gia hạn (+')}{selectedHours} {t('giờ ×')} {formatCurrency(effectiveHourlyRate)} {t('đ/h)')}
                     </span>
                     <span className="text-slate-900 font-semibold">
                       {formatCurrency(extensionBaseFee)} VND
@@ -553,25 +555,25 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                     <div className="flex justify-between text-rose-600 font-semibold">
                       <span className="flex items-center gap-1">
                         <AlertTriangle className="w-3.5 h-3.5" />
-                        Phí quá hạn hiện tại (tự động tất toán)
+                        {t('Phí quá hạn hiện tại (tự động tất toán)')}
                       </span>
                       <span>+{formatCurrency(overdueFee)} VND</span>
                     </div>
                   )}
 
                   <div className="flex justify-between">
-                    <span>Gia hạn hiệu lực mã QR &amp; PIN mở tủ</span>
-                    <span className="text-emerald-700 font-semibold">Miễn phí (0 VND)</span>
+                    <span>{t('Gia hạn hiệu lực mã QR & PIN mở tủ')}</span>
+                    <span className="text-emerald-700 font-semibold">{t('Miễn phí (0 VND)')}</span>
                   </div>
                 </div>
 
                 <div className="pt-2.5 border-t border-slate-100 flex items-baseline justify-between">
-                  <span className="text-sm font-bold text-slate-900">Tổng phụ phí gia hạn</span>
+                  <span className="text-sm font-bold text-slate-900">{t('Tổng phụ phí gia hạn')}</span>
                   <div className="text-right">
                     <span className="text-xl font-extrabold text-blue-600 tracking-tight">
                       {formatCurrency(totalPayable)} VND
                     </span>
-                    <div className="text-slate-500 text-xs">Thanh toán qua PayOS VietQR</div>
+                    <div className="text-slate-500 text-xs">{t('Thanh toán qua PayOS VietQR')}</div>
                   </div>
                 </div>
               </div>
@@ -594,7 +596,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
               onClick={onClose}
               className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm cursor-pointer transition-all"
             >
-              Hoàn tất &amp; Quay lại đơn đặt tủ
+              {t('Hoàn tất & Quay lại đơn đặt tủ')}
             </button>
           ) : paymentData ? (
             <>
@@ -607,7 +609,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                 className="px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-100 transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Đổi số giờ</span>
+                <span>{t('Đổi số giờ')}</span>
               </button>
 
               <button
@@ -619,12 +621,12 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                 {isCheckingPayment ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Đang đối soát PayOS...</span>
+                    <span>{t('Đang đối soát PayOS...')}</span>
                   </>
                 ) : (
                   <>
                     <RefreshCw className="w-3.5 h-3.5" />
-                    <span>Tôi đã chuyển khoản — Kiểm tra ngay</span>
+                    <span>{t('Tôi đã chuyển khoản — Kiểm tra ngay')}</span>
                   </>
                 )}
               </button>
@@ -648,13 +650,13 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Đang tạo mã VietQR PayOS...</span>
+                    <span>{t('Đang tạo mã VietQR PayOS...')}</span>
                   </>
                 ) : (
                   <>
                     <QrCode className="w-4 h-4" />
                     <span>
-                      Tiếp tục thanh toán ({formatCurrency(totalPayable)} VND)
+                      {t('Tiếp tục thanh toán (')}{formatCurrency(totalPayable)} VND)
                     </span>
                   </>
                 )}

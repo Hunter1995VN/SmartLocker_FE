@@ -9,6 +9,7 @@ import CustomerHeader from '../components/layout/CustomerHeader';
 import profileService from '../api/profileService';
 import type { UserProfileDto, UserOverdueDebtResponse } from '../api/profileService';
 import { getApiErrorMessage, resolveAssetUrl } from '../api/client';
+import { useT } from '../i18n';
 
 export const PROFILE_UPDATED_EVENT = 'smartlocker:profile-updated';
 const AVATAR_MAX_BYTES = 2 * 1024 * 1024;
@@ -54,6 +55,7 @@ const formatDate = (isoString?: string): string => {
 };
 
 export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, initialTab = 'info' }) => {
+    const t = useT();
     const [activeTab, setActiveTab] = useState<'info' | 'debt'>(initialTab);
     const [loading, setLoading] = useState<boolean>(true);
     const [refreshing, setRefreshing] = useState<boolean>(false);
@@ -112,7 +114,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
             }
         } catch (err: any) {
             console.error('Lỗi tải dữ liệu profile:', err);
-            setProfileErrorMsg('Không thể tải thông tin từ máy chủ. Vui lòng thử lại sau.');
+            setProfileErrorMsg(t('Không thể tải thông tin từ máy chủ. Vui lòng thử lại sau.'));
         } finally {
             setLoading(false);
             setRefreshing(false);
@@ -131,11 +133,11 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
         setProfileSuccessMsg('');
         setProfileErrorMsg('');
         if (!AVATAR_TYPES.includes(file.type)) {
-            setProfileErrorMsg('Chỉ chấp nhận ảnh JPEG, PNG hoặc WebP.');
+            setProfileErrorMsg(t('Chỉ chấp nhận ảnh JPEG, PNG hoặc WebP.'));
             return;
         }
         if (file.size > AVATAR_MAX_BYTES) {
-            setProfileErrorMsg('Ảnh quá lớn. Vui lòng chọn ảnh dưới 2 MB.');
+            setProfileErrorMsg(t('Ảnh quá lớn. Vui lòng chọn ảnh dưới 2 MB.'));
             return;
         }
         setUploadingAvatar(true);
@@ -144,13 +146,13 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
             if (res.success && res.data) {
                 setProfile(res.data);
                 syncStoredUser({ avatarUrl: res.data.avatarUrl ?? null });
-                setProfileSuccessMsg('Đã cập nhật ảnh đại diện.');
+                setProfileSuccessMsg(t('Đã cập nhật ảnh đại diện.'));
                 setTimeout(() => setProfileSuccessMsg(''), 4000);
             } else {
-                setProfileErrorMsg(res.message || 'Không tải được ảnh lên.');
+                setProfileErrorMsg(res.message || t('Không tải được ảnh lên.'));
             }
         } catch (err) {
-            setProfileErrorMsg(getApiErrorMessage(err, 'Không tải được ảnh lên. Vui lòng thử lại.'));
+            setProfileErrorMsg(getApiErrorMessage(err, t('Không tải được ảnh lên. Vui lòng thử lại.')));
         } finally {
             setUploadingAvatar(false);
         }
@@ -165,13 +167,13 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
             if (res.success && res.data) {
                 setProfile(res.data);
                 syncStoredUser({ avatarUrl: null });
-                setProfileSuccessMsg('Đã xóa ảnh đại diện.');
+                setProfileSuccessMsg(t('Đã xóa ảnh đại diện.'));
                 setTimeout(() => setProfileSuccessMsg(''), 4000);
             } else {
-                setProfileErrorMsg(res.message || 'Không xóa được ảnh.');
+                setProfileErrorMsg(res.message || t('Không xóa được ảnh.'));
             }
         } catch (err) {
-            setProfileErrorMsg(getApiErrorMessage(err, 'Không xóa được ảnh. Vui lòng thử lại.'));
+            setProfileErrorMsg(getApiErrorMessage(err, t('Không xóa được ảnh. Vui lòng thử lại.')));
         } finally {
             setUploadingAvatar(false);
         }
@@ -184,12 +186,12 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
         setProfileErrorMsg('');
 
         if (!fullName.trim() || fullName.trim().length < 2) {
-            setProfileErrorMsg('Họ và tên phải có ít nhất 2 ký tự.');
+            setProfileErrorMsg(t('Họ và tên phải có ít nhất 2 ký tự.'));
             return;
         }
 
         if (!phone.trim()) {
-            setProfileErrorMsg('Vui lòng nhập số điện thoại.');
+            setProfileErrorMsg(t('Vui lòng nhập số điện thoại.'));
             return;
         }
 
@@ -204,13 +206,13 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
             if (res.success && res.data) {
                 setProfile(res.data);
                 syncStoredUser({ fullName: res.data.fullName, phone: res.data.phone });
-                setProfileSuccessMsg('Cập nhật thông tin cá nhân thành công!');
+                setProfileSuccessMsg(t('Cập nhật thông tin cá nhân thành công!'));
                 setTimeout(() => setProfileSuccessMsg(''), 4000);
             } else {
-                setProfileErrorMsg(res.message || 'Cập nhật thất bại.');
+                setProfileErrorMsg(res.message || t('Cập nhật thất bại.'));
             }
         } catch (err: any) {
-            const msg = err.response?.data?.message || err.message || 'Lỗi kết nối khi cập nhật thông tin.';
+            const msg = err.response?.data?.message || err.message || t('Lỗi kết nối khi cập nhật thông tin.');
             setProfileErrorMsg(msg);
         } finally {
             setUpdatingProfile(false);
@@ -224,17 +226,17 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
         setPwdErrorMsg('');
 
         if (profile?.hasPassword && !currentPassword) {
-            setPwdErrorMsg('Vui lòng nhập mật khẩu hiện tại.');
+            setPwdErrorMsg(t('Vui lòng nhập mật khẩu hiện tại.'));
             return;
         }
 
         if (newPassword.length < 6) {
-            setPwdErrorMsg('Mật khẩu mới phải có tối thiểu 6 ký tự.');
+            setPwdErrorMsg(t('Mật khẩu mới phải có tối thiểu 6 ký tự.'));
             return;
         }
 
         if (newPassword !== confirmPassword) {
-            setPwdErrorMsg('Mật khẩu xác nhận không khớp.');
+            setPwdErrorMsg(t('Mật khẩu xác nhận không khớp.'));
             return;
         }
 
@@ -247,16 +249,16 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
             });
 
             if (res.success) {
-                setPwdSuccessMsg(res.message || 'Đổi mật khẩu thành công!');
+                setPwdSuccessMsg(res.message || t('Đổi mật khẩu thành công!'));
                 setCurrentPassword('');
                 setNewPassword('');
                 setConfirmPassword('');
                 setTimeout(() => setPwdSuccessMsg(''), 5000);
             } else {
-                setPwdErrorMsg(res.message || 'Đổi mật khẩu thất bại.');
+                setPwdErrorMsg(res.message || t('Đổi mật khẩu thất bại.'));
             }
         } catch (err: any) {
-            const msg = err.response?.data?.message || err.message || 'Lỗi khi đổi mật khẩu.';
+            const msg = err.response?.data?.message || err.message || t('Lỗi khi đổi mật khẩu.');
             setPwdErrorMsg(msg);
         } finally {
             setChangingPassword(false);
@@ -273,18 +275,18 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
             if (res && res.success && res.data?.paymentUrl) {
                 setDebtActionMsg({
                     type: 'success',
-                    text: 'Đang chuyển hướng tới cổng thanh toán PayOS...'
+                    text: t('Đang chuyển hướng tới cổng thanh toán PayOS...')
                 });
                 // Redirect user to PayOS Checkout
                 window.location.href = res.data.paymentUrl;
             } else {
                 setDebtActionMsg({
                     type: 'error',
-                    text: res?.message || 'Không thể tạo liên kết thanh toán. Vui lòng thử lại.'
+                    text: res?.message || t('Không thể tạo liên kết thanh toán. Vui lòng thử lại.')
                 });
             }
         } catch (err: any) {
-            const msg = err.response?.data?.message || err.message || 'Lỗi khi xử lý thanh toán quá hạn.';
+            const msg = err.response?.data?.message || err.message || t('Lỗi khi xử lý thanh toán quá hạn.');
             setDebtActionMsg({
                 type: 'error',
                 text: msg
@@ -311,13 +313,13 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                             className="link-target inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline mb-2 transition-colors cursor-pointer"
                         >
                             <ArrowLeft className="w-3.5 h-3.5" />
-                            <span>Quay lại Trang tổng quan</span>
+                            <span>{t('Quay lại Trang tổng quan')}</span>
                         </button>
                         <h1 className="text-2xl sm:text-3xl font-extrabold text-on-surface tracking-tight">
-                            Quản lý tài khoản & Dư nợ
+                            {t('Quản lý tài khoản & Dư nợ')}
                         </h1>
                         <p className="text-sm text-on-surface-muted mt-1">
-                            Xem thông tin cá nhân, cập nhật bảo mật và tra cứu chi tiết dư nợ quá hạn
+                            {t('Xem thông tin cá nhân, cập nhật bảo mật và tra cứu chi tiết dư nợ quá hạn')}
                         </p>
                     </div>
 
@@ -329,7 +331,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                             className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-on-surface bg-white border border-outline-soft hover:bg-surface-container-low hover:border-[#b8ccfa] transition-all shadow-xs disabled:opacity-60 cursor-pointer"
                         >
                             <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-primary' : ''}`} />
-                            <span>{refreshing ? 'Đang cập nhật...' : 'Làm mới'}</span>
+                            <span>{refreshing ? t('Đang cập nhật...') : t('Làm mới')}</span>
                         </button>
                     </div>
                 </div>
@@ -343,10 +345,10 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                             </div>
                             <div>
                                 <h2 className="text-sm font-bold text-rose-900">
-                                    Tài khoản có dư nợ quá hạn: {formatCurrency(debtData?.totalOverdueDebt || 0)} VNĐ
+                                    {t('Tài khoản có dư nợ quá hạn:')} {formatCurrency(debtData?.totalOverdueDebt || 0)} {t('VNĐ')}
                                 </h2>
                                 <p className="text-sm text-rose-700 mt-0.5">
-                                    Theo quy tắc <strong>BR-P08</strong>, bạn cần thanh toán toàn bộ nợ quá hạn để mở khóa tính năng đặt tủ mới.
+                                    {t('Theo quy tắc')} <strong>BR-P08</strong>{t(', bạn cần thanh toán toàn bộ nợ quá hạn để mở khóa tính năng đặt tủ mới.')}
                                 </p>
                             </div>
                         </div>
@@ -355,7 +357,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                 onClick={() => setActiveTab('debt')}
                                 className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition-colors shrink-0 shadow-xs cursor-pointer flex items-center gap-1.5"
                             >
-                                <span>Xem & Thanh toán</span>
+                                <span>{t('Xem & Thanh toán')}</span>
                                 <ChevronRight className="w-3.5 h-3.5" />
                             </button>
                         )}
@@ -373,7 +375,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                         }`}
                     >
                         <User className="w-4 h-4" />
-                        <span>Thông tin cá nhân & Bảo mật</span>
+                        <span>{t('Thông tin cá nhân & Bảo mật')}</span>
                     </button>
 
                     <button
@@ -385,7 +387,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                         }`}
                     >
                         <DollarSign className="w-4 h-4" />
-                        <span>Tra cứu dư nợ quá hạn</span>
+                        <span>{t('Tra cứu dư nợ quá hạn')}</span>
                         {hasOverdueDebt && (
                             <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
                         )}
@@ -425,20 +427,20 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                     </div>
 
                                     <h2 className="text-lg font-bold text-on-surface">
-                                        {profile.fullName || 'Khách hàng'}
+                                        {profile.fullName || t('Khách hàng')}
                                     </h2>
                                     <p className="text-sm text-on-surface-muted mt-0.5">{profile.email}</p>
 
                                     <div className="flex items-center gap-2 mt-3">
                                         <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-100">
-                                            {profile.role === 'TRAVELER' ? 'Khách hàng SmartLocker' : profile.role}
+                                            {profile.role === 'TRAVELER' ? t('Khách hàng SmartLocker') : profile.role}
                                         </span>
                                         <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${
                                             profile.status === 'ACTIVE'
                                                 ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
                                                 : 'bg-amber-50 text-amber-700 border-amber-100'
                                         }`}>
-                                            {profile.status === 'ACTIVE' ? 'Đang hoạt động' : profile.status}
+                                            {profile.status === 'ACTIVE' ? t('Đang hoạt động') : profile.status}
                                         </span>
                                     </div>
                                 </div>
@@ -448,32 +450,32 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                 <div className="space-y-3.5 text-xs text-on-surface-variant">
                                     <div className="flex items-center justify-between">
                                         <span className="text-on-surface-muted flex items-center gap-1.5">
-                                            <Phone className="w-3.5 h-3.5" /> Số điện thoại:
+                                            <Phone className="w-3.5 h-3.5" /> {t('Số điện thoại:')}
                                         </span>
                                         <span className="font-semibold text-on-surface">{profile.phone || '--'}</span>
                                     </div>
 
                                     <div className="flex items-center justify-between">
                                         <span className="text-on-surface-muted flex items-center gap-1.5">
-                                            <Calendar className="w-3.5 h-3.5" /> Ngày đăng ký:
+                                            <Calendar className="w-3.5 h-3.5" /> {t('Ngày đăng ký:')}
                                         </span>
                                         <span className="font-semibold text-on-surface">{formatDate(profile.createdAt)}</span>
                                     </div>
 
                                     <div className="flex items-center justify-between">
                                         <span className="text-on-surface-muted flex items-center gap-1.5">
-                                            <Shield className="w-3.5 h-3.5" /> Liên kết Google:
+                                            <Shield className="w-3.5 h-3.5" /> {t('Liên kết Google:')}
                                         </span>
                                         <span className={`font-semibold ${profile.googleLinked ? 'text-emerald-600' : 'text-slate-500'}`}>
-                                            {profile.googleLinked ? 'Đã liên kết' : 'Chưa liên kết'}
+                                            {profile.googleLinked ? t('Đã liên kết') : t('Chưa liên kết')}
                                         </span>
                                     </div>
 
                                     <div className="flex items-center justify-between">
                                         <span className="text-on-surface-muted flex items-center gap-1.5">
-                                            <Clock className="w-3.5 h-3.5" /> Lượt đặt tủ:
+                                            <Clock className="w-3.5 h-3.5" /> {t('Lượt đặt tủ:')}
                                         </span>
-                                        <span className="font-semibold text-on-surface">{profile.totalBookings} đơn</span>
+                                        <span className="font-semibold text-on-surface">{profile.totalBookings} {t('đơn')}</span>
                                     </div>
                                 </div>
                             </div>
@@ -488,8 +490,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                         <User className="w-5 h-5" />
                                     </div>
                                     <div>
-                                        <h2 className="text-base font-bold text-on-surface">Cập nhật thông tin cá nhân</h2>
-                                        <p className="text-sm text-on-surface-muted">Thay đổi họ và tên, số điện thoại hoặc ảnh đại diện</p>
+                                        <h2 className="text-base font-bold text-on-surface">{t('Cập nhật thông tin cá nhân')}</h2>
+                                        <p className="text-sm text-on-surface-muted">{t('Thay đổi họ và tên, số điện thoại hoặc ảnh đại diện')}</p>
                                     </div>
                                 </div>
 
@@ -510,14 +512,14 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                 <form onSubmit={handleUpdateProfile} className="space-y-4">
                                     <div>
                                         <label className="block text-xs font-bold text-on-surface mb-1.5">
-                                            Họ và tên <span className="text-rose-500">*</span>
+                                            {t('Họ và tên')} <span className="text-rose-500">*</span>
                                         </label>
                                         <input
                                             type="text"
                                             value={fullName}
                                             onChange={(e) => setFullName(e.target.value)}
-                                            placeholder="Nguyễn Văn A"
-                                            aria-label="Họ và tên"
+                                            placeholder={t('Nguyễn Văn A')}
+                                            aria-label={t('Họ và tên')}
                                             className="w-full px-4 py-2.5 rounded-xl text-xs border border-outline-soft focus:outline-hidden focus:border-primary focus:ring-2 focus:ring-primary/15 transition-all text-on-surface"
                                             required
                                         />
@@ -526,12 +528,12 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
                                             <label className="block text-xs font-bold text-on-surface mb-1.5">
-                                                Email đăng ký (Cố định)
+                                                {t('Email đăng ký (Cố định)')}
                                             </label>
                                             <input
                                                 type="email"
                                                 value={profile.email}
-                                                aria-label="Email đăng ký (cố định)"
+                                                aria-label={t('Email đăng ký (cố định)')}
                                                 disabled
                                                 className="w-full px-4 py-2.5 rounded-xl text-xs border border-surface-container bg-surface-bright text-on-surface-muted cursor-not-allowed"
                                             />
@@ -539,14 +541,14 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
 
                                         <div>
                                             <label className="block text-xs font-bold text-on-surface mb-1.5">
-                                                Số điện thoại liên hệ <span className="text-rose-500">*</span>
+                                                {t('Số điện thoại liên hệ')} <span className="text-rose-500">*</span>
                                             </label>
                                             <input
                                                 type="tel"
                                                 value={phone}
                                                 onChange={(e) => setPhone(e.target.value)}
                                                 placeholder="0901234567"
-                                                aria-label="Số điện thoại liên hệ"
+                                                aria-label={t('Số điện thoại liên hệ')}
                                                 className="w-full px-4 py-2.5 rounded-xl text-xs border border-outline-soft focus:outline-hidden focus:border-primary focus:ring-2 focus:ring-primary/15 transition-all text-on-surface"
                                                 required
                                             />
@@ -555,7 +557,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
 
                                     <div>
                                         <label className="block text-xs font-bold text-on-surface mb-1.5">
-                                            Ảnh đại diện
+                                            {t('Ảnh đại diện')}
                                         </label>
                                         <input
                                             ref={avatarInputRef}
@@ -563,7 +565,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                             accept="image/jpeg,image/png,image/webp"
                                             onChange={handleAvatarFile}
                                             className="hidden"
-                                            aria-label="Chọn ảnh đại diện"
+                                            aria-label={t('Chọn ảnh đại diện')}
                                         />
                                         <div className="flex flex-wrap items-center gap-2">
                                             <button
@@ -573,7 +575,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                                 className="px-4 py-2.5 rounded-xl text-xs font-bold border border-outline-soft bg-white hover:bg-surface-container-low text-on-surface flex items-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                                             >
                                                 <Camera className="w-3.5 h-3.5" />
-                                                {uploadingAvatar ? 'Đang tải ảnh lên...' : 'Chọn ảnh từ máy'}
+                                                {uploadingAvatar ? t('Đang tải ảnh lên...') : t('Chọn ảnh từ máy')}
                                             </button>
                                             {profile.avatarUrl && (
                                                 <button
@@ -583,10 +585,10 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                                     className="px-4 py-2.5 rounded-xl text-xs font-bold border border-rose-200 text-rose-600 hover:bg-rose-50 flex items-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                                                 >
                                                     <Trash2 className="w-3.5 h-3.5" />
-                                                    Xóa ảnh
+                                                    {t('Xóa ảnh')}
                                                 </button>
                                             )}
-                                            <span className="text-xs text-on-surface-muted">JPEG, PNG hoặc WebP, tối đa 2 MB. Ảnh được lưu ngay khi tải lên.</span>
+                                            <span className="text-xs text-on-surface-muted">{t('JPEG, PNG hoặc WebP, tối đa 2 MB. Ảnh được lưu ngay khi tải lên.')}</span>
                                         </div>
                                     </div>
 
@@ -597,7 +599,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                             className="px-6 py-2.5 bg-primary-container hover:bg-[#003896] text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-blue-500/15 disabled:opacity-60 flex items-center gap-2 cursor-pointer"
                                         >
                                             <Save className="w-3.5 h-3.5" />
-                                            <span>{updatingProfile ? 'Đang lưu...' : 'Lưu thay đổi'}</span>
+                                            <span>{updatingProfile ? t('Đang lưu...') : t('Lưu thay đổi')}</span>
                                         </button>
                                     </div>
                                 </form>
@@ -611,12 +613,12 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                     </div>
                                     <div>
                                         <h2 className="text-base font-bold text-on-surface">
-                                            {profile.hasPassword ? 'Đổi mật khẩu' : 'Thiết lập mật khẩu'}
+                                            {profile.hasPassword ? t('Đổi mật khẩu') : t('Thiết lập mật khẩu')}
                                         </h2>
                                         <p className="text-sm text-on-surface-muted">
                                             {profile.hasPassword
-                                                ? 'Cập nhật mật khẩu định kỳ để bảo vệ tài khoản an toàn'
-                                                : 'Tài khoản đăng nhập bằng Google. Bạn có thể đặt mật khẩu để đăng nhập trực tiếp.'}
+                                                ? t('Cập nhật mật khẩu định kỳ để bảo vệ tài khoản an toàn')
+                                                : t('Tài khoản đăng nhập bằng Google. Bạn có thể đặt mật khẩu để đăng nhập trực tiếp.')}
                                         </p>
                                     </div>
                                 </div>
@@ -639,14 +641,14 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                     {profile.hasPassword && (
                                         <div>
                                             <label className="block text-xs font-bold text-on-surface mb-1.5">
-                                                Mật khẩu hiện tại <span className="text-rose-500">*</span>
+                                                {t('Mật khẩu hiện tại')} <span className="text-rose-500">*</span>
                                             </label>
                                             <input
                                                 type="password"
                                                 value={currentPassword}
                                                 onChange={(e) => setCurrentPassword(e.target.value)}
                                                 placeholder="••••••••"
-                                                aria-label="Mật khẩu hiện tại"
+                                                aria-label={t('Mật khẩu hiện tại')}
                                                 className="w-full px-4 py-2.5 rounded-xl text-xs border border-outline-soft focus:outline-hidden focus:border-primary focus:ring-2 focus:ring-primary/15 transition-all text-on-surface"
                                                 required
                                             />
@@ -656,14 +658,14 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
                                             <label className="block text-xs font-bold text-on-surface mb-1.5">
-                                                Mật khẩu mới <span className="text-rose-500">*</span>
+                                                {t('Mật khẩu mới')} <span className="text-rose-500">*</span>
                                             </label>
                                             <input
                                                 type="password"
                                                 value={newPassword}
                                                 onChange={(e) => setNewPassword(e.target.value)}
-                                                placeholder="Tối thiểu 6 ký tự"
-                                                aria-label="Mật khẩu mới"
+                                                placeholder={t('Tối thiểu 6 ký tự')}
+                                                aria-label={t('Mật khẩu mới')}
                                                 className="w-full px-4 py-2.5 rounded-xl text-xs border border-outline-soft focus:outline-hidden focus:border-primary focus:ring-2 focus:ring-primary/15 transition-all text-on-surface"
                                                 required
                                             />
@@ -671,14 +673,14 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
 
                                         <div>
                                             <label className="block text-xs font-bold text-on-surface mb-1.5">
-                                                Xác nhận mật khẩu mới <span className="text-rose-500">*</span>
+                                                {t('Xác nhận mật khẩu mới')} <span className="text-rose-500">*</span>
                                             </label>
                                             <input
                                                 type="password"
                                                 value={confirmPassword}
                                                 onChange={(e) => setConfirmPassword(e.target.value)}
-                                                placeholder="Nhập lại mật khẩu mới"
-                                                aria-label="Xác nhận mật khẩu mới"
+                                                placeholder={t('Nhập lại mật khẩu mới')}
+                                                aria-label={t('Xác nhận mật khẩu mới')}
                                                 className="w-full px-4 py-2.5 rounded-xl text-xs border border-outline-soft focus:outline-hidden focus:border-primary focus:ring-2 focus:ring-primary/15 transition-all text-on-surface"
                                                 required
                                             />
@@ -692,7 +694,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                             className="px-6 py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl transition-all shadow-md disabled:opacity-60 flex items-center gap-2 cursor-pointer"
                                         >
                                             <Key className="w-3.5 h-3.5" />
-                                            <span>{changingPassword ? 'Đang cập nhật...' : 'Cập nhật mật khẩu'}</span>
+                                            <span>{changingPassword ? t('Đang cập nhật...') : t('Cập nhật mật khẩu')}</span>
                                         </button>
                                     </div>
                                 </form>
@@ -724,11 +726,11 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                                 ? 'bg-rose-100/70 text-rose-800 border-rose-300'
                                                 : 'bg-emerald-100/70 text-emerald-800 border-emerald-300'
                                         }`}>
-                                            {hasOverdueDebt ? 'Tài khoản có dư nợ' : 'Tài khoản sạch nợ'}
+                                            {hasOverdueDebt ? t('Tài khoản có dư nợ') : t('Tài khoản sạch nợ')}
                                         </span>
 
                                         <h2 className="text-xl sm:text-2xl font-extrabold text-on-surface mt-1.5">
-                                            {hasOverdueDebt ? 'Phát sinh dư nợ quá hạn chưa thanh toán' : 'Không có bất kỳ dư nợ quá hạn nào'}
+                                            {hasOverdueDebt ? t('Phát sinh dư nợ quá hạn chưa thanh toán') : t('Không có bất kỳ dư nợ quá hạn nào')}
                                         </h2>
 
                                         <p className="text-xs sm:text-sm text-on-surface-variant mt-1 max-w-2xl leading-relaxed">
@@ -739,12 +741,12 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
 
                                 <div className="text-left sm:text-right shrink-0 bg-white/70 p-4 rounded-2xl border border-white/60 backdrop-blur-xs">
                                     <span className="text-xs text-on-surface-muted font-semibold block uppercase">
-                                        Tổng nợ quá hạn
+                                        {t('Tổng nợ quá hạn')}
                                     </span>
                                     <span className={`text-2xl sm:text-3xl font-extrabold ${
                                         hasOverdueDebt ? 'text-rose-600' : 'text-emerald-600'
                                     }`}>
-                                        {formatCurrency(debtData.totalOverdueDebt)} VNĐ
+                                        {formatCurrency(debtData.totalOverdueDebt)} {t('VNĐ')}
                                     </span>
                                 </div>
                             </div>
@@ -769,29 +771,29 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                         {/* 3 Metric Cards */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                             <div className="bg-white p-5 rounded-2xl border border-surface-container shadow-xs">
-                                <span className="text-xs font-semibold text-on-surface-muted block">Dư nợ tài khoản (BR-P08)</span>
+                                <span className="text-xs font-semibold text-on-surface-muted block">{t('Dư nợ tài khoản (BR-P08)')}</span>
                                 <span className="text-xl font-bold text-on-surface mt-1 block">
-                                    {formatCurrency(debtData.accountOverdueDebt)} VNĐ
+                                    {formatCurrency(debtData.accountOverdueDebt)} {t('VNĐ')}
                                 </span>
-                                <span className="text-xs text-on-surface-muted mt-0.5 block">Khoản nợ ghi nhận trên hồ sơ</span>
+                                <span className="text-xs text-on-surface-muted mt-0.5 block">{t('Khoản nợ ghi nhận trên hồ sơ')}</span>
                             </div>
 
                             <div className="bg-white p-5 rounded-2xl border border-surface-container shadow-xs">
-                                <span className="text-xs font-semibold text-on-surface-muted block">Đơn đang quá hạn</span>
+                                <span className="text-xs font-semibold text-on-surface-muted block">{t('Đơn đang quá hạn')}</span>
                                 <span className={`text-xl font-bold mt-1 block ${
                                     debtData.overdueBookings.length > 0 ? 'text-rose-600' : 'text-on-surface'
                                 }`}>
-                                    {debtData.overdueBookings.length} đơn
+                                    {debtData.overdueBookings.length} {t('đơn')}
                                 </span>
-                                <span className="text-xs text-on-surface-muted mt-0.5 block">Tủ đang lưu quá giờ hẹn</span>
+                                <span className="text-xs text-on-surface-muted mt-0.5 block">{t('Tủ đang lưu quá giờ hẹn')}</span>
                             </div>
 
                             <div className="bg-white p-5 rounded-2xl border border-surface-container shadow-xs">
-                                <span className="text-xs font-semibold text-on-surface-muted block">Đã thanh toán nợ quá hạn</span>
+                                <span className="text-xs font-semibold text-on-surface-muted block">{t('Đã thanh toán nợ quá hạn')}</span>
                                 <span className="text-xl font-bold text-emerald-600 mt-1 block">
-                                    {debtData.paymentHistory.length} giao dịch
+                                    {debtData.paymentHistory.length} {t('giao dịch')}
                                 </span>
-                                <span className="text-xs text-on-surface-muted mt-0.5 block">Các khoản nợ đã hoàn tất</span>
+                                <span className="text-xs text-on-surface-muted mt-0.5 block">{t('Các khoản nợ đã hoàn tất')}</span>
                             </div>
                         </div>
 
@@ -804,10 +806,10 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                     </div>
                                     <div>
                                         <h2 className="text-base font-bold text-on-surface">
-                                            Danh sách đơn đặt tủ đang quá hạn ({debtData.overdueBookings.length})
+                                            {t('Danh sách đơn đặt tủ đang quá hạn (')}{debtData.overdueBookings.length})
                                         </h2>
                                         <p className="text-sm text-on-surface-muted">
-                                            Các đơn tủ quá hạn gửi đồ cần được thanh toán phụ phí trước khi lấy đồ hoặc đặt đơn mới
+                                            {t('Các đơn tủ quá hạn gửi đồ cần được thanh toán phụ phí trước khi lấy đồ hoặc đặt đơn mới')}
                                         </p>
                                     </div>
                                 </div>
@@ -816,9 +818,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                             {debtData.overdueBookings.length === 0 ? (
                                 <div className="text-center py-12 px-4 bg-surface-bright rounded-2xl border border-dashed border-outline-soft">
                                     <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto mb-2" />
-                                    <h4 className="text-sm font-bold text-on-surface">Không có đơn nào bị quá hạn</h4>
+                                    <h4 className="text-sm font-bold text-on-surface">{t('Không có đơn nào bị quá hạn')}</h4>
                                     <p className="text-sm text-on-surface-muted mt-1 max-w-md mx-auto">
-                                        Tất cả các lượt gửi tủ của bạn đều đang trong khung giờ quy định hoặc đã được hoàn tất đúng hạn.
+                                        {t('Tất cả các lượt gửi tủ của bạn đều đang trong khung giờ quy định hoặc đã được hoàn tất đúng hạn.')}
                                     </p>
                                 </div>
                             ) : (
@@ -838,35 +840,35 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                                         {b.stationName}
                                                     </span>
                                                     <span className="text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">
-                                                        Tủ {b.lockerCode} ({b.lockerSize})
+                                                        {t('Tủ')} {b.lockerCode} ({b.lockerSize})
                                                     </span>
                                                 </div>
 
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-xs text-on-surface-muted">
                                                     <div>
-                                                        <span>Bắt đầu quá hạn từ: </span>
+                                                        <span>{t('Bắt đầu quá hạn từ:')} </span>
                                                         <strong className="text-rose-600">{formatDate(b.overdueSince)}</strong>
                                                     </div>
                                                     <div>
-                                                        <span>Thời gian quá hạn: </span>
-                                                        <strong className="text-rose-600">{b.overdueHours} giờ</strong>
+                                                        <span>{t('Thời gian quá hạn:')} </span>
+                                                        <strong className="text-rose-600">{b.overdueHours} {t('giờ')}</strong>
                                                     </div>
                                                     <div>
-                                                        <span>Đơn giá quá hạn: </span>
-                                                        <span className="font-semibold text-on-surface">{formatCurrency(b.overdueFeePerHour)}đ/giờ</span>
+                                                        <span>{t('Đơn giá quá hạn:')} </span>
+                                                        <span className="font-semibold text-on-surface">{formatCurrency(b.overdueFeePerHour)}{t('đ/giờ')}</span>
                                                     </div>
                                                     <div>
-                                                        <span>Địa chỉ trạm: </span>
-                                                        <span className="truncate">{b.stationAddress || 'Tại trạm'}</span>
+                                                        <span>{t('Địa chỉ trạm:')} </span>
+                                                        <span className="truncate">{b.stationAddress || t('Tại trạm')}</span>
                                                     </div>
                                                 </div>
                                             </div>
 
                                             <div className="flex sm:flex-col items-center sm:items-end justify-between gap-3 shrink-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-surface-container-low">
                                                 <div className="text-left sm:text-right">
-                                                    <span className="text-xs text-on-surface-muted uppercase font-bold block">Phụ phí quá hạn</span>
+                                                    <span className="text-xs text-on-surface-muted uppercase font-bold block">{t('Phụ phí quá hạn')}</span>
                                                     <span className="text-lg font-extrabold text-rose-600">
-                                                        {formatCurrency(b.estimatedOverdueFee)} VNĐ
+                                                        {formatCurrency(b.estimatedOverdueFee)} {t('VNĐ')}
                                                     </span>
                                                 </div>
 
@@ -876,7 +878,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                                     className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-rose-600/20 disabled:opacity-60 flex items-center gap-1.5 cursor-pointer shrink-0"
                                                 >
                                                     <CreditCard className="w-3.5 h-3.5" />
-                                                    <span>{payingBookingId === b.bookingId ? 'Đang tạo link...' : 'Thanh toán ngay'}</span>
+                                                    <span>{payingBookingId === b.bookingId ? t('Đang tạo link...') : t('Thanh toán ngay')}</span>
                                                 </button>
                                             </div>
                                         </div>
@@ -892,26 +894,26 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                     <Clock className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <h2 className="text-base font-bold text-on-surface">Lịch sử thanh toán phụ phí quá hạn</h2>
-                                    <p className="text-sm text-on-surface-muted">Các giao dịch thanh toán quá hạn đã được đối soát thành công qua PayOS</p>
+                                    <h2 className="text-base font-bold text-on-surface">{t('Lịch sử thanh toán phụ phí quá hạn')}</h2>
+                                    <p className="text-sm text-on-surface-muted">{t('Các giao dịch thanh toán quá hạn đã được đối soát thành công qua PayOS')}</p>
                                 </div>
                             </div>
 
                             {debtData.paymentHistory.length === 0 ? (
                                 <div className="text-center py-8 text-xs text-on-surface-muted bg-surface-bright rounded-2xl border border-surface-container">
-                                    Chưa có giao dịch thanh toán phụ phí quá hạn nào.
+                                    {t('Chưa có giao dịch thanh toán phụ phí quá hạn nào.')}
                                 </div>
                             ) : (
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left text-xs">
                                         <thead>
                                             <tr className="border-b border-surface-container text-on-surface-muted font-bold">
-                                                <th className="pb-3 px-3">Mã đơn hàng</th>
-                                                <th className="pb-3 px-3">Mã đơn đặt tủ</th>
-                                                <th className="pb-3 px-3">Số tiền</th>
-                                                <th className="pb-3 px-3">Cổng thanh toán</th>
-                                                <th className="pb-3 px-3">Thời gian</th>
-                                                <th className="pb-3 px-3 text-right">Trạng thái</th>
+                                                <th className="pb-3 px-3">{t('Mã đơn hàng')}</th>
+                                                <th className="pb-3 px-3">{t('Mã đơn đặt tủ')}</th>
+                                                <th className="pb-3 px-3">{t('Số tiền')}</th>
+                                                <th className="pb-3 px-3">{t('Cổng thanh toán')}</th>
+                                                <th className="pb-3 px-3">{t('Thời gian')}</th>
+                                                <th className="pb-3 px-3 text-right">{t('Trạng thái')}</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-surface-container-low">
@@ -924,7 +926,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                                         {p.bookingCode}
                                                     </td>
                                                     <td className="py-3 px-3 font-bold text-rose-600">
-                                                        {formatCurrency(p.amount)} VNĐ
+                                                        {formatCurrency(p.amount)} {t('VNĐ')}
                                                     </td>
                                                     <td className="py-3 px-3 text-on-surface-muted">
                                                         {p.gateway}
@@ -934,7 +936,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                                     </td>
                                                     <td className="py-3 px-3 text-right">
                                                         <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
-                                                            Thành công
+                                                            {t('Thành công')}
                                                         </span>
                                                     </td>
                                                 </tr>

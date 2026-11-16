@@ -1,6 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { EN } from './en';
 
 /**
  * Ngôn ngữ giao diện web cho khách (Việt / Anh). Kiosk có bộ ngôn ngữ riêng (utils/kioskMessages.ts).
@@ -25,23 +24,34 @@ function detectLang(): Lang {
 interface LanguageContextValue {
     lang: Lang;
     setLang: (lang: Lang) => void;
+    /** Bảng dịch Anh, tải khi cần (null trong lúc đang tải hoặc khi dùng tiếng Việt). */
+    dict: Record<string, string> | null;
 }
 
-const LanguageContext = createContext<LanguageContextValue>({ lang: 'VI', setLang: () => undefined });
+const LanguageContext = createContext<LanguageContextValue>({ lang: 'VI', setLang: () => undefined, dict: null });
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
     const [lang, setLangState] = useState<Lang>(detectLang);
+    const [dict, setDict] = useState<Record<string, string> | null>(null);
 
     useEffect(() => {
         document.documentElement.lang = lang === 'VI' ? 'vi' : 'en';
     }, [lang]);
+
+    // Bảng dịch tiếng Anh nằm ở một gói riêng, chỉ tải khi khách chọn EN (giữ gói chính nhỏ).
+    useEffect(() => {
+        if (lang !== 'EN' || dict) return;
+        let alive = true;
+        void import('./en').then((m) => { if (alive) setDict(m.EN); });
+        return () => { alive = false; };
+    }, [lang, dict]);
 
     const setLang = useCallback((next: Lang) => {
         setLangState(next);
         try { localStorage.setItem(STORAGE_KEY, next); } catch { /* không lưu được thì chỉ đổi cho phiên này */ }
     }, []);
 
-    const value = useMemo(() => ({ lang, setLang }), [lang, setLang]);
+    const value = useMemo(() => ({ lang, setLang, dict }), [lang, setLang, dict]);
     return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 }
 
@@ -56,9 +66,9 @@ function fill(text: string, vars?: Record<string, string | number>) {
 
 /** Trả về hàm dịch gắn với ngôn ngữ hiện tại; component dùng hook này sẽ tự vẽ lại khi đổi ngôn ngữ. */
 export function useT() {
-    const { lang } = useLanguage();
+    const { lang, dict } = useLanguage();
     return useCallback(
-        (vi: string, vars?: Record<string, string | number>) => fill(lang === 'EN' ? (EN[vi] ?? vi) : vi, vars),
-        [lang],
+        (vi: string, vars?: Record<string, string | number>) => fill(lang === 'EN' && dict ? (dict[vi] ?? vi) : vi, vars),
+        [lang, dict],
     );
 }
