@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNetworkStats } from '../../utils/useNetworkStats';
-import { MapPin, Clock, Package, Search, Zap, Shield, Wifi, RotateCw, ChevronDown, QrCode, Sparkles, MapPinned } from 'lucide-react';
+import { MapPin, Clock, Package, Search, Zap, Shield, Wifi, RotateCw, ChevronDown, QrCode, MapPinned } from 'lucide-react';
 import { getStations } from '../../api/stationService';
 
 /** Sự kiện để các khối khác (bảng giá) chọn sẵn cỡ tủ trong widget này. */
@@ -84,12 +84,6 @@ const Hero = () => {
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           {/* Top Badges & Main Copy */}
           <div className="max-w-3xl mx-auto text-center mb-12">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-primary/20 text-primary mb-6 shadow-elevation-1 hover-lift">
-              <Sparkles className="w-4 h-4" />
-              <span className="text-xs font-bold uppercase tracking-wider">Mạng lưới tủ hành lý thông minh số 1 tại Việt Nam</span>
-            </div>
-            
             {/* Headline */}
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-on-surface tracking-tight mb-6 leading-[1.1] text-balance">
               Gửi Hành Lý Thông Minh 24/7 — <br className="hidden sm:inline"/>
@@ -131,13 +125,14 @@ const Hero = () => {
             <form className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5 items-end" onSubmit={(e) => { e.preventDefault(); handleSearch(); }}>
               {/* Input 1: Location Dropdown */}
               <div className="md:col-span-4 flex flex-col gap-2">
-                <label className="text-xs font-bold text-on-surface uppercase tracking-wider flex items-center gap-1.5">
+                <label htmlFor="hero-station" className="text-xs font-bold text-on-surface uppercase tracking-wider flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5 text-primary" />
                   Chọn trạm gửi
                 </label>
                 <div className="relative">
                   <select 
                     className="w-full h-14 bg-surface-container-low/40 border border-outline-variant/60 rounded-xl px-4 pr-10 text-on-surface text-sm font-semibold focus:ring-2 focus:ring-primary-container focus:border-primary-container outline-none transition-all cursor-pointer appearance-none hover:border-primary/40"
+                    id="hero-station"
                     value={selectedStation}
                     onChange={(e) => setSelectedStation(e.target.value)}
                   >
@@ -152,7 +147,7 @@ const Hero = () => {
 
               {/* Input 2: Time Range Selector */}
               <div className="md:col-span-3 flex flex-col gap-2">
-                <label className="text-xs font-bold text-on-surface uppercase tracking-wider flex items-center gap-1.5">
+                <label htmlFor="hero-station" className="text-xs font-bold text-on-surface uppercase tracking-wider flex items-center gap-1.5">
                   <Clock className="w-3.5 h-3.5 text-primary" />
                   Thời gian gửi
                 </label>
@@ -166,7 +161,7 @@ const Hero = () => {
 
               {/* Input 3: Locker Size Selector Pills */}
               <div className="md:col-span-5 flex flex-col gap-2">
-                <label className="text-xs font-bold text-on-surface uppercase tracking-wider flex items-center gap-1.5">
+                <label htmlFor="hero-station" className="text-xs font-bold text-on-surface uppercase tracking-wider flex items-center gap-1.5">
                   <Package className="w-3.5 h-3.5 text-primary" />
                   Kích thước ngăn tủ
                 </label>

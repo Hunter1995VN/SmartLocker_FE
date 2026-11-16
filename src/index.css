@@ -197,12 +197,9 @@
     background-size: 24px 24px;
   }
 
-  /* Gradient text */
+  /* Emphasis text: solid brand colour (gradient text removed; emphasis comes from colour and weight) */
   .text-gradient {
-    background: linear-gradient(135deg, #2563eb 0%, #004ac6 50%, #0053db 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--color-primary);
   }
   
   /* Glass effect */

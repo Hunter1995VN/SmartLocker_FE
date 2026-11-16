@@ -219,6 +219,7 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                     </div>
                 )}
                 <main className="p-4 sm:p-6 lg:p-7 space-y-5 max-w-7xl w-full mx-auto print:p-0 print:max-w-none">
+                  <h1 className="sr-only">Bảng điều khiển quản trị SmartLocker</h1>
                   <Suspense fallback={<div role="status" aria-live="polite" className="py-16 text-center text-sm text-slate-500">Đang tải...</div>}>
                     {activeMenu === 'abandoned' ? (
                         <AbandonedPropertyView userRole={role} currentUser={user} />

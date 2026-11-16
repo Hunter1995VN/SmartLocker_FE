@@ -424,9 +424,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                         )}
                                     </div>
 
-                                    <h3 className="text-lg font-bold text-on-surface">
+                                    <h2 className="text-lg font-bold text-on-surface">
                                         {profile.fullName || 'Khách hàng'}
-                                    </h3>
+                                    </h2>
                                     <p className="text-xs text-on-surface-muted mt-0.5">{profile.email}</p>
 
                                     <div className="flex items-center gap-2 mt-3">
@@ -488,7 +488,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                         <User className="w-5 h-5" />
                                     </div>
                                     <div>
-                                        <h3 className="text-base font-bold text-on-surface">Cập nhật thông tin cá nhân</h3>
+                                        <h2 className="text-base font-bold text-on-surface">Cập nhật thông tin cá nhân</h2>
                                         <p className="text-xs text-on-surface-muted">Thay đổi họ và tên, số điện thoại hoặc ảnh đại diện</p>
                                     </div>
                                 </div>
@@ -517,6 +517,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                             value={fullName}
                                             onChange={(e) => setFullName(e.target.value)}
                                             placeholder="Nguyễn Văn A"
+                                            aria-label="Họ và tên"
                                             className="w-full px-4 py-2.5 rounded-xl text-xs border border-outline-soft focus:outline-hidden focus:border-primary focus:ring-2 focus:ring-primary/15 transition-all text-on-surface"
                                             required
                                         />
@@ -530,6 +531,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                             <input
                                                 type="email"
                                                 value={profile.email}
+                                                aria-label="Email đăng ký (cố định)"
                                                 disabled
                                                 className="w-full px-4 py-2.5 rounded-xl text-xs border border-surface-container bg-surface-bright text-on-surface-muted cursor-not-allowed"
                                             />
@@ -544,6 +546,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                                 value={phone}
                                                 onChange={(e) => setPhone(e.target.value)}
                                                 placeholder="0901234567"
+                                                aria-label="Số điện thoại liên hệ"
                                                 className="w-full px-4 py-2.5 rounded-xl text-xs border border-outline-soft focus:outline-hidden focus:border-primary focus:ring-2 focus:ring-primary/15 transition-all text-on-surface"
                                                 required
                                             />
@@ -607,9 +610,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                         <Lock className="w-5 h-5" />
                                     </div>
                                     <div>
-                                        <h3 className="text-base font-bold text-on-surface">
+                                        <h2 className="text-base font-bold text-on-surface">
                                             {profile.hasPassword ? 'Đổi mật khẩu' : 'Thiết lập mật khẩu'}
-                                        </h3>
+                                        </h2>
                                         <p className="text-xs text-on-surface-muted">
                                             {profile.hasPassword
                                                 ? 'Cập nhật mật khẩu định kỳ để bảo vệ tài khoản an toàn'
@@ -643,6 +646,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                                 value={currentPassword}
                                                 onChange={(e) => setCurrentPassword(e.target.value)}
                                                 placeholder="••••••••"
+                                                aria-label="Mật khẩu hiện tại"
                                                 className="w-full px-4 py-2.5 rounded-xl text-xs border border-outline-soft focus:outline-hidden focus:border-primary focus:ring-2 focus:ring-primary/15 transition-all text-on-surface"
                                                 required
                                             />
@@ -659,6 +663,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                                 value={newPassword}
                                                 onChange={(e) => setNewPassword(e.target.value)}
                                                 placeholder="Tối thiểu 6 ký tự"
+                                                aria-label="Mật khẩu mới"
                                                 className="w-full px-4 py-2.5 rounded-xl text-xs border border-outline-soft focus:outline-hidden focus:border-primary focus:ring-2 focus:ring-primary/15 transition-all text-on-surface"
                                                 required
                                             />
@@ -673,6 +678,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                                 value={confirmPassword}
                                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                                 placeholder="Nhập lại mật khẩu mới"
+                                                aria-label="Xác nhận mật khẩu mới"
                                                 className="w-full px-4 py-2.5 rounded-xl text-xs border border-outline-soft focus:outline-hidden focus:border-primary focus:ring-2 focus:ring-primary/15 transition-all text-on-surface"
                                                 required
                                             />
@@ -797,9 +803,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                         <AlertTriangle className="w-5 h-5" />
                                     </div>
                                     <div>
-                                        <h3 className="text-base font-bold text-on-surface">
+                                        <h2 className="text-base font-bold text-on-surface">
                                             Danh sách đơn đặt tủ đang quá hạn ({debtData.overdueBookings.length})
-                                        </h3>
+                                        </h2>
                                         <p className="text-xs text-on-surface-muted">
                                             Các đơn tủ quá hạn gửi đồ cần được thanh toán phụ phí trước khi lấy đồ hoặc đặt đơn mới
                                         </p>
@@ -886,7 +892,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                     <Clock className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <h3 className="text-base font-bold text-on-surface">Lịch sử thanh toán phụ phí quá hạn</h3>
+                                    <h2 className="text-base font-bold text-on-surface">Lịch sử thanh toán phụ phí quá hạn</h2>
                                     <p className="text-xs text-on-surface-muted">Các giao dịch thanh toán quá hạn đã được đối soát thành công qua PayOS</p>
                                 </div>
                             </div>

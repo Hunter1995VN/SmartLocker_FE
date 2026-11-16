@@ -266,6 +266,7 @@ export default function FindStationPage({
                                     onChange={e => setSearchQuery(e.target.value)}
                                     className="w-full h-10 pl-10 pr-8 rounded-xl bg-slate-50 border border-slate-200/80 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all"
                                     placeholder="Tìm tên trạm, đường, quận..."
+                                    aria-label="Tìm trạm theo tên, đường hoặc quận"
                                 />
                                 {searchQuery && (
                                     <button
@@ -525,9 +526,9 @@ function StationCard({
         >
             {/* Row 1: Title + Distance */}
             <div className="flex items-start justify-between gap-3">
-                <h3 className="text-sm font-bold text-slate-900 leading-snug line-clamp-1">
+                <h2 className="text-sm font-bold text-slate-900 leading-snug line-clamp-1">
                     {station.name}
-                </h3>
+                </h2>
                 {distLabel && (
                     <span className="shrink-0 text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">
                         {distLabel}

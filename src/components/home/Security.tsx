@@ -1,5 +1,5 @@
 import { openLegal } from '../../utils/contact';
-import { Lock, Shield, WifiOff, CreditCard, RefreshCw, ShieldCheck, AlertCircle, ArrowRight, Sparkles } from 'lucide-react';
+import { Shield, WifiOff, CreditCard, RefreshCw, ShieldCheck, AlertCircle, ArrowRight, Sparkles } from 'lucide-react';
 
 /**
  * Security Component - Phần giới thiệu tính năng bảo mật và công nghệ
@@ -13,10 +13,6 @@ const Security = () => {
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           {/* Section Header */}
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <div className="inline-flex items-center gap-1.5 text-primary text-xs font-bold uppercase tracking-wider mb-3 px-3 py-1.5 rounded-full bg-primary-container/10 border border-primary/20">
-              <Lock className="w-3.5 h-3.5" />
-              Chuẩn Mực Enterprise
-            </div>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-on-surface tracking-tight leading-tight mb-4 text-balance">
               Bảo Mật & <span className="text-gradient">Công Nghệ Đi Đầu</span>
             </h2>

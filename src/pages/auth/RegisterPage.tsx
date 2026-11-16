@@ -352,6 +352,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                                         <button
                                             type="button"
                                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                            aria-label={showConfirmPassword ? 'Ẩn mật khẩu xác nhận' : 'Hiện mật khẩu xác nhận'}
                                             className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-600 transition-colors"
                                         >
                                             {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}

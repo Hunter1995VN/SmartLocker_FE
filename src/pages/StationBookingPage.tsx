@@ -538,7 +538,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                       </div>
                       <ChevronDown className="w-4 h-4 text-slate-500 group-hover:text-blue-600 transition-colors" />
                     </div>
-                    <input
+                    <input aria-label="Ngày gửi đồ"
                       ref={dateInputRef}
                       type="date"
                       min={todayStr}
@@ -563,7 +563,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                     <div className="flex items-center justify-between mt-1">
                       <div className="flex items-center text-slate-900 font-semibold text-sm w-full mr-2">
                         <Clock className="w-5 h-5 mr-2 text-blue-600 shrink-0" />
-                        <select
+                        <select aria-label="Giờ gửi đồ"
                           value={dropOffTime}
                           onChange={(e) => setDropOffTime(e.target.value)}
                           className="w-full bg-transparent font-semibold text-slate-900 text-sm outline-none cursor-pointer py-1"
@@ -607,7 +607,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   
                   {isCustomDuration ? (
                     <div className="flex items-center bg-white border-2 border-blue-600 rounded-full px-3 py-1 shadow-sm">
-                      <input
+                      <input aria-label="Số giờ gửi (từ 1 đến 72)"
                         type="number"
                         min="1"
                         max="72"
@@ -986,7 +986,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                       </div>
                     ) : (
                       <div className="flex gap-1.5">
-                        <input
+                        <input aria-label="Mã giảm giá"
                           type="text"
                           value={voucherInput}
                           onChange={(e) => setVoucherInput(e.target.value.toUpperCase())}

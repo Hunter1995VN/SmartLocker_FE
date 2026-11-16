@@ -142,7 +142,7 @@ export default function StationFleetTable({ stations, isLoading, onInspect }: St
                                                 <button
                                                     type="button"
                                                     onClick={onInspect}
-                                                    className="text-xs font-semibold text-blue-700 hover:text-blue-800 hover:underline cursor-pointer"
+                                                    className="text-xs font-semibold text-blue-700 hover:text-blue-800 hover:underline cursor-pointer px-2 py-1.5 -my-1.5 rounded-md"
                                                 >
                                                     Xem lưới tủ
                                                 </button>

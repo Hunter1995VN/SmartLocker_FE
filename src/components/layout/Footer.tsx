@@ -124,7 +124,7 @@ const Footer = () => {
 
             {/* Links Columns */}
             <div>
-              <h4 className="text-sm font-bold text-on-surface uppercase tracking-wider mb-4">Vị Trí & Trạm Tủ</h4>
+              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wider mb-4">Vị Trí & Trạm Tủ</h3>
               <ul className="space-y-2.5 text-sm">
                 {footerLinks.locations.map((link, index) => (
                   <li key={index}>
@@ -141,7 +141,7 @@ const Footer = () => {
             </div>
 
             <div>
-              <h4 className="text-sm font-bold text-on-surface uppercase tracking-wider mb-4">Dịch Vụ & An Toàn</h4>
+              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wider mb-4">Dịch Vụ & An Toàn</h3>
               <ul className="space-y-2.5 text-sm">
                 {footerLinks.services.map((link, index) => (
                   <li key={index}>
@@ -158,7 +158,7 @@ const Footer = () => {
             </div>
 
             <div>
-              <h4 className="text-sm font-bold text-on-surface uppercase tracking-wider mb-4">Đối Tác & Pháp Lý</h4>
+              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wider mb-4">Đối Tác & Pháp Lý</h3>
               <ul className="space-y-2.5 text-sm">
                 {footerLinks.legal.map((link, index) => (
                   <li key={index}>
