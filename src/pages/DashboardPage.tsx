@@ -317,7 +317,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                             {locationText}
                                         </span>
                                         {(locState === 'denied' || locState === 'os-blocked' || locState === 'unavailable' || locState === 'timeout') && (
-                                            <button type="button" onClick={locate} className="hidden sm:inline text-xs font-bold text-primary underline cursor-pointer">Thử lại</button>
+                                            <button type="button" onClick={locate} className="link-target hidden sm:inline-flex text-xs font-bold text-primary underline cursor-pointer">Thử lại</button>
                                         )}
                                     </p>
                                 </div>
@@ -502,7 +502,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                     ) : stationsError ? (
                                         <div className="p-4 rounded-xl bg-error-container text-sm text-on-error-container flex items-center justify-between gap-3">
                                             <span>{stationsError}</span>
-                                            <button type="button" onClick={loadData} className="font-bold underline cursor-pointer">Thử lại</button>
+                                            <button type="button" onClick={loadData} className="link-target font-bold underline cursor-pointer">Thử lại</button>
                                         </div>
                                     ) : modelStation ? (
                                         <div className="flex flex-col gap-3 p-3 bg-surface-container-low rounded-xl">
