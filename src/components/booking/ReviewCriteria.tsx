@@ -1,3 +1,4 @@
+import { useT } from '../../i18n';
 const labels: Record<string, string> = {
   CLEAN: 'Tủ sạch sẽ',
   FAST: 'Mở khóa nhanh',
@@ -5,12 +6,13 @@ const labels: Record<string, string> = {
 };
 
 export default function ReviewCriteria({ criteria }: { criteria: string }) {
+    const t = useT();
   const selected = criteria.split(',').filter(key => Object.hasOwn(labels, key));
   if (selected.length === 0) return null;
 
   return (
-    <ul className="flex flex-wrap gap-1.5" aria-label="Tiêu chí được chọn">
-      {selected.map(key => <li key={key} className="rounded-full bg-surface-container-low px-2.5 py-1 text-xs font-semibold text-primary">{labels[key]}</li>)}
+    <ul className="flex flex-wrap gap-1.5" aria-label={t('Tiêu chí được chọn')}>
+      {selected.map(key => <li key={key} className="rounded-full bg-surface-container-low px-2.5 py-1 text-xs font-semibold text-primary">{t(labels[key])}</li>)}
     </ul>
   );
 }

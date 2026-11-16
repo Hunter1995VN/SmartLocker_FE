@@ -6,6 +6,7 @@ import ReviewCriteria from '../booking/ReviewCriteria';
 import ReviewStars from '../booking/ReviewStars';
 import ReviewReportDialog from './ReviewReportDialog';
 import './CustomerReviews.css';
+import { useT } from '../../i18n';
 
 const numberFormat = new Intl.NumberFormat('vi-VN');
 const ratingFormat = new Intl.NumberFormat('vi-VN', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -24,6 +25,7 @@ const prefersReducedMotion = () => window.matchMedia(reducedMotionQuery).matches
 type Reviews = Awaited<ReturnType<typeof stationReviewService.publicReviews>>;
 
 export default function CustomerReviews({ initialPage = 1, onLogin }: { initialPage?: number; onLogin: (page: number) => void }) {
+    const t = useT();
   const [page, setPage] = useState(initialPage);
   const [result, setResult] = useState<(Reviews & { page: number }) | null>(null);
   const [loading, setLoading] = useState(true);
@@ -107,27 +109,27 @@ export default function CustomerReviews({ initialPage = 1, onLogin }: { initialP
       <div className="mx-auto max-w-7xl px-4 md:px-8">
         <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 id="customer-reviews-title" className="text-3xl font-bold tracking-tight text-on-surface md:text-4xl">Đánh giá từ khách hàng</h2>
-            <p className="mt-2 text-on-surface-variant">Trải nghiệm thực tế sau khi sử dụng tủ SmartLocker.</p>
+            <h2 id="customer-reviews-title" className="text-3xl font-bold tracking-tight text-on-surface md:text-4xl">{t('Đánh giá từ khách hàng')}</h2>
+            <p className="mt-2 text-on-surface-variant">{t('Trải nghiệm thực tế sau khi sử dụng tủ SmartLocker.')}</p>
           </div>
           {result && result.count > 0 && (
             <div className="inline-flex items-center gap-2 rounded-2xl border border-outline-variant/60 bg-white px-4 py-2 shadow-elevation-1">
               <Star className="h-5 w-5 fill-amber-400 text-amber-500" aria-hidden="true" />
               <span className="font-bold">{ratingFormat.format(result.average)}/5</span>
-              <span className="text-sm text-on-surface-variant">· {numberFormat.format(result.count)} lượt đánh giá</span>
+              <span className="text-sm text-on-surface-variant">· {numberFormat.format(result.count)} {t('lượt đánh giá')}</span>
             </div>
           )}
         </div>
 
-        <p role="status" className="sr-only">{announcement || (loading && (!autoAdvance || !result) ? 'Đang tải đánh giá' : '')}</p>
+        <p role="status" className="sr-only">{announcement || (loading && (!autoAdvance || !result) ? t('Đang tải đánh giá') : '')}</p>
         {error && (
           <div role="alert" className="mb-4 flex flex-wrap items-center gap-3 text-sm text-error">
-            <span>Chưa tải được đánh giá.</span>
-            <button type="button" className="font-semibold underline" onClick={() => { setError(false); setLoading(true); setRetry(n => n + 1); }}>Thử lại</button>
+            <span>{t('Chưa tải được đánh giá.')}</span>
+            <button type="button" className="font-semibold underline" onClick={() => { setError(false); setLoading(true); setRetry(n => n + 1); }}>{t('Thử lại')}</button>
           </div>
         )}
         {!result && loading && <div className="h-36 rounded-2xl bg-white/70 motion-safe:animate-pulse" />}
-        {result?.count === 0 && <p className="rounded-2xl border border-outline-variant/50 bg-white p-6 text-on-surface-variant">Chưa có đánh giá công khai.</p>}
+        {result?.count === 0 && <p className="rounded-2xl border border-outline-variant/50 bg-white p-6 text-on-surface-variant">{t('Chưa có đánh giá công khai.')}</p>}
 
         <ul ref={cardsRef} className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-busy={loading}
           onPointerEnter={event => { if (event.pointerType === 'mouse') setHovering(true); }}
@@ -145,13 +147,13 @@ export default function CustomerReviews({ initialPage = 1, onLogin }: { initialP
               <div className="mt-auto flex items-end justify-between gap-3 border-t border-outline-variant/40 pt-4">
                 <div className="min-w-0">
                   <p className="flex items-start gap-1.5 text-sm font-semibold"><MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" /><span className="[overflow-wrap:anywhere]">{review.stationName}</span></p>
-                  <p className="mt-1 text-sm text-on-surface-variant">Đã sử dụng tủ cỡ {review.lockerSize}</p>
+                  <p className="mt-1 text-sm text-on-surface-variant">{t('Đã sử dụng tủ cỡ')} {review.lockerSize}</p>
                 </div>
                 {!review.isOwn && (review.hasReported ? (
-                  <span className="shrink-0 text-xs text-on-surface-variant">Đã báo cáo</span>
+                  <span className="shrink-0 text-xs text-on-surface-variant">{t('Đã báo cáo')}</span>
                 ) : (
                   <button type="button" disabled={loading} className="inline-flex shrink-0 items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-semibold text-on-surface-variant hover:bg-surface-container-low hover:text-primary disabled:opacity-50"
-                    onClick={() => startReport(review.id)}><Flag className="h-3.5 w-3.5" aria-hidden="true" /> Báo cáo</button>
+                    onClick={() => startReport(review.id)}><Flag className="h-3.5 w-3.5" aria-hidden="true" /> {t('Báo cáo')}</button>
                 ))}
               </div>
             </li>
@@ -159,15 +161,15 @@ export default function CustomerReviews({ initialPage = 1, onLogin }: { initialP
         </ul>
 
         {totalPages > 1 && (
-          <nav aria-label="Phân trang đánh giá khách hàng" className="mt-6 flex items-center justify-center gap-4">
-            <button type="button" aria-label="Trang đánh giá trước" disabled={loading || page === 1} onClick={() => navigateReviews(page - 1)}
+          <nav aria-label={t('Phân trang đánh giá khách hàng')} className="mt-6 flex items-center justify-center gap-4">
+            <button type="button" aria-label={t('Trang đánh giá trước')} disabled={loading || page === 1} onClick={() => navigateReviews(page - 1)}
               className="rounded-full border border-outline-variant bg-white p-2.5 text-primary hover:bg-primary-fixed focus-visible:outline-2 focus-visible:outline-primary disabled:opacity-40"><ChevronLeft className="h-5 w-5" aria-hidden="true" /></button>
             <span className="text-sm font-semibold" aria-live={autoAdvance ? 'off' : 'polite'}>{displayedPage} / {totalPages}</span>
-            <button type="button" aria-label="Trang đánh giá sau" disabled={loading || page >= totalPages} onClick={() => navigateReviews(page + 1)}
+            <button type="button" aria-label={t('Trang đánh giá sau')} disabled={loading || page >= totalPages} onClick={() => navigateReviews(page + 1)}
               className="rounded-full border border-outline-variant bg-white p-2.5 text-primary hover:bg-primary-fixed focus-visible:outline-2 focus-visible:outline-primary disabled:opacity-40"><ChevronRight className="h-5 w-5" aria-hidden="true" /></button>
             {!reducedMotion && (
-              <button type="button" aria-label={paused ? 'Tiếp tục tự chuyển đánh giá' : 'Tạm dừng tự chuyển đánh giá'}
-                title={paused ? 'Tiếp tục tự chuyển đánh giá' : 'Tạm dừng tự chuyển đánh giá'}
+              <button type="button" aria-label={paused ? t('Tiếp tục tự chuyển đánh giá') : t('Tạm dừng tự chuyển đánh giá')}
+                title={paused ? t('Tiếp tục tự chuyển đánh giá') : t('Tạm dừng tự chuyển đánh giá')}
                 onClick={() => setPaused(value => !value)}
                 className="rounded-full border border-outline-variant bg-white p-2.5 text-primary hover:bg-primary-fixed focus-visible:outline-2 focus-visible:outline-primary">
                 {paused ? <Play className="h-5 w-5" aria-hidden="true" /> : <Pause className="h-5 w-5" aria-hidden="true" />}
@@ -178,7 +180,7 @@ export default function CustomerReviews({ initialPage = 1, onLogin }: { initialP
       </div>
       {reportId && <ReviewReportDialog reviewId={reportId} onClose={() => setReportId(null)} onReported={() => {
         setResult(current => current && { ...current, items: current.items.map(item => item.id === reportId ? { ...item, hasReported: true } : item) });
-        setAnnouncement('Đã gửi báo cáo đánh giá.');
+        setAnnouncement(t('Đã gửi báo cáo đánh giá.'));
         setReportId(null);
       }} />}
     </section>

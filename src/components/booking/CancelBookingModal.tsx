@@ -12,6 +12,7 @@ import {
   ShieldAlert,
 } from 'lucide-react';
 import { getCancelPreview, type CancelPreviewDto } from '../../api/bookingService';
+import { useT } from '../../i18n';
 
 interface CancelBookingModalProps {
   isOpen: boolean;
@@ -36,6 +37,7 @@ export const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
   stationName = 'SmartLocker Station',
   paidAmount = 0,
 }) => {
+    const t = useT();
   const [selectedReason, setSelectedReason] = useState<string>('Đổi kế hoạch / Chuyến bay bị hoãn');
   const [customReason, setCustomReason] = useState<string>('');
   const [preview, setPreview] = useState<CancelPreviewDto | null>(null);
@@ -158,13 +160,13 @@ export const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
               <AlertTriangle className="w-6 h-6 text-rose-500" />
             </div>
             <div>
-              <h2 className="text-xl text-on-surface font-bold tracking-tight">Hủy đặt tủ</h2>
-              <p className="text-sm text-secondary mt-0.5">Nhả ngăn tủ đã giữ và gửi yêu cầu hoàn tiền tự động</p>
+              <h2 className="text-xl text-on-surface font-bold tracking-tight">{t('Hủy đặt tủ')}</h2>
+              <p className="text-sm text-secondary mt-0.5">{t('Nhả ngăn tủ đã giữ và gửi yêu cầu hoàn tiền tự động')}</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            aria-label="Đóng hộp thoại"
+            aria-label={t('Đóng hộp thoại')}
             className="w-8 h-8 rounded-lg flex items-center justify-center text-secondary hover:text-on-surface hover:bg-surface-container-low transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
@@ -183,7 +185,7 @@ export const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
           {/* 2. Booking Summary Card */}
           <div className="p-4 rounded-xl bg-surface-container-low border border-outline-variant/30 flex flex-col gap-2.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs uppercase tracking-wider text-secondary font-bold">Đơn đang giữ chỗ</span>
+              <span className="text-xs uppercase tracking-wider text-secondary font-bold">{t('Đơn đang giữ chỗ')}</span>
               <span className="text-xs font-bold text-primary bg-primary-fixed/60 px-2.5 py-0.5 rounded-md font-mono">{bookingCode}</span>
             </div>
             <div className="grid grid-cols-2 gap-3 pt-1">
@@ -192,7 +194,7 @@ export const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
                 <span className="text-sm text-on-surface font-semibold">{lockerCode}</span>
               </div>
               <div>
-                <span className="text-xs text-secondary block">Tổng số tiền đã thanh toán</span>
+                <span className="text-xs text-secondary block">{t('Tổng số tiền đã thanh toán')}</span>
                 <span className="text-sm text-on-surface font-bold">{formatCurrency(actualPaid)} VND</span>
               </div>
             </div>
@@ -206,33 +208,33 @@ export const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
           {isLoadingPreview ? (
             <div className="p-5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center gap-2 text-xs text-slate-500 font-semibold">
               <RefreshCw className="w-4 h-4 animate-spin text-primary" />
-              <span>Đang kiểm tra chính sách hoàn tiền và quy tắc chống lạm dụng...</span>
+              <span>{t('Đang kiểm tra chính sách hoàn tiền và quy tắc chống lạm dụng...')}</span>
             </div>
           ) : isLimitExceeded ? (
             <div className="p-4 rounded-xl bg-amber-50 border-2 border-amber-300 shadow-xs">
               <div className="flex items-center justify-between mb-2">
                 <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-bold uppercase tracking-wider">
                   <ShieldAlert className="w-3.5 h-3.5 text-amber-700" />
-                  <span>Đã hết lượt hủy trong ngày (hoàn 0%)</span>
+                  <span>{t('Đã hết lượt hủy trong ngày (hoàn 0%)')}</span>
                 </div>
                 <span className="text-xs text-amber-800 font-mono font-bold">Attempt #{preview ? preview.dailyCancellationCount + 1 : 3} Today</span>
               </div>
               <p className="text-sm text-amber-900 leading-relaxed font-medium">
-                Để chặn đặt chỗ hàng loạt, khách đã hủy 2 đơn trong ngày sẽ bị giữ lại 100% tiền ở các lần hủy tiếp theo. Sẽ không được hoàn tiền.
+                {t('Để chặn đặt chỗ hàng loạt, khách đã hủy 2 đơn trong ngày sẽ bị giữ lại 100% tiền ở các lần hủy tiếp theo. Sẽ không được hoàn tiền.')}
               </p>
               <div className="mt-3 pt-2.5 border-t border-amber-200/80 flex items-center justify-between text-xs font-bold">
-                <span className="text-slate-600">Số tiền hoàn dự kiến:</span>
+                <span className="text-slate-600">{t('Số tiền hoàn dự kiến:')}</span>
                 <span className="text-amber-800 font-mono text-sm">0 VND</span>
               </div>
             </div>
           ) : actualPaid <= 0 ? (
             <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-bold text-slate-700 uppercase">Hủy đơn chưa thanh toán</span>
+                <span className="text-xs font-bold text-slate-700 uppercase">{t('Hủy đơn chưa thanh toán')}</span>
                 <span className="text-xs font-bold text-slate-500">0 VND</span>
               </div>
               <p className="text-sm text-slate-600 leading-relaxed">
-                Đơn này chưa thanh toán. Hủy đơn sẽ nhả ngăn tủ đang giữ ngay lập tức và không mất phí.
+                {t('Đơn này chưa thanh toán. Hủy đơn sẽ nhả ngăn tủ đang giữ ngay lập tức và không mất phí.')}
               </p>
             </div>
           ) : (
@@ -240,15 +242,15 @@ export const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
               <div className="flex items-center justify-between mb-2">
                 <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider">
                   <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Đủ điều kiện hoàn 100%</span>
+                  <span>{t('Đủ điều kiện hoàn 100%')}</span>
                 </div>
                 <span className="text-xs text-emerald-800 font-bold">SmartLocker Policy</span>
               </div>
               <p className="text-sm text-on-surface leading-relaxed">
-                Bạn hủy trước khi gửi đồ. Bạn sẽ được hoàn 100%, tức <strong>{formatCurrency(calculatedRefund)} VND</strong>.
+                {t('Bạn hủy trước khi gửi đồ. Bạn sẽ được hoàn 100%, tức')} <strong>{formatCurrency(calculatedRefund)} VND</strong>.
               </p>
               <div className="mt-3 pt-2.5 border-t border-emerald-200 flex items-center justify-between text-xs">
-                <span className="text-secondary font-medium">Tổng tiền được hoàn:</span>
+                <span className="text-secondary font-medium">{t('Tổng tiền được hoàn:')}</span>
                 <span className="text-emerald-700 font-mono font-extrabold text-sm">{formatCurrency(calculatedRefund)} VND</span>
               </div>
             </div>
@@ -261,9 +263,9 @@ export const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
                 <Building className="w-4 h-4" />
               </div>
               <div className="text-xs text-on-surface leading-snug">
-                <span className="font-semibold text-on-surface block mb-0.5">Quản trị viên duyệt &amp; hoàn tiền qua PayOS</span>
+                <span className="font-semibold text-on-surface block mb-0.5">{t('Quản trị viên duyệt & hoàn tiền qua PayOS')}</span>
                 <p className="text-secondary">
-                  Yêu cầu hoàn tiền <span className="font-semibold text-on-surface">{formatCurrency(calculatedRefund)} VND</span> sẽ được gửi tự động đến bộ phận vận hành để xác minh, rồi hoàn về tài khoản bạn đã dùng để thanh toán.
+                  {t('Yêu cầu hoàn tiền')} <span className="font-semibold text-on-surface">{formatCurrency(calculatedRefund)} VND</span> {t('sẽ được gửi tự động đến bộ phận vận hành để xác minh, rồi hoàn về tài khoản bạn đã dùng để thanh toán.')}
                 </p>
               </div>
             </div>
@@ -281,10 +283,10 @@ export const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
                 onChange={(e) => setSelectedReason(e.target.value)}
                 className="w-full h-11 bg-white border border-outline-variant/60 rounded-xl px-3.5 text-xs text-on-surface focus:border-primary-container focus:ring-2 focus:ring-primary-container focus:outline-none transition appearance-none pr-10 cursor-pointer"
               >
-                <option>Đổi kế hoạch / Chuyến bay bị hoãn</option>
-                <option>Đặt nhầm cỡ ngăn tủ</option>
-                <option>Lịch trình thay đổi</option>
-                <option>Đã tìm được nơi gửi hành lý khác</option>
+                <option>{t('Đổi kế hoạch / Chuyến bay bị hoãn')}</option>
+                <option>{t('Đặt nhầm cỡ ngăn tủ')}</option>
+                <option>{t('Lịch trình thay đổi')}</option>
+                <option>{t('Đã tìm được nơi gửi hành lý khác')}</option>
                 <option>Other</option>
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-secondary">
@@ -294,7 +296,7 @@ export const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
             {selectedReason === 'Other' && (
               <input
                 type="text"
-                placeholder="Vui lòng mô tả lý do..."
+                placeholder={t('Vui lòng mô tả lý do...')}
                 value={customReason}
                 onChange={(e) => setCustomReason(e.target.value)}
                 className="w-full h-10 px-3.5 bg-white border border-outline-variant/60 rounded-xl text-xs focus:ring-2 focus:ring-primary-container focus:outline-none"
@@ -306,7 +308,7 @@ export const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
           <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 flex items-start gap-2.5">
             <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
             <p className="text-sm text-amber-900 leading-snug">
-              Sau khi hủy, ngăn tủ được gán sẽ được mở khóa ngay và trả lại kho tủ trống. Mã PIN/QR của bạn sẽ bị thu hồi vĩnh viễn.
+              {t('Sau khi hủy, ngăn tủ được gán sẽ được mở khóa ngay và trả lại kho tủ trống. Mã PIN/QR của bạn sẽ bị thu hồi vĩnh viễn.')}
             </p>
           </div>
         </div>
@@ -318,7 +320,7 @@ export const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
             disabled={isSubmitting}
             className="w-full sm:w-auto px-5 py-2.5 bg-white hover:bg-slate-50 text-on-surface text-xs font-semibold border border-outline-variant/60 rounded-xl transition active:scale-[0.98] cursor-pointer disabled:opacity-50"
           >
-            Giữ đơn
+            {t('Giữ đơn')}
           </button>
           <button
             onClick={handleSubmit}
@@ -328,13 +330,13 @@ export const CancelBookingModal: React.FC<CancelBookingModalProps> = ({
             {isSubmitting ? (
               <>
                 <RefreshCw className="w-4 h-4 animate-spin" />
-                <span>Đang xử lý yêu cầu hủy...</span>
+                <span>{t('Đang xử lý yêu cầu hủy...')}</span>
               </>
             ) : (
               <>
                 <XCircle className="w-4 h-4" />
                 <span>
-                  Xác nhận hủy {calculatedRefund > 0 ? `(Hoàn ${formatCurrency(calculatedRefund)} VND)` : ''}
+                  {t('Xác nhận hủy')} {calculatedRefund > 0 ? t('(Hoàn {amount} VND)', { amount: formatCurrency(calculatedRefund) }) : ''}
                 </span>
               </>
             )}

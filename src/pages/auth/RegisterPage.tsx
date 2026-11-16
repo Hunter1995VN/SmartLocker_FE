@@ -4,6 +4,8 @@ import { Lock, Eye, EyeOff, ChevronLeft, ArrowRight, AlertCircle, Check, X, Pack
 import { useState } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
 import { describeGoogleNonOAuthError, describeGoogleOAuthError } from '../../utils/googleAuthError';
+import { useT } from '../../i18n';
+import LanguageSwitcher from '../../components/ui/LanguageSwitcher';
 
 type ViewMode = 'login' | 'register' | 'verify-otp' | 'forgot-password';
 
@@ -18,6 +20,7 @@ interface RegisterPageProps {
  * - Cột phải: Form đăng ký có layout 2 cột cho các trường ngắn
  */
 export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPageProps) {
+    const t = useT();
     const { stations, lockers } = useNetworkStats();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -43,11 +46,11 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                     localStorage.setItem('smartlocker_user', JSON.stringify(result.data));
                     onLoginSuccess?.();
                 } else {
-                    setError(result.message || 'Đăng ký Google thất bại');
+                    setError(result.message || t('Đăng ký Google thất bại'));
                 }
             } catch (err: unknown) {
                 const { getApiErrorMessage } = await import('../../api/client');
-                setError(getApiErrorMessage(err, 'Không thể đăng nhập bằng Google'));
+                setError(getApiErrorMessage(err, t('Không thể đăng nhập bằng Google')));
             } finally {
                 setIsLoading(false);
             }
@@ -58,25 +61,25 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
 
     // Real-time password strength check
     const passwordChecks = [
-        { label: 'Ít nhất 8 ký tự', ok: password.length >= 8 },
-        { label: 'Có chữ hoa (A–Z)', ok: /[A-Z]/.test(password) },
-        { label: 'Có số (0–9)', ok: /[0-9]/.test(password) },
-        { label: 'Mật khẩu khớp nhau', ok: password === confirmPassword && password.length > 0 },
+        { label: t('Ít nhất 8 ký tự'), ok: password.length >= 8 },
+        { label: t('Có chữ hoa (A–Z)'), ok: /[A-Z]/.test(password) },
+        { label: t('Có số (0–9)'), ok: /[0-9]/.test(password) },
+        { label: t('Mật khẩu khớp nhau'), ok: password === confirmPassword && password.length > 0 },
     ];
     const strengthScore = passwordChecks.filter(c => c.ok).length;
     const strengthColors = ['#f87171', '#f87171', '#fbbf24', '#fbbf24', '#34d399'];
-    const strengthLabels = ['', 'Yếu', 'Trung bình', 'Khá mạnh', 'Mạnh'];
+    const strengthLabels = ['', t('Yếu'), t('Trung bình'), t('Khá mạnh'), t('Mạnh')];
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
 
-        if (!fullName.trim()) { setError('Vui lòng nhập họ và tên'); return; }
-        if (!email.includes('@')) { setError('Email không hợp lệ'); return; }
-        if (!/^0\d{9,10}$/.test(phone)) { setError('Số điện thoại phải 10-11 số bắt đầu bằng 0'); return; }
-        if (password.length < 8) { setError('Mật khẩu phải có ít nhất 8 ký tự'); return; }
-        if (password !== confirmPassword) { setError('Mật khẩu xác nhận không khớp'); return; }
-        if (!agreeTerms) { setError('Bạn cần đồng ý với điều khoản dịch vụ'); return; }
+        if (!fullName.trim()) { setError(t('Vui lòng nhập họ và tên')); return; }
+        if (!email.includes('@')) { setError(t('Email không hợp lệ')); return; }
+        if (!/^0\d{9,10}$/.test(phone)) { setError(t('Số điện thoại phải 10-11 số bắt đầu bằng 0')); return; }
+        if (password.length < 8) { setError(t('Mật khẩu phải có ít nhất 8 ký tự')); return; }
+        if (password !== confirmPassword) { setError(t('Mật khẩu xác nhận không khớp')); return; }
+        if (!agreeTerms) { setError(t('Bạn cần đồng ý với điều khoản dịch vụ')); return; }
 
         setIsLoading(true);
         try {
@@ -87,11 +90,11 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
             if (response.success && response.data) {
                 onNavigate('verify-otp', { email });
             } else {
-                setError(response.message || 'Đăng ký thất bại. Vui lòng thử lại.');
+                setError(response.message || t('Đăng ký thất bại. Vui lòng thử lại.'));
             }
         } catch (err: unknown) {
             const axiosErr = err as { response?: { data?: { message?: string; code?: string } } };
-            const msg = axiosErr.response?.data?.message || 'Không thể kết nối tới máy chủ';
+            const msg = axiosErr.response?.data?.message || t('Không thể kết nối tới máy chủ');
             setError(msg);
         } finally {
             setIsLoading(false);
@@ -113,7 +116,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                         </div>
                         <div>
                             <span className="text-lg font-extrabold text-white tracking-tight">SmartLocker</span>
-                            <p className="text-xs text-white/60 uppercase tracking-widest">Tủ hành lý thông minh</p>
+                            <p className="text-xs text-white/60 uppercase tracking-widest">{t('Tủ hành lý thông minh')}</p>
                         </div>
                     </div>
 
@@ -121,24 +124,24 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                     <div className="my-auto py-10">
                         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full mb-5" style={{background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)'}}>
                             <Zap className="w-3.5 h-3.5 text-yellow-300" />
-                            <span className="text-xs text-white/90 font-semibold">Đăng ký miễn phí — Chỉ 1 phút</span>
+                            <span className="text-xs text-white/90 font-semibold">{t('Đăng ký miễn phí — Chỉ 1 phút')}</span>
                         </div>
                         <h1 className="text-3xl xl:text-4xl font-extrabold text-white leading-[1.1] tracking-tight mb-4">
-                            Tạo tài khoản<br />
+                            {t('Tạo tài khoản')}<br />
                             <span style={{color: '#93c5fd'}}>
-                                miễn phí
+                                {t('miễn phí')}
                             </span>
                         </h1>
                         <p className="text-sm text-white/70 leading-relaxed max-w-xs">
-                            Tham gia SmartLocker để đặt tủ, theo dõi lịch sử gửi đồ và nhận ưu đãi thành viên đặc biệt.
+                            {t('Tham gia SmartLocker để đặt tủ, theo dõi lịch sử gửi đồ và nhận ưu đãi thành viên đặc biệt.')}
                         </p>
 
                         {/* Benefits */}
                         <div className="mt-8 space-y-2.5">
                             {[
-                                { icon: Check, label: 'Miễn phí đăng ký tài khoản', desc: 'Không phí ẩn, không thẻ tín dụng' },
-                                { icon: Package, label: 'Đặt tủ chỉ từ 10.000đ/giờ', desc: 'Giá minh bạch, không phụ phí' },
-                                { icon: Lock, label: 'OTP bảo mật 2 lớp', desc: 'Mã hóa JWS, không lo lộ thông tin' },
+                                { icon: Check, label: t('Miễn phí đăng ký tài khoản'), desc: t('Không phí ẩn, không thẻ tín dụng') },
+                                { icon: Package, label: t('Đặt tủ chỉ từ 10.000đ/giờ'), desc: t('Giá minh bạch, không phụ phí') },
+                                { icon: Lock, label: t('OTP bảo mật 2 lớp'), desc: t('Mã hóa JWS, không lo lộ thông tin') },
                             ].map(({ icon: Icon, label, desc }, i) => (
                                 <div key={i} className="flex items-center gap-3 p-3 rounded-xl" style={{background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)'}}>
                                     <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{background: 'rgba(52, 211, 153, 0.2)'}}>
@@ -156,9 +159,9 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                     {/* Stats */}
                     <div className="grid grid-cols-3 gap-3">
                         {[
-                            { num: stations != null ? String(stations) : '—', label: 'Trạm tủ' },
-                            { num: '24/7', label: 'Hoạt động' },
-                            { num: lockers != null ? String(lockers) : '—', label: 'Ô tủ' },
+                            { num: stations != null ? String(stations) : '—', label: t('Trạm tủ') },
+                            { num: '24/7', label: t('Hoạt động') },
+                            { num: lockers != null ? String(lockers) : '—', label: t('Ô tủ') },
                         ].map(({ num, label }) => (
                             <div key={label} className="text-center py-3 px-2 rounded-xl" style={{background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)'}}>
                                 <div className="text-xl font-extrabold text-white">{num}</div>
@@ -179,16 +182,17 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                         className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-blue-600 transition-colors group"
                     >
                         <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-                        Đăng nhập
+                        {t('Đăng nhập')}
                     </button>
+                    <LanguageSwitcher />
                     <div className="text-sm text-gray-500">
-                        Đã có tài khoản?{' '}
+                        {t('Đã có tài khoản?')}{' '}
                         <button
                             type="button"
                             onClick={() => onNavigate('login')}
                             className="font-bold text-blue-600 hover:text-blue-700 transition-colors"
                         >
-                            Đăng nhập ngay
+                            {t('Đăng nhập ngay')}
                         </button>
                     </div>
                 </div>
@@ -199,10 +203,10 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                         {/* Header */}
                         <div className="mb-6">
                             <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight mb-1.5">
-                                Tạo tài khoản mới
+                                {t('Tạo tài khoản mới')}
                             </h2>
                             <p className="text-sm text-gray-500">
-                                Điền đầy đủ thông tin bên dưới. Mã OTP sẽ được gửi tới email của bạn.
+                                {t('Điền đầy đủ thông tin bên dưới. Mã OTP sẽ được gửi tới email của bạn.')}
                             </p>
                         </div>
 
@@ -227,7 +231,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                             </svg>
-                            Đăng ký nhanh với Google
+                            {t('Đăng ký nhanh với Google')}
                         </button>
 
                         {/* Divider */}
@@ -237,7 +241,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                             </div>
                             <div className="relative flex justify-center">
                                 <span className="bg-white px-3 text-xs text-gray-500 uppercase tracking-widest font-semibold">
-                                    hoặc đăng ký bằng email
+                                    {t('hoặc đăng ký bằng email')}
                                 </span>
                             </div>
                         </div>
@@ -246,14 +250,14 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                             {/* Row 1: Full Name (full width) */}
                             <div>
                                 <label htmlFor="fullName" className="block text-sm font-semibold text-gray-700 mb-1.5">
-                                    Họ và tên <span className="text-red-500">*</span>
+                                    {t('Họ và tên')} <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     id="fullName"
                                     type="text"
                                     value={fullName}
                                     onChange={(e) => setFullName(e.target.value)}
-                                    placeholder="Nguyễn Văn A"
+                                    placeholder={t('Nguyễn Văn A')}
                                     autoComplete="name"
                                     disabled={isLoading}
                                     className="w-full h-11 px-4 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-900 text-sm placeholder:text-gray-500 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all disabled:opacity-50"
@@ -279,7 +283,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                                 </div>
                                 <div>
                                     <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-1.5">
-                                        Số điện thoại <span className="text-red-500">*</span>
+                                        {t('Số điện thoại')} <span className="text-red-500">*</span>
                                     </label>
                                     <div className="relative">
                                         <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-500 text-xs font-bold pointer-events-none select-none">
@@ -303,7 +307,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label htmlFor="reg-password" className="block text-sm font-semibold text-gray-700 mb-1.5">
-                                        Mật khẩu <span className="text-red-500">*</span>
+                                        {t('Mật khẩu')} <span className="text-red-500">*</span>
                                     </label>
                                     <div className="relative">
                                         <input
@@ -320,7 +324,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                                             type="button"
                                             onClick={() => setShowPassword(!showPassword)}
                                             className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-600 transition-colors"
-                                            aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                                            aria-label={showPassword ? t('Ẩn mật khẩu') : t('Hiện mật khẩu')}
                                         >
                                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                         </button>
@@ -328,7 +332,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                                 </div>
                                 <div>
                                     <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 mb-1.5">
-                                        Xác nhận MK <span className="text-red-500">*</span>
+                                        {t('Xác nhận MK')} <span className="text-red-500">*</span>
                                     </label>
                                     <div className="relative">
                                         <input
@@ -350,7 +354,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                                         <button
                                             type="button"
                                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                            aria-label={showConfirmPassword ? 'Ẩn mật khẩu xác nhận' : 'Hiện mật khẩu xác nhận'}
+                                            aria-label={showConfirmPassword ? t('Ẩn mật khẩu xác nhận') : t('Hiện mật khẩu xác nhận')}
                                             className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-600 transition-colors"
                                         >
                                             {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -413,11 +417,11 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                                     className="w-4 h-4 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
                                 />
                                 <label htmlFor="agreeTerms" className="text-xs text-gray-500 cursor-pointer leading-relaxed">
-                                    Tôi đồng ý với{' '}
-                                    <a href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }} className="text-blue-600 font-semibold hover:underline">Điều khoản dịch vụ</a>
-                                    {' '}và{' '}
-                                    <a href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }} className="text-blue-600 font-semibold hover:underline">Chính sách bảo mật</a>
-                                    {' '}của SmartLocker.
+                                    {t('Tôi đồng ý với')}{' '}
+                                    <a href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }} className="text-blue-600 font-semibold hover:underline">{t('Điều khoản dịch vụ')}</a>
+                                    {' '}{t('và')}{' '}
+                                    <a href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }} className="text-blue-600 font-semibold hover:underline">{t('Chính sách bảo mật')}</a>
+                                    {' '}{t('của SmartLocker.')}
                                 </label>
                             </div>
 
@@ -438,11 +442,11 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"></path>
                                         </svg>
-                                        Đang xử lý...
+                                        {t('Đang xử lý...')}
                                     </>
                                 ) : (
                                     <>
-                                        <span>Tạo tài khoản</span>
+                                        <span>{t('Tạo tài khoản')}</span>
                                         <ArrowRight className="w-4 h-4" />
                                     </>
                                 )}
@@ -450,8 +454,8 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                         </form>
 
                         <p className="mt-5 text-center text-sm text-gray-500">
-                            Quản lý thông tin theo{' '}
-                            <a href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }} className="text-blue-600 font-semibold hover:underline">Chính sách bảo mật</a>
+                            {t('Quản lý thông tin theo')}{' '}
+                            <a href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }} className="text-blue-600 font-semibold hover:underline">{t('Chính sách bảo mật')}</a>
                         </p>
                     </div>
                 </div>

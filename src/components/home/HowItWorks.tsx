@@ -1,32 +1,34 @@
 import { Smartphone, QrCode, LockOpen, ArrowRight } from 'lucide-react';
+import { useT } from '../../i18n';
 
 /**
  * HowItWorks Component - Phần hướng dẫn 3 bước sử dụng dịch vụ
  * Cải thiện visual balance với connecting line
  */
 const HowItWorks = () => {
+    const t = useT();
   const steps = [
     {
       icon: Smartphone,
-      step: 'BƯỚC 01',
-      title: 'Đặt tủ online trong 30s',
-      description: 'Truy cập website hoặc app, chọn trạm gần nhất, chọn kích cỡ tủ và thanh toán quét mã VietQR tự động xác nhận tức thì.',
+      step: t('BƯỚC 01'),
+      title: t('Đặt tủ online trong 30s'),
+      description: t('Truy cập website hoặc app, chọn trạm gần nhất, chọn kích cỡ tủ và thanh toán quét mã VietQR tự động xác nhận tức thì.'),
       highlighted: false,
       color: 'blue',
     },
     {
       icon: QrCode,
-      step: 'BƯỚC 02',
-      title: 'Nhận vé số hóa JWS tức thì',
-      description: 'Mã QR kèm PIN dự phòng được cấp tự động. Công nghệ chữ ký số JWS mã hóa bảo mật chống sao chép và giả mạo.',
+      step: t('BƯỚC 02'),
+      title: t('Nhận vé số hóa JWS tức thì'),
+      description: t('Mã QR kèm PIN dự phòng được cấp tự động. Công nghệ chữ ký số JWS mã hóa bảo mật chống sao chép và giả mạo.'),
       highlighted: true,
       color: 'primary',
     },
     {
       icon: LockOpen,
-      step: 'BƯỚC 03',
-      title: 'Quét mã mở tủ tại trạm',
-      description: 'Đến trạm tủ thông minh, giơ mã QR trước camera Kiosk iPad. Cửa tủ tương ứng sẽ tự động bật mở ngay tức khắc.',
+      step: t('BƯỚC 03'),
+      title: t('Quét mã mở tủ tại trạm'),
+      description: t('Đến trạm tủ thông minh, giơ mã QR trước camera Kiosk iPad. Cửa tủ tương ứng sẽ tự động bật mở ngay tức khắc.'),
       highlighted: false,
       color: 'emerald',
     },
@@ -40,10 +42,10 @@ const HowItWorks = () => {
           {/* Section Header */}
           <div className="text-center max-w-2xl mx-auto mb-16">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-on-surface tracking-tight leading-tight mb-4 text-balance">
-              Quy Trình Gửi Đồ <span className="text-gradient">3 Bước Dễ Dàng</span>
+              {t('Quy Trình Gửi Đồ')} <span className="text-gradient">{t('3 Bước Dễ Dàng')}</span>
             </h2>
             <p className="text-base sm:text-lg text-secondary">
-              Không cần xếp hàng, không cần tiền mặt, không lo mất chìa khóa vật lý.
+              {t('Không cần xếp hàng, không cần tiền mặt, không lo mất chìa khóa vật lý.')}
             </p>
           </div>
 
@@ -124,7 +126,7 @@ const HowItWorks = () => {
               href="#booking-widget" 
               className="inline-flex items-center gap-2 text-primary font-bold hover:underline"
             >
-              Bắt đầu đặt tủ ngay
+              {t('Bắt đầu đặt tủ ngay')}
               <ArrowRight className="w-4 h-4" />
             </a>
           </div>

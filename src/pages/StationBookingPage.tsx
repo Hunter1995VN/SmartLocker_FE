@@ -32,6 +32,7 @@ import adminPromotionService, {
 } from '../api/adminPromotionService';
 import CustomerHeader from '../components/layout/CustomerHeader';
 import { bookingQuote } from '../utils/bookingQuote';
+import { useT } from '../i18n';
 
 interface StationBookingPageProps {
   onNavigate: (page: string, props?: any) => void;
@@ -46,6 +47,7 @@ interface StationBookingPageProps {
 }
 
 const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, stationId, initialBookingData }) => {
+    const t = useT();
   const [stationDetail, setStationDetail] = useState<StationDetail | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -136,9 +138,9 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
         const data = stationId ? await getStationById(stationId, start.toISOString(), end.toISOString()) : null;
         if (cancelled) return;
         setStationDetail(data);
-        if (!data) setApiError('Không tải được dữ liệu trạm. Vui lòng thử lại.');
+        if (!data) setApiError(t('Không tải được dữ liệu trạm. Vui lòng thử lại.'));
       } catch {
-        if (!cancelled) { setStationDetail(null); setApiError('Không tải được dữ liệu trạm.'); }
+        if (!cancelled) { setStationDetail(null); setApiError(t('Không tải được dữ liệu trạm.')); }
       } finally {
         if (!cancelled) { setIsLoading(false); setIsRefreshing(false); }
       }
@@ -206,13 +208,13 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
         setVoucherInput(res.data.code);
         setVoucherFeedback({
           type: 'success',
-          text: `Đã áp dụng mã ${res.data.code}: tiết kiệm ${res.data.discountAmount.toLocaleString('vi-VN')} VND`
+          text: t('Đã áp dụng mã {code}: tiết kiệm {amount} VND', { code: res.data.code, amount: res.data.discountAmount.toLocaleString('vi-VN') })
         });
       } else {
         setAppliedVoucher(null);
         setVoucherFeedback({
           type: 'error',
-          text: res.data?.message || res.message || 'Mã giảm giá không đủ điều kiện áp dụng.'
+          text: res.data?.message || res.message || t('Mã giảm giá không đủ điều kiện áp dụng.')
         });
       }
     } catch (err: unknown) {
@@ -223,7 +225,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
         text:
           axiosErr.response?.data?.data?.message ||
           axiosErr.response?.data?.message ||
-          'Mã Voucher không hợp lệ hoặc đã hết ngân sách khuyến mại.'
+          t('Mã Voucher không hợp lệ hoặc đã hết ngân sách khuyến mại.')
       });
     } finally {
       setIsApplyingVoucher(false);
@@ -273,7 +275,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
             setAppliedVoucher(null);
             setVoucherFeedback({
               type: 'error',
-              text: valRes.data?.message || 'Mã giảm giá đã tự động gỡ do thay đổi giá trị đơn thuê.'
+              text: valRes.data?.message || t('Mã giảm giá đã tự động gỡ do thay đổi giá trị đơn thuê.')
             });
           }
         } catch {
@@ -318,7 +320,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
       <div className="bg-slate-50 min-h-screen pb-20 flex items-center justify-center">
         <div className="flex flex-col items-center">
           <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-          <p className="mt-4 text-slate-500 font-medium">Đang tải thông tin trạm...</p>
+          <p className="mt-4 text-slate-500 font-medium">{t('Đang tải thông tin trạm...')}</p>
         </div>
       </div>
     );
@@ -326,9 +328,9 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
 
   if (!stationDetail) return (
     <main className="min-h-screen grid place-content-center gap-4 p-8 text-center">
-      <p role="alert">{apiError || 'Trạm chưa có dữ liệu.'}</p>
-      <button onClick={() => window.location.reload()}>Tải lại</button>
-      <button onClick={() => onNavigate('find-station')}>Chọn trạm khác</button>
+      <p role="alert">{apiError || t('Trạm chưa có dữ liệu.')}</p>
+      <button onClick={() => window.location.reload()}>{t('Tải lại')}</button>
+      <button onClick={() => onNavigate('find-station')}>{t('Chọn trạm khác')}</button>
     </main>
   );
 
@@ -343,7 +345,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
       {/* 2. MAIN CONTENT CONTAINER */}
       <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 w-full">
         {/* STEP PROGRESS BAR - ĐỒNG BỘ 100% VỚI BOOKING PAYMENT PAGE */}
-        <nav aria-label="Các bước đặt tủ" className="mb-6 md:mb-8 bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
+        <nav aria-label={t('Các bước đặt tủ')} className="mb-6 md:mb-8 bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
           <div className="grid grid-cols-3 gap-2 sm:gap-4 items-center">
             {/* Step 1 (Current / In Progress) */}
             <div className="flex items-center gap-2 sm:gap-3 text-left">
@@ -351,7 +353,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                 1
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="text-xs uppercase font-bold text-blue-600 tracking-wider">Bước 1 (đang thực hiện)</span>
+                <span className="text-xs uppercase font-bold text-blue-600 tracking-wider">{t('Bước 1 (đang thực hiện)')}</span>
                 <span className="text-sm font-semibold text-slate-900 truncate">
                   Select Size &amp; Duration
                 </span>
@@ -364,7 +366,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                 2
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="text-xs uppercase font-bold text-slate-500 tracking-wider">Bước 2</span>
+                <span className="text-xs uppercase font-bold text-slate-500 tracking-wider">{t('Bước 2')}</span>
                 <span className="text-sm font-semibold text-slate-500 truncate">
                   PayOS VietQR Payment
                 </span>
@@ -377,7 +379,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                 3
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="text-xs uppercase font-bold text-slate-500 tracking-wider">Bước 3</span>
+                <span className="text-xs uppercase font-bold text-slate-500 tracking-wider">{t('Bước 3')}</span>
                 <span className="text-sm font-semibold text-slate-500 truncate">
                   Unlock Digital Access Key
                 </span>
@@ -393,12 +395,12 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
             <div className="md:col-span-4 relative h-48 md:h-full min-h-[180px]">
               <img 
                 src="https://images.unsplash.com/photo-1542296332-2e4473faf563?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
-                alt="Vị trí trạm" 
+                alt={t('Vị trí trạm')} 
                 className="w-full h-full object-cover"
               />
               <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-lg flex items-center text-xs font-medium">
                 <ShieldCheck className="w-4 h-4 mr-1.5 text-emerald-400" />
-                Cảm biến cửa từng ô tủ
+                {t('Cảm biến cửa từng ô tủ')}
               </div>
             </div>
             
@@ -424,19 +426,19 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                 <div className="hidden sm:flex flex-col items-end">
                   <div className="flex items-center text-amber-500 font-medium bg-amber-50 px-2 py-1 rounded text-sm mb-1">
                     <Star className="w-4 h-4 mr-1 fill-current" />
-                    {currentStation.ratingCount ? currentStation.ratingAverage?.toFixed(1) : 'Chưa có đánh giá'}
+                    {currentStation.ratingCount ? currentStation.ratingAverage?.toFixed(1) : t('Chưa có đánh giá')}
                   </div>
-                  <span className="text-xs text-slate-500">{currentStation.ratingCount ?? 0} lượt đánh giá</span>
+                  <span className="text-xs text-slate-500">{currentStation.ratingCount ?? 0} {t('lượt đánh giá')}</span>
                 </div>
               </div>
 
               <div className="border-t border-slate-100 my-4"></div>
 
               <div>
-                <p className="text-xs font-medium text-slate-500 mb-3 uppercase tracking-wider">Tiện ích & an ninh</p>
+                <p className="text-xs font-medium text-slate-500 mb-3 uppercase tracking-wider">{t('Tiện ích & an ninh')}</p>
                 <div className="flex flex-wrap gap-2">
                   <div className="flex items-center bg-slate-100 text-slate-600 text-xs px-3 py-1.5 rounded-full border border-slate-200">
-                    <ShieldCheck className="w-3.5 h-3.5 mr-1.5 text-blue-600" /> Cảm biến cửa 24/7
+                    <ShieldCheck className="w-3.5 h-3.5 mr-1.5 text-blue-600" /> {t('Cảm biến cửa 24/7')}
                   </div>
                   <div className="flex items-center bg-slate-100 text-slate-600 text-xs px-3 py-1.5 rounded-full border border-slate-200">
                     <QrCode className="w-3.5 h-3.5 mr-1.5 text-indigo-600" /> QR Access
@@ -465,8 +467,8 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                 <div className="flex items-center">
                   <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold mr-3 border border-blue-200">1</div>
                   <div>
-                    <h2 className="text-xl font-bold text-slate-900">Thời điểm gửi</h2>
-                    <p className="text-sm text-slate-500 mt-0.5">Bạn muốn gửi hành lý lúc nào?</p>
+                    <h2 className="text-xl font-bold text-slate-900">{t('Thời điểm gửi')}</h2>
+                    <p className="text-sm text-slate-500 mt-0.5">{t('Bạn muốn gửi hành lý lúc nào?')}</p>
                   </div>
                 </div>
               </div>
@@ -483,7 +485,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   }`}
                 >
                   <Sparkles className="w-4 h-4 text-amber-500" />
-                  <span>Gửi ngay (bắt đầu ngay)</span>
+                  <span>{t('Gửi ngay (bắt đầu ngay)')}</span>
                 </button>
                 <button
                   type="button"
@@ -495,7 +497,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   }`}
                 >
                   <Calendar className="w-4 h-4 text-blue-600" />
-                  <span>Đặt trước (chọn ngày &amp; giờ)</span>
+                  <span>{t('Đặt trước (chọn ngày & giờ)')}</span>
                 </button>
               </div>
 
@@ -507,11 +509,11 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                       <Clock className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Giờ bắt đầu</p>
+                      <p className="text-xs font-bold text-emerald-800 uppercase tracking-wider">{t('Giờ bắt đầu')}</p>
                       <p className="text-base font-extrabold text-slate-900">
                         Starts Right Now <span className="text-slate-500 font-normal text-sm">({formatTimeStr(startDateObj)} Today)</span>
                       </p>
-                      <p className="text-sm text-slate-500 mt-0.5">Chỉ cần chọn thời lượng thuê bên dưới để tiếp tục</p>
+                      <p className="text-sm text-slate-500 mt-0.5">{t('Chỉ cần chọn thời lượng thuê bên dưới để tiếp tục')}</p>
                     </div>
                   </div>
                   <span className="hidden sm:inline-block text-xs font-bold text-emerald-700 bg-white px-3 py-1 rounded-full border border-emerald-200 shadow-xs">
@@ -527,8 +529,8 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                     className="relative border border-slate-200 rounded-xl p-4 hover:border-blue-500 transition-colors bg-white group cursor-pointer shadow-xs"
                   >
                     <div className="flex justify-between items-center mb-1">
-                      <label className="text-xs font-semibold text-slate-500 cursor-pointer">Ngày đến (ngày bắt đầu)</label>
-                      <span className="text-xs font-medium text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">Tối thiểu: hôm nay</span>
+                      <label className="text-xs font-semibold text-slate-500 cursor-pointer">{t('Ngày đến (ngày bắt đầu)')}</label>
+                      <span className="text-xs font-medium text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">{t('Tối thiểu: hôm nay')}</span>
                     </div>
                     <div className="flex items-center justify-between mt-1">
                       <div className="flex items-center text-slate-900 font-semibold text-sm">
@@ -537,7 +539,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                       </div>
                       <ChevronDown className="w-4 h-4 text-slate-500 group-hover:text-blue-600 transition-colors" />
                     </div>
-                    <input aria-label="Ngày gửi đồ"
+                    <input aria-label={t('Ngày gửi đồ')}
                       ref={dateInputRef}
                       type="date"
                       min={todayStr}
@@ -548,13 +550,13 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                       }}
                       className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                     />
-                    <span className="text-xs text-slate-500 block mt-2">Tối đa: đặt trước 30 ngày</span>
+                    <span className="text-xs text-slate-500 block mt-2">{t('Tối đa: đặt trước 30 ngày')}</span>
                   </div>
                   
                   {/* Arrival Time Box */}
                   <div className="relative border border-slate-200 rounded-xl p-4 hover:border-blue-500 transition-colors bg-white group shadow-xs">
                     <div className="flex justify-between items-center mb-1">
-                      <label className="text-xs font-semibold text-slate-500">Giờ đến (giờ bắt đầu)</label>
+                      <label className="text-xs font-semibold text-slate-500">{t('Giờ đến (giờ bắt đầu)')}</label>
                       <span className="text-xs font-medium text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
                         Open: {currentStation.opensAt || '06:00'} - {currentStation.closesAt || '23:00'}
                       </span>
@@ -562,7 +564,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                     <div className="flex items-center justify-between mt-1">
                       <div className="flex items-center text-slate-900 font-semibold text-sm w-full mr-2">
                         <Clock className="w-5 h-5 mr-2 text-blue-600 shrink-0" />
-                        <select aria-label="Giờ gửi đồ"
+                        <select aria-label={t('Giờ gửi đồ')}
                           value={dropOffTime}
                           onChange={(e) => setDropOffTime(e.target.value)}
                           className="w-full bg-transparent font-semibold text-slate-900 text-sm outline-none cursor-pointer py-1"
@@ -576,14 +578,14 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                       </div>
                       <ChevronDown className="w-4 h-4 text-slate-500 group-hover:text-blue-600 transition-colors pointer-events-none" />
                     </div>
-                    <span className="text-xs text-slate-500 block mt-1">Giờ dự kiến bạn đến tủ</span>
+                    <span className="text-xs text-slate-500 block mt-1">{t('Giờ dự kiến bạn đến tủ')}</span>
                   </div>
                 </div>
               )}
 
               {/* Duration Selection */}
               <div>
-                <label className="text-sm font-semibold text-slate-900 mb-3 block">Thời lượng gửi (bạn cần bao lâu?)</label>
+                <label className="text-sm font-semibold text-slate-900 mb-3 block">{t('Thời lượng gửi (bạn cần bao lâu?)')}</label>
                 <div className="flex flex-wrap items-center gap-3">
                   {[1, 3, 6, 12, 24].map((duration) => (
                     <button
@@ -606,7 +608,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   
                   {isCustomDuration ? (
                     <div className="flex items-center bg-white border-2 border-blue-600 rounded-full px-3 py-1 shadow-sm">
-                      <input aria-label="Số giờ gửi (từ 1 đến 72)"
+                      <input aria-label={t('Số giờ gửi (từ 1 đến 72)')}
                         type="number"
                         min="1"
                         max="72"
@@ -620,7 +622,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                         autoFocus
                         className="w-16 text-sm font-bold text-center outline-none text-blue-600"
                       />
-                      <span className="text-xs font-semibold text-slate-500 mr-2">giờ (tối đa 72)</span>
+                      <span className="text-xs font-semibold text-slate-500 mr-2">{t('giờ (tối đa 72)')}</span>
                       <button
                         type="button"
                         onClick={handleApplyCustomDuration}
@@ -650,7 +652,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   <div className="flex items-center gap-3">
                     <div className="w-3.5 h-3.5 rounded-full bg-amber-500 shrink-0 ring-4 ring-amber-100"></div>
                     <div>
-                      <p className="text-xs font-bold text-amber-800 uppercase tracking-wider">Thời gian giữ chỗ miễn phí</p>
+                      <p className="text-xs font-bold text-amber-800 uppercase tracking-wider">{t('Thời gian giữ chỗ miễn phí')}</p>
                       <p className="text-sm font-extrabold text-slate-900">
                         30 Minutes to Arrive
                       </p>
@@ -665,9 +667,9 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   <div className="flex items-center gap-3">
                     <div className="w-3.5 h-3.5 rounded-full bg-emerald-500 shrink-0 ring-4 ring-emerald-100"></div>
                     <div>
-                      <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Số lượng ngăn</p>
+                      <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('Số lượng ngăn')}</p>
                       <p className="text-sm font-extrabold text-slate-900">
-                        Bắt đầu khi gửi đồ tại kiosk
+                        {t('Bắt đầu khi gửi đồ tại kiosk')}
                       </p>
                     </div>
                   </div>
@@ -676,8 +678,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                 <div className="pt-3 border-t border-blue-200/60 flex items-start text-xs text-blue-900 leading-relaxed bg-white/80 p-3 rounded-xl border border-blue-100">
                   <Info className="w-4 h-4 mr-2 mt-0.5 shrink-0 text-blue-600" />
                   <span>
-                    <strong>Chính sách giữ tủ mới:</strong> Bạn có 30 phút giữ tủ miễn phí sau khi thanh toán để di chuyển đến trạm. 
-                    Thời gian thuê <strong>{selectedDuration} tiếng</strong> chỉ chính thức bắt đầu đếm ngược từ lúc bạn quét mã QR/nhập PIN mở tủ tại trạm.
+                    <strong>{t('Chính sách giữ tủ mới:')}</strong> {t('Bạn có 30 phút giữ tủ miễn phí sau khi thanh toán để di chuyển đến trạm. Thời gian thuê')} <strong>{selectedDuration} {t('tiếng')}</strong> {t('chỉ chính thức bắt đầu đếm ngược từ lúc bạn quét mã QR/nhập PIN mở tủ tại trạm.')}
                   </span>
                 </div>
               </div>
@@ -689,8 +690,8 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                 <div className="flex items-center mb-2 sm:mb-0">
                   <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold mr-3 border border-blue-200">2</div>
                   <div>
-                    <h2 className="text-xl font-bold text-slate-900">Chọn cỡ ngăn tủ</h2>
-                    <p className="text-sm text-slate-500 mt-0.5">Chọn cỡ ngăn tủ phù hợp kích thước hành lý của bạn</p>
+                    <h2 className="text-xl font-bold text-slate-900">{t('Chọn cỡ ngăn tủ')}</h2>
+                    <p className="text-sm text-slate-500 mt-0.5">{t('Chọn cỡ ngăn tủ phù hợp kích thước hành lý của bạn')}</p>
                   </div>
                 </div>
                 <div className="flex items-center text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">
@@ -724,19 +725,19 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                         <Backpack className="w-6 h-6" />
                       </div>
                       <span className={`text-xs font-bold px-2 py-1 rounded ${isSAvailable ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' : 'text-rose-700 bg-rose-50 border border-rose-200'}`}>
-                        {isSAvailable ? `${availS}/${totalS} left` : 'Không khả dụng'}
+                        {isSAvailable ? `${availS}/${totalS} left` : t('Không khả dụng')}
                       </span>
                     </div>
-                    <h3 className={`text-lg font-bold ${!isSAvailable ? 'text-slate-500' : 'text-slate-900'}`}>Nhỏ (S)</h3>
+                    <h3 className={`text-lg font-bold ${!isSAvailable ? 'text-slate-500' : 'text-slate-900'}`}>{t('Nhỏ (S)')}</h3>
                     <div className={`flex items-center text-xs mt-1 mb-3 ${!isSAvailable ? 'text-slate-500' : 'text-slate-500'}`}>
                       <Ruler className="w-3.5 h-3.5 mr-1" /> 45 x 45 x 65 cm
                     </div>
-                    <p className={`text-sm mb-4 ${!isSAvailable ? 'text-slate-500' : 'text-slate-600'}`}>Vừa 1–2 balo tiêu chuẩn, túi xách hoặc túi mua sắm.</p>
+                    <p className={`text-sm mb-4 ${!isSAvailable ? 'text-slate-500' : 'text-slate-600'}`}>{t('Vừa 1–2 balo tiêu chuẩn, túi xách hoặc túi mua sắm.')}</p>
                   </div>
                   <div className={`p-4 border-t relative z-0 ${!isSAvailable ? 'border-slate-200 bg-slate-100' : selectedSize === 'S' ? 'border-blue-200 bg-blue-50/50' : 'border-slate-100 bg-slate-50/50'}`}>
                     <div className="flex items-baseline justify-between">
                       <span className={`text-lg font-bold ${!isSAvailable ? 'text-slate-500' : 'text-blue-600'}`}>{formatCurrency(basePrices.S)}</span>
-                      <span className={`text-xs font-medium ${!isSAvailable ? 'text-slate-500' : 'text-slate-500'}`}>/ {stationDetail?.sizePricing?.find(p => p.size === 'S')?.blockHours ?? '—'} giờ</span>
+                      <span className={`text-xs font-medium ${!isSAvailable ? 'text-slate-500' : 'text-slate-500'}`}>/ {stationDetail?.sizePricing?.find(p => p.size === 'S')?.blockHours ?? '—'} {t('giờ')}</span>
                     </div>
                     <button 
                       disabled={!isSAvailable} 
@@ -748,7 +749,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                         !isSAvailable ? 'bg-slate-200 text-slate-500 cursor-not-allowed' : selectedSize === 'S' ? 'bg-blue-600 text-white cursor-pointer shadow-sm shadow-blue-500/30' : 'bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 cursor-pointer'
                       }`}
                     >
-                      {!isSAvailable ? 'Không khả dụng' : selectedSize === 'S' ? 'Selected' : 'Select'}
+                      {!isSAvailable ? t('Không khả dụng') : selectedSize === 'S' ? 'Selected' : 'Select'}
                     </button>
                   </div>
                 </div>
@@ -781,19 +782,19 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                         <Package className="w-6 h-6" />
                       </div>
                       <span className={`text-xs font-bold px-2 py-1 rounded ${isMAvailable ? 'text-amber-700 bg-amber-50 border border-amber-200' : 'text-rose-700 bg-rose-50 border border-rose-200'}`}>
-                        {isMAvailable ? `${availM}/${totalM} left` : 'Không khả dụng'}
+                        {isMAvailable ? `${availM}/${totalM} left` : t('Không khả dụng')}
                       </span>
                     </div>
-                    <h3 className={`text-lg font-bold ${!isMAvailable ? 'text-slate-500' : 'text-slate-900'}`}>Vừa (M)</h3>
+                    <h3 className={`text-lg font-bold ${!isMAvailable ? 'text-slate-500' : 'text-slate-900'}`}>{t('Vừa (M)')}</h3>
                     <div className={`flex items-center text-xs mt-1 mb-3 ${!isMAvailable ? 'text-slate-500' : 'text-slate-500'}`}>
                       <Ruler className="w-3.5 h-3.5 mr-1" /> 65 x 45 x 65 cm
                     </div>
-                    <p className={`text-sm mb-4 ${!isMAvailable ? 'text-slate-500' : 'text-slate-600'}`}>Vừa 1 vali cabin và 1 balo.</p>
+                    <p className={`text-sm mb-4 ${!isMAvailable ? 'text-slate-500' : 'text-slate-600'}`}>{t('Vừa 1 vali cabin và 1 balo.')}</p>
                   </div>
                   <div className={`p-4 border-t relative z-0 ${!isMAvailable ? 'border-slate-200 bg-slate-100' : selectedSize === 'M' ? 'border-blue-200 bg-blue-50/50' : 'border-slate-100 bg-slate-50/50'}`}>
                     <div className="flex items-baseline justify-between">
                       <span className={`text-lg font-bold ${!isMAvailable ? 'text-slate-500' : 'text-blue-600'}`}>{formatCurrency(basePrices.M)}</span>
-                      <span className={`text-xs font-medium ${!isMAvailable ? 'text-slate-500' : 'text-slate-500'}`}>/ {stationDetail?.sizePricing?.find(p => p.size === 'M')?.blockHours ?? '—'} giờ</span>
+                      <span className={`text-xs font-medium ${!isMAvailable ? 'text-slate-500' : 'text-slate-500'}`}>/ {stationDetail?.sizePricing?.find(p => p.size === 'M')?.blockHours ?? '—'} {t('giờ')}</span>
                     </div>
                     <button 
                       disabled={!isMAvailable} 
@@ -805,7 +806,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                         !isMAvailable ? 'bg-slate-200 text-slate-500 cursor-not-allowed' : selectedSize === 'M' ? 'bg-blue-600 text-white cursor-pointer shadow-sm shadow-blue-500/30' : 'bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 cursor-pointer'
                       }`}
                     >
-                      {!isMAvailable ? 'Không khả dụng' : selectedSize === 'M' ? 'Selected' : 'Select'}
+                      {!isMAvailable ? t('Không khả dụng') : selectedSize === 'M' ? 'Selected' : 'Select'}
                     </button>
                   </div>
                 </div>
@@ -835,19 +836,19 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                         <Package className="w-6 h-6" />
                       </div>
                       <span className={`text-xs font-bold px-2 py-1 rounded ${isLAvailable ? 'text-emerald-700 bg-emerald-50 border border-emerald-200' : 'text-rose-700 bg-rose-50 border border-rose-200'}`}>
-                        {isLAvailable ? `${availL}/${totalL} left` : 'Không khả dụng'}
+                        {isLAvailable ? `${availL}/${totalL} left` : t('Không khả dụng')}
                       </span>
                     </div>
-                    <h3 className={`text-lg font-bold ${!isLAvailable ? 'text-slate-500' : 'text-slate-900'}`}>Lớn (L)</h3>
+                    <h3 className={`text-lg font-bold ${!isLAvailable ? 'text-slate-500' : 'text-slate-900'}`}>{t('Lớn (L)')}</h3>
                     <div className={`flex items-center text-xs mt-1 mb-3 ${!isLAvailable ? 'text-slate-500' : 'text-slate-500'}`}>
                       <Ruler className="w-3.5 h-3.5 mr-1" /> 95 x 55 x 65 cm
                     </div>
-                    <p className={`text-sm mb-4 ${!isLAvailable ? 'text-slate-500' : 'text-slate-600'}`}>Vừa vali ký gửi cỡ lớn và đồ cồng kềnh.</p>
+                    <p className={`text-sm mb-4 ${!isLAvailable ? 'text-slate-500' : 'text-slate-600'}`}>{t('Vừa vali ký gửi cỡ lớn và đồ cồng kềnh.')}</p>
                   </div>
                   <div className={`p-4 border-t relative z-0 ${!isLAvailable ? 'border-slate-200 bg-slate-100' : selectedSize === 'L' ? 'border-blue-200 bg-blue-50/50' : 'border-slate-100 bg-slate-50/50'}`}>
                     <div className="flex items-baseline justify-between">
                       <span className={`text-lg font-bold ${!isLAvailable ? 'text-slate-500' : 'text-blue-600'}`}>{formatCurrency(basePrices.L)}</span>
-                      <span className={`text-xs font-medium ${!isLAvailable ? 'text-slate-500' : 'text-slate-500'}`}>/ {stationDetail?.sizePricing?.find(p => p.size === 'L')?.blockHours ?? '—'} giờ</span>
+                      <span className={`text-xs font-medium ${!isLAvailable ? 'text-slate-500' : 'text-slate-500'}`}>/ {stationDetail?.sizePricing?.find(p => p.size === 'L')?.blockHours ?? '—'} {t('giờ')}</span>
                     </div>
                     <button 
                       disabled={!isLAvailable} 
@@ -859,7 +860,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                         !isLAvailable ? 'bg-slate-200 text-slate-500 cursor-not-allowed' : selectedSize === 'L' ? 'bg-blue-600 text-white cursor-pointer shadow-sm shadow-blue-500/30' : 'bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 cursor-pointer'
                       }`}
                     >
-                      {!isLAvailable ? 'Không khả dụng' : selectedSize === 'L' ? 'Selected' : 'Select'}
+                      {!isLAvailable ? t('Không khả dụng') : selectedSize === 'L' ? 'Selected' : 'Select'}
                     </button>
                   </div>
                 </div>
@@ -867,18 +868,18 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
             </section>
 
             <section className="bg-white p-6 rounded-2xl border border-slate-200">
-              <h2 className="text-xl font-bold">Các ngăn tủ tại trạm</h2>
-              <p className="text-sm text-slate-500 my-3">Chọn kích thước S, M hoặc L. Hệ thống gán ngăn đúng kích thước khi check-in, sau khi kiểm tra vé và thiết bị.</p>
+              <h2 className="text-xl font-bold">{t('Các ngăn tủ tại trạm')}</h2>
+              <p className="text-sm text-slate-500 my-3">{t('Chọn kích thước S, M hoặc L. Hệ thống gán ngăn đúng kích thước khi check-in, sau khi kiểm tra vé và thiết bị.')}</p>
               <div className="grid gap-3 sm:grid-cols-3">
                 {(stationDetail?.lockers ?? []).map(locker => (
                   <div key={locker.lockerId} className="rounded-xl border border-slate-200 p-4">
                     <strong>{locker.lockerCode} · {locker.size}</strong>
                     <p className="text-sm">{locker.businessStatus} · {locker.healthStatus}</p>
-                    <p className="text-sm">Cửa: {locker.doorState} · {locker.connectivityStatus}</p>
+                    <p className="text-sm">{t('Cửa:')} {locker.doorState} · {locker.connectivityStatus}</p>
                   </div>
                 ))}
               </div>
-              {!stationDetail?.lockers?.length && <p>Trạm chưa có ngăn tủ được kết nối.</p>}
+              {!stationDetail?.lockers?.length && <p>{t('Trạm chưa có ngăn tủ được kết nối.')}</p>}
             </section>
           </div>
 
@@ -890,22 +891,22 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
               <div className="bg-white rounded-2xl shadow-lg shadow-blue-900/5 border border-blue-200 overflow-hidden mb-6">
                 <div className="bg-blue-600 p-5 text-white relative overflow-hidden">
                   <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-                  <h3 className="text-lg font-bold mb-1 relative z-10">Tóm tắt đặt chỗ</h3>
-                  <p className="text-blue-100 text-sm relative z-10">Xem lại thông tin gửi đồ</p>
+                  <h3 className="text-lg font-bold mb-1 relative z-10">{t('Tóm tắt đặt chỗ')}</h3>
+                  <p className="text-blue-100 text-sm relative z-10">{t('Xem lại thông tin gửi đồ')}</p>
                 </div>
                 
                 <div className="p-5 space-y-4">
                   {/* Line Items */}
                   <div className="flex justify-between items-start pb-3 border-b border-slate-100">
                     <div>
-                      <p className="text-sm text-slate-500 mb-0.5">Vị trí trạm</p>
+                      <p className="text-sm text-slate-500 mb-0.5">{t('Vị trí trạm')}</p>
                       <p className="text-sm font-bold text-slate-900">{currentStation.name}</p>
                     </div>
                   </div>
 
                   <div className="flex justify-between items-start pb-3 border-b border-slate-100">
                     <div>
-                      <p className="text-sm text-slate-500 mb-0.5">Kích thước đã chọn</p>
+                      <p className="text-sm text-slate-500 mb-0.5">{t('Kích thước đã chọn')}</p>
                       <p className="text-sm font-bold text-blue-600 flex items-center">
                         {selectedSize === 'S' ? 'Small Unit (S)' : selectedSize === 'M' ? 'Medium Unit (M)' : selectedSize === 'L' ? 'Large Unit (L)' : 'None Selected'}
                       </p>
@@ -928,7 +929,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
 
                   <div className="flex justify-between items-center pt-1 text-sm">
                     <p className="text-slate-500">
-                      Chi phí theo chính sách giá ({selectedDuration} giờ)
+                      {t('Chi phí theo chính sách giá (')}{selectedDuration} {t('giờ)')}
                     </p>
                     <p className="font-semibold text-slate-900">{formatCurrency(currentPrice)}</p>
                   </div>
@@ -956,7 +957,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                       </span>
                       {availableVouchers.filter(v => v.isEligibleNow).length > 0 && (
                         <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                          {availableVouchers.filter(v => v.isEligibleNow).length} mã khả dụng
+                          {availableVouchers.filter(v => v.isEligibleNow).length} {t('mã khả dụng')}
                         </span>
                       )}
                     </div>
@@ -978,14 +979,14 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                           type="button"
                           onClick={handleClearVoucher}
                           className="p-1 rounded-lg text-emerald-700 hover:bg-emerald-100 cursor-pointer shrink-0"
-                          title="Gỡ mã giảm giá"
+                          title={t('Gỡ mã giảm giá')}
                         >
                           <X className="w-4 h-4" />
                         </button>
                       </div>
                     ) : (
                       <div className="flex gap-1.5">
-                        <input aria-label="Mã giảm giá"
+                        <input aria-label={t('Mã giảm giá')}
                           type="text"
                           value={voucherInput}
                           onChange={(e) => setVoucherInput(e.target.value.toUpperCase())}
@@ -995,7 +996,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                               void handleApplyVoucherCode();
                             }
                           }}
-                          placeholder="Nhập mã (VD: DANANG20)"
+                          placeholder={t('Nhập mã (VD: DANANG20)')}
                           className="flex-1 px-3 py-2 rounded-xl border border-slate-200 text-xs font-mono font-bold uppercase focus:border-blue-500 focus:outline-none"
                         />
                         <button
@@ -1004,7 +1005,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                           onClick={() => void handleApplyVoucherCode()}
                           className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:bg-slate-200 disabled:text-slate-500 text-white text-xs font-bold transition cursor-pointer"
                         >
-                          {isApplyingVoucher ? '...' : 'Áp dụng'}
+                          {isApplyingVoucher ? '...' : t('Áp dụng')}
                         </button>
                       </div>
                     )}
@@ -1035,7 +1036,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                               <span className="text-emerald-600">(-{(v.estimatedDiscount / 1000).toFixed(0)}K)</span>
                             ) : (
                               <span className="text-xs font-normal">
-                                (Đơn từ {(v.minOrderAmount / 1000).toFixed(0)}K)
+                                {t('(Đơn từ')} {(v.minOrderAmount / 1000).toFixed(0)}K)
                               </span>
                             )}
                           </button>
@@ -1058,16 +1059,16 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                       </>
                     )}
                     <div className="flex justify-between items-end mb-1">
-                      <p className="text-sm font-bold text-slate-900">Tổng tiền</p>
+                      <p className="text-sm font-bold text-slate-900">{t('Tổng tiền')}</p>
                       <p className="text-2xl font-extrabold text-blue-600">{formatCurrency(finalPayableAmount)}</p>
                     </div>
-                    <p className="text-sm text-slate-500 text-right">Đã gồm VAT & dịch vụ tại trạm</p>
+                    <p className="text-sm text-slate-500 text-right">{t('Đã gồm VAT & dịch vụ tại trạm')}</p>
                   </div>
 
                   <div className="bg-emerald-50 p-3 rounded-lg flex items-start border border-emerald-200">
                     <CheckCircle className="w-4 h-4 text-emerald-600 mr-2 mt-0.5 shrink-0" />
                     <p className="text-sm text-emerald-800">
-                      <strong>Hủy miễn phí</strong> up to 2 hours before scheduled drop-off time.
+                      <strong>{t('Hủy miễn phí')}</strong> up to 2 hours before scheduled drop-off time.
                     </p>
                   </div>
 
@@ -1149,16 +1150,16 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        Đang xử lý...
+                        {t('Đang xử lý...')}
                       </span>
                      ) : (
-                      <>Tiếp tục thanh toán <ArrowRight className="w-5 h-5 ml-2" /></>
+                      <>{t('Tiếp tục thanh toán')} <ArrowRight className="w-5 h-5 ml-2" /></>
                      )}
                   </button>
 
                   <div className="flex items-center justify-center text-xs text-slate-500 mt-4 space-x-4">
-                    <span className="flex items-center"><Lock className="w-3.5 h-3.5 mr-1 text-slate-500" /> Thanh toán bảo mật</span>
-                    <span className="flex items-center"><BadgeCheck className="w-3.5 h-3.5 mr-1 text-blue-600" /> Đối tác đã xác minh</span>
+                    <span className="flex items-center"><Lock className="w-3.5 h-3.5 mr-1 text-slate-500" /> {t('Thanh toán bảo mật')}</span>
+                    <span className="flex items-center"><BadgeCheck className="w-3.5 h-3.5 mr-1 text-blue-600" /> {t('Đối tác đã xác minh')}</span>
                   </div>
                 </div>
               </div>
@@ -1169,8 +1170,8 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   <Headphones className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900 mb-1">Cần hỗ trợ?</h4>
-                  <p className="text-sm text-slate-500 mb-2">Đội hỗ trợ sẵn sàng 24/7 cho các câu hỏi về đặt chỗ.</p>
+                  <h4 className="text-sm font-bold text-slate-900 mb-1">{t('Cần hỗ trợ?')}</h4>
+                  <p className="text-sm text-slate-500 mb-2">{t('Đội hỗ trợ sẵn sàng 24/7 cho các câu hỏi về đặt chỗ.')}</p>
                   <a href="tel:+8419001234" className="text-sm font-bold text-blue-600 hover:underline">Hotline: 1900 1234</a>
                 </div>
               </div>
@@ -1188,18 +1189,18 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
             <div className="space-y-1">
               <div className="flex items-center justify-center md:justify-start gap-2">
                 <span className="text-base text-blue-600 font-extrabold tracking-tight">SmartLocker</span>
-                <span className="text-xs text-slate-500 font-medium">Hệ thống tủ gửi hành lý thông minh</span>
+                <span className="text-xs text-slate-500 font-medium">{t('Hệ thống tủ gửi hành lý thông minh')}</span>
               </div>
               <p className="text-sm text-slate-500">
-                © {new Date().getFullYear()} SmartLocker. Cổng thanh toán tích hợp PayOS &amp; VietQR Napas 24/7.
+                © {new Date().getFullYear()} {t('SmartLocker. Cổng thanh toán tích hợp PayOS & VietQR Napas 24/7.')}
               </p>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-500">
-              <a className="hover:text-blue-600 transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>Chính sách bảo mật</a>
+              <a className="hover:text-blue-600 transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>{t('Chính sách bảo mật')}</a>
               <span>•</span>
-              <a className="hover:text-blue-600 transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }}>Điều khoản dịch vụ</a>
+              <a className="hover:text-blue-600 transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }}>{t('Điều khoản dịch vụ')}</a>
               <span>•</span>
-              <a className="hover:text-blue-600 transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}>Hỗ trợ khách hàng</a>
+              <a className="hover:text-blue-600 transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}>{t('Hỗ trợ khách hàng')}</a>
             </div>
           </div>
         </div>

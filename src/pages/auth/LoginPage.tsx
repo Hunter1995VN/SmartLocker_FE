@@ -4,6 +4,8 @@ import { Lock, Eye, EyeOff, ArrowRight, ChevronLeft, AlertCircle, Shield, Sparkl
 import { useState } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
 import { describeGoogleNonOAuthError, describeGoogleOAuthError } from '../../utils/googleAuthError';
+import { useT } from '../../i18n';
+import LanguageSwitcher from '../../components/ui/LanguageSwitcher';
 
 type ViewMode = 'login' | 'register' | 'verify-otp' | 'forgot-password';
 
@@ -18,6 +20,7 @@ interface LoginPageProps {
  * - Cột phải: Form đăng nhập gọn đẹp
  */
 export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps) {
+    const t = useT();
     const { stations } = useNetworkStats();
     const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
@@ -39,11 +42,11 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                     localStorage.setItem('smartlocker_user', JSON.stringify(result.data));
                     onLoginSuccess?.();
                 } else {
-                    setError(result.message || 'Đăng nhập Google thất bại');
+                    setError(result.message || t('Đăng nhập Google thất bại'));
                 }
             } catch (err: unknown) {
                 const { getApiErrorMessage } = await import('../../api/client');
-                setError(getApiErrorMessage(err, 'Không thể đăng nhập bằng Google'));
+                setError(getApiErrorMessage(err, t('Không thể đăng nhập bằng Google')));
             } finally {
                 setIsLoading(false);
             }
@@ -57,7 +60,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
         setError('');
 
         if (!email || !password) {
-            setError('Vui lòng nhập email và mật khẩu');
+            setError(t('Vui lòng nhập email và mật khẩu'));
             return;
         }
 
@@ -72,11 +75,11 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                 localStorage.setItem('smartlocker_user', JSON.stringify(response.data));
                 onLoginSuccess?.();
             } else {
-                setError(response.message || 'Đăng nhập thất bại');
+                setError(response.message || t('Đăng nhập thất bại'));
             }
         } catch (err: unknown) {
             const axiosErr = err as { response?: { data?: { message?: string } } };
-            setError(axiosErr.response?.data?.message || 'Không thể kết nối tới máy chủ. Kiểm tra Backend đã chạy chưa.');
+            setError(axiosErr.response?.data?.message || t('Không thể kết nối tới máy chủ. Kiểm tra Backend đã chạy chưa.'));
         } finally {
             setIsLoading(false);
         }
@@ -100,7 +103,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                         </div>
                         <div>
                             <span className="text-lg font-extrabold text-white tracking-tight">SmartLocker</span>
-                            <p className="text-xs text-white/60 uppercase tracking-widest">Tủ hành lý thông minh</p>
+                            <p className="text-xs text-white/60 uppercase tracking-widest">{t('Tủ hành lý thông minh')}</p>
                         </div>
                     </div>
 
@@ -108,24 +111,24 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                     <div className="my-auto py-12">
                         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full mb-6" style={{background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)'}}>
                             <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
-                            <span className="text-xs text-white/90 font-semibold">Nền tảng #1 tại Việt Nam</span>
+                            <span className="text-xs text-white/90 font-semibold">{t('Nền tảng #1 tại Việt Nam')}</span>
                         </div>
                         <h1 className="text-4xl xl:text-5xl font-extrabold text-white leading-[1.1] tracking-tight mb-5">
-                            Chào mừng<br />
+                            {t('Chào mừng')}<br />
                             <span style={{color: '#93c5fd'}}>
-                                trở lại!
+                                {t('trở lại!')}
                             </span>
                         </h1>
                         <p className="text-base text-white/70 leading-relaxed max-w-sm">
-                            Đăng nhập để quản lý hành lý, mở tủ từ xa và tận hưởng ưu đãi thành viên thân thiết.
+                            {t('Đăng nhập để quản lý hành lý, mở tủ từ xa và tận hưởng ưu đãi thành viên thân thiết.')}
                         </p>
 
                         {/* Feature cards */}
                         <div className="mt-10 space-y-3">
                             {[
-                                { icon: Shield, title: 'Bảo mật chuẩn ngân hàng', desc: 'Mã hóa JWS & BCrypt' },
-                                { icon: Package, title: stations != null ? `${stations} trạm tủ đang hoạt động` : 'Mạng lưới trạm tủ', desc: 'Sân bay, metro, phố đi bộ' },
-                                { icon: Sparkles, title: 'Hoạt động 24/7', desc: 'Hỗ trợ kỹ thuật liên tục' },
+                                { icon: Shield, title: t('Bảo mật chuẩn ngân hàng'), desc: t('Mã hóa JWS & BCrypt') },
+                                { icon: Package, title: stations != null ? t('{n} trạm tủ đang hoạt động', { n: stations }) : t('Mạng lưới trạm tủ'), desc: t('Sân bay, metro, phố đi bộ') },
+                                { icon: Sparkles, title: t('Hoạt động 24/7'), desc: t('Hỗ trợ kỹ thuật liên tục') },
                             ].map(({ icon: Icon, title, desc }, i) => (
                                 <div key={i} className="flex items-center gap-3.5 p-3.5 rounded-2xl" style={{background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', backdropFilter: 'blur(8px)'}}>
                                     <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{background: 'rgba(255,255,255,0.15)'}}>
@@ -143,14 +146,14 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                     {/* Bottom testimonial */}
                     <div className="p-4 rounded-2xl" style={{background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)'}}>
                         <p className="text-white/85 text-sm leading-relaxed italic">
-                            "SmartLocker giúp chuyến công tác của tôi nhẹ nhàng hơn rất nhiều. Mở tủ trong tích tắc!"
+                            {t('"SmartLocker giúp chuyến công tác của tôi nhẹ nhàng hơn rất nhiều. Mở tủ trong tích tắc!"')}
                         </p>
                         <div className="flex items-center gap-2.5 mt-3">
                             <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{background: '#60a5fa'}}>
                                 TM
                             </div>
                             <div>
-                                <p className="text-white/80 text-sm font-semibold">Trần Minh Đức</p>
+                                <p className="text-white/80 text-sm font-semibold">{t('Trần Minh Đức')}</p>
                                 <p className="text-white/45 text-sm">Freelance Designer</p>
                             </div>
                             <div className="ml-auto flex gap-0.5">
@@ -169,16 +172,17 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                 <div className="flex items-center justify-between px-8 py-5 border-b border-gray-100">
                     <a href="/" className="inline-flex items-center gap-1.5 min-h-11 text-sm font-semibold text-gray-500 hover:text-blue-600 transition-colors group">
                         <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-                        Về trang chủ
+                        {t('Về trang chủ')}
                     </a>
+                    <LanguageSwitcher />
                     <div className="text-sm text-gray-500">
-                        Chưa có tài khoản?{' '}
+                        {t('Chưa có tài khoản?')}{' '}
                         <button
                             type="button"
                             onClick={() => onNavigate('register')}
                             className="font-bold text-blue-600 hover:text-blue-700 transition-colors"
                         >
-                            Đăng ký ngay
+                            {t('Đăng ký ngay')}
                         </button>
                     </div>
                 </div>
@@ -189,10 +193,10 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                         {/* Header */}
                         <div className="mb-8">
                             <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight mb-2">
-                                Đăng nhập
+                                {t('Đăng nhập')}
                             </h2>
                             <p className="text-sm text-gray-500">
-                                Nhập thông tin tài khoản của bạn để tiếp tục
+                                {t('Nhập thông tin tài khoản của bạn để tiếp tục')}
                             </p>
                         </div>
 
@@ -229,7 +233,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                             </div>
                             <div className="relative flex justify-center">
                                 <span className="bg-white px-3 text-xs text-gray-500 uppercase tracking-widest font-semibold">
-                                    hoặc đăng nhập với email
+                                    {t('hoặc đăng nhập với email')}
                                 </span>
                             </div>
                         </div>
@@ -239,7 +243,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                             {/* Email */}
                             <div className="group">
                                 <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-1.5">
-                                    Địa chỉ Email
+                                    {t('Địa chỉ Email')}
                                 </label>
                                 <input
                                     id="email"
@@ -257,14 +261,14 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                             <div>
                                 <div className="flex items-center justify-between mb-1.5">
                                     <label htmlFor="password" className="block text-sm font-semibold text-gray-700">
-                                        Mật khẩu
+                                        {t('Mật khẩu')}
                                     </label>
                                     <button
                                         type="button"
                                         onClick={() => onNavigate('forgot-password')}
                                         className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors"
                                     >
-                                        Quên mật khẩu?
+                                        {t('Quên mật khẩu?')}
                                     </button>
                                 </div>
                                 <div className="relative">
@@ -273,7 +277,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                                         type={showPassword ? 'text' : 'password'}
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        placeholder="Nhập mật khẩu..."
+                                        placeholder={t('Nhập mật khẩu...')}
                                         autoComplete="current-password"
                                         disabled={isLoading}
                                         className="w-full h-12 px-4 pr-12 rounded-xl border-2 border-gray-100 bg-gray-50 text-gray-900 text-sm placeholder:text-gray-500 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all disabled:opacity-50"
@@ -282,7 +286,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
                                         className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500 hover:text-gray-600 transition-colors"
-                                        aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                                        aria-label={showPassword ? t('Ẩn mật khẩu') : t('Hiện mật khẩu')}
                                     >
                                         {showPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
                                     </button>
@@ -300,7 +304,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                                     className="w-4 h-4 rounded-md border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
                                 />
                                 <label htmlFor="rememberMe" className="text-sm text-gray-600 cursor-pointer select-none">
-                                    Ghi nhớ đăng nhập trong 30 ngày
+                                    {t('Ghi nhớ đăng nhập trong 30 ngày')}
                                 </label>
                             </div>
 
@@ -321,11 +325,11 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"></path>
                                         </svg>
-                                        Đang đăng nhập...
+                                        {t('Đang đăng nhập...')}
                                     </>
                                 ) : (
                                     <>
-                                        <span>Đăng nhập</span>
+                                        <span>{t('Đăng nhập')}</span>
                                         <ArrowRight className="w-4 h-4" />
                                     </>
                                 )}
@@ -334,10 +338,10 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
 
                         {/* Trust Footer */}
                         <p className="mt-6 text-center text-sm text-gray-500 leading-relaxed">
-                            Bằng việc đăng nhập, bạn đồng ý với{' '}
-                            <a href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }} className="text-blue-600 font-semibold hover:underline">Điều khoản dịch vụ</a>
-                            {' '}và{' '}
-                            <a href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }} className="text-blue-600 font-semibold hover:underline">Chính sách bảo mật</a>
+                            {t('Bằng việc đăng nhập, bạn đồng ý với')}{' '}
+                            <a href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }} className="text-blue-600 font-semibold hover:underline">{t('Điều khoản dịch vụ')}</a>
+                            {' '}{t('và')}{' '}
+                            <a href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }} className="text-blue-600 font-semibold hover:underline">{t('Chính sách bảo mật')}</a>
                         </p>
                     </div>
                 </div>

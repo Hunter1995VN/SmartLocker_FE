@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Check, Clock, Copy, Mail, Phone, ShieldAlert, X } from 'lucide-react';
 import { CONTACT, LEGAL_EVENT, SUPPORT_EVENT, type LegalKind } from '../../utils/contact';
 import ModalOverlay from '../ui/ModalOverlay';
+import { useT } from '../../i18n';
 
 const LEGAL_CONTENT: Record<LegalKind, { title: string; sections: { heading: string; body: string }[] }> = {
     privacy: {
@@ -34,12 +35,13 @@ const LEGAL_CONTENT: Record<LegalKind, { title: string; sections: { heading: str
 
 /** Hộp thoại chung dựa trên ModalOverlay (Esc, khóa cuộn, nhốt Tab, trả focus); bấm nền để đóng. */
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
+    const t = useT();
     return (
         <ModalOverlay onClose={onClose} closeOnBackdrop label={title} zClass="z-[1000]">
             <div className="w-full max-w-lg max-h-[88vh] overflow-y-auto rounded-2xl bg-white shadow-2xl border border-slate-200">
                 <div className="flex items-center justify-between gap-3 px-6 pt-5 pb-3 sticky top-0 bg-white border-b border-slate-100">
                     <h2 className="text-lg font-bold text-slate-900">{title}</h2>
-                    <button type="button" onClick={onClose} aria-label="Đóng" className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 cursor-pointer">
+                    <button type="button" onClick={onClose} aria-label={t('Đóng')} className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 cursor-pointer">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
@@ -50,6 +52,7 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
 }
 
 function SupportBody() {
+    const t = useT();
     const [copied, setCopied] = useState(false);
     const copyHotline = async () => {
         try {
@@ -61,18 +64,18 @@ function SupportBody() {
     return (
         <div className="space-y-4 text-sm text-slate-700">
             <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-blue-700 mb-1">Tổng đài hỗ trợ</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-blue-700 mb-1">{t('Tổng đài hỗ trợ')}</p>
                 <p className="text-2xl font-extrabold text-slate-900 tracking-wide">{CONTACT.hotlineLabel}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                     <a href={`tel:${CONTACT.hotlineTel}`} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold">
-                        <Phone className="w-4 h-4" /> Gọi ngay
+                        <Phone className="w-4 h-4" /> {t('Gọi ngay')}
                     </a>
                     <button type="button" onClick={copyHotline} className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 font-semibold cursor-pointer">
                         {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
-                        {copied ? 'Đã sao chép' : 'Sao chép số'}
+                        {copied ? t('Đã sao chép') : t('Sao chép số')}
                     </button>
                 </div>
-                <p className="mt-2 text-xs text-slate-500">Nếu bấm &ldquo;Gọi ngay&rdquo; không mở ứng dụng gọi điện (máy tính), hãy dùng điện thoại gọi số trên.</p>
+                <p className="mt-2 text-xs text-slate-500">{t('Nếu bấm “Gọi ngay” không mở ứng dụng gọi điện (máy tính), hãy dùng điện thoại gọi số trên.')}</p>
             </div>
             {CONTACT.email && (
                 <a href={`mailto:${CONTACT.email}`} className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 hover:bg-slate-50">
@@ -91,6 +94,7 @@ function SupportBody() {
 
 /** Gắn một lần ở App: lắng nghe sự kiện mở hộp thoại Liên hệ và Chính sách. */
 export default function GlobalDialogs() {
+    const t = useT();
     const [supportOpen, setSupportOpen] = useState(false);
     const [legal, setLegal] = useState<LegalKind | null>(null);
     useEffect(() => {
@@ -107,17 +111,17 @@ export default function GlobalDialogs() {
     const closeLegal = useCallback(() => setLegal(null), []);
     return (
         <>
-            {supportOpen && <Modal title="Liên hệ & Hỗ trợ" onClose={closeSupport}><SupportBody /></Modal>}
+            {supportOpen && <Modal title={t('Liên hệ & Hỗ trợ')} onClose={closeSupport}><SupportBody /></Modal>}
             {legal && (
-                <Modal title={LEGAL_CONTENT[legal].title} onClose={closeLegal}>
+                <Modal title={t(LEGAL_CONTENT[legal].title)} onClose={closeLegal}>
                     <div className="space-y-4 text-sm text-slate-700">
                         {LEGAL_CONTENT[legal].sections.map((s) => (
                             <section key={s.heading}>
-                                <h3 className="font-bold text-slate-900 mb-1">{s.heading}</h3>
-                                <p className="leading-relaxed">{s.body}</p>
+                                <h3 className="font-bold text-slate-900 mb-1">{t(s.heading)}</h3>
+                                <p className="leading-relaxed">{t(s.body)}</p>
                             </section>
                         ))}
-                        <p className="text-xs text-slate-500 pt-2 border-t border-slate-100">Nội dung minh họa cho đồ án SmartLocker; cần được nhóm xác nhận trước khi dùng chính thức.</p>
+                        <p className="text-xs text-slate-500 pt-2 border-t border-slate-100">{t('Nội dung minh họa cho đồ án SmartLocker; cần được nhóm xác nhận trước khi dùng chính thức.')}</p>
                     </div>
                 </Modal>
             )}

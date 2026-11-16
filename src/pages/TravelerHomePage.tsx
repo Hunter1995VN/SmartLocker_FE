@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { MOCK_STATIONS, MOCK_ACTIVE_BOOKING, calcDistance, getStations } from '../api/stationService';
 import type { Station, Booking } from '../api/stationService';
+import { useT } from '../i18n';
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string || '';
@@ -51,6 +52,7 @@ interface Props {
 
 // ─── Main Component ──────────────────────────────────────────────────────────
 export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigateRegister, onNavigateDashboard, onNavigateBooking }: Props) {
+    const t = useT();
     const user: AuthUser = JSON.parse(localStorage.getItem('smartlocker_user') || '{}');
     /** true nếu chưa đăng nhập (khách vãng lai) */
     const isGuest = !user.fullName;
@@ -142,7 +144,7 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
         if (!activeBooking || activeBooking.status !== 'CHECKED_IN') return;
         const update = () => {
             const diff = new Date(activeBooking.endAt).getTime() - Date.now();
-            if (diff <= 0) { setTimeLeft('Đã hết giờ'); return; }
+            if (diff <= 0) { setTimeLeft(t('Đã hết giờ')); return; }
             const h = Math.floor(diff / 3_600_000);
             const m = Math.floor((diff % 3_600_000) / 60_000);
             const s = Math.floor((diff % 60_000) / 1_000);
@@ -198,18 +200,18 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                                         24/7 Online
                                     </span>
                                 </span>
-                                <span className="text-xs text-gray-500 leading-tight hidden sm:block">Mạng lưới tủ thông minh</span>
+                                <span className="text-xs text-gray-500 leading-tight hidden sm:block">{t('Mạng lưới tủ thông minh')}</span>
                             </div>
                         </a>
 
                         {/* Nav links desktop */}
                         <nav className="hidden lg:flex items-center gap-1">
                             {[
-                                { label: 'Trang chủ', href: '#' },
-                                { label: 'Tìm trạm', href: '#', active: true },
-                                { label: 'Cách hoạt động', href: '#' },
-                                { label: 'Bảng giá', href: '#' },
-                                { label: 'Hỗ trợ', href: '#' },
+                                { label: t('Trang chủ'), href: '#' },
+                                { label: t('Tìm trạm'), href: '#', active: true },
+                                { label: t('Cách hoạt động'), href: '#' },
+                                { label: t('Bảng giá'), href: '#' },
+                                { label: t('Hỗ trợ'), href: '#' },
                             ].map(link => (
                                 <a
                                     key={link.label}
@@ -233,7 +235,7 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                                     <span className="w-2 h-2 rounded-full bg-emerald-500" />
                                     <span className="absolute w-2 h-2 rounded-full bg-emerald-500 animate-ping opacity-75" />
                                 </span>
-                                <span>Tất cả trạm Online</span>
+                                <span>{t('Tất cả trạm Online')}</span>
                             </div>
 
                             {/* Language pill */}
@@ -249,7 +251,7 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                                 onClick={() => onNavigateLogin?.()}
                                 className="hidden md:inline-flex text-gray-600 hover:text-gray-900 px-4 py-2 text-sm font-semibold transition-colors rounded-lg hover:bg-gray-50"
                             >
-                                Đăng nhập
+                                {t('Đăng nhập')}
                             </button>
 
                             {/* Đặt tủ ngay */}
@@ -258,7 +260,7 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                                 className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm hover:shadow-md transition-all duration-200"
                             >
                                 <Zap className="w-4 h-4 hidden sm:block" />
-                                <span>Đặt tủ ngay</span>
+                                <span>{t('Đặt tủ ngay')}</span>
                                 <ArrowRight className="w-4 h-4" />
                             </button>
 
@@ -266,7 +268,7 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                             <button
                                 className="lg:hidden p-2 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
                                 onClick={() => setSidebarOpen(v => !v)}
-                                aria-label="Mở menu"
+                                aria-label={t('Mở menu')}
                             >
                                 <Menu className="w-6 h-6" />
                             </button>
@@ -303,9 +305,9 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                             >
                                 Dashboard
                             </button>
-                            <span className="px-4 py-1.5 text-sm font-semibold rounded-xl bg-surface-container-low text-primary-container">Tìm trạm</span>
-                            <a href="#" className="px-4 py-1.5 text-sm font-semibold rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors">Lịch sử</a>
-                            <a href="#" className="px-4 py-1.5 text-sm font-semibold rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors">Hỗ trợ</a>
+                            <span className="px-4 py-1.5 text-sm font-semibold rounded-xl bg-surface-container-low text-primary-container">{t('Tìm trạm')}</span>
+                            <a href="#" className="px-4 py-1.5 text-sm font-semibold rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors">{t('Lịch sử')}</a>
+                            <a href="#" className="px-4 py-1.5 text-sm font-semibold rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors">{t('Hỗ trợ')}</a>
                         </nav>
                     </div>
 
@@ -330,7 +332,7 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                             <button
                                 onClick={handleLogout}
                                 className="ml-2 p-1 rounded-lg hover:bg-red-50 text-on-surface-muted hover:text-red-500 transition-colors"
-                                title="Đăng xuất"
+                                title={t('Đăng xuất')}
                             >
                                 <LogOut className="w-3.5 h-3.5" />
                             </button>
@@ -358,12 +360,12 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
 
                         {/* Quick Actions */}
                         <div className="px-4 py-3 border-b border-gray-50">
-                            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Thao tác nhanh</p>
+                            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">{t('Thao tác nhanh')}</p>
                             <div className="grid grid-cols-2 gap-2">
-                                <QuickAction icon={<Zap className="w-4 h-4" />} label="Đặt tủ ngay" color="bg-blue-600" onClick={() => {}} />
-                                <QuickAction icon={<Clock className="w-4 h-4" />} label="Lịch sử" color="bg-violet-600" onClick={() => {}} />
-                                <QuickAction icon={<Package className="w-4 h-4" />} label="Đơn của tôi" color="bg-emerald-600" onClick={() => {}} />
-                                <QuickAction icon={<User className="w-4 h-4" />} label="Hồ sơ" color="bg-amber-500" onClick={() => {}} />
+                                <QuickAction icon={<Zap className="w-4 h-4" />} label={t('Đặt tủ ngay')} color="bg-blue-600" onClick={() => {}} />
+                                <QuickAction icon={<Clock className="w-4 h-4" />} label={t('Lịch sử')} color="bg-violet-600" onClick={() => {}} />
+                                <QuickAction icon={<Package className="w-4 h-4" />} label={t('Đơn của tôi')} color="bg-emerald-600" onClick={() => {}} />
+                                <QuickAction icon={<User className="w-4 h-4" />} label={t('Hồ sơ')} color="bg-amber-500" onClick={() => {}} />
                             </div>
                         </div>
 
@@ -376,7 +378,7 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                                         onClick={() => setActiveTab(tab)}
                                         className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === tab ? 'bg-white text-primary shadow-elevation-1' : 'text-gray-500'}`}
                                     >
-                                        {tab === 'map' ? '🗺️ Bản đồ' : '📋 Danh sách'}
+                                        {tab === 'map' ? t('🗺️ Bản đồ') : t('📋 Danh sách')}
                                     </button>
                                 ))}
                             </div>
@@ -390,7 +392,7 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                                     type="text"
                                     value={searchQuery}
                                     onChange={e => setSearchQuery(e.target.value)}
-                                    placeholder="Tìm kiếm trạm tủ..."
+                                    placeholder={t('Tìm kiếm trạm tủ...')}
                                     className="w-full pl-9 pr-8 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
                                 />
                                 {searchQuery && (
@@ -407,14 +409,14 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                         {/* Station count */}
                         <div className="px-4 py-1.5 flex items-center justify-between">
                             <p className="text-xs text-gray-500">
-                                <span className="font-bold text-on-surface">{filtered.length}</span> trạm tủ
-                                {userLocation ? ' gần bạn' : ''}
+                                <span className="font-bold text-on-surface">{filtered.length}</span> {t('trạm tủ')}
+                                {userLocation ? t(' gần bạn') : ''}
                             </p>
                             <button
                                 onClick={() => setStations([...MOCK_STATIONS])}
                                 className="text-xs text-primary hover:underline flex items-center gap-1"
                             >
-                                <RefreshCw className="w-3 h-3" /> Làm mới
+                                <RefreshCw className="w-3 h-3" /> {t('Làm mới')}
                             </button>
                         </div>
 
@@ -436,7 +438,7 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                             ) : filtered.length === 0 ? (
                                 <div className="text-center py-10 text-gray-500">
                                     <MapPin className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                                    <p className="text-sm">Không tìm thấy trạm tủ</p>
+                                    <p className="text-sm">{t('Không tìm thấy trạm tủ')}</p>
                                 </div>
                             ) : (
                                 filtered.map(station => (
@@ -468,7 +470,7 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                         className="absolute top-3 left-3 z-10 bg-white shadow-elevation-2 rounded-xl p-2.5 hover:bg-gray-50 transition-colors hidden lg:flex items-center gap-2 text-sm font-semibold text-gray-600"
                     >
                         <Menu className="w-4 h-4" />
-                        {sidebarOpen ? 'Ẩn' : 'Trạm tủ'}
+                        {sidebarOpen ? t('Ẩn') : t('Trạm tủ')}
                     </button>
 
                     {/* My Location button */}
@@ -481,7 +483,7 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                                 mapRef.current?.setZoom(15);
                             }}
                             className="absolute bottom-6 right-4 z-10 bg-white shadow-elevation-3 rounded-full p-3 hover:bg-blue-50 transition-colors"
-                            title="Vị trí của tôi"
+                            title={t('Vị trí của tôi')}
                         >
                             <Navigation className="w-5 h-5 text-blue-600" />
                         </button>
@@ -489,7 +491,7 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
 
                     {/* Map count badge */}
                     <div className="absolute top-3 right-4 z-10 bg-white rounded-full px-3 py-1.5 shadow-elevation-2 text-xs font-bold text-gray-600">
-                        📍 {filtered.filter(s => s.status === 'ACTIVE').length} trạm hoạt động
+                        📍 {filtered.filter(s => s.status === 'ACTIVE').length} {t('trạm hoạt động')}
                     </div>
 
                     {/* Google Map */}
@@ -499,7 +501,7 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                         <div className="w-full h-full flex items-center justify-center bg-gray-100">
                             <div className="text-center">
                                 <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                                <p className="text-sm text-gray-500">Đang tải bản đồ...</p>
+                                <p className="text-sm text-gray-500">{t('Đang tải bản đồ...')}</p>
                             </div>
                         </div>
                     ) : (
@@ -530,7 +532,7 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                                         strokeColor: '#ffffff',
                                         strokeWeight: 3,
                                     }}
-                                    title="Vị trí của bạn"
+                                    title={t('Vị trí của bạn')}
                                 />
                             )}
 
@@ -600,6 +602,7 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function ActiveBookingCard({ booking, timeLeft }: { booking: Booking; timeLeft: string }) {
+    const t = useT();
     const st = STATUS_BOOKING[booking.status] ?? STATUS_BOOKING.CONFIRMED;
     const isCheckedIn = booking.status === 'CHECKED_IN';
 
@@ -607,11 +610,11 @@ function ActiveBookingCard({ booking, timeLeft }: { booking: Booking; timeLeft: 
  <div className={`mx-4 mt-4 mb-1 rounded-2xl border-2 p-4 ${isCheckedIn ? 'border-emerald-200 bg-tertiary-fixed/30' : 'border-blue-200 bg-blue-50'}`}>
             <div className="flex items-start justify-between mb-3">
                 <div>
-                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Booking hiện tại</p>
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">{t('Booking hiện tại')}</p>
                     <p className="font-bold text-on-surface mt-0.5">{booking.bookingCode}</p>
                 </div>
                 <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${st.color}`}>
-                    {st.label}
+                    {t(st.label)}
                 </span>
             </div>
 
@@ -626,16 +629,16 @@ function ActiveBookingCard({ booking, timeLeft }: { booking: Booking; timeLeft: 
             <div className="flex items-center gap-4 mb-3 text-xs text-gray-500">
                 <span className="flex items-center gap-1">
                     <Package className="w-3.5 h-3.5" />
-                    Tủ <strong className="text-on-surface">{booking.lockerCode}</strong>
+                    {t('Tủ')} <strong className="text-on-surface">{booking.lockerCode}</strong>
                 </span>
                 <span className={`px-2 py-0.5 rounded-full font-semibold ${SIZE_COLOR[booking.size]}`}>
-                    {SIZE_LABEL[booking.size]}
+                    {t(SIZE_LABEL[booking.size])}
                 </span>
             </div>
 
             {isCheckedIn && timeLeft && (
                 <div className="bg-white/70 rounded-xl p-3 text-center mb-3">
-                    <p className="text-xs text-gray-500 mb-0.5">Thời gian còn lại</p>
+                    <p className="text-xs text-gray-500 mb-0.5">{t('Thời gian còn lại')}</p>
                     <p className="text-2xl font-mono font-bold text-emerald-600">{timeLeft}</p>
                 </div>
             )}
@@ -643,7 +646,7 @@ function ActiveBookingCard({ booking, timeLeft }: { booking: Booking; timeLeft: 
             {isCheckedIn && (
                 <button className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-colors active:scale-95">
                     <CheckCircle className="w-4 h-4" />
-                    Mở tủ
+                    {t('Mở tủ')}
                 </button>
             )}
         </div>
@@ -669,6 +672,7 @@ function QuickAction({ icon, label, color, onClick }: {
 function StationCard({ station, isSelected, onClick }: {
     station: Station; isSelected: boolean; onClick: () => void;
 }) {
+    const t = useT();
     const availS = station.availableS ?? station.totalS;
     const availM = station.availableM ?? station.totalM;
     const availL = station.availableL ?? station.totalL;
@@ -704,14 +708,14 @@ function StationCard({ station, isSelected, onClick }: {
                             <>
                                 <span className="flex items-center gap-1 text-xs text-emerald-600 font-semibold">
                                     <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                                    {totalAvail} ô trống
+                                    {totalAvail} {t('ô trống')}
                                 </span>
                                 <span className="text-gray-200">|</span>
                                 <span className="text-xs text-gray-500">{station.opensAt || '06:00'}–{station.closesAt || '22:00'}</span>
                             </>
                         ) : (
                             <span className="flex items-center gap-1 text-xs text-amber-600 font-semibold">
-                                <AlertTriangle className="w-3 h-3" /> Bảo trì
+                                <AlertTriangle className="w-3 h-3" /> {t('Bảo trì')}
                             </span>
                         )}
                     </div>
@@ -737,6 +741,7 @@ function StationCard({ station, isSelected, onClick }: {
 }
 
 function MapInfoWindow({ station, onBook }: { station: Station; onBook?: (s: Station) => void }) {
+    const t = useT();
     const availS = station.availableS ?? station.totalS;
     const availM = station.availableM ?? station.totalM;
     const availL = station.availableL ?? station.totalL;
@@ -748,7 +753,7 @@ function MapInfoWindow({ station, onBook }: { station: Station; onBook?: (s: Sta
             <div className="flex items-start justify-between gap-2 mb-2">
                 <p className="font-bold text-gray-900 text-sm leading-tight">{station.name}</p>
                 <span className={`text-xs px-2 py-0.5 rounded-full font-semibold shrink-0 ${isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
-                    {isActive ? 'Hoạt động' : 'Bảo trì'}
+                    {isActive ? t('Hoạt động') : t('Bảo trì')}
                 </span>
             </div>
             <p className="text-xs text-gray-500 mb-2">{station.address}</p>
@@ -783,11 +788,11 @@ function MapInfoWindow({ station, onBook }: { station: Station; onBook?: (s: Sta
                     onClick={() => onBook?.(station)}
                     className="w-full py-2 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white text-xs font-bold rounded-lg transition-all cursor-pointer shadow-sm"
                 >
-                    Đặt tủ tại đây →
+                    {t('Đặt tủ tại đây →')}
                 </button>
             )}
             {isActive && totalAvail === 0 && (
-                <p className="text-xs text-center text-gray-500 py-1">Hết ô trống — thử trạm khác</p>
+                <p className="text-xs text-center text-gray-500 py-1">{t('Hết ô trống — thử trạm khác')}</p>
             )}
         </div>
     );
@@ -795,19 +800,20 @@ function MapInfoWindow({ station, onBook }: { station: Station; onBook?: (s: Sta
 
 // Fallback khi không có API key
 function MapErrorFallback({ stations, onSelect }: { stations: Station[]; onSelect: (s: Station) => void }) {
+    const t = useT();
     return (
         <div className="w-full h-full flex flex-col">
  <div className="flex-1 bg-primary-fixed/40 flex items-center justify-center">
                 <div className="text-center p-6">
                     <MapPin className="w-12 h-12 text-blue-400 mx-auto mb-3 opacity-50" />
-                    <p className="text-gray-500 text-sm mb-1">Cần Google Maps API Key</p>
+                    <p className="text-gray-500 text-sm mb-1">{t('Cần Google Maps API Key')}</p>
                     <p className="text-xs text-gray-500 max-w-xs">
-                        Thêm <code className="bg-white px-1 rounded text-blue-600">VITE_GOOGLE_MAPS_API_KEY</code> vào file <code className="bg-white px-1 rounded text-blue-600">.env</code>
+                        {t('Thêm')} <code className="bg-white px-1 rounded text-blue-600">VITE_GOOGLE_MAPS_API_KEY</code> {t('vào file')} <code className="bg-white px-1 rounded text-blue-600">.env</code>
                     </p>
                 </div>
             </div>
             <div className="p-4 bg-white border-t border-gray-100">
-                <p className="text-xs font-bold text-gray-500 mb-2">DANH SÁCH TRẠM TỦ</p>
+                <p className="text-xs font-bold text-gray-500 mb-2">{t('DANH SÁCH TRẠM TỦ')}</p>
                 <div className="grid grid-cols-2 gap-2 overflow-y-auto max-h-48">
                     {stations.map(s => (
                         <button key={s.id} onClick={() => onSelect(s)}

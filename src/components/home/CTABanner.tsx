@@ -1,5 +1,6 @@
 import { ArrowRight } from 'lucide-react';
 import { useNetworkStats } from '../../utils/useNetworkStats';
+import { useT } from '../../i18n';
 
 /**
  * CTABanner Component - Phần banner kêu gọi hành động cuối trang
@@ -10,6 +11,7 @@ interface CTABannerProps {
 }
 
 const CTABanner = ({ onNavigate }: CTABannerProps) => {
+    const t = useT();
   const { stations, lockers } = useNetworkStats();
   return (
     <>
@@ -30,32 +32,32 @@ const CTABanner = ({ onNavigate }: CTABannerProps) => {
               {/* Badge */}
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-xs font-bold mb-5">
                 <span>✈️</span>
-                <span>Tận Hưởng Kỳ Nghỉ Trọn Vẹn</span>
+                <span>{t('Tận Hưởng Kỳ Nghỉ Trọn Vẹn')}</span>
               </div>
 
               {/* Headline */}
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-5 leading-tight text-balance">
-                Sẵn sàng du lịch và công tác không vướng bận?
+                {t('Sẵn sàng du lịch và công tác không vướng bận?')}
               </h2>
 
               {/* Description */}
               <p className="text-base md:text-lg text-white/85 max-w-2xl leading-relaxed mb-8">
-                Trải nghiệm phong cách du lịch nhẹ nhàng thông minh cùng SmartLocker ngay hôm nay. Đặt tủ trước để giữ chỗ tại các trạm đông khách nhất.
+                {t('Trải nghiệm phong cách du lịch nhẹ nhàng thông minh cùng SmartLocker ngay hôm nay. Đặt tủ trước để giữ chỗ tại các trạm đông khách nhất.')}
               </p>
 
               {/* Stats Row */}
               <div className="grid grid-cols-3 gap-4 md:gap-6 mb-8 max-w-xl">
                 <div>
                   <div className="text-2xl md:text-3xl font-bold">{stations ?? "—"}</div>
-                  <div className="text-xs text-white/70 mt-1">Trạm tủ</div>
+                  <div className="text-xs text-white/70 mt-1">{t('Trạm tủ')}</div>
                 </div>
                 <div>
                   <div className="text-2xl md:text-3xl font-bold">{lockers ?? "—"}</div>
-                  <div className="text-xs text-white/70 mt-1">Ô tủ</div>
+                  <div className="text-xs text-white/70 mt-1">{t('Ô tủ')}</div>
                 </div>
                 <div>
                   <div className="text-2xl md:text-3xl font-bold">24/7</div>
-                  <div className="text-xs text-white/70 mt-1">Hoạt động</div>
+                  <div className="text-xs text-white/70 mt-1">{t('Hoạt động')}</div>
                 </div>
               </div>
 
@@ -67,14 +69,14 @@ const CTABanner = ({ onNavigate }: CTABannerProps) => {
                   onClick={(e) => { e.preventDefault(); onNavigate?.('register'); }}
                   role="button"
                 >
-                  <span>🚀 Tìm trạm & Đặt tủ ngay</span>
+                  <span>{t('🚀 Tìm trạm & Đặt tủ ngay')}</span>
                   <ArrowRight className="w-5 h-5" />
                 </a>
                 <a 
                   href="#how-it-works"
                   className="px-6 py-4 rounded-xl border-2 border-white/40 hover:bg-white/10 text-white text-base font-semibold text-center transition-all"
                 >
-                  Xem video hướng dẫn 60s
+                  {t('Xem video hướng dẫn 60s')}
                 </a>
               </div>
             </div>
@@ -83,7 +85,7 @@ const CTABanner = ({ onNavigate }: CTABannerProps) => {
             <div className="lg:col-span-4">
               <div className="bg-white/10 backdrop-blur-md rounded-3xl p-6 border border-white/20 text-center shadow-elevation-3">
                 <span className="text-xs font-bold uppercase tracking-wider text-white/80 block mb-3">
-                  Lưu Nhanh SmartLocker PWA
+                  {t('Lưu Nhanh SmartLocker PWA')}
                 </span>
                 
                 {/* QR Code Placeholder */}
@@ -118,7 +120,7 @@ const CTABanner = ({ onNavigate }: CTABannerProps) => {
                 </div>
                 
                 <p className="text-sm text-white/85 leading-relaxed">
-                  Quét mã bằng camera điện thoại để lưu SmartLocker lên màn hình chính mà không cần cài đặt App.
+                  {t('Quét mã bằng camera điện thoại để lưu SmartLocker lên màn hình chính mà không cần cài đặt App.')}
                 </p>
               </div>
             </div>
