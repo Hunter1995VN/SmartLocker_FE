@@ -21,6 +21,8 @@ import {
 } from 'lucide-react';
 import adminAuditService from '../../../api/adminAuditService';
 import type { AuditLogItemDto, AuditLogQueryResponse } from '../../../api/adminAuditService';
+import ModalOverlay from '../../ui/ModalOverlay';
+import Pagination, { usePagination } from '../Pagination';
 
 const FALLBACK_AUDIT_LOGS: AuditLogItemDto[] = [
     {
@@ -154,6 +156,7 @@ export default function AuditLogView() {
         const matchRole = roleFilter === 'ALL' || item.userRole === roleFilter;
         return matchSearch && matchAction && matchEntity && matchRole;
     });
+    const pgLogs = usePagination(filteredLogs, 20);
 
     const getActionBadge = (action: string) => {
         if (action.includes('UNLOCK')) {
@@ -173,7 +176,7 @@ export default function AuditLogView() {
 
     const handleExportCsv = () => {
         const headers = ['ID', 'ThoiGian', 'NguoiThucHien', 'Email', 'VaiTro', 'HanhDong', 'DoiTuong', 'MaDoiTuong', 'IP', 'ChiTiet'];
-        const rows = filteredLogs.map((l) => [
+        const rows = pgLogs.pageItems.map((l) => [
             l.id,
             new Date(l.createdAt).toLocaleString('vi-VN'),
             `"${(l.userName || '').replace(/"/g, '""')}"`,
@@ -447,11 +450,12 @@ export default function AuditLogView() {
                         </tbody>
                     </table>
                 </div>
+                <Pagination page={pgLogs.page} totalPages={pgLogs.totalPages} total={filteredLogs.length} from={pgLogs.from} to={pgLogs.to} onPageChange={pgLogs.setPage} label="nhật ký" />
             </div>
 
             {/* Detail Modal */}
             {selectedLog && (
-                <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+                <ModalOverlay onClose={() => setSelectedLog(null)}>
                     <div className="bg-white rounded-2xl border border-slate-200 max-w-xl w-full shadow-2xl overflow-hidden">
                         <div className="p-4 sm:p-5 bg-slate-900 text-white flex items-center justify-between">
                             <div className="flex items-center gap-2.5">
@@ -525,7 +529,7 @@ export default function AuditLogView() {
                             </div>
                         </div>
                     </div>
-                </div>
+                </ModalOverlay>
             )}
         </div>
     );

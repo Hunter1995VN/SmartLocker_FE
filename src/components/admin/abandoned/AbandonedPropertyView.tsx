@@ -43,6 +43,7 @@ import {
     parseItemDescription,
     disposalLabel,
 } from './AbandonedPropertyHelpers';
+import ModalOverlay from '../../ui/ModalOverlay';
 
 interface AbandonedPropertyViewProps {
     userRole: string;
@@ -1571,7 +1572,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
 
             {/* Modal: Inspection Form (Staff Mắt 1 - UC-S10) */}
             {showCreateModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+                <ModalOverlay>
                     <InspectionForm
                         prefill={
                             activeRecord
@@ -1596,12 +1597,12 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                         }}
                         onCancel={() => setShowCreateModal(false)}
                     />
-                </div>
+                </ModalOverlay>
             )}
 
             {/* Modal: UC-S11 Customer Handover Procedure */}
             {showHandoverModal && activeRecord && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+                <ModalOverlay onClose={() => setShowHandoverModal(false)}>
                     <div className="bg-white rounded-2xl p-6 max-w-lg w-full shadow-2xl border border-slate-200 space-y-4">
                         <div className="flex items-start justify-between border-b border-slate-100 pb-3">
                             <div className="flex items-center gap-2.5">
@@ -1764,12 +1765,12 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                             </button>
                         </div>
                     </div>
-                </div>
+                </ModalOverlay>
             )}
 
             {/* Modal: Reject with reason (Admin Reject - UC-A07) */}
             {showRejectModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+                <ModalOverlay onClose={() => setShowRejectModal(false)}>
                     <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-slate-200 space-y-4">
                         <div className="flex items-start justify-between">
                             <h3 className="text-base font-extrabold text-slate-900">
@@ -1816,12 +1817,12 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                             </button>
                         </div>
                     </div>
-                </div>
+                </ModalOverlay>
             )}
 
             {/* Modal: Quy chế pháp lý */}
             {showLawModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+                <ModalOverlay onClose={() => setShowLawModal(false)}>
                     <div className="bg-white rounded-2xl p-6 max-w-lg w-full shadow-2xl border border-slate-200 space-y-4">
                         <div className="flex items-start justify-between">
                             <div className="flex items-center gap-2">
@@ -1864,15 +1865,12 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                             </button>
                         </div>
                     </div>
-                </div>
+                </ModalOverlay>
             )}
 
             {/* Modal: Lightbox View Image */}
             {lightboxUrl && (
-                <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 cursor-zoom-out"
-                    onClick={() => setLightboxUrl(null)}
-                >
+                <ModalOverlay onClose={() => setLightboxUrl(null)} closeOnBackdrop scrim="dark" className="cursor-zoom-out">
                     <div
                         className="relative max-w-4xl max-h-[90vh] bg-slate-900 rounded-2xl overflow-hidden border border-slate-700 shadow-2xl cursor-default"
                         onClick={(e) => e.stopPropagation()}
@@ -1890,7 +1888,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                             className="max-w-full max-h-[85vh] object-contain mx-auto"
                         />
                     </div>
-                </div>
+                </ModalOverlay>
             )}
         </div>
     );

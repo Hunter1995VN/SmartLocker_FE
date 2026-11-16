@@ -4,6 +4,7 @@ import adminStationService from '../../../api/adminStationService';
 import adminIncidentService from '../../../api/adminIncidentService';
 import { LOCKER_STATUS_CONFIG, normalizeLockerStatus } from './lockerStatusConstants';
 import { ArrowRightLeft, Wrench, AlertTriangle, CheckCircle2, Cpu, RefreshCw, XCircle, Unlock } from 'lucide-react';
+import ModalOverlay from '../../ui/ModalOverlay';
 
 interface Props {
     locker: LockerGridItemDto | null;
@@ -238,7 +239,7 @@ export default function LockerDetailControlPanel({ locker, stationName, onUpdate
             </div>
 
             {showSwapModal && (
-                <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+                <ModalOverlay onClose={() => { if (!isSwapping) setShowSwapModal(false); }}>
                     <div className="bg-white rounded-3xl max-w-md w-full border border-slate-200 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                         <div className="p-5 border-b border-slate-100 flex items-center gap-3">
                             <span className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center"><ArrowRightLeft className="w-5 h-5" /></span>
@@ -270,7 +271,7 @@ export default function LockerDetailControlPanel({ locker, stationName, onUpdate
                             </button>
                         </div>
                     </div>
-                </div>
+                </ModalOverlay>
             )}
         </section>
     );

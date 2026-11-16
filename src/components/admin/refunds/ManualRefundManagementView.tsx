@@ -34,6 +34,7 @@ import type {
 } from '../../../api/adminManualRefundService';
 import CreateManualRefundModal from './CreateManualRefundModal';
 import ReviewManualRefundModal from './ReviewManualRefundModal';
+import Pagination, { usePagination } from '../Pagination';
 
 interface ManualRefundManagementViewProps {
     userRole?: string;
@@ -257,6 +258,7 @@ export default function ManualRefundManagementView({
     };
 
     const items = overview?.items ?? [];
+    const pgRefunds = usePagination(items, 15);
 
     return (
         <div className="space-y-5">
@@ -555,7 +557,7 @@ export default function ManualRefundManagementView({
                                         </td>
                                     </tr>
                                 ) : (
-                                    items.map((item) => {
+                                    pgRefunds.pageItems.map((item) => {
                                         const cat = CATEGORY_META[item.exceptionCategory] || {
                                             label: item.exceptionCategory,
                                             cls: 'bg-slate-100 text-slate-700 border-slate-200',
@@ -664,6 +666,7 @@ export default function ManualRefundManagementView({
                             </tbody>
                         </table>
                     </div>
+                    <Pagination page={pgRefunds.page} totalPages={pgRefunds.totalPages} total={items.length} from={pgRefunds.from} to={pgRefunds.to} onPageChange={pgRefunds.setPage} label="yêu cầu hoàn tiền" />
                 </div>
             )}
 

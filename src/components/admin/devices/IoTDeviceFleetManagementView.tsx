@@ -21,6 +21,8 @@ import adminStationService, {
     type IoTDeviceDto,
     type DiagnosticsResultDto,
 } from '../../../api/adminStationService';
+import ModalOverlay from '../../ui/ModalOverlay';
+import Pagination, { usePagination } from '../Pagination';
 
 interface IoTDeviceFleetManagementViewProps {
     onShowToast?: (message: string, type?: 'success' | 'error') => void;
@@ -85,6 +87,7 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
             return true;
         });
     }, [devices, searchQuery, filterStatus]);
+    const pgDevices = usePagination(filteredDevices, 15);
 
     // Handle Reboot (UC-S09)
     const handleConfirmReboot = async () => {
@@ -304,7 +307,7 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                                     </td>
                                 </tr>
                             ) : (
-                                filteredDevices.map(device => {
+                                pgDevices.pageItems.map(device => {
                                     const isUnprovisioned = !device.isProvisioned || device.connectivityStatus === 'UNPROVISIONED';
                                     const isOnline = !isUnprovisioned && device.connectivityStatus === 'ONLINE';
                                     const isReboot = !isUnprovisioned && device.connectivityStatus === 'REBOOTING';
@@ -457,11 +460,12 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                         </tbody>
                     </table>
                 </div>
+                <Pagination page={pgDevices.page} totalPages={pgDevices.totalPages} total={filteredDevices.length} from={pgDevices.from} to={pgDevices.to} onPageChange={pgDevices.setPage} label="thiết bị" />
             </div>
 
             {/* Self-Test Diagnostic Result Modal (UC-S07) */}
             {diagnosticsModal && (
-                <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+                <ModalOverlay onClose={() => setDiagnosticsModal(null)}>
                     <div className="bg-white rounded-2xl max-w-lg w-full p-6 border border-slate-200 shadow-2xl space-y-4">
                         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                             <div className="flex items-center gap-2.5">
@@ -550,12 +554,12 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                             </button>
                         </div>
                     </div>
-                </div>
+                </ModalOverlay>
             )}
 
             {/* Reboot Confirm Modal (UC-S09) */}
             {selectedDeviceForReboot && (
-                <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+                <ModalOverlay onClose={() => { if (!isRebooting) setSelectedDeviceForReboot(null); }}>
                     <div className="bg-white rounded-2xl max-w-sm w-full p-5 border border-slate-200 shadow-xl space-y-4">
                         <div className="flex items-center gap-3 text-amber-600">
                             <div className="p-2.5 bg-amber-50 rounded-xl border border-amber-200">
@@ -594,7 +598,7 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                             </button>
                         </div>
                     </div>
-                </div>
+                </ModalOverlay>
             )}
         </div>
     );
