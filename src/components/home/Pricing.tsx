@@ -43,7 +43,7 @@ const Pricing = () => {
         'Cổng sạc pin dự phòng tích hợp trong tủ',
         'Bảo hiểm bồi thường 20.000.000đ',
         'Mở tủ không giới hạn số lần',
-        'Cảm biến chống cạy cửa 24/7',
+        'Cảm biến đóng/mở cửa từng ô tủ',
       ],
       popular: true,
       color: 'primary',
@@ -72,7 +72,7 @@ const Pricing = () => {
 
   const guarantees = [
     { icon: ShieldCheck, text: 'Khóa điện tử Solenoid chịu lực cao' },
-    { icon: Shield, text: 'Cảm biến chống cạy cửa 24/7' },
+    { icon: Shield, text: 'Cảm biến đóng/mở cửa từng ô tủ' },
     { icon: Award, text: 'Tặng kèm bảo hiểm bồi hoàn tới 20 triệu' },
     { icon: Battery, text: 'Hỗ trợ kỹ thuật từ xa 24/7 tức thì' },
   ];
