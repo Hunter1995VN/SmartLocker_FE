@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { AlertTriangle, Lock, Unlock, Shield, X } from 'lucide-react';
 import type { UserAdminListItemDto, UserRole } from '../../../api/adminUserService';
 import { getRoleConfig } from './userConstants';
+import ModalOverlay from '../../ui/ModalOverlay';
 
 export type ActionType = 'LOCK' | 'ACTIVATE' | 'CHANGE_ROLE';
 
@@ -46,7 +47,7 @@ export default function UserActionConfirmModal({
     const isTraveler = user.role === 'TRAVELER';
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+        <ModalOverlay onClose={onClose}>
             <div className="bg-white rounded-2xl max-w-md w-full border border-slate-200 shadow-2xl overflow-hidden flex flex-col">
                 {/* Header */}
                 <div className="p-5 border-b border-slate-100 flex items-center justify-between">
@@ -190,6 +191,6 @@ export default function UserActionConfirmModal({
                     </div>
                 </form>
             </div>
-        </div>
+        </ModalOverlay>
     );
 }

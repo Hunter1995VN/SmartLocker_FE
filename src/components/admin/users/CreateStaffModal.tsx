@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { UserPlus, X, Mail, Lock, Phone, User, Shield } from 'lucide-react';
 import type { CreateStaffRequest, UserRole } from '../../../api/adminUserService';
+import ModalOverlay from '../../ui/ModalOverlay';
 
 interface CreateStaffModalProps {
     isOpen: boolean;
@@ -69,7 +70,7 @@ export default function CreateStaffModal({
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+        <ModalOverlay onClose={onClose}>
             <div className="bg-white rounded-2xl max-w-lg w-full border border-slate-200 shadow-2xl overflow-hidden flex flex-col">
                 {/* Header */}
                 <div className="p-5 border-b border-slate-100 flex items-center justify-between">
@@ -226,6 +227,6 @@ export default function CreateStaffModal({
                     </div>
                 </form>
             </div>
-        </div>
+        </ModalOverlay>
     );
 }

@@ -20,6 +20,7 @@ import type {
     CreateManualRefundRequest,
     ExceptionRefundCategory,
 } from '../../../api/adminManualRefundService';
+import ModalOverlay from '../../ui/ModalOverlay';
 
 interface CreateManualRefundModalProps {
     isOpen: boolean;
@@ -237,7 +238,7 @@ export default function CreateManualRefundModal({
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/55 backdrop-blur-xs p-4">
+        <ModalOverlay onClose={onClose}>
             <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden">
                 {/* Header */}
                 <div className="px-6 py-4 bg-gradient-to-r from-purple-700 to-indigo-600 text-white flex items-center justify-between">
@@ -607,6 +608,6 @@ export default function CreateManualRefundModal({
                     </div>
                 </form>
             </div>
-        </div>
+        </ModalOverlay>
     );
 }

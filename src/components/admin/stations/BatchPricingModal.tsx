@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { X, Tag, CheckCircle2, Layers, RotateCcw } from 'lucide-react';
 import type { StationAdminDetailDto } from '../../../api/adminStationService';
 import adminStationService from '../../../api/adminStationService';
+import ModalOverlay from '../../ui/ModalOverlay';
 
 interface BatchPricingModalProps {
     isOpen: boolean;
@@ -99,7 +100,7 @@ export default function BatchPricingModal({
     };
 
     return (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+        <ModalOverlay onClose={onClose}>
             <div className="bg-white rounded-3xl max-w-lg w-full border border-slate-200 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                 <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                     <div className="flex items-center gap-3">
@@ -277,6 +278,6 @@ export default function BatchPricingModal({
                     </div>
                 </form>
             </div>
-        </div>
+        </ModalOverlay>
     );
 }
