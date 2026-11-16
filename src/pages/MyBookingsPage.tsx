@@ -108,7 +108,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
   );
 
   return (
-    <div className="bg-[#f8f9ff] text-[#0b1c30] font-body-md antialiased min-h-screen flex flex-col selection:bg-primary-container selection:text-white pb-12">
+    <div className="bg-surface-bright text-on-surface font-body-md antialiased min-h-screen flex flex-col selection:bg-primary-container selection:text-white pb-12">
       {/* UNIFIED CUSTOMER HEADER */}
       <CustomerHeader
         currentPage="my-bookings"
@@ -122,7 +122,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
           <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-semibold text-secondary">
             <button onClick={() => onNavigate('home')} className="hover:text-primary transition-colors cursor-pointer">Home</button>
             <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-[#0b1c30] font-semibold">My Bookings</span>
+            <span className="text-on-surface font-semibold">My Bookings</span>
           </nav>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -197,7 +197,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
             }`}
           >
             <span>Active Bookings</span>
-            <span className="px-2 py-0.5 rounded-full bg-[#dbe1ff] text-primary text-xs font-bold">
+            <span className="px-2 py-0.5 rounded-full bg-primary-fixed text-primary text-xs font-bold">
               {activeBookings.length}
             </span>
           </button>
@@ -210,7 +210,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
             }`}
           >
             <span>Past History</span>
-            <span className="px-2 py-0.5 rounded-full bg-[#e5eeff] text-secondary text-xs">
+            <span className="px-2 py-0.5 rounded-full bg-surface-container text-secondary text-xs">
               {historyBookings.length}
             </span>
           </button>
@@ -267,7 +267,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                     {/* Booking ID */}
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-secondary font-medium">Booking ID:</span>
-                      <span className="font-mono text-sm tracking-wider font-bold text-slate-900 bg-[#eff4ff] px-2.5 py-1 rounded-lg border border-outline-variant/40">
+                      <span className="font-mono text-sm tracking-wider font-bold text-slate-900 bg-surface-container-low px-2.5 py-1 rounded-lg border border-outline-variant/40">
                         {booking.bookingCode}
                       </span>
                     </div>
@@ -358,7 +358,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                         </p>
                       </div>
                       {/* Mini QR Preview snippet */}
-                      <div className="flex items-center gap-3 p-2 rounded-xl bg-[#eff4ff] border border-outline-variant/30">
+                      <div className="flex items-center gap-3 p-2 rounded-xl bg-surface-container-low border border-outline-variant/30">
                         <div className="w-10 h-10 bg-white p-1 rounded-lg border border-slate-200 flex items-center justify-center shrink-0">
                           <QrCode className="w-6 h-6 text-slate-900" />
                         </div>
@@ -530,7 +530,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                             </button>
                             <button
                               onClick={() => onNavigate('find-station')}
-                              className="px-3.5 py-2 bg-[#eff4ff] text-primary-container hover:bg-blue-100 text-xs font-bold rounded-xl transition-colors cursor-pointer"
+                              className="px-3.5 py-2 bg-surface-container-low text-primary-container hover:bg-blue-100 text-xs font-bold rounded-xl transition-colors cursor-pointer"
                             >
                               Book Again
                             </button>
@@ -556,14 +556,14 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
 
       {/* OVERDUE PAYMENT MODAL (UC-T09) */}
       {showOverdueModal && selectedBooking && (
-        <div className="fixed inset-0 z-50 bg-[#0b1c30]/50 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-on-surface/50 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-md rounded-2xl border border-outline-variant/30 shadow-2xl p-6 space-y-5 animate-fade-in-up">
             <div className="flex items-center justify-between border-b border-outline-variant/30 pb-3">
               <div className="flex items-center gap-2">
                 <AlertCircle className="w-5 h-5 text-rose-600" />
-                <h3 className="text-base font-bold text-[#0b1c30]">Thanh toán phí phạt quá hạn</h3>
+                <h3 className="text-base font-bold text-on-surface">Thanh toán phí phạt quá hạn</h3>
               </div>
-              <button onClick={() => setShowOverdueModal(false)} className="text-secondary hover:text-[#0b1c30]">✕</button>
+              <button onClick={() => setShowOverdueModal(false)} className="text-secondary hover:text-on-surface">✕</button>
             </div>
 
             <div className="bg-rose-50 border border-rose-200 rounded-xl p-3.5 space-y-1 text-xs">
@@ -572,7 +572,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
               <p className="text-rose-600">Theo quy định: Phí phạt 15,000 VND cho mỗi 30 phút quá hạn.</p>
             </div>
 
-            <div className="bg-[#eff4ff] p-4 rounded-xl flex justify-between items-center text-xs">
+            <div className="bg-surface-container-low p-4 rounded-xl flex justify-between items-center text-xs">
               <span className="font-semibold text-slate-700">Tổng phí cần nộp:</span>
               <span className="font-mono text-xl font-extrabold text-rose-600">{formatCurrency(selectedBooking.currentOverdueFee || 0)} VND</span>
             </div>
@@ -665,7 +665,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
 
       {/* CANCELLATION DETAILS MODAL */}
       {cancelledDetailBooking && (
-        <div className="fixed inset-0 z-50 bg-[#0b1c30]/50 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-on-surface/50 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-md rounded-2xl border border-outline-variant/30 shadow-2xl p-6 space-y-5 animate-fade-in-up">
             <div className="flex items-center justify-between border-b border-outline-variant/30 pb-3">
               <div className="flex items-center gap-2.5">
@@ -673,7 +673,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                   <Ban className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-[#0b1c30]">Cancellation &amp; Refund</h3>
+                  <h3 className="text-base font-bold text-on-surface">Cancellation &amp; Refund</h3>
                   <p className="text-xs text-secondary font-mono">#{cancelledDetailBooking.bookingCode}</p>
                 </div>
               </div>
@@ -727,7 +727,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                   </div>
 
                   {/* Refund Breakdown */}
-                  <div className="bg-[#eff4ff] p-4 rounded-xl space-y-2 text-xs border border-blue-100">
+                  <div className="bg-surface-container-low p-4 rounded-xl space-y-2 text-xs border border-blue-100">
                     <div className="flex justify-between items-center text-slate-600">
                       <span>Original Paid Amount:</span>
                       <span className="font-semibold text-slate-900">{formatCurrency(cancelledDetailBooking.baseAmount)} VND</span>
@@ -745,7 +745,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                   </div>
 
                   {/* Refund Method Note */}
-                  <div className={`text-xs p-3 rounded-xl flex items-start gap-2.5 border ${isRefunded ? 'bg-emerald-50 border-emerald-200 text-[#434655]' : 'bg-amber-50 border-amber-200 text-amber-900'}`}>
+                  <div className={`text-xs p-3 rounded-xl flex items-start gap-2.5 border ${isRefunded ? 'bg-emerald-50 border-emerald-200 text-on-surface-variant' : 'bg-amber-50 border-amber-200 text-amber-900'}`}>
                     {isRefunded ? (
                       <>
                         <CheckCircle className="w-4 h-4 text-emerald-600 mt-0.5 shrink-0" />
@@ -780,7 +780,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
 
       {/* TOAST NOTIFICATION */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 bg-[#0b1c30] text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg border border-[#334155] z-50 flex items-center gap-2 animate-fade-in-up">
+        <div className="fixed bottom-6 right-6 bg-on-surface text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg border border-slate-700 z-50 flex items-center gap-2 animate-fade-in-up">
           <CheckCircle className="w-4 h-4 text-emerald-400" />
           <span>{toastMessage}</span>
         </div>
@@ -794,11 +794,11 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
               <ShieldCheck className="w-5 h-5 text-primary" />
               <span className="text-base text-primary font-bold">SmartLocker</span>
             </div>
-            <p className="text-xs text-[#434655]">
+            <p className="text-xs text-on-surface-variant">
               © 2025 SmartLocker Systems Inc. Telemetry &amp; Cryptographic Access Active. All rights reserved.
             </p>
           </div>
-          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-xs text-[#434655]">
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-xs text-on-surface-variant">
             <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>Security Architecture</a>
             <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>Compliance &amp; SOC2</a>
             <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }}>Terms of Service</a>

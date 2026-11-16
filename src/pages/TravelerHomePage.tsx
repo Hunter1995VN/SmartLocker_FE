@@ -291,45 +291,45 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                     {/* Logo + Nav */}
                     <div className="flex items-center gap-8 flex-1 min-w-0">
                         <a href="#" className="flex items-center gap-2 shrink-0">
-                            <div className="w-9 h-9 rounded-xl bg-[#2563eb] flex items-center justify-center shadow-sm">
+                            <div className="w-9 h-9 rounded-xl bg-primary-container flex items-center justify-center shadow-sm">
                                 <Lock className="w-[18px] h-[18px] text-white" />
                             </div>
-                            <span className="font-bold text-[18px] leading-6 tracking-tight text-[#0b1c30] hidden sm:block">SmartLocker</span>
+                            <span className="font-bold text-[18px] leading-6 tracking-tight text-on-surface hidden sm:block">SmartLocker</span>
                         </a>
                         <nav className="hidden lg:flex items-center gap-1">
                             <button
                                 onClick={() => onNavigateDashboard?.()}
-                                className="px-4 py-1.5 text-sm font-semibold rounded-xl text-[#434655] hover:text-[#0b1c30] hover:bg-[#f0f4ff] transition-colors"
+                                className="px-4 py-1.5 text-sm font-semibold rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors"
                             >
                                 Dashboard
                             </button>
-                            <span className="px-4 py-1.5 text-sm font-semibold rounded-xl bg-[#eff4ff] text-[#2563eb]">Tìm trạm</span>
-                            <a href="#" className="px-4 py-1.5 text-sm font-semibold rounded-xl text-[#434655] hover:text-[#0b1c30] hover:bg-[#f0f4ff] transition-colors">Lịch sử</a>
-                            <a href="#" className="px-4 py-1.5 text-sm font-semibold rounded-xl text-[#434655] hover:text-[#0b1c30] hover:bg-[#f0f4ff] transition-colors">Hỗ trợ</a>
+                            <span className="px-4 py-1.5 text-sm font-semibold rounded-xl bg-surface-container-low text-primary-container">Tìm trạm</span>
+                            <a href="#" className="px-4 py-1.5 text-sm font-semibold rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors">Lịch sử</a>
+                            <a href="#" className="px-4 py-1.5 text-sm font-semibold rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors">Hỗ trợ</a>
                         </nav>
                     </div>
 
                     {/* Right actions */}
                     <div className="flex items-center gap-2 shrink-0">
-                        <button className="w-9 h-9 rounded-xl flex items-center justify-center text-[#434655] hover:bg-[#eff4ff] transition-colors">
+                        <button className="w-9 h-9 rounded-xl flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-colors">
                             <Search className="w-5 h-5" />
                         </button>
-                        <button className="relative w-9 h-9 rounded-xl flex items-center justify-center text-[#434655] hover:bg-[#eff4ff] transition-colors">
+                        <button className="relative w-9 h-9 rounded-xl flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-colors">
                             <Bell className="w-5 h-5" />
                             <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white" />
                         </button>
                         {/* User badge */}
-                        <div className="flex items-center gap-2 pl-2 py-1 pr-3 rounded-xl bg-white border border-[#c3c6d7] hover:bg-[#eff4ff] cursor-pointer transition-colors">
-                            <div className="w-8 h-8 rounded-full bg-[#004ac6] flex items-center justify-center text-white text-sm font-bold shrink-0">
+                        <div className="flex items-center gap-2 pl-2 py-1 pr-3 rounded-xl bg-white border border-outline-variant hover:bg-surface-container-low cursor-pointer transition-colors">
+                            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold shrink-0">
                                 {user.fullName?.charAt(0).toUpperCase() ?? 'U'}
                             </div>
                             <div className="hidden md:flex flex-col leading-none">
-                                <span className="text-xs font-semibold text-[#0b1c30]">{user.fullName}</span>
-                                <span className="text-xs text-[#434655]">{user.role || 'Traveler'}</span>
+                                <span className="text-xs font-semibold text-on-surface">{user.fullName}</span>
+                                <span className="text-xs text-on-surface-variant">{user.role || 'Traveler'}</span>
                             </div>
                             <button
                                 onClick={handleLogout}
-                                className="ml-2 p-1 rounded-lg hover:bg-red-50 text-[#5c5f70] hover:text-red-500 transition-colors"
+                                className="ml-2 p-1 rounded-lg hover:bg-red-50 text-on-surface-muted hover:text-red-500 transition-colors"
                                 title="Đăng xuất"
                             >
                                 <LogOut className="w-3.5 h-3.5" />

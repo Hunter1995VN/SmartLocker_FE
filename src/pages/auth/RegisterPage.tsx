@@ -97,7 +97,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
     };
 
     return (
-        <div className="min-h-screen flex bg-[#f0f4ff] font-sans">
+        <div className="min-h-screen flex bg-surface-container-low font-sans">
             {/* LEFT SIDE */}
             <aside className="hidden lg:flex lg:w-[44%] relative overflow-hidden shrink-0" style={{background: 'linear-gradient(135deg, #0f2977 0%, #1a4ac4 40%, #2563eb 70%, #3b82f6 100%)'}}>
                 {/* Ambient blobs */}

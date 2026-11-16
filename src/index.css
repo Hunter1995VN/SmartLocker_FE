@@ -50,6 +50,15 @@
   --color-background: #f8f9ff;
   --color-on-background: #0b1c30;
 
+  /* Semantic additions used across the app (kept next to the Material-style set above) */
+  /* Secondary/metadata text: ≥4.5:1 on white and on surface-container tints (outline #737686 is only for borders/icons) */
+  --color-on-surface-muted: #5c5f70;
+  /* Soft input/card borders */
+  --color-outline-soft: #dce3f1;
+  /* Caution / non-blocking notices (e.g. location blocked) */
+  --color-warning-container: #fff6d6;
+  --color-on-warning-container: #6b4a00;
+
   /* Font Family */
   --font-family-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 

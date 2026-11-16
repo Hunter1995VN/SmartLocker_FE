@@ -279,7 +279,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
   const effectiveQrCode = qrCodeData || bookingData?.paymentUrl || `https://pay.payos.vn/web/${orderCode}`;
 
   return (
-    <div className="bg-[#F8FAFC] text-[#0F172A] min-h-screen flex flex-col justify-between selection:bg-blue-100 selection:text-blue-900 pb-12">
+    <div className="bg-slate-50 text-slate-900 min-h-screen flex flex-col justify-between selection:bg-blue-100 selection:text-blue-900 pb-12">
       {/* UNIFIED CUSTOMER HEADER */}
       <CustomerHeader
         currentPage="booking-payment"

@@ -316,7 +316,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
 
   if (isLoading) {
     return (
-      <div className="bg-[#F8FAFC] min-h-screen pb-20 flex items-center justify-center">
+      <div className="bg-slate-50 min-h-screen pb-20 flex items-center justify-center">
         <div className="flex flex-col items-center">
           <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
           <p className="mt-4 text-slate-500 font-medium">Loading station details...</p>
@@ -334,7 +334,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
   );
 
   return (
-    <div className="bg-[#F8FAFC] text-[#0F172A] min-h-screen flex flex-col justify-between selection:bg-blue-100 selection:text-blue-900 pb-12">
+    <div className="bg-slate-50 text-slate-900 min-h-screen flex flex-col justify-between selection:bg-blue-100 selection:text-blue-900 pb-12">
       {/* 1. UNIFIED CUSTOMER HEADER */}
       <CustomerHeader
         currentPage="station-booking"
@@ -416,7 +416,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                       ACTIVE
                     </span>
                   </div>
-                  <h1 className="text-2xl font-bold text-[#0F172A] mb-2">{currentStation.name}</h1>
+                  <h1 className="text-2xl font-bold text-slate-900 mb-2">{currentStation.name}</h1>
                   <div className="flex items-center text-slate-500 text-sm">
                     <MapPin className="w-4 h-4 mr-1.5 shrink-0 text-blue-600" />
                     <span>{currentStation.address}</span>
@@ -436,16 +436,16 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
               <div>
                 <p className="text-xs font-medium text-slate-500 mb-3 uppercase tracking-wider">Amenities & Security Features</p>
                 <div className="flex flex-wrap gap-2">
-                  <div className="flex items-center bg-[#F1F5F9] text-[#475569] text-xs px-3 py-1.5 rounded-full border border-slate-200">
+                  <div className="flex items-center bg-slate-100 text-slate-600 text-xs px-3 py-1.5 rounded-full border border-slate-200">
                     <Video className="w-3.5 h-3.5 mr-1.5 text-blue-600" /> CCTV 24/7
                   </div>
-                  <div className="flex items-center bg-[#F1F5F9] text-[#475569] text-xs px-3 py-1.5 rounded-full border border-slate-200">
+                  <div className="flex items-center bg-slate-100 text-slate-600 text-xs px-3 py-1.5 rounded-full border border-slate-200">
                     <QrCode className="w-3.5 h-3.5 mr-1.5 text-indigo-600" /> QR Access
                   </div>
-                  <div className="flex items-center bg-[#F1F5F9] text-[#475569] text-xs px-3 py-1.5 rounded-full border border-slate-200">
+                  <div className="flex items-center bg-slate-100 text-slate-600 text-xs px-3 py-1.5 rounded-full border border-slate-200">
                     <Plug className="w-3.5 h-3.5 mr-1.5 text-amber-600" /> Power Sockets
                   </div>
-                  <div className="flex items-center bg-[#F1F5F9] text-[#475569] text-xs px-3 py-1.5 rounded-full border border-slate-200">
+                  <div className="flex items-center bg-slate-100 text-slate-600 text-xs px-3 py-1.5 rounded-full border border-slate-200">
                     <Snowflake className="w-3.5 h-3.5 mr-1.5 text-cyan-600" /> Air-Conditioned
                   </div>
                 </div>
@@ -466,7 +466,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                 <div className="flex items-center">
                   <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold mr-3 border border-blue-200">1</div>
                   <div>
-                    <h2 className="text-xl font-bold text-[#0F172A]">Storage Timing</h2>
+                    <h2 className="text-xl font-bold text-slate-900">Storage Timing</h2>
                     <p className="text-xs text-slate-500 mt-0.5">When do you want to deposit your luggage?</p>
                   </div>
                 </div>
@@ -509,7 +509,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                     </div>
                     <div>
                       <p className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Start Time</p>
-                      <p className="text-base font-extrabold text-[#0F172A]">
+                      <p className="text-base font-extrabold text-slate-900">
                         Starts Right Now <span className="text-slate-500 font-normal text-sm">({formatTimeStr(startDateObj)} Today)</span>
                       </p>
                       <p className="text-xs text-slate-500 mt-0.5">Simply choose your rental duration below to proceed</p>
@@ -532,7 +532,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                       <span className="text-xs font-medium text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">Min: Today</span>
                     </div>
                     <div className="flex items-center justify-between mt-1">
-                      <div className="flex items-center text-[#0F172A] font-semibold text-sm">
+                      <div className="flex items-center text-slate-900 font-semibold text-sm">
                         <Calendar className="w-5 h-5 mr-2 text-blue-600 shrink-0" />
                         <span>{displayStorageDate}</span>
                       </div>
@@ -561,12 +561,12 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                       </span>
                     </div>
                     <div className="flex items-center justify-between mt-1">
-                      <div className="flex items-center text-[#0F172A] font-semibold text-sm w-full mr-2">
+                      <div className="flex items-center text-slate-900 font-semibold text-sm w-full mr-2">
                         <Clock className="w-5 h-5 mr-2 text-blue-600 shrink-0" />
                         <select
                           value={dropOffTime}
                           onChange={(e) => setDropOffTime(e.target.value)}
-                          className="w-full bg-transparent font-semibold text-[#0F172A] text-sm outline-none cursor-pointer py-1"
+                          className="w-full bg-transparent font-semibold text-slate-900 text-sm outline-none cursor-pointer py-1"
                         >
                           {availableTimeSlots.map((timeSlot) => (
                             <option key={timeSlot} value={timeSlot}>
@@ -584,7 +584,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
 
               {/* Duration Selection */}
               <div>
-                <label className="text-sm font-semibold text-[#0F172A] mb-3 block">Storage Duration (How long do you need?)</label>
+                <label className="text-sm font-semibold text-slate-900 mb-3 block">Storage Duration (How long do you need?)</label>
                 <div className="flex flex-wrap items-center gap-3">
                   {[1, 3, 6, 12, 24].map((duration) => (
                     <button
@@ -652,7 +652,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                     <div className="w-3.5 h-3.5 rounded-full bg-amber-500 shrink-0 ring-4 ring-amber-100"></div>
                     <div>
                       <p className="text-xs font-bold text-amber-800 uppercase tracking-wider">Free Hold Window</p>
-                      <p className="text-sm font-extrabold text-[#0F172A]">
+                      <p className="text-sm font-extrabold text-slate-900">
                         30 Minutes to Arrive
                       </p>
                     </div>
@@ -667,7 +667,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                     <div className="w-3.5 h-3.5 rounded-full bg-emerald-500 shrink-0 ring-4 ring-emerald-100"></div>
                     <div>
                       <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Storage Count</p>
-                      <p className="text-sm font-extrabold text-[#0F172A]">
+                      <p className="text-sm font-extrabold text-slate-900">
                         Starts at Kiosk Check-in
                       </p>
                     </div>
@@ -690,7 +690,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                 <div className="flex items-center mb-2 sm:mb-0">
                   <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold mr-3 border border-blue-200">2</div>
                   <div>
-                    <h2 className="text-xl font-bold text-[#0F172A]">Choose Compartment Size</h2>
+                    <h2 className="text-xl font-bold text-slate-900">Choose Compartment Size</h2>
                     <p className="text-xs text-slate-500 mt-0.5">Select a compartment tier that accommodates your luggage dimensions</p>
                   </div>
                 </div>
@@ -728,7 +728,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                         {isSAvailable ? `${availS}/${totalS} left` : 'Không khả dụng'}
                       </span>
                     </div>
-                    <h3 className={`text-lg font-bold ${!isSAvailable ? 'text-slate-500' : 'text-[#0F172A]'}`}>Small (S)</h3>
+                    <h3 className={`text-lg font-bold ${!isSAvailable ? 'text-slate-500' : 'text-slate-900'}`}>Small (S)</h3>
                     <div className={`flex items-center text-xs mt-1 mb-3 ${!isSAvailable ? 'text-slate-500' : 'text-slate-500'}`}>
                       <Ruler className="w-3.5 h-3.5 mr-1" /> 45 x 45 x 65 cm
                     </div>
@@ -785,7 +785,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                         {isMAvailable ? `${availM}/${totalM} left` : 'Không khả dụng'}
                       </span>
                     </div>
-                    <h3 className={`text-lg font-bold ${!isMAvailable ? 'text-slate-500' : 'text-[#0F172A]'}`}>Medium (M)</h3>
+                    <h3 className={`text-lg font-bold ${!isMAvailable ? 'text-slate-500' : 'text-slate-900'}`}>Medium (M)</h3>
                     <div className={`flex items-center text-xs mt-1 mb-3 ${!isMAvailable ? 'text-slate-500' : 'text-slate-500'}`}>
                       <Ruler className="w-3.5 h-3.5 mr-1" /> 65 x 45 x 65 cm
                     </div>
@@ -839,7 +839,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                         {isLAvailable ? `${availL}/${totalL} left` : 'Không khả dụng'}
                       </span>
                     </div>
-                    <h3 className={`text-lg font-bold ${!isLAvailable ? 'text-slate-500' : 'text-[#0F172A]'}`}>Large (L)</h3>
+                    <h3 className={`text-lg font-bold ${!isLAvailable ? 'text-slate-500' : 'text-slate-900'}`}>Large (L)</h3>
                     <div className={`flex items-center text-xs mt-1 mb-3 ${!isLAvailable ? 'text-slate-500' : 'text-slate-500'}`}>
                       <Ruler className="w-3.5 h-3.5 mr-1" /> 95 x 55 x 65 cm
                     </div>
@@ -900,7 +900,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   <div className="flex justify-between items-start pb-3 border-b border-slate-100">
                     <div>
                       <p className="text-xs text-slate-500 mb-0.5">Station Location</p>
-                      <p className="text-sm font-bold text-[#0F172A]">{currentStation.name}</p>
+                      <p className="text-sm font-bold text-slate-900">{currentStation.name}</p>
                     </div>
                   </div>
 
@@ -916,7 +916,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   <div className="flex justify-between items-start pb-3 border-b border-slate-100">
                     <div>
                       <p className="text-xs text-slate-500 mb-0.5">Schedule</p>
-                      <p className="text-sm font-semibold text-[#0F172A]">
+                      <p className="text-sm font-semibold text-slate-900">
                         {bookingMode === 'NOW' ? `Right Now (${formatTimeStr(startDateObj)})` : `${dropOffTime} (${displayStorageDate})`}
                       </p>
                       <p className="text-xs text-slate-500 mt-0.5">Deadline: {pickUpDisplay}</p>
@@ -931,7 +931,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                     <p className="text-slate-500">
                       Chi phí theo chính sách giá ({selectedDuration} giờ)
                     </p>
-                    <p className="font-semibold text-[#0F172A]">{formatCurrency(currentPrice)}</p>
+                    <p className="font-semibold text-slate-900">{formatCurrency(currentPrice)}</p>
                   </div>
                   
                   <div className="flex justify-between items-center text-sm">
@@ -951,7 +951,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   {/* Promo Code & Voucher Selection */}
                   <div className="pt-3 border-t border-slate-100 space-y-2.5">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-[#0F172A] flex items-center gap-1.5">
+                      <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
                         <Ticket className="w-3.5 h-3.5 text-emerald-600" />
                         Promo Code / Voucher
                       </span>
@@ -1059,7 +1059,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                       </>
                     )}
                     <div className="flex justify-between items-end mb-1">
-                      <p className="text-sm font-bold text-[#0F172A]">Total Amount</p>
+                      <p className="text-sm font-bold text-slate-900">Total Amount</p>
                       <p className="text-2xl font-extrabold text-blue-600">{formatCurrency(finalPayableAmount)}</p>
                     </div>
                     <p className="text-xs text-slate-500 text-right">Includes VAT & station facility services</p>
@@ -1170,7 +1170,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                   <Headphones className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-[#0F172A] mb-1">Need assistance?</h4>
+                  <h4 className="text-sm font-bold text-slate-900 mb-1">Need assistance?</h4>
                   <p className="text-xs text-slate-500 mb-2">Our support team is available 24/7 for booking inquiries.</p>
                   <a href="tel:+8419001234" className="text-sm font-bold text-blue-600 hover:underline">1900 1234 (Hotline)</a>
                 </div>

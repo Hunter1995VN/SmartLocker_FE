@@ -81,7 +81,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
     };
 
     return (
-        <div className="min-h-screen flex bg-[#f0f4ff] font-sans">
+        <div className="min-h-screen flex bg-surface-container-low font-sans">
             {/* LEFT SIDE - Visual Branding */}
             <aside className="hidden lg:flex lg:w-[52%] relative overflow-hidden" style={{background: 'linear-gradient(135deg, #0f2977 0%, #1a4ac4 40%, #2563eb 70%, #3b82f6 100%)'}}>
                 {/* Ambient blobs */}

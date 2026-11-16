@@ -87,9 +87,9 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
 
     return (
         <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl border border-[#e5eeff] max-w-lg w-full shadow-2xl overflow-hidden animate-fade-in-down">
+            <div className="bg-white rounded-3xl border border-surface-container max-w-lg w-full shadow-2xl overflow-hidden animate-fade-in-down">
                 {/* Header */}
-                <div className="p-5 bg-gradient-to-r from-[#0b1c30] to-[#1e3a8a] text-white flex items-center justify-between">
+                <div className="p-5 bg-gradient-to-r from-on-surface to-[#1e3a8a] text-white flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-2xl bg-white/15 flex items-center justify-center">
                             <Bell className="w-5 h-5 text-blue-200" />
@@ -320,7 +320,7 @@ export const NotificationPreferencesModal: React.FC<NotificationPreferencesModal
                         type="button"
                         onClick={() => void handleSave()}
                         disabled={isSaving}
-                        className="px-4 py-2 rounded-xl bg-[#2563eb] hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition cursor-pointer disabled:opacity-50"
+                        className="px-4 py-2 rounded-xl bg-primary-container hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition cursor-pointer disabled:opacity-50"
                     >
                         <Save className="w-4 h-4" />
                         <span>{isSaving ? 'Đang lưu...' : 'Lưu Thiết Lập Thông Báo'}</span>

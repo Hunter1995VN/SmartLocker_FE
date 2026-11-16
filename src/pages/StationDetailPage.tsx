@@ -152,7 +152,7 @@ export default function StationDetailPage({
 
     if (isLoading && !detail) {
         return (
-            <div className="min-h-screen bg-[#f8f9ff] flex flex-col" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            <div className="min-h-screen bg-surface-bright flex flex-col" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 <CustomerHeader currentPage="find-station" onNavigate={(p) => {
                     if (p === 'dashboard') onNavigateDashboard?.();
                     else if (p === 'my-bookings') onNavigateHistory?.();
@@ -160,8 +160,8 @@ export default function StationDetailPage({
                 }} onLogout={handleLogout} />
                 <div className="flex-1 flex items-center justify-center p-6">
                     <div className="text-center">
-                        <div className="w-12 h-12 border-4 border-[#2563eb] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                        <p className="text-base font-bold text-[#0b1c30]">Đang tải thông tin trạm từ cơ sở dữ liệu...</p>
+                        <div className="w-12 h-12 border-4 border-primary-container border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                        <p className="text-base font-bold text-on-surface">Đang tải thông tin trạm từ cơ sở dữ liệu...</p>
                     </div>
                 </div>
             </div>
@@ -170,27 +170,27 @@ export default function StationDetailPage({
 
     if (error && !detail) {
         return (
-            <div className="min-h-screen bg-[#f8f9ff] flex flex-col" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            <div className="min-h-screen bg-surface-bright flex flex-col" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 <CustomerHeader currentPage="find-station" onNavigate={(p) => {
                     if (p === 'dashboard') onNavigateDashboard?.();
                     else if (p === 'my-bookings') onNavigateHistory?.();
                     else if (p === 'find-station') onBack();
                 }} onLogout={handleLogout} />
                 <div className="flex-1 flex items-center justify-center p-6">
-                    <div className="bg-white rounded-2xl shadow-md border border-[#e5eeff] p-8 max-w-md w-full text-center">
+                    <div className="bg-white rounded-2xl shadow-md border border-surface-container p-8 max-w-md w-full text-center">
                         <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-3" />
-                        <h2 className="text-lg font-bold text-[#0b1c30] mb-1">Không thể tải thông tin trạm</h2>
-                        <p className="text-xs text-[#5c5f70] mb-5">{error}</p>
+                        <h2 className="text-lg font-bold text-on-surface mb-1">Không thể tải thông tin trạm</h2>
+                        <p className="text-xs text-on-surface-muted mb-5">{error}</p>
                         <div className="flex items-center gap-3 justify-center">
                             <button
                                 onClick={onBack}
-                                className="px-4 py-2.5 rounded-xl bg-[#eff4ff] text-[#2563eb] text-xs font-bold hover:bg-[#dce9ff] cursor-pointer"
+                                className="px-4 py-2.5 rounded-xl bg-surface-container-low text-primary-container text-xs font-bold hover:bg-surface-container-high cursor-pointer"
                             >
                                 Quay lại bản đồ
                             </button>
                             <button
                                 onClick={fetchDetail}
-                                className="px-4 py-2.5 rounded-xl bg-[#2563eb] text-white text-xs font-bold hover:bg-[#1d4ed8] cursor-pointer flex items-center gap-1.5"
+                                className="px-4 py-2.5 rounded-xl bg-primary-container text-white text-xs font-bold hover:bg-blue-700 cursor-pointer flex items-center gap-1.5"
                             >
                                 <RefreshCw className="w-3.5 h-3.5" /> Thử lại
                             </button>
@@ -259,7 +259,7 @@ export default function StationDetailPage({
     };
 
     return (
-        <div className="min-h-screen bg-[#f8f9ff] flex flex-col" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+        <div className="min-h-screen bg-surface-bright flex flex-col" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
 
             {/* ══ UNIFIED CUSTOMER HEADER ══ */}
             <CustomerHeader
@@ -273,22 +273,22 @@ export default function StationDetailPage({
             />
 
             {/* ══ BREADCRUMB / NAV BAR ══ */}
-            <div className="bg-white border-b border-[#f0f4ff] shadow-xs sticky top-16 z-30">
+            <div className="bg-white border-b border-surface-container-low shadow-xs sticky top-16 z-30">
                 <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-2.5 flex items-center justify-between gap-3 flex-wrap">
-                    <nav className="flex items-center gap-1.5 text-xs text-[#434655] font-medium">
-                        <button onClick={onNavigateDashboard} className="hover:text-[#2563eb] transition-colors flex items-center gap-1 cursor-pointer">
+                    <nav className="flex items-center gap-1.5 text-xs text-on-surface-variant font-medium">
+                        <button onClick={onNavigateDashboard} className="hover:text-primary-container transition-colors flex items-center gap-1 cursor-pointer">
                             🏠 Trang chủ
                         </button>
-                        <ChevronRight className="w-3.5 h-3.5 text-[#c3c6d7]" />
-                        <button onClick={onBack} className="hover:text-[#2563eb] transition-colors cursor-pointer">
+                        <ChevronRight className="w-3.5 h-3.5 text-outline-variant" />
+                        <button onClick={onBack} className="hover:text-primary-container transition-colors cursor-pointer">
                             Bản đồ tìm trạm
                         </button>
-                        <ChevronRight className="w-3.5 h-3.5 text-[#c3c6d7]" />
-                        <span className="font-semibold text-[#0b1c30] truncate max-w-[220px] md:max-w-md">{detail.name}</span>
+                        <ChevronRight className="w-3.5 h-3.5 text-outline-variant" />
+                        <span className="font-semibold text-on-surface truncate max-w-[220px] md:max-w-md">{detail.name}</span>
                     </nav>
                     <button
                         onClick={onBack}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#eff4ff] hover:bg-[#e5eeff] text-[#2563eb] text-xs font-bold transition-all active:scale-95 shadow-xs cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-low hover:bg-surface-container text-primary-container text-xs font-bold transition-all active:scale-95 shadow-xs cursor-pointer"
                     >
                         <ArrowLeft className="w-3.5 h-3.5" />
                         Quay lại bản đồ GPS
@@ -305,16 +305,16 @@ export default function StationDetailPage({
                         <div className="lg:col-span-8 flex flex-col gap-6 min-w-0">
 
                             {/* ── Station Hero & GPS Info ── */}
-                            <div className="rounded-2xl bg-white shadow-[0_1px_3px_rgba(15,23,42,0.06)] p-6 md:p-8 relative overflow-hidden border border-[#e5eeff]">
+                            <div className="rounded-2xl bg-white shadow-[0_1px_3px_rgba(15,23,42,0.06)] p-6 md:p-8 relative overflow-hidden border border-surface-container">
                                 <div className="flex flex-wrap items-start justify-between gap-4 relative z-10">
                                     <div className="flex flex-col gap-1.5">
                                         <div className="flex flex-wrap items-center gap-2">
-                                            <span className="px-2 py-0.5 rounded bg-[#e5eeff] text-[#434655] text-xs font-bold tracking-wider font-mono">
+                                            <span className="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant text-xs font-bold tracking-wider font-mono">
                                                 {getStationCode(detail.name)}
                                             </span>
                                             {detail.status === 'ACTIVE' ? (
-                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-[#007d55] text-xs font-bold">
-                                                    <span className="w-1.5 h-1.5 rounded-full bg-[#007d55] animate-pulse" />
+                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-tertiary-container text-xs font-bold">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-tertiary-container animate-pulse" />
                                                     {isOpen ? `Đang mở cửa (${detail.opensAt} – ${detail.closesAt})` : `Tạm đóng (${detail.opensAt} – ${detail.closesAt})`}
                                                 </span>
                                             ) : (
@@ -323,13 +323,13 @@ export default function StationDetailPage({
                                                 </span>
                                             )}
                                             {distLabel && (
-                                                <span className="inline-flex items-center gap-1 text-[#2563eb] bg-[#eff4ff] px-2.5 py-0.5 rounded-full text-xs font-bold">
+                                                <span className="inline-flex items-center gap-1 text-primary-container bg-surface-container-low px-2.5 py-0.5 rounded-full text-xs font-bold">
                                                     <Navigation className="w-3 h-3" />
                                                     Cách bạn {distLabel}{walkMin ? ` (~${walkMin} phút)` : ''}
                                                 </span>
                                             )}
                                         </div>
-                                        <h1 className="text-2xl md:text-[26px] font-bold text-[#0b1c30] tracking-tight mt-1 leading-tight">
+                                        <h1 className="text-2xl md:text-[26px] font-bold text-on-surface tracking-tight mt-1 leading-tight">
                                             {detail.name}
                                         </h1>
                                     </div>
@@ -337,27 +337,27 @@ export default function StationDetailPage({
                                     {detail.contactPhone && (
                                         <a
                                             href={`tel:${detail.contactPhone}`}
-                                            className="flex items-center gap-2.5 bg-[#eff4ff] hover:bg-[#dce9ff] px-4 py-2 rounded-xl shrink-0 transition-colors"
+                                            className="flex items-center gap-2.5 bg-surface-container-low hover:bg-surface-container-high px-4 py-2 rounded-xl shrink-0 transition-colors"
                                         >
                                             <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center shadow-xs">
-                                                <Phone className="w-4 h-4 text-[#2563eb]" />
+                                                <Phone className="w-4 h-4 text-primary-container" />
                                             </div>
                                             <div className="flex flex-col leading-none">
-                                                <span className="text-xs font-bold uppercase tracking-wide text-[#5c5f70]">Hotline Trạm</span>
-                                                <span className="text-sm font-bold text-[#0b1c30]">{detail.contactPhone}</span>
+                                                <span className="text-xs font-bold uppercase tracking-wide text-on-surface-muted">Hotline Trạm</span>
+                                                <span className="text-sm font-bold text-on-surface">{detail.contactPhone}</span>
                                             </div>
                                         </a>
                                     )}
                                 </div>
 
                                 {/* Address + GPS actions */}
-                                <div className="mt-4 pt-4 border-t border-[#f0f4ff] flex flex-wrap items-center justify-between gap-3 relative z-10">
+                                <div className="mt-4 pt-4 border-t border-surface-container-low flex flex-wrap items-center justify-between gap-3 relative z-10">
                                     <div className="flex flex-col gap-1">
-                                        <div className="flex items-start gap-2 text-[#434655] text-sm">
-                                            <MapPin className="w-4 h-4 text-[#2563eb] shrink-0 mt-0.5" />
+                                        <div className="flex items-start gap-2 text-on-surface-variant text-sm">
+                                            <MapPin className="w-4 h-4 text-primary-container shrink-0 mt-0.5" />
                                             <span>{detail.address}</span>
                                         </div>
-                                        <span className="text-xs text-[#5c5f70] font-mono ml-6">
+                                        <span className="text-xs text-on-surface-muted font-mono ml-6">
                                             Tọa độ GPS: {Number(detail.latitude).toFixed(5)}, {Number(detail.longitude).toFixed(5)}
                                         </span>
                                     </div>
@@ -366,14 +366,14 @@ export default function StationDetailPage({
                                             href={`https://www.google.com/maps/dir/?api=1&destination=${detail.latitude},${detail.longitude}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#2563eb] text-white text-xs font-bold hover:bg-[#1d4ed8] transition-colors shadow-xs"
+                                            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary-container text-white text-xs font-bold hover:bg-blue-700 transition-colors shadow-xs"
                                         >
                                             <ExternalLink className="w-3.5 h-3.5" /> Chỉ đường Google Maps
                                         </a>
                                         <button
                                             type="button"
                                             onClick={handleShare}
-                                            className="px-3 py-2 rounded-xl bg-[#eff4ff] text-[#2563eb] hover:bg-[#dce9ff] flex items-center gap-1.5 text-xs font-bold transition-colors cursor-pointer"
+                                            className="px-3 py-2 rounded-xl bg-surface-container-low text-primary-container hover:bg-surface-container-high flex items-center gap-1.5 text-xs font-bold transition-colors cursor-pointer"
                                             title="Sao chép liên kết trạm"
                                         >
                                             <Share2 className="w-3.5 h-3.5" />
@@ -383,7 +383,7 @@ export default function StationDetailPage({
                                 </div>
 
                                 {/* Interactive Mini Map showing exact GPS pin */}
-                                <div className="mt-5 h-60 rounded-xl overflow-hidden border border-[#dce9ff] relative">
+                                <div className="mt-5 h-60 rounded-xl overflow-hidden border border-surface-container-high relative">
                                     <InteractiveStationMap
                                         stations={[detail]}
                                         selectedStation={null}
@@ -400,13 +400,13 @@ export default function StationDetailPage({
                             {/* ── Section 1: Real-time Locker Status from DB ── */}
                             <div className="flex flex-col gap-4">
                                 <div className="flex items-center justify-between">
-                                    <h2 className="text-[18px] font-semibold text-[#0b1c30] flex items-center gap-2">
+                                    <h2 className="text-[18px] font-semibold text-on-surface flex items-center gap-2">
                                         <span className="text-xl">🔢</span> Số lượng ô tủ trống &amp; Giá niêm yết thực tế
                                     </h2>
                                     <button
                                         type="button"
                                         onClick={fetchDetail}
-                                        className="flex items-center gap-1.5 text-[#2563eb] text-xs font-semibold hover:underline cursor-pointer"
+                                        className="flex items-center gap-1.5 text-primary-container text-xs font-semibold hover:underline cursor-pointer"
                                     >
                                         <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
                                         Làm mới dữ liệu
@@ -426,9 +426,9 @@ export default function StationDetailPage({
                                             <div
                                                 key={sz}
                                                 onClick={() => a > 0 && setSelectedSize(sz)}
-                                                className={`rounded-xl bg-white p-5 shadow-[0_1px_3px_rgba(15,23,42,0.06)] border border-[#e5eeff] hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden
+                                                className={`rounded-xl bg-white p-5 shadow-[0_1px_3px_rgba(15,23,42,0.06)] border border-surface-container hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden
                                                     ${a > 0 ? 'cursor-pointer' : 'opacity-60'}
-                                                    ${selectedSize === sz ? 'ring-2 ring-[#2563eb]' : ''}`}
+                                                    ${selectedSize === sz ? 'ring-2 ring-primary-container' : ''}`}
                                             >
                                                 {sz === 'M' && (
                                                     <div className="absolute top-0 right-0 w-14 h-14 bg-amber-50 rounded-bl-full pointer-events-none flex items-start justify-end p-2">
@@ -438,16 +438,16 @@ export default function StationDetailPage({
                                                 <div className="flex flex-col gap-2">
                                                     <div className="flex items-center justify-between">
                                                         <span className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg font-bold
-                                                            ${sz === 'S' ? 'bg-[#eff4ff] text-[#2563eb]' : sz === 'M' ? 'bg-[#e5eeff] text-[#004ac6]' : 'bg-red-50 text-red-500'}`}>
+                                                            ${sz === 'S' ? 'bg-surface-container-low text-primary-container' : sz === 'M' ? 'bg-surface-container text-primary' : 'bg-red-50 text-red-500'}`}>
                                                             {sz}
                                                         </span>
                                                         <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${urgencyClass}`}>{urgency}</span>
                                                     </div>
                                                     <div>
-                                                        <h3 className="font-bold text-[#0b1c30] text-sm">{meta.label}</h3>
-                                                        <p className="text-xs text-[#5c5f70]">{meta.desc}</p>
+                                                        <h3 className="font-bold text-on-surface text-sm">{meta.label}</h3>
+                                                        <p className="text-xs text-on-surface-muted">{meta.desc}</p>
                                                     </div>
-                                                    <div className="flex items-center justify-between bg-[#f8f9ff] px-2.5 py-1.5 rounded-lg text-xs text-[#5c5f70]">
+                                                    <div className="flex items-center justify-between bg-surface-bright px-2.5 py-1.5 rounded-lg text-xs text-on-surface-muted">
                                                         <span>{meta.dims}</span>
                                                         <span>Tối đa {meta.maxKg} kg</span>
                                                     </div>
@@ -456,14 +456,14 @@ export default function StationDetailPage({
                                                     <div className="flex items-baseline justify-between">
                                                         <span className={`text-3xl font-bold ${meta.color}`}>
                                                             {Math.min(t, a)}
-                                                            <span className="text-sm text-[#5c5f70] font-normal ml-1">/ {t} trống</span>
+                                                            <span className="text-sm text-on-surface-muted font-normal ml-1">/ {t} trống</span>
                                                         </span>
-                                                        <span className="text-base font-bold text-[#2563eb]">
+                                                        <span className="text-base font-bold text-primary-container">
                                                             {price > 0 ? `${(price / 1000).toFixed(0)}.000đ` : 'Liên hệ'}
-                                                            <span className="text-xs text-[#5c5f70] font-normal">/h</span>
+                                                            <span className="text-xs text-on-surface-muted font-normal">/h</span>
                                                         </span>
                                                     </div>
-                                                    <div className="w-full bg-[#e5eeff] h-2 rounded-full overflow-hidden">
+                                                    <div className="w-full bg-surface-container h-2 rounded-full overflow-hidden">
                                                         <div
                                                             className={`h-full rounded-full transition-all ${meta.barColor}`}
                                                             style={{ width: `${pct}%` }}
@@ -477,13 +477,13 @@ export default function StationDetailPage({
                             </div>
 
                             {/* ── Section 2: Real Time-Window Availability Check ── */}
-                            <div className="rounded-2xl bg-white shadow-[0_1px_3px_rgba(15,23,42,0.06)] border border-[#e5eeff] p-6 flex flex-col gap-5">
+                            <div className="rounded-2xl bg-white shadow-[0_1px_3px_rgba(15,23,42,0.06)] border border-surface-container p-6 flex flex-col gap-5">
                                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
                                     <div className="flex items-center gap-2">
-                                        <Calendar className="w-5 h-5 text-[#2563eb]" />
+                                        <Calendar className="w-5 h-5 text-primary-container" />
                                         <div>
-                                            <h2 className="text-[18px] font-semibold text-[#0b1c30]">Kiểm tra ô trống theo khung giờ</h2>
-                                            <p className="text-xs text-[#5c5f70]">Dữ liệu tính toán trực tiếp từ các đơn đặt chỗ trong cơ sở dữ liệu</p>
+                                            <h2 className="text-[18px] font-semibold text-on-surface">Kiểm tra ô trống theo khung giờ</h2>
+                                            <p className="text-xs text-on-surface-muted">Dữ liệu tính toán trực tiếp từ các đơn đặt chỗ trong cơ sở dữ liệu</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-1.5">
@@ -499,8 +499,8 @@ export default function StationDetailPage({
                                                 onClick={() => setSimStartHourOffset(opt.offset)}
                                                 className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                                                     simStartHourOffset === opt.offset
-                                                        ? 'bg-[#2563eb] text-white'
-                                                        : 'bg-[#eff4ff] text-[#434655] hover:bg-[#dce9ff]'
+                                                        ? 'bg-primary-container text-white'
+                                                        : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high'
                                                 }`}
                                             >
                                                 {opt.label}
@@ -509,35 +509,35 @@ export default function StationDetailPage({
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-[#f8f9ff] p-4 rounded-xl border border-[#e5eeff] text-xs">
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-surface-bright p-4 rounded-xl border border-surface-container text-xs">
                                     <div>
-                                        <span className="text-[#5c5f70] uppercase font-bold text-xs">Bắt đầu gửi</span>
-                                        <p className="font-bold text-[#0b1c30] text-sm mt-0.5">
+                                        <span className="text-on-surface-muted uppercase font-bold text-xs">Bắt đầu gửi</span>
+                                        <p className="font-bold text-on-surface text-sm mt-0.5">
                                             {simStartDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} - {simStartDate.toLocaleDateString('vi-VN')}
                                         </p>
                                     </div>
                                     <div>
-                                        <span className="text-[#5c5f70] uppercase font-bold text-xs">Dự kiến nhận lại</span>
-                                        <p className="font-bold text-[#0b1c30] text-sm mt-0.5">
+                                        <span className="text-on-surface-muted uppercase font-bold text-xs">Dự kiến nhận lại</span>
+                                        <p className="font-bold text-on-surface text-sm mt-0.5">
                                             {simEndDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} - {simEndDate.toLocaleDateString('vi-VN')}
                                         </p>
                                     </div>
                                     <div>
-                                        <span className="text-[#5c5f70] uppercase font-bold text-xs">Thời lượng thuê</span>
-                                        <p className="font-bold text-[#2563eb] text-sm mt-0.5">{selectedDuration} giờ liên tục</p>
+                                        <span className="text-on-surface-muted uppercase font-bold text-xs">Thời lượng thuê</span>
+                                        <p className="font-bold text-primary-container text-sm mt-0.5">{selectedDuration} giờ liên tục</p>
                                     </div>
                                 </div>
                             </div>
 
                             {/* ── Section 3: Real Pricing Table from DB ── */}
-                            <div className="rounded-2xl bg-white shadow-[0_1px_3px_rgba(15,23,42,0.06)] border border-[#e5eeff] p-6 flex flex-col gap-4">
-                                <h2 className="text-[18px] font-semibold text-[#0b1c30] flex items-center gap-2">
+                            <div className="rounded-2xl bg-white shadow-[0_1px_3px_rgba(15,23,42,0.06)] border border-surface-container p-6 flex flex-col gap-4">
+                                <h2 className="text-[18px] font-semibold text-on-surface flex items-center gap-2">
                                     <span className="text-xl">🧾</span> Bảng giá cước &amp; Chính sách trạm (Dữ liệu Hệ thống)
                                 </h2>
-                                <div className="overflow-x-auto rounded-xl border border-[#e5eeff]">
+                                <div className="overflow-x-auto rounded-xl border border-surface-container">
                                     <table className="w-full text-sm">
                                         <thead>
-                                            <tr className="bg-[#f8f9ff] text-[#5c5f70] text-xs font-bold uppercase tracking-wide">
+                                            <tr className="bg-surface-bright text-on-surface-muted text-xs font-bold uppercase tracking-wide">
                                                 <th className="py-3 px-4 text-left">Kích cỡ tủ</th>
                                                 <th className="py-3 px-4 text-left">Giá thuê / giờ</th>
                                                 <th className="py-3 px-4 text-left">Thời gian thuê</th>
@@ -545,31 +545,31 @@ export default function StationDetailPage({
                                                 <th className="py-3 px-4 text-left">Hoàn tiền hủy sớm</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-[#f0f4ff]">
+                                        <tbody className="divide-y divide-surface-container-low">
                                             {(['S', 'M', 'L'] as SizeKey[]).map(sz => {
                                                 const rate = getRateForSize(sz);
                                                 const overdue = getOverdueForSize(sz);
                                                 return (
-                                                    <tr key={sz} className="hover:bg-[#f8f9ff] transition-colors">
-                                                        <td className="py-3.5 px-4 font-semibold text-[#0b1c30]">
+                                                    <tr key={sz} className="hover:bg-surface-bright transition-colors">
+                                                        <td className="py-3.5 px-4 font-semibold text-on-surface">
                                                             <div className="flex items-center gap-2">
                                                                 <span className={`w-5 h-5 rounded flex items-center justify-center text-xs font-bold
-                                                                    ${sz === 'S' ? 'bg-[#eff4ff] text-[#2563eb]' : sz === 'M' ? 'bg-[#e5eeff] text-[#004ac6]' : 'bg-red-50 text-red-500'}`}>
+                                                                    ${sz === 'S' ? 'bg-surface-container-low text-primary-container' : sz === 'M' ? 'bg-surface-container text-primary' : 'bg-red-50 text-red-500'}`}>
                                                                     {sz}
                                                                 </span>
                                                                 {SIZE_META[sz].label}
                                                             </div>
                                                         </td>
-                                                        <td className="py-3.5 px-4 font-bold text-[#2563eb]">
+                                                        <td className="py-3.5 px-4 font-bold text-primary-container">
                                                             {rate > 0 ? `${formatVND(rate)} / giờ` : 'Chưa cấu hình'}
                                                         </td>
-                                                        <td className="py-3.5 px-4 text-[#5c5f70]">
+                                                        <td className="py-3.5 px-4 text-on-surface-muted">
                                                             {detail.minHours ?? 1}h – {detail.maxHours ?? 72}h
                                                         </td>
                                                         <td className="py-3.5 px-4 text-amber-700 font-medium">
                                                             {overdue > 0 ? `+${formatVND(overdue)} / giờ` : 'Theo quy định'}
                                                         </td>
-                                                        <td className="py-3.5 px-4 text-[#007d55] font-semibold text-xs">
+                                                        <td className="py-3.5 px-4 text-tertiary-container font-semibold text-xs">
                                                             {Math.round((detail.refundRateEarly ?? 1) * 100)}% (trước {detail.refundCutoffHours ?? 2}h)
                                                         </td>
                                                     </tr>
@@ -579,15 +579,15 @@ export default function StationDetailPage({
                                     </table>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    <div className="p-3.5 rounded-xl bg-[#f8f9ff] border border-[#e5eeff] flex items-start gap-2">
-                                        <CheckCircle className="w-5 h-5 text-[#007d55] shrink-0 mt-0.5" />
-                                        <p className="text-xs text-[#0b1c30]">
+                                    <div className="p-3.5 rounded-xl bg-surface-bright border border-surface-container flex items-start gap-2">
+                                        <CheckCircle className="w-5 h-5 text-tertiary-container shrink-0 mt-0.5" />
+                                        <p className="text-xs text-on-surface">
                                             <strong>Thời gian ân hạn (Grace Period):</strong> Miễn phí {detail.gracePeriodMinutes ?? 15} phút đầu tiên sau khi hết giờ thuê trước khi tính phụ phí quá hạn.
                                         </p>
                                     </div>
-                                    <div className="p-3.5 rounded-xl bg-[#f8f9ff] border border-[#e5eeff] flex items-start gap-2">
-                                        <Clock className="w-5 h-5 text-[#2563eb] shrink-0 mt-0.5" />
-                                        <p className="text-xs text-[#0b1c30]">
+                                    <div className="p-3.5 rounded-xl bg-surface-bright border border-surface-container flex items-start gap-2">
+                                        <Clock className="w-5 h-5 text-primary-container shrink-0 mt-0.5" />
+                                        <p className="text-xs text-on-surface">
                                             <strong>Hỗ trợ Kiosk &amp; Offline QR:</strong> Mở khóa ngăn tủ bằng mã PIN 6 số hoặc mã QR động tại màn hình Kiosk trạm.
                                         </p>
                                     </div>
@@ -595,9 +595,9 @@ export default function StationDetailPage({
                             </div>
 
                             {/* ── Section 4: IoT Hardware & Security Amenities ── */}
-                            <div className="rounded-2xl bg-white shadow-[0_1px_3px_rgba(15,23,42,0.06)] border border-[#e5eeff] p-6 flex flex-col gap-4">
+                            <div className="rounded-2xl bg-white shadow-[0_1px_3px_rgba(15,23,42,0.06)] border border-surface-container p-6 flex flex-col gap-4">
                                 <div className="flex items-center justify-between">
-                                    <h2 className="text-[18px] font-semibold text-[#0b1c30] flex items-center gap-2">
+                                    <h2 className="text-[18px] font-semibold text-on-surface flex items-center gap-2">
                                         <span className="text-xl">📡</span> Tiện ích &amp; An ninh tại trạm
                                     </h2>
                                     <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold">
@@ -607,17 +607,17 @@ export default function StationDetailPage({
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                     {[
-                                        { icon: Wifi, label: 'Kết nối IoT MQTT', title: 'Đồng bộ Thời gian thực', sub: 'Phản hồi mở khóa < 1 giây', color: 'text-[#007d55]' },
-                                        { icon: QrCode, label: 'Xác thực Đa phương thức', title: 'QR Code & Mã PIN', sub: 'Hỗ trợ mở khóa ngoại tuyến', color: 'text-[#2563eb]' },
-                                        { icon: Video, label: 'Giám sát An ninh', title: 'Camera CCTV 24/7', sub: 'Cảm biến từ trường cửa tủ', color: 'text-[#007d55]' },
+                                        { icon: Wifi, label: 'Kết nối IoT MQTT', title: 'Đồng bộ Thời gian thực', sub: 'Phản hồi mở khóa < 1 giây', color: 'text-tertiary-container' },
+                                        { icon: QrCode, label: 'Xác thực Đa phương thức', title: 'QR Code & Mã PIN', sub: 'Hỗ trợ mở khóa ngoại tuyến', color: 'text-primary-container' },
+                                        { icon: Video, label: 'Giám sát An ninh', title: 'Camera CCTV 24/7', sub: 'Cảm biến từ trường cửa tủ', color: 'text-tertiary-container' },
                                     ].map((item, i) => (
-                                        <div key={i} className="p-4 rounded-xl bg-[#f8f9ff] border border-[#e5eeff] flex flex-col gap-1.5">
-                                            <div className="flex items-center justify-between text-[#5c5f70]">
+                                        <div key={i} className="p-4 rounded-xl bg-surface-bright border border-surface-container flex flex-col gap-1.5">
+                                            <div className="flex items-center justify-between text-on-surface-muted">
                                                 <span className="text-xs font-bold uppercase tracking-wide">{item.label}</span>
                                                 <item.icon className={`w-4 h-4 ${item.color}`} />
                                             </div>
-                                            <span className="text-sm font-bold text-[#0b1c30]">{item.title}</span>
-                                            <span className="text-xs text-[#5c5f70]">{item.sub}</span>
+                                            <span className="text-sm font-bold text-on-surface">{item.title}</span>
+                                            <span className="text-xs text-on-surface-muted">{item.sub}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -628,20 +628,20 @@ export default function StationDetailPage({
                         <div className="lg:col-span-4 w-full lg:sticky lg:top-28 flex flex-col gap-4">
 
                             {/* Booking Card */}
-                            <div className="rounded-2xl bg-white shadow-[0_4px_16px_rgba(15,23,42,0.1)] p-6 flex flex-col gap-5 border border-[#e5eeff]">
+                            <div className="rounded-2xl bg-white shadow-[0_4px_16px_rgba(15,23,42,0.1)] p-6 flex flex-col gap-5 border border-surface-container">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="text-xs font-bold uppercase tracking-wider text-[#2563eb]">Đặt chỗ nhanh trạm này</p>
-                                        <h3 className="text-lg font-bold text-[#0b1c30] mt-0.5">Cấu hình gửi hành lý</h3>
+                                        <p className="text-xs font-bold uppercase tracking-wider text-primary-container">Đặt chỗ nhanh trạm này</p>
+                                        <h3 className="text-lg font-bold text-on-surface mt-0.5">Cấu hình gửi hành lý</h3>
                                     </div>
-                                    <Shield className="w-6 h-6 text-[#2563eb]" />
+                                    <Shield className="w-6 h-6 text-primary-container" />
                                 </div>
 
                                 {/* Step 1: Size selector */}
                                 <div className="flex flex-col gap-2">
                                     <div className="flex items-center justify-between">
-                                        <label className="text-sm font-semibold text-[#0b1c30]">1. Chọn kích thước ngăn tủ</label>
-                                        <span className="text-xs text-[#5c5f70]">Đã chọn: <strong className="text-[#2563eb]">Size {selectedSize}</strong></span>
+                                        <label className="text-sm font-semibold text-on-surface">1. Chọn kích thước ngăn tủ</label>
+                                        <span className="text-xs text-on-surface-muted">Đã chọn: <strong className="text-primary-container">Size {selectedSize}</strong></span>
                                     </div>
                                     <div className="grid grid-cols-3 gap-2">
                                         {(['S', 'M', 'L'] as SizeKey[]).map(sz => {
@@ -656,7 +656,7 @@ export default function StationDetailPage({
                                                         onClick={() => a > 0 && setSelectedSize(sz)}
                                                         disabled={a === 0}
                                                         className={`w-full p-3 rounded-xl flex flex-col items-center justify-center gap-0.5 text-center transition-all shadow-xs cursor-pointer
-                                                            ${isSelected ? 'bg-[#2563eb] text-white' : a === 0 ? 'bg-[#f8f9ff] text-[#c3c6d7] cursor-not-allowed' : 'bg-[#f0f4ff] text-[#434655] hover:bg-[#e5eeff]'}`}
+                                                            ${isSelected ? 'bg-primary-container text-white' : a === 0 ? 'bg-surface-bright text-outline-variant cursor-not-allowed' : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container'}`}
                                                     >
                                                         <span className="text-xl font-bold">{sz}</span>
                                                         <span className="text-xs opacity-90">{r > 0 ? `${(r / 1000).toFixed(0)}k/h` : '--'}</span>
@@ -670,8 +670,8 @@ export default function StationDetailPage({
                                 {/* Step 2: Duration */}
                                 <div className="flex flex-col gap-2">
                                     <div className="flex items-center justify-between">
-                                        <label className="text-sm font-semibold text-[#0b1c30]">2. Thời gian gửi dự kiến</label>
-                                        <span className="text-xs text-[#2563eb] font-semibold">{selectedDuration} Giờ</span>
+                                        <label className="text-sm font-semibold text-on-surface">2. Thời gian gửi dự kiến</label>
+                                        <span className="text-xs text-primary-container font-semibold">{selectedDuration} Giờ</span>
                                     </div>
                                     <div className="grid grid-cols-4 gap-1.5">
                                         {DURATIONS.map(d => (
@@ -681,7 +681,7 @@ export default function StationDetailPage({
                                                 type="button"
                                                 onClick={() => setSelectedDuration(d)}
                                                 className={`py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer
-                                                    ${selectedDuration === d ? 'bg-[#2563eb] text-white shadow-xs' : 'bg-[#f0f4ff] text-[#434655] hover:bg-[#e5eeff]'}`}
+                                                    ${selectedDuration === d ? 'bg-primary-container text-white shadow-xs' : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container'}`}
                                             >
                                                 {d}h
                                             </button>
@@ -690,21 +690,21 @@ export default function StationDetailPage({
                                 </div>
 
                                 {/* Pricing breakdown */}
-                                <div className="p-4 rounded-xl bg-[#f8f9ff] border border-[#e5eeff] flex flex-col gap-2.5">
-                                    <div className="flex items-center justify-between text-xs text-[#5c5f70]">
+                                <div className="p-4 rounded-xl bg-surface-bright border border-surface-container flex flex-col gap-2.5">
+                                    <div className="flex items-center justify-between text-xs text-on-surface-muted">
                                         <span>Đơn giá ({formatVND(currentRate)} × {selectedDuration}h)</span>
-                                        <span className="font-semibold text-[#0b1c30]">{formatVND(totalAmount)}</span>
+                                        <span className="font-semibold text-on-surface">{formatVND(totalAmount)}</span>
                                     </div>
-                                    <div className="flex items-center justify-between text-xs text-[#5c5f70]">
+                                    <div className="flex items-center justify-between text-xs text-on-surface-muted">
                                         <span className="flex items-center gap-1">Số ô Size {selectedSize} khả dụng</span>
-                                        <span className="text-[#007d55] font-bold">{avail} ô trống</span>
+                                        <span className="text-tertiary-container font-bold">{avail} ô trống</span>
                                     </div>
-                                    <div className="pt-2.5 mt-1 border-t border-[#e5eeff] flex items-center justify-between">
+                                    <div className="pt-2.5 mt-1 border-t border-surface-container flex items-center justify-between">
                                         <div className="flex flex-col">
-                                            <span className="text-xs font-bold uppercase tracking-wider text-[#5c5f70]">Tạm tính thanh toán</span>
-                                            <span className="text-xs text-[#5b6b80]">(Giá chính thức từ hệ thống)</span>
+                                            <span className="text-xs font-bold uppercase tracking-wider text-on-surface-muted">Tạm tính thanh toán</span>
+                                            <span className="text-xs text-on-surface-muted">(Giá chính thức từ hệ thống)</span>
                                         </div>
-                                        <span className="text-2xl font-bold text-[#2563eb]">{formatVND(totalAmount)}</span>
+                                        <span className="text-2xl font-bold text-primary-container">{formatVND(totalAmount)}</span>
                                     </div>
                                 </div>
 
@@ -716,8 +716,8 @@ export default function StationDetailPage({
                                     disabled={avail === 0 || detail.status !== 'ACTIVE'}
                                     className={`w-full h-12 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer
                                         ${avail === 0 || detail.status !== 'ACTIVE'
-                                            ? 'bg-[#e5eeff] text-[#5b6b80] cursor-not-allowed'
-                                            : 'bg-[#2563eb] hover:bg-[#1d4ed8] text-white active:scale-[0.98]'
+                                            ? 'bg-surface-container text-on-surface-muted cursor-not-allowed'
+                                            : 'bg-primary-container hover:bg-blue-700 text-white active:scale-[0.98]'
                                         }`}
                                 >
                                     {avail === 0 ? 'Hết ô trống — vui lòng chọn cỡ khác' : (
@@ -730,12 +730,12 @@ export default function StationDetailPage({
 
                                 {/* Trust badges */}
                                 <div className="flex flex-col gap-2 pt-1">
-                                    <div className="flex items-center gap-2 text-xs text-[#434655]">
-                                        <Shield className="w-4 h-4 text-[#007d55] shrink-0" />
+                                    <div className="flex items-center gap-2 text-xs text-on-surface-variant">
+                                        <Shield className="w-4 h-4 text-tertiary-container shrink-0" />
                                         <span>Giám sát an ninh 24/7 &amp; khóa từ tự động</span>
                                     </div>
-                                    <div className="flex items-center gap-2 text-xs text-[#434655]">
-                                        <CheckCircle className="w-4 h-4 text-[#2563eb] shrink-0" />
+                                    <div className="flex items-center gap-2 text-xs text-on-surface-variant">
+                                        <CheckCircle className="w-4 h-4 text-primary-container shrink-0" />
                                         <span>Thanh toán trực tuyến an toàn qua PayOS QR</span>
                                     </div>
                                 </div>
@@ -743,19 +743,19 @@ export default function StationDetailPage({
 
                             {/* Emergency support */}
                             {detail.contactPhone && (
-                                <div className="rounded-2xl bg-[#f8f9ff] border border-[#e5eeff] p-4 flex items-center justify-between">
+                                <div className="rounded-2xl bg-surface-bright border border-surface-container p-4 flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-xs text-[#2563eb]">
+                                        <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-xs text-primary-container">
                                             <Phone className="w-5 h-5" />
                                         </div>
                                         <div className="flex flex-col leading-none">
-                                            <span className="text-xs font-bold uppercase tracking-wide text-[#5c5f70]">Hỗ trợ tại trạm</span>
-                                            <span className="text-base font-bold text-[#0b1c30] font-mono mt-0.5">{detail.contactPhone}</span>
+                                            <span className="text-xs font-bold uppercase tracking-wide text-on-surface-muted">Hỗ trợ tại trạm</span>
+                                            <span className="text-base font-bold text-on-surface font-mono mt-0.5">{detail.contactPhone}</span>
                                         </div>
                                     </div>
                                     <a
                                         href={`tel:${detail.contactPhone}`}
-                                        className="px-4 py-2 rounded-xl bg-white border border-[#e5eeff] text-[#0b1c30] text-xs font-semibold hover:bg-[#eff4ff] transition-colors shadow-xs"
+                                        className="px-4 py-2 rounded-xl bg-white border border-surface-container text-on-surface text-xs font-semibold hover:bg-surface-container-low transition-colors shadow-xs"
                                     >
                                         Gọi ngay
                                     </a>

@@ -250,7 +250,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
     <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 md:p-6 animate-fade-in-up">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-[#0b1c30]/50 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-on-surface/50 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 

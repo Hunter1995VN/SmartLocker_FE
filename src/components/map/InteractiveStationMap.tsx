@@ -376,11 +376,11 @@ export default function InteractiveStationMap({
 
     if (leafletError) {
         return (
-            <div className="w-full h-full flex items-center justify-center bg-[#f0f4ff] p-6">
-                <div className="bg-white rounded-2xl p-6 shadow-md max-w-sm text-center border border-[#e5eeff]">
-                    <MapPin className="w-10 h-10 text-[#2563eb] mx-auto mb-3" />
-                    <p className="font-bold text-[#0b1c30] text-sm">Không thể tải lớp bản đồ trực tuyến</p>
-                    <p className="text-xs text-[#5c5f70] mt-1">Vui lòng kiểm tra kết nối mạng Internet để tải bản đồ số.</p>
+            <div className="w-full h-full flex items-center justify-center bg-surface-container-low p-6">
+                <div className="bg-white rounded-2xl p-6 shadow-md max-w-sm text-center border border-surface-container">
+                    <MapPin className="w-10 h-10 text-primary-container mx-auto mb-3" />
+                    <p className="font-bold text-on-surface text-sm">Không thể tải lớp bản đồ trực tuyến</p>
+                    <p className="text-xs text-on-surface-muted mt-1">Vui lòng kiểm tra kết nối mạng Internet để tải bản đồ số.</p>
                 </div>
             </div>
         );
@@ -393,7 +393,7 @@ export default function InteractiveStationMap({
 
             {/* Banner hướng dẫn khi đang ở chế độ chọn vị trí trên bản đồ */}
             {pickLocationMode && (
-                <div className="absolute top-16 left-1/2 -translate-x-1/2 z-[450] bg-[#dc2626] text-white px-4 py-2 rounded-full shadow-lg text-xs font-bold flex items-center gap-2 animate-bounce">
+                <div className="absolute top-16 left-1/2 -translate-x-1/2 z-[450] bg-red-600 text-white px-4 py-2 rounded-full shadow-lg text-xs font-bold flex items-center gap-2 animate-bounce">
                     <LocateFixed className="w-4 h-4" />
                     <span>Nhấp vào bất kỳ điểm nào trên bản đồ để đặt "Vị trí của bạn"</span>
                     <button
@@ -408,18 +408,18 @@ export default function InteractiveStationMap({
 
             {/* Loading overlay while Leaflet initializes */}
             {!leafletReady && (
-                <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#f0f4ff]/90">
+                <div className="absolute inset-0 z-20 flex items-center justify-center bg-surface-container-low/90">
                     <div className="text-center">
-                        <div className="w-11 h-11 border-4 border-[#2563eb] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                        <p className="text-sm text-[#0b1c30] font-semibold">Đang khởi tạo bản đồ số GPS...</p>
+                        <div className="w-11 h-11 border-4 border-primary-container border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                        <p className="text-sm text-on-surface font-semibold">Đang khởi tạo bản đồ số GPS...</p>
                     </div>
                 </div>
             )}
 
             {/* Map Style Switcher & Pick Location Button (Bottom Left) */}
             <div className="absolute bottom-4 left-4 z-[400] flex items-center gap-2 flex-wrap">
-                <div className="flex items-center gap-1 bg-white/95 backdrop-blur-md p-1 rounded-xl shadow-[0_2px_12px_rgba(15,23,42,0.12)] border border-[#e5eeff]">
-                    <Layers className="w-3.5 h-3.5 text-[#2563eb] ml-2 mr-1" />
+                <div className="flex items-center gap-1 bg-white/95 backdrop-blur-md p-1 rounded-xl shadow-[0_2px_12px_rgba(15,23,42,0.12)] border border-surface-container">
+                    <Layers className="w-3.5 h-3.5 text-primary-container ml-2 mr-1" />
                     {(Object.keys(TILE_LAYERS) as MapStyleKey[]).map((key) => (
                         <button
                             key={key}
@@ -427,8 +427,8 @@ export default function InteractiveStationMap({
                             onClick={() => setMapStyle(key)}
                             className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                                 mapStyle === key
-                                    ? 'bg-[#2563eb] text-white shadow-xs'
-                                    : 'text-[#434655] hover:bg-[#eff4ff]'
+                                    ? 'bg-primary-container text-white shadow-xs'
+                                    : 'text-on-surface-variant hover:bg-surface-container-low'
                             }`}
                         >
                             {TILE_LAYERS[key].label}
@@ -442,8 +442,8 @@ export default function InteractiveStationMap({
                         onClick={() => setPickLocationMode(v => !v)}
                         className={`px-3 py-1.5 rounded-xl text-xs font-bold shadow-[0_2px_12px_rgba(15,23,42,0.12)] border transition-all cursor-pointer flex items-center gap-1.5 ${
                             pickLocationMode
-                                ? 'bg-[#dc2626] text-white border-[#dc2626]'
-                                : 'bg-white/95 text-[#dc2626] border-[#fecaca] hover:bg-red-50'
+                                ? 'bg-red-600 text-white border-red-600'
+                                : 'bg-white/95 text-red-600 border-red-200 hover:bg-red-50'
                         }`}
                         title="Chọn vị trí hiện tại của bạn trực tiếp trên bản đồ"
                     >
@@ -455,11 +455,11 @@ export default function InteractiveStationMap({
 
             {/* Selected Station Floating Info Card on Map */}
             {selectedStation && (
-                <div className="absolute bottom-14 left-1/2 -translate-x-1/2 z-[450] w-[92%] max-w-[410px] bg-white rounded-2xl shadow-[0_10px_30px_rgba(15,23,42,0.22)] border border-[#dce9ff] p-4 animate-fade-in-up">
+                <div className="absolute bottom-14 left-1/2 -translate-x-1/2 z-[450] w-[92%] max-w-[410px] bg-white rounded-2xl shadow-[0_10px_30px_rgba(15,23,42,0.22)] border border-surface-container-high p-4 animate-fade-in-up">
                     <button
                         type="button"
                         onClick={() => onSelectStation(null)}
-                        className="absolute top-3 right-3 w-7 h-7 rounded-full bg-[#f0f4ff] hover:bg-[#e5eeff] flex items-center justify-center text-[#434655] cursor-pointer"
+                        className="absolute top-3 right-3 w-7 h-7 rounded-full bg-surface-container-low hover:bg-surface-container flex items-center justify-center text-on-surface-variant cursor-pointer"
                         title="Đóng"
                     >
                         <X className="w-4 h-4" />
@@ -475,19 +475,19 @@ export default function InteractiveStationMap({
                                 {selectedStation.status === 'ACTIVE' ? '● Đang hoạt động' : '⚠ Bảo trì'}
                             </span>
                             {distLabel && (
-                                <span className="text-xs font-bold text-[#dc2626] bg-red-50 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                <span className="text-xs font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full flex items-center gap-1">
                                     <Navigation className="w-3 h-3" /> Cách bạn {distLabel}
                                 </span>
                             )}
                             {minPrice != null && Number.isFinite(minPrice) && (
-                                <span className="text-xs font-bold text-[#007d55] bg-emerald-50 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                <span className="text-xs font-bold text-tertiary-container bg-emerald-50 px-2 py-0.5 rounded-full flex items-center gap-1">
                                     <Sparkles className="w-3 h-3" /> Từ {(minPrice / 1000).toFixed(0)}k/h
                                 </span>
                             )}
                         </div>
-                        <h3 className="font-bold text-[#0b1c30] text-base leading-snug">{selectedStation.name}</h3>
-                        <p className="text-xs text-[#5c5f70] mt-0.5 line-clamp-2 flex items-start gap-1">
-                            <MapPin className="w-3.5 h-3.5 text-[#2563eb] shrink-0 mt-0.5" />
+                        <h3 className="font-bold text-on-surface text-base leading-snug">{selectedStation.name}</h3>
+                        <p className="text-xs text-on-surface-muted mt-0.5 line-clamp-2 flex items-start gap-1">
+                            <MapPin className="w-3.5 h-3.5 text-primary-container shrink-0 mt-0.5" />
                             <span>{selectedStation.address}</span>
                         </p>
                     </div>
@@ -502,30 +502,30 @@ export default function InteractiveStationMap({
                             <div
                                 key={k}
                                 className={`rounded-xl px-2.5 py-1.5 text-center border ${
-                                    a > 0 ? 'bg-[#f8f9ff] border-[#dce9ff]' : 'bg-red-50/60 border-red-100'
+                                    a > 0 ? 'bg-surface-bright border-surface-container-high' : 'bg-red-50/60 border-red-100'
                                 }`}
                             >
-                                <div className="text-xs font-bold text-[#5c5f70] flex items-center justify-between">
+                                <div className="text-xs font-bold text-on-surface-muted flex items-center justify-between">
                                     <span>{label}</span>
-                                    {p != null && <span className="text-[#2563eb]">{(p / 1000).toFixed(0)}k/h</span>}
+                                    {p != null && <span className="text-primary-container">{(p / 1000).toFixed(0)}k/h</span>}
                                 </div>
-                                <div className={`text-sm font-extrabold mt-0.5 ${a > 0 ? 'text-[#0b1c30]' : 'text-red-500'}`}>
-                                    {Math.min(t, a)}<span className="text-xs font-normal text-[#5c5f70]">/{t} trống</span>
+                                <div className={`text-sm font-extrabold mt-0.5 ${a > 0 ? 'text-on-surface' : 'text-red-500'}`}>
+                                    {Math.min(t, a)}<span className="text-xs font-normal text-on-surface-muted">/{t} trống</span>
                                 </div>
                             </div>
                         ))}
                     </div>
 
                     {/* Hours & Phone */}
-                    <div className="flex items-center justify-between text-xs text-[#434655] mb-3 px-1">
+                    <div className="flex items-center justify-between text-xs text-on-surface-variant mb-3 px-1">
                         <span className="flex items-center gap-1 font-medium">
-                            <Clock className="w-3.5 h-3.5 text-[#2563eb]" />
+                            <Clock className="w-3.5 h-3.5 text-primary-container" />
                             Giờ mở cửa: <strong>{selectedStation.opensAt || '00:00'} – {selectedStation.closesAt || '23:59'}</strong>
                         </span>
                         {selectedStation.contactPhone && (
                             <a
                                 href={`tel:${selectedStation.contactPhone}`}
-                                className="flex items-center gap-1 font-semibold text-[#2563eb] hover:underline"
+                                className="flex items-center gap-1 font-semibold text-primary-container hover:underline"
                             >
                                 <Phone className="w-3.5 h-3.5" /> {selectedStation.contactPhone}
                             </a>
@@ -537,7 +537,7 @@ export default function InteractiveStationMap({
                         <button
                             type="button"
                             onClick={() => onViewDetail(selectedStation)}
-                            className="flex-1 py-2.5 px-3 bg-[#eff4ff] hover:bg-[#dce9ff] text-[#2563eb] text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                            className="flex-1 py-2.5 px-3 bg-surface-container-low hover:bg-surface-container-high text-primary-container text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
                         >
                             Xem thông tin trạm
                         </button>
@@ -545,17 +545,17 @@ export default function InteractiveStationMap({
                             href={`https://www.google.com/maps/dir/?api=1&origin=${userLocation ? `${userLocation.lat},${userLocation.lng}` : ''}&destination=${selectedStation.latitude},${selectedStation.longitude}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-[#0b1c30] text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1"
+                            className="py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-on-surface text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1"
                             title="Mở Google Maps dẫn đường từ vị trí của bạn"
                         >
-                            <ExternalLink className="w-3.5 h-3.5 text-[#2563eb]" />
+                            <ExternalLink className="w-3.5 h-3.5 text-primary-container" />
                             Chỉ đường
                         </a>
                         {selectedStation.status === 'ACTIVE' && (
                             <button
                                 type="button"
                                 onClick={() => onBookStation(selectedStation)}
-                                className="flex-1 py-2.5 px-3 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-bold rounded-xl transition-all shadow-sm cursor-pointer flex items-center justify-center gap-1"
+                                className="flex-1 py-2.5 px-3 bg-primary-container hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm cursor-pointer flex items-center justify-center gap-1"
                             >
                                 Đặt tủ <ArrowRight className="w-3.5 h-3.5" />
                             </button>
