@@ -308,7 +308,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                     <div>
                         <button
                             onClick={() => onNavigate('dashboard')}
-                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline mb-2 transition-colors cursor-pointer"
+                            className="link-target inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline mb-2 transition-colors cursor-pointer"
                         >
                             <ArrowLeft className="w-3.5 h-3.5" />
                             <span>Quay lại Trang tổng quan</span>

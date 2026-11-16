@@ -120,7 +120,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
         {/* Breadcrumb & Header Section */}
         <div className="space-y-4">
           <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-semibold text-secondary">
-            <button onClick={() => onNavigate('home')} className="hover:text-primary transition-colors cursor-pointer">Home</button>
+            <button onClick={() => onNavigate('home')} className="link-target hover:text-primary transition-colors cursor-pointer">Home</button>
             <ChevronRight className="w-3.5 h-3.5" />
             <span className="text-on-surface font-semibold">My Bookings</span>
           </nav>
@@ -420,7 +420,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                           setSelectedBooking(booking);
                           setShowCancelModal(true);
                         }}
-                        className="text-xs font-semibold text-rose-600 hover:text-rose-700 hover:underline inline-flex items-center gap-1 cursor-pointer"
+                        className="link-target text-xs font-semibold text-rose-600 hover:text-rose-700 hover:underline inline-flex items-center gap-1 cursor-pointer"
                       >
                         <XCircle className="w-4 h-4" />
                         <span>Cancel Booking</span>
@@ -799,10 +799,10 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-xs text-on-surface-variant">
-            <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>Bảo mật</a>
-            <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>Quyền riêng tư</a>
-            <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }}>Điều khoản dịch vụ</a>
-            <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}>Hỗ trợ</a>
+            <a className="link-target hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>Bảo mật</a>
+            <a className="link-target hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>Quyền riêng tư</a>
+            <a className="link-target hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }}>Điều khoản dịch vụ</a>
+            <a className="link-target hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}>Hỗ trợ</a>
             <span className="text-primary font-bold hidden md:inline">Hotline: 1900 1234</span>
           </div>
         </div>

@@ -312,7 +312,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                             <span className="text-primary-container">📅</span>
                                             {formatDate()}
                                         </span>
-                                        <span className="text-outline-variant">·</span>
+                                        <span className="text-outline" aria-hidden="true">·</span>
                                         <span
                                             role="status"
                                             className={`text-xs font-semibold px-2 py-0.5 rounded-md ${locState === 'granted' ? 'text-primary-container bg-surface-container-low' : 'text-on-warning-container bg-warning-container'}`}
@@ -320,7 +320,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                             {locationText}
                                         </span>
                                         {(locState === 'denied' || locState === 'os-blocked' || locState === 'unavailable' || locState === 'timeout') && (
-                                            <button type="button" onClick={locate} className="text-xs font-bold text-primary underline cursor-pointer">Thử lại</button>
+                                            <button type="button" onClick={locate} className="link-target text-xs font-bold text-primary underline cursor-pointer">Thử lại</button>
                                         )}
                                     </p>
                                 </div>
@@ -353,7 +353,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                             <button
                                 type="button"
                                 onClick={() => onNavigate?.('my-bookings')}
-                                className="shrink-0 text-xs font-bold text-primary hover:text-on-surface transition-colors flex items-center gap-0.5 cursor-pointer"
+                                className="link-target shrink-0 text-xs font-bold text-primary hover:text-on-surface transition-colors flex items-center gap-0.5 cursor-pointer"
                             >
                                 Xem đặt chỗ <ArrowRight className="w-3.5 h-3.5" />
                             </button>
@@ -506,7 +506,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                 <div className="flex flex-col gap-3">
                                     <div className="flex items-center justify-between">
                                         <h2 className="text-[18px] font-semibold uppercase tracking-wider text-on-surface">Lịch sử đặt chỗ gần đây</h2>
-                                        <button type="button" onClick={() => onNavigate?.('my-bookings')} className="text-sm font-semibold text-primary hover:underline flex items-center gap-1 cursor-pointer">
+                                        <button type="button" onClick={() => onNavigate?.('my-bookings')} className="link-target text-sm font-semibold text-primary hover:underline flex items-center gap-1 cursor-pointer">
                                             Xem tất cả lịch sử ({totalBookings}) <ArrowRight className="w-4 h-4" />
                                         </button>
                                     </div>
@@ -651,7 +651,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                         <p className="text-sm text-on-surface-variant mt-0.5">
                                             Cửa tủ không mở, mất mã PIN hoặc cần lấy đồ khẩn cấp: gọi {CONTACT.hotlineLabel} (24/7).
                                         </p>
-                                        <button type="button" onClick={openSupport} className="mt-2 self-start text-xs font-bold text-primary hover:underline cursor-pointer">
+                                        <button type="button" onClick={openSupport} className="link-target mt-2 self-start text-xs font-bold text-primary hover:underline cursor-pointer">
                                             Xem cách liên hệ
                                         </button>
                                     </div>
@@ -683,10 +683,10 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                 <footer className="border-t border-surface-container mt-4 px-4 md:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
                     <p className="text-sm text-on-surface-muted">© {new Date().getFullYear()} SmartLocker. Bản quyền thuộc về SmartLocker.</p>
                     <div className="flex items-center gap-4 text-xs text-on-surface-variant">
-                        <a href="/?view=reviews" className="hover:text-primary transition-colors">Đánh giá khách hàng</a>
-                        <button type="button" onClick={() => openLegal('privacy')} className="hover:text-primary transition-colors cursor-pointer">Chính sách bảo mật</button>
-                        <button type="button" onClick={() => openLegal('terms')} className="hover:text-primary transition-colors cursor-pointer">Điều khoản dịch vụ</button>
-                        <button type="button" onClick={openSupport} className="hover:text-primary transition-colors cursor-pointer">Trợ giúp khẩn cấp 24/7</button>
+                        <a href="/?view=reviews" className="link-target hover:text-primary transition-colors">Đánh giá khách hàng</a>
+                        <button type="button" onClick={() => openLegal('privacy')} className="link-target hover:text-primary transition-colors cursor-pointer">Chính sách bảo mật</button>
+                        <button type="button" onClick={() => openLegal('terms')} className="link-target hover:text-primary transition-colors cursor-pointer">Điều khoản dịch vụ</button>
+                        <button type="button" onClick={openSupport} className="link-target hover:text-primary transition-colors cursor-pointer">Trợ giúp khẩn cấp 24/7</button>
                     </div>
                 </footer>
             </main>
@@ -726,7 +726,7 @@ function BookingRow({ booking, onOpen }: { booking: BookingListItemDto; onOpen: 
                     </div>
                     <p className="text-sm text-on-surface-variant flex flex-wrap items-center gap-2 mt-0.5">
                         <span>{date}</span>
-                        <span className="text-outline-variant">·</span>
+                        <span className="text-outline" aria-hidden="true">·</span>
                         <span className={`font-bold ${isCancelled ? 'line-through text-on-surface-muted' : 'text-on-surface'}`}>
                             {booking.baseAmount.toLocaleString('vi-VN')}đ
                         </span>
@@ -743,7 +743,7 @@ function BookingRow({ booking, onOpen }: { booking: BookingListItemDto; onOpen: 
                         <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />Đánh giá
                     </button>
                 )}
-                <button type="button" onClick={onOpen} className="text-xs font-semibold text-primary-container hover:text-primary flex items-center gap-0.5 transition-colors cursor-pointer">
+                <button type="button" onClick={onOpen} className="link-target text-xs font-semibold text-primary-container hover:text-primary flex items-center gap-0.5 transition-colors cursor-pointer">
                     {booking.status === 'COMPLETED' ? <>Biên lai <ReceiptText className="w-4 h-4" /></> : <>Chi tiết <ChevronRight className="w-4 h-4" /></>}
                 </button>
             </div>
@@ -801,9 +801,9 @@ function NearbyStationCard({ station, onBook }: { station: Station; onBook: () =
             <div className="flex items-center justify-between pt-1">
                 <div className="flex items-center gap-2 text-xs text-on-surface-variant">
                     <span>S: <strong className="text-tertiary">{availS}</strong></span>
-                    <span>·</span>
+                    <span aria-hidden="true">·</span>
                     <span>M: <strong className="text-tertiary">{availM}</strong></span>
-                    <span>·</span>
+                    <span aria-hidden="true">·</span>
                     <span>L: <strong className="text-tertiary">{availL}</strong></span>
                 </div>
                 <button
