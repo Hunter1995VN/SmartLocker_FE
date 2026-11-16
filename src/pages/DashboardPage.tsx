@@ -44,6 +44,11 @@ const STATUS_LABEL: Record<string, { label: string; className: string }> = {
     EXPIRED: { label: 'HẾT HẠN', className: 'bg-surface-container-high text-on-surface-variant' },
 };
 
+function fetchDashboardData() {
+    return Promise.allSettled([getMyBookings(undefined, 1, 20), getStations()]);
+}
+type DashboardResults = Awaited<ReturnType<typeof fetchDashboardData>>;
+
 const SIZE_DIMENSIONS: Record<string, string> = { S: '45×45×65', M: '65×45×65', L: '95×55×65' };
 
 // ─── Helpers ───────────────────────────────────────────────
@@ -105,7 +110,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
     const [now, setNow] = useState(() => Date.now());
 
     const [userLoc, setUserLoc] = useState<{ lat: number; lng: number } | null>(null);
-    const [locState, setLocState] = useState<LocationState>('locating');
+    const [locState, setLocState] = useState<LocationState>(() => (typeof navigator !== 'undefined' && navigator.geolocation ? 'locating' : 'unsupported'));
 
     // Ảnh đại diện/tên mới từ trang Hồ sơ hiện ngay, không cần tải lại trang
     useEffect(() => {
@@ -114,15 +119,12 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
         return () => window.removeEventListener('smartlocker:profile-updated', refresh);
     }, []);
 
-    const loadData = useCallback(async () => {
-        setIsLoadingBookings(true);
-        setIsLoadingStations(true);
-        setBookingsError('');
-        setStationsError('');
-        const [bookingsResult, stationsResult] = await Promise.allSettled([getMyBookings(undefined, 1, 20), getStations()]);
+    // Gọi API (không đặt state) và áp kết quả (đặt state) tách riêng: effect chỉ đặt state trong callback `.then`, không đồng bộ.
+    const applyResults = useCallback(([bookingsResult, stationsResult]: DashboardResults) => {
         if (bookingsResult.status === 'fulfilled' && bookingsResult.value.success) {
             setBookings(bookingsResult.value.data.items);
             setTotalBookings(bookingsResult.value.data.totalCount);
+            setBookingsError('');
         } else {
             setBookings([]);
             setBookingsError(bookingsResult.status === 'rejected'
@@ -132,6 +134,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
         setIsLoadingBookings(false);
         if (stationsResult.status === 'fulfilled') {
             setStations(stationsResult.value);
+            setStationsError('');
         } else {
             setStations([]);
             setStationsError(getApiErrorMessage(stationsResult.reason, 'Không tải được danh sách trạm.'));
@@ -139,19 +142,35 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
         setIsLoadingStations(false);
     }, []);
 
-    useEffect(() => { loadData(); }, [loadData]);
+    // Bấm "Thử lại" / làm mới: bật lại trạng thái đang tải rồi tải lại.
+    const loadData = useCallback(() => {
+        setIsLoadingBookings(true);
+        setIsLoadingStations(true);
+        setBookingsError('');
+        setStationsError('');
+        void fetchDashboardData().then(applyResults);
+    }, [applyResults]);
+
+    // Lần đầu: trạng thái "đang tải" đã là true từ useState.
+    useEffect(() => {
+        let alive = true;
+        void fetchDashboardData().then((results) => { if (alive) applyResults(results); });
+        return () => { alive = false; };
+    }, [applyResults]);
 
     // Vị trí thật của người dùng (một lần khi mở trang, có thể bấm thử lại)
+    const onPosition = useCallback((pos: GeolocationPosition) => { setUserLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude }); setLocState('granted'); }, []);
+    const onPositionError = useCallback((err: GeolocationPositionError) => { void classifyGeoError(err).then(setLocState); }, []);
+    // Bấm "Thử lại": đặt lại trạng thái "đang xác định" rồi hỏi vị trí.
     const locate = useCallback(() => {
         if (!navigator.geolocation) { setLocState('unsupported'); return; }
         setLocState('locating');
-        navigator.geolocation.getCurrentPosition(
-            (pos) => { setUserLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude }); setLocState('granted'); },
-            (err) => { void classifyGeoError(err).then(setLocState); },
-            { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 },
-        );
-    }, []);
-    useEffect(() => { locate(); }, [locate]);
+        navigator.geolocation.getCurrentPosition(onPosition, onPositionError, { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 });
+    }, [onPosition, onPositionError]);
+    // Lần đầu: trạng thái khởi tạo đã là "locating" (hoặc "unsupported"), chỉ cần hỏi vị trí.
+    useEffect(() => {
+        if (navigator.geolocation) navigator.geolocation.getCurrentPosition(onPosition, onPositionError, { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 });
+    }, [onPosition, onPositionError]);
     // Allowing location in the address bar or switching on OS location services takes effect without a reload.
     const locStateRef = useRef(locState);
     useEffect(() => { locStateRef.current = locState; }, [locState]);
