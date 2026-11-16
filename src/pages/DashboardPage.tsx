@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
-    Search, MapPin, Navigation, Zap,
-    Shield, User, Clock, RefreshCw, ChevronRight,
-    ArrowRight, Phone, Package, ReceiptText, Lock, CheckCircle, Star, Calendar,
+    Search, MapPin, Navigation,
+    Shield, Clock, RefreshCw, ChevronRight,
+    ArrowRight, Phone, Package, ReceiptText, Lock, Star, Calendar,
 } from 'lucide-react';
 import { getStations, calcDistance } from '../api/stationService';
 import type { Station } from '../api/stationService';
@@ -164,7 +164,6 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
         () => bookings.find((b) => b.status === 'STORED') ?? bookings.find((b) => b.status === 'CONFIRMED') ?? null,
         [bookings],
     );
-    const storedCount = useMemo(() => bookings.filter((b) => b.status === 'STORED').length, [bookings]);
     const recentBookings = useMemo(() => bookings.slice(0, 5), [bookings]);
 
     // Đồng hồ chỉ chạy khi có đơn đang hoạt động
@@ -326,37 +325,6 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                 </div>
                             </div>
 
-                            <div className="relative z-10 grid grid-cols-1 min-[400px]:grid-cols-2 sm:flex sm:flex-wrap items-center gap-2">
-                                <div className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl ${storedCount > 0 ? 'bg-tertiary-container text-white shadow-sm' : 'bg-surface-container text-on-surface'}`}>
-                                    <Lock className="w-5 h-5" />
-                                    <div className="flex flex-col leading-none">
-                                        <span className="text-xs font-bold uppercase tracking-wider opacity-80">Đang sử dụng</span>
-                                        <span className="text-sm font-bold">{storedCount > 0 ? `${storedCount} tủ đang gửi` : 'Chưa gửi tủ nào'}</span>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-surface-container text-on-surface rounded-xl">
-                                    <CheckCircle className="w-5 h-5 text-primary" />
-                                    <div className="flex flex-col leading-none">
-                                        <span className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Lịch sử</span>
-                                        <span className="text-sm font-bold">{isLoadingBookings ? '...' : `${totalBookings} đơn đặt`}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Tip bar */}
-                        <div className="w-full rounded-xl bg-surface-container-low px-4 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-3 text-on-surface-variant">
-                            <p className="text-sm min-w-0">
-                                <span className="font-semibold text-on-surface">Mẹo thao tác nhanh:</span>{' '}
-                                Mã QR và mã PIN mở tủ nằm trong trang chi tiết đặt chỗ. Đưa mã trước kiosk tại trạm để mở tủ.
-                            </p>
-                            <button
-                                type="button"
-                                onClick={() => onNavigate?.('my-bookings')}
-                                className="shrink-0 text-xs font-bold text-primary hover:text-on-surface transition-colors flex items-center gap-0.5 cursor-pointer"
-                            >
-                                Xem đặt chỗ <ArrowRight className="w-3.5 h-3.5" />
-                            </button>
                         </div>
 
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -367,10 +335,6 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                 {/* Active Booking */}
                                 <div className="flex flex-col gap-3">
                                     <div className="flex items-center gap-2">
-                                        <span className="relative flex h-3 w-3">
-                                            {activeBooking && <span className="animate-ping motion-reduce:animate-none absolute inline-flex h-full w-full rounded-full bg-tertiary opacity-75" />}
-                                            <span className={`relative inline-flex rounded-full h-3 w-3 ${activeBooking ? 'bg-tertiary' : 'bg-outline'}`} />
-                                        </span>
                                         <h2 className="text-[18px] font-semibold text-on-surface">Đặt chỗ hiện tại</h2>
                                     </div>
 
@@ -382,7 +346,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                             <button type="button" onClick={loadData} className="px-4 py-2 rounded-xl bg-surface-container text-primary text-sm font-semibold cursor-pointer">Thử lại</button>
                                         </div>
                                     ) : activeBooking ? (
-                                        <div className="relative overflow-hidden rounded-2xl bg-white shadow-xs p-6 md:p-8 flex flex-col gap-6">
+                                        <div className="relative overflow-hidden rounded-2xl bg-white shadow-xs p-4 sm:p-6 md:p-8 flex flex-col gap-4 sm:gap-6">
                                             <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-outline-soft">
                                                 <div className="flex items-center gap-2">
                                                     <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${STATUS_LABEL[activeBooking.status]?.className ?? 'bg-surface-container-high text-on-surface-variant'}`}>
@@ -436,9 +400,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                                 </div>
                                             </div>
 
-                                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-3 bg-surface-bright rounded-xl text-center">
-                                                <InfoCell label="Mã đơn" value={activeBooking.bookingCode} mono />
-                                                <InfoCell label="Cỡ tủ" value={`Size ${activeBooking.size}`} />
+                                            <div className="grid grid-cols-2 gap-2 p-3 bg-surface-bright rounded-xl text-center">
                                                 <InfoCell label="Thời lượng" value={activeBooking.durationHours ? `${activeBooking.durationHours} giờ` : '—'} />
                                                 <InfoCell label="Đã thanh toán" value={`${activeBooking.baseAmount.toLocaleString('vi-VN')}đ`} />
                                             </div>
@@ -479,6 +441,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                                     Cần trợ giúp khẩn cấp?
                                                 </button>
                                             </div>
+                                            <p className="text-sm text-on-surface-variant -mt-2">Đưa mã QR hoặc PIN trước kiosk tại trạm để mở tủ.</p>
                                         </div>
                                     ) : (
                                         <div className="rounded-2xl bg-white shadow-xs p-8 flex flex-col items-center text-center gap-4">
@@ -562,7 +525,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                             </div>
 
                             {/* ── RIGHT COLUMN ── */}
-                            <div className="lg:col-span-4 grid grid-cols-1 md:grid-cols-2 lg:flex lg:flex-col gap-6 min-w-0 items-start lg:items-stretch">
+                            <div className="lg:col-span-4 flex flex-col gap-6 min-w-0">
 
                                 <div className="rounded-2xl bg-white shadow-xs p-6 flex flex-col gap-4">
                                     <div className="flex items-center gap-2">
@@ -611,50 +574,6 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                     </button>
                                 </div>
 
-                                <div className="rounded-2xl bg-white shadow-xs p-6 flex flex-col gap-4">
-                                    <h3 className="text-[18px] font-semibold text-on-surface">Thao tác nhanh</h3>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <QuickActionCard
-                                            icon={<MapPin className="w-5 h-5" />}
-                                            iconBg="bg-primary-fixed" iconColor="text-primary"
-                                            title="Tìm trạm quanh đây" desc="Xem bản đồ GPS"
-                                            onClick={goMap}
-                                        />
-                                        <QuickActionCard
-                                            icon={<Zap className="w-5 h-5" />}
-                                            iconBg="bg-tertiary-fixed" iconColor="text-tertiary"
-                                            title="Đặt tủ mới" desc="Chọn trạm & cỡ tủ"
-                                            onClick={goMap}
-                                        />
-                                        <QuickActionCard
-                                            icon={<Shield className="w-5 h-5" />}
-                                            iconBg="bg-secondary-container" iconColor="text-on-secondary-container"
-                                            title="Điều khoản & bảo mật" desc="Quy định sử dụng"
-                                            onClick={() => openLegal('terms')}
-                                        />
-                                        <QuickActionCard
-                                            icon={<User className="w-5 h-5" />}
-                                            iconBg="bg-surface-container-high" iconColor="text-on-surface"
-                                            title="Hồ sơ cá nhân" desc="Ảnh, SĐT, dư nợ"
-                                            onClick={() => onNavigate?.('profile')}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="md:col-span-2 lg:col-span-1 w-full rounded-2xl bg-surface-container-low p-4 flex items-start gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-primary-container text-white flex items-center justify-center shrink-0">
-                                        <Shield className="w-4 h-4" />
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-sm font-bold text-on-surface">Cần hỗ trợ?</span>
-                                        <p className="text-sm text-on-surface-variant mt-0.5">
-                                            Cửa tủ không mở, mất mã PIN hoặc cần lấy đồ khẩn cấp: gọi {CONTACT.hotlineLabel} (24/7).
-                                        </p>
-                                        <button type="button" onClick={openSupport} className="mt-2 self-start text-xs font-bold text-primary hover:underline cursor-pointer">
-                                            Xem cách liên hệ
-                                        </button>
-                                    </div>
-                                </div>
                             </div>
                         </div>
 
@@ -695,11 +614,11 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
 
 // ─── Sub-components ───────────────────────────────────────────────
 
-function InfoCell({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
+function InfoCell({ label, value }: { label: string; value: string }) {
     return (
         <div className="flex flex-col items-center justify-center p-1">
             <span className="text-xs font-bold text-on-surface-variant">{label}</span>
-            <span className={`text-xs mt-0.5 text-on-surface ${mono ? 'font-mono' : ''}`}>{value}</span>
+            <span className="text-xs mt-0.5 text-on-surface">{value}</span>
         </div>
     );
 }
@@ -821,23 +740,5 @@ function NearbyStationCard({ station, onBook }: { station: Station; onBook: () =
                 </button>
             </div>
         </div>
-    );
-}
-
-function QuickActionCard({ icon, iconBg, iconColor, title, desc, onClick }: {
-    icon: React.ReactNode; iconBg: string; iconColor: string; title: string; desc: string; onClick?: () => void;
-}) {
-    return (
-        <button
-            type="button"
-            onClick={onClick}
-            className="flex flex-col items-start gap-2 p-4 rounded-xl bg-surface-bright border border-outline-soft hover:bg-surface-container-low hover:border-outline-variant transition-all group text-left cursor-pointer"
-        >
-            <div className={`w-10 h-10 rounded-xl ${iconBg} ${iconColor} flex items-center justify-center group-hover:scale-105 transition-transform`}>
-                {icon}
-            </div>
-            <span className="text-sm font-bold text-on-surface">{title}</span>
-            <span className="text-xs text-on-surface-variant">{desc}</span>
-        </button>
     );
 }
