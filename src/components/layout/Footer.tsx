@@ -57,7 +57,7 @@ const Footer = () => {
             <div className="lg:col-span-2 space-y-5">
               {/* Logo */}
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-container to-primary flex items-center justify-center text-white shadow-elevation-1">
+ <div className="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center text-white shadow-elevation-1">
                   <Lock className="w-5 h-5" />
                 </div>
                 <span className="text-xl font-bold text-on-surface">SmartLocker</span>
@@ -65,7 +65,7 @@ const Footer = () => {
 
               {/* Description */}
               <p className="text-sm text-secondary max-w-sm leading-relaxed">
-                Hạ tầng mạng lưới tủ gửi đồ tự động thông minh 24/7 hàng đầu Việt Nam. Tích hợp thanh toán số VietQR, mã hóa bảo mật JWS không phụ thuộc internet và bảo hiểm đồ họa toàn diện.
+                Hạ tầng mạng lưới tủ gửi đồ tự động thông minh 24/7 hàng đầu Việt Nam. Tích hợp thanh toán số VietQR, mã hóa bảo mật JWS không phụ thuộc internet và bảo hiểm hành lý theo từng đơn.
               </p>
 
               {/* Contact Info */}

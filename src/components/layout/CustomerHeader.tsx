@@ -96,10 +96,10 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                         </button>
 
                         {/* Navigation Links */}
-                        <nav className="hidden md:flex items-center gap-1.5">
+                        <nav className="hidden md:flex items-center gap-1 lg:gap-1.5">
                             <button
                                 onClick={() => onNavigate('dashboard')}
-                                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
+                                className={`flex items-center gap-2 px-2.5 lg:px-3.5 py-1.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
                                     isTabActive('dashboard')
                                         ? 'bg-surface-container-low text-primary-container'
                                         : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low'
@@ -111,31 +111,33 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
 
                             <button
                                 onClick={() => onNavigate('find-station')}
-                                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
+                                className={`flex items-center gap-2 px-2.5 lg:px-3.5 py-1.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
                                     isTabActive('find-station')
                                         ? 'bg-surface-container-low text-primary-container'
                                         : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low'
                                 }`}
                             >
                                 <Compass className="w-4 h-4" />
-                                <span>Tìm trạm & Đặt tủ</span>
+                                <span className="lg:hidden">Tìm trạm</span>
+                                <span className="hidden lg:inline">Tìm trạm & Đặt tủ</span>
                             </button>
 
                             <button
                                 onClick={() => onNavigate('my-bookings')}
-                                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
+                                className={`flex items-center gap-2 px-2.5 lg:px-3.5 py-1.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
                                     isTabActive('my-bookings')
                                         ? 'bg-surface-container-low text-primary-container'
                                         : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low'
                                 }`}
                             >
                                 <Clock className="w-4 h-4" />
-                                <span>Lịch sử đặt chỗ</span>
+                                <span className="lg:hidden">Lịch sử</span>
+                                <span className="hidden lg:inline">Lịch sử đặt chỗ</span>
                             </button>
 
                             <a
                                 href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}
-                                className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-sm font-semibold text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all"
+                                className="flex items-center gap-2 px-2.5 lg:px-3.5 py-1.5 rounded-xl text-sm font-semibold whitespace-nowrap text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all"
                             >
                                 <Headphones className="w-4 h-4" />
                                 <span>Hỗ trợ</span>
@@ -151,7 +153,7 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                                 onClick={() => setUserMenuOpen(prev => !prev)}
                                 className="flex items-center gap-2.5 p-1.5 pl-2.5 rounded-xl hover:bg-surface-container-low transition-colors border border-transparent hover:border-surface-container cursor-pointer"
                             >
-                                <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs shadow-xs overflow-hidden">
+                                <div className="w-8 h-8 rounded-full bg-primary-container text-white flex items-center justify-center font-bold text-xs shadow-xs overflow-hidden">
                                     {user.avatarUrl ? (
                                         <img
                                             src={resolveAssetUrl(user.avatarUrl)}

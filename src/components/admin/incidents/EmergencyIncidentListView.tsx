@@ -33,6 +33,8 @@ import adminStationService, {
     type LockerGridItemDto,
 } from '../../../api/adminStationService';
 import IncidentDetailPanel from './IncidentDetailPanel';
+import ModalOverlay from '../../ui/ModalOverlay';
+import Pagination, { usePagination } from '../Pagination';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -207,6 +209,7 @@ export default function EmergencyIncidentListView({
             (inc.severity || '').toUpperCase() === severityFilter;
         return matchStatus && matchSeverity;
     });
+    const pgIncidents = usePagination(visibleIncidents, 15);
 
     // ── Render ─────────────────────────────────────────────────────────────────
 
@@ -378,7 +381,7 @@ export default function EmergencyIncidentListView({
                             ) : visibleIncidents.length === 0 ? (
                                 <EmptyState />
                             ) : (
-                                visibleIncidents.map((inc) => (
+                                pgIncidents.pageItems.map((inc) => (
                                     <IncidentRow
                                         key={inc.id}
                                         incident={inc}
@@ -387,6 +390,9 @@ export default function EmergencyIncidentListView({
                                     />
                                 ))
                             )}
+                        </div>
+                        <div className="px-3 pb-3">
+                            <Pagination page={pgIncidents.page} totalPages={pgIncidents.totalPages} total={visibleIncidents.length} from={pgIncidents.from} to={pgIncidents.to} onPageChange={pgIncidents.setPage} label="sự cố" />
                         </div>
                     </div>
                 </div>
@@ -618,12 +624,7 @@ function CreateIncidentModal({
     };
 
     return (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="create-incident-modal-title"
-        >
+        <ModalOverlay onClose={onClose}>
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg border border-slate-200/80 overflow-hidden">
                 {/* Header */}
                 <div className="px-6 pt-5 pb-4 border-b border-slate-100 flex items-start justify-between gap-3 bg-slate-50/60">
@@ -838,7 +839,7 @@ function CreateIncidentModal({
 
                         {evidenceImage ? (
                             <div className="relative rounded-xl border border-slate-200 overflow-hidden bg-slate-50 p-2 flex items-center gap-3">
-                                <img
+                                <img loading="lazy" decoding="async"
                                     src={evidenceImage}
                                     alt="Bằng chứng sự cố"
                                     className="w-20 h-20 rounded-lg object-cover border border-slate-200"
@@ -905,7 +906,7 @@ function CreateIncidentModal({
                     </div>
                 </form>
             </div>
-        </div>
+        </ModalOverlay>
     );
 }
 // ─── Sub-components ───────────────────────────────────────────────────────────

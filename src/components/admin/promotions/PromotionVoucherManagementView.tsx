@@ -45,6 +45,7 @@ import type {
 } from '../../../api/adminPromotionService';
 import CampaignFormModal from './CampaignFormModal';
 import VoucherFormModal from './VoucherFormModal';
+import Pagination, { usePagination } from '../Pagination';
 
 interface PromotionVoucherManagementViewProps {
     onNavigateAudit?: () => void;
@@ -198,6 +199,7 @@ export default function PromotionVoucherManagementView({
             );
         });
     }, [overview?.vouchers, searchQuery, selectedCampaignFilter, selectedStatusFilter]);
+    const pgVouchers = usePagination(filteredVouchers, 15);
 
     const handleCopyCode = async (code: string) => {
         try {
@@ -1009,7 +1011,7 @@ export default function PromotionVoucherManagementView({
                                         </td>
                                     </tr>
                                 ) : (
-                                    filteredVouchers.map((v) => {
+                                    pgVouchers.pageItems.map((v) => {
                                         const st = STATUS_BADGES[v.effectiveStatus] || {
                                             label: v.effectiveStatus,
                                             cls: 'bg-slate-100 text-slate-600 border-slate-200',
@@ -1174,6 +1176,7 @@ export default function PromotionVoucherManagementView({
                             </tbody>
                         </table>
                     </div>
+                    <Pagination page={pgVouchers.page} totalPages={pgVouchers.totalPages} total={filteredVouchers.length} from={pgVouchers.from} to={pgVouchers.to} onPageChange={pgVouchers.setPage} label="voucher" />
                 </div>
             )}
 

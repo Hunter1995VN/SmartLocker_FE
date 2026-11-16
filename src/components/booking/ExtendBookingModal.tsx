@@ -350,7 +350,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                     {paymentData.qrCode ? (
                       <QRCodeSVG value={paymentData.qrCode} size={156} level="M" />
                     ) : vietQrImgUrl ? (
-                      <img
+                      <img loading="lazy" decoding="async"
                         src={vietQrImgUrl}
                         alt="Gia hạn qua VietQR"
                         className="w-40 h-40 object-contain"

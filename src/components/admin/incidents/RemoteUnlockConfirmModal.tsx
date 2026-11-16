@@ -8,6 +8,7 @@
 import { useState } from 'react';
 import { X, ShieldAlert, AlertTriangle, FileCheck2 } from 'lucide-react';
 import type { IncidentDetailDto } from '../../../api/adminIncidentService';
+import ModalOverlay from '../../ui/ModalOverlay';
 
 interface RemoteUnlockConfirmModalProps {
     incident: IncidentDetailDto;
@@ -40,12 +41,7 @@ export default function RemoteUnlockConfirmModal({
 
     return (
         /* Backdrop */
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="unlock-modal-title"
-        >
+        <ModalOverlay onClose={onCancel}>
             {/* Dialog card */}
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg border border-slate-200/80 overflow-hidden">
                 {/* Header */}
@@ -194,7 +190,7 @@ export default function RemoteUnlockConfirmModal({
                     </button>
                 </div>
             </div>
-        </div>
+        </ModalOverlay>
     );
 }
 

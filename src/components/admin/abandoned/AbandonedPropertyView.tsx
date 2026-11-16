@@ -43,6 +43,7 @@ import {
     parseItemDescription,
     disposalLabel,
 } from './AbandonedPropertyHelpers';
+import ModalOverlay from '../../ui/ModalOverlay';
 
 interface AbandonedPropertyViewProps {
     userRole: string;
@@ -111,12 +112,10 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
 
     // ─── Fetch API ─────────────────────────────────────────────────────────────
 
-    const fetchRecords = useCallback(async (showSpinner = true) => {
-        if (showSpinner) setIsLoading(true);
-        setLoadError(null);
-        try {
-            const res = await abandonedPropertyService.getRecords();
+    // Áp kết quả API vào state (gọi trong `.then`/sau await, không đồng bộ trong effect).
+    const applyRecordsResult = useCallback((res: Awaited<ReturnType<typeof abandonedPropertyService.getRecords>>) => {
             if (res.success && Array.isArray(res.data)) {
+                setLoadError(null);
                 setRecords(res.data);
                 if (res.data.length > 0) {
                     setSelectedRecordId((prev) => {
@@ -132,17 +131,29 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
             } else {
                 setLoadError(res.message ?? 'Không thể tải danh sách tài sản bỏ quên.');
             }
+    }, []);
+
+    const fetchRecords = useCallback(async (showSpinner = true) => {
+        if (showSpinner) setIsLoading(true);
+        try {
+            applyRecordsResult(await abandonedPropertyService.getRecords());
         } catch {
             setLoadError('Lỗi kết nối API. Vui lòng kiểm tra backend server.');
         } finally {
             setIsLoading(false);
             setIsRefreshing(false);
         }
-    }, []);
+    }, [applyRecordsResult]);
 
+    // Lần đầu: isLoading đã là true từ useState; chỉ đặt state trong callback `.then`.
     useEffect(() => {
-        void fetchRecords();
-    }, [fetchRecords]);
+        let alive = true;
+        abandonedPropertyService.getRecords()
+            .then((res) => { if (alive) applyRecordsResult(res); })
+            .catch(() => { if (alive) setLoadError('Lỗi kết nối API. Vui lòng kiểm tra backend server.'); })
+            .finally(() => { if (alive) { setIsLoading(false); setIsRefreshing(false); } });
+        return () => { alive = false; };
+    }, [applyRecordsResult]);
 
     const handleRefresh = () => {
         setIsRefreshing(true);
@@ -1112,7 +1123,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                                 onClick={() => setLightboxUrl(photoUrl)}
                                                 className="group relative h-24 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 cursor-pointer shadow-xs hover:border-indigo-400 transition"
                                             >
-                                                <img
+                                                <img loading="lazy" decoding="async"
                                                     src={photoUrl}
                                                     alt={`Bằng chứng #${idx + 1}`}
                                                     className="w-full h-full object-cover group-hover:scale-105 transition duration-200"
@@ -1561,7 +1572,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
 
             {/* Modal: Inspection Form (Staff Mắt 1 - UC-S10) */}
             {showCreateModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+                <ModalOverlay>
                     <InspectionForm
                         prefill={
                             activeRecord
@@ -1586,12 +1597,12 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                         }}
                         onCancel={() => setShowCreateModal(false)}
                     />
-                </div>
+                </ModalOverlay>
             )}
 
             {/* Modal: UC-S11 Customer Handover Procedure */}
             {showHandoverModal && activeRecord && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+                <ModalOverlay onClose={() => setShowHandoverModal(false)}>
                     <div className="bg-white rounded-2xl p-6 max-w-lg w-full shadow-2xl border border-slate-200 space-y-4">
                         <div className="flex items-start justify-between border-b border-slate-100 pb-3">
                             <div className="flex items-center gap-2.5">
@@ -1678,7 +1689,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                     />
                                     {handoverProofUrl && (
                                         <div className="relative w-20 h-20 rounded-xl overflow-hidden border border-slate-200">
-                                            <img
+                                            <img loading="lazy" decoding="async"
                                                 src={handoverProofUrl}
                                                 alt="Bằng chứng bàn giao"
                                                 className="w-full h-full object-cover"
@@ -1754,12 +1765,12 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                             </button>
                         </div>
                     </div>
-                </div>
+                </ModalOverlay>
             )}
 
             {/* Modal: Reject with reason (Admin Reject - UC-A07) */}
             {showRejectModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+                <ModalOverlay onClose={() => setShowRejectModal(false)}>
                     <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-slate-200 space-y-4">
                         <div className="flex items-start justify-between">
                             <h3 className="text-base font-extrabold text-slate-900">
@@ -1806,12 +1817,12 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                             </button>
                         </div>
                     </div>
-                </div>
+                </ModalOverlay>
             )}
 
             {/* Modal: Quy chế pháp lý */}
             {showLawModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+                <ModalOverlay onClose={() => setShowLawModal(false)}>
                     <div className="bg-white rounded-2xl p-6 max-w-lg w-full shadow-2xl border border-slate-200 space-y-4">
                         <div className="flex items-start justify-between">
                             <div className="flex items-center gap-2">
@@ -1854,15 +1865,12 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                             </button>
                         </div>
                     </div>
-                </div>
+                </ModalOverlay>
             )}
 
             {/* Modal: Lightbox View Image */}
             {lightboxUrl && (
-                <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 cursor-zoom-out"
-                    onClick={() => setLightboxUrl(null)}
-                >
+                <ModalOverlay onClose={() => setLightboxUrl(null)} closeOnBackdrop scrim="dark" className="cursor-zoom-out">
                     <div
                         className="relative max-w-4xl max-h-[90vh] bg-slate-900 rounded-2xl overflow-hidden border border-slate-700 shadow-2xl cursor-default"
                         onClick={(e) => e.stopPropagation()}
@@ -1874,13 +1882,13 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                         >
                             <X className="w-5 h-5" />
                         </button>
-                        <img
+                        <img loading="lazy" decoding="async"
                             src={lightboxUrl}
                             alt="Ảnh bằng chứng kích thước đầy đủ"
                             className="max-w-full max-h-[85vh] object-contain mx-auto"
                         />
                     </div>
-                </div>
+                </ModalOverlay>
             )}
         </div>
     );

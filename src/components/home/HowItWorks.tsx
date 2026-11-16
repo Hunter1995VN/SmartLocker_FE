@@ -63,14 +63,14 @@ const HowItWorks = () => {
                   {/* Step Card */}
                   <div className={`rounded-3xl p-7 border transition-all h-full flex flex-col ${
                     step.highlighted 
-                      ? 'bg-gradient-to-br from-primary-container/5 via-white to-primary-container/10 border-2 border-primary-container/40 shadow-elevation-3' 
+ ? 'bg-primary-container/5 border-2 border-primary-container/40 shadow-elevation-3' 
                       : 'bg-white border border-outline-variant/40 shadow-elevation-1 hover-lift'
                   }`}>
                     {/* Step Number Circle */}
                     <div className="flex items-center justify-between mb-6">
                       <div className={`w-20 h-20 rounded-2xl flex items-center justify-center shadow-elevation-2 relative ${
                         step.highlighted 
-                          ? 'bg-gradient-to-br from-primary-container to-primary text-white' 
+ ? 'bg-primary-container text-white' 
                           : 'bg-primary-container/10 text-primary'
                       }`}>
                         <step.icon className="w-9 h-9" />

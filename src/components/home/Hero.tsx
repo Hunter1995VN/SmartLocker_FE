@@ -60,10 +60,10 @@ const Hero = () => {
   ];
 
   const valueProps = [
-    { icon: Zap, text: 'Nhận tủ trong 30s', color: 'text-amber-500', bg: 'bg-amber-50' },
-    { icon: Shield, text: 'Bảo hiểm 100% đồ đạc', color: 'text-blue-600', bg: 'bg-blue-50' },
-    { icon: Wifi, text: 'Mở tủ Offline chuẩn JWS', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-    { icon: RotateCw, text: 'Hoàn tiền linh hoạt', color: 'text-indigo-600', bg: 'bg-indigo-50' },
+    { icon: Zap, text: 'Nhận tủ trong 30s', color: 'text-on-warning-container', bg: 'bg-warning-container' },
+    { icon: Shield, text: 'Có bảo hiểm hành lý', color: 'text-primary', bg: 'bg-primary-fixed' },
+    { icon: Wifi, text: 'Mở tủ Offline chuẩn JWS', color: 'text-tertiary', bg: 'bg-tertiary-fixed' },
+    { icon: RotateCw, text: 'Hoàn tiền linh hoạt', color: 'text-on-secondary-container', bg: 'bg-secondary-container' },
   ];
 
   const handleSearch = () => {
@@ -75,17 +75,15 @@ const Hero = () => {
   return (
     <>
       {/* Hero Section - Improved */}
-      <section className="relative pt-12 pb-20 md:pt-20 md:pb-32 overflow-hidden bg-gradient-to-b from-surface-bright via-background to-background">
+ <section className="relative pt-12 pb-20 md:pt-20 md:pb-32 overflow-hidden bg-surface-bright">
         {/* Layered Background Effects */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[600px] bg-primary/8 rounded-full blur-3xl pointer-events-none -z-10"></div>
-        <div className="absolute top-40 right-0 w-[500px] h-[500px] bg-primary-container/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
         <div className="absolute inset-0 grid-pattern opacity-30 -z-10"></div>
         
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           {/* Top Badges & Main Copy */}
-          <div className="max-w-3xl mx-auto text-center mb-12">
+          <div className="max-w-5xl mx-auto text-center mb-12">
             {/* Headline */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-on-surface tracking-tight mb-6 leading-[1.1] text-balance">
+            <h1 className="max-w-3xl mx-auto text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-on-surface tracking-tight mb-6 leading-[1.1] text-balance">
               Gửi Hành Lý Thông Minh 24/7 — <br className="hidden sm:inline"/>
               <span className="text-gradient">Tự Do Khám Phá</span> Từng Góc Phố
             </h1>
@@ -96,7 +94,7 @@ const Hero = () => {
             </p>
 
             {/* Value Props Pill Row */}
-            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-3">
+            <div className="grid grid-cols-2 gap-2 max-w-xl mx-auto sm:gap-3 lg:max-w-none lg:flex lg:flex-nowrap lg:items-center lg:justify-center">
               {valueProps.map((prop, index) => (
                 <span
                   key={index}
@@ -187,7 +185,7 @@ const Hero = () => {
                         }`}
                       >
                         {size.popular && !size.selected && (
-                          <span className="absolute -top-2 right-2 px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-xs font-bold uppercase">Hot</span>
+                          <span className="absolute -top-2 right-2 px-2 py-0.5 rounded-full bg-warning-container text-on-warning-container text-xs font-bold uppercase">Hot</span>
                         )}
                         <span className={`font-bold text-sm ${size.selected ? 'text-primary' : 'text-on-surface'}`}>
                           {size.name} {size.popular && '★'}
@@ -203,14 +201,14 @@ const Hero = () => {
               <div className="md:col-span-12 flex flex-col sm:flex-row items-center justify-between pt-5 border-t border-outline-variant/30 gap-4">
                 <div className="flex items-center gap-2 text-sm font-semibold text-secondary">
                   <span className="relative flex items-center justify-center">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                    <span className="absolute w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping opacity-75"></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-tertiary-container"></span>
+                    <span className="absolute w-2.5 h-2.5 rounded-full bg-tertiary-container animate-ping motion-reduce:animate-none opacity-75"></span>
                   </span>
                   <span>{lockers != null ? <><strong className="text-on-surface font-bold">{lockers} ô tủ</strong> thuộc mạng lưới trạm đang hoạt động</> : "Mạng lưới trạm tủ đang hoạt động"}</span>
                 </div>
                 <button 
                   type="submit"
-                  className="w-full sm:w-auto px-8 h-14 bg-primary-container hover:bg-primary active:bg-on-primary-fixed-variant text-on-primary rounded-xl text-base font-bold flex items-center justify-center gap-2 shadow-elevation-2 hover:shadow-elevation-3 transition-all active:scale-[0.98]"
+                  className="w-full sm:w-auto px-8 h-14 bg-primary-container hover:bg-on-primary-fixed-variant active:bg-on-primary-fixed-variant text-on-primary rounded-xl text-base font-bold flex items-center justify-center gap-2 shadow-elevation-2 hover:shadow-elevation-3 transition-all active:scale-[0.98]"
                 >
                   <Search className="w-5 h-5" />
                   <span>Tìm tủ trống ngay</span>
@@ -227,7 +225,7 @@ const Hero = () => {
             </div>
             <div className="flex items-center gap-2">
               <Shield className="w-4 h-4 text-primary" />
-              <span>Bảo hiểm lên tới 20 triệu</span>
+              <span>Bảo hiểm hành lý theo từng đơn</span>
             </div>
             <div className="flex items-center gap-2">
               <Wifi className="w-4 h-4 text-primary" />
@@ -244,7 +242,7 @@ const Hero = () => {
             <div className="relative rounded-3xl overflow-hidden bg-white border border-outline-variant/40 shadow-elevation-4">
               <div className="relative aspect-video max-h-[560px]">
                 {/* Hero Image Placeholder với thiết kế đẹp */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary-container via-primary to-primary-fixed-dim">
+ <div className="absolute inset-0 bg-primary-container">
                   {/* Decorative circles */}
                   <div className="absolute top-10 left-10 w-40 h-40 rounded-full bg-white/10 blur-2xl"></div>
                   <div className="absolute bottom-10 right-10 w-60 h-60 rounded-full bg-white/5 blur-3xl"></div>
@@ -269,7 +267,7 @@ const Hero = () => {
                   <div className="backdrop-blur-md bg-inverse-surface/85 text-inverse-on-surface px-4 py-2.5 rounded-xl border border-white/10 shadow-elevation-3 flex items-center gap-3">
                     <span className="relative flex items-center justify-center">
                       <span className="w-3 h-3 rounded-full bg-emerald-400"></span>
-                      <span className="absolute w-3 h-3 rounded-full bg-emerald-400 animate-ping opacity-75"></span>
+                      <span className="absolute w-3 h-3 rounded-full bg-emerald-400 animate-ping motion-reduce:animate-none opacity-75"></span>
                     </span>
                     <div>
                       <div className="text-xs font-bold uppercase tracking-wider text-tertiary-fixed">Trạm #042</div>
@@ -281,7 +279,7 @@ const Hero = () => {
                 {/* Stats Badge */}
                 <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 hidden sm:flex items-center gap-3">
                   <div className="backdrop-blur-md bg-white/95 text-on-surface px-5 py-3 rounded-xl border border-white/40 shadow-elevation-3 flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-emerald-500/15 text-emerald-600 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-xl bg-tertiary-fixed text-tertiary flex items-center justify-center">
                       <Zap className="w-6 h-6" />
                     </div>
                     <div>

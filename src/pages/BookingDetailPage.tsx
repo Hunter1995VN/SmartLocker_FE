@@ -322,9 +322,9 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
         <section className="space-y-3">
           {/* Breadcrumb trail */}
           <nav className="flex items-center gap-2 text-on-surface-variant text-xs">
-            <button onClick={() => onNavigate('home')} className="hover:text-primary transition-colors cursor-pointer">Trang chủ</button>
+            <button onClick={() => onNavigate('home')} className="link-target hover:text-primary transition-colors cursor-pointer">Trang chủ</button>
             <ChevronRight className="w-3.5 h-3.5 text-outline" />
-            <button onClick={() => onNavigate('my-bookings')} className="hover:text-primary transition-colors cursor-pointer">Đơn đặt chỗ của tôi</button>
+            <button onClick={() => onNavigate('my-bookings')} className="link-target hover:text-primary transition-colors cursor-pointer">Đơn đặt chỗ của tôi</button>
             <ChevronRight className="w-3.5 h-3.5 text-outline" />
             <span className="text-on-surface font-semibold">Booking #{orderId}</span>
           </nav>
@@ -380,7 +380,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
 
             {/* Locker Unit Identifier Pill (Elevated) */}
             <div className="flex items-center gap-3 bg-surface-container-low border border-primary/20 p-3.5 rounded-xl lg:self-center shadow-xs">
-              <div className="w-12 h-12 rounded-lg bg-primary text-white flex items-center justify-center shadow-sm">
+              <div className="w-12 h-12 rounded-lg bg-primary-container text-white flex items-center justify-center shadow-sm">
                 <DoorOpen className="w-6 h-6" />
               </div>
               <div>
@@ -403,7 +403,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
           <div className="lg:col-span-7 space-y-6">
             <div className="bg-white rounded-2xl border border-outline-variant/40 shadow-sm p-6 sm:p-8 relative overflow-hidden">
               {/* Top Accent Light Bar */}
-              <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-primary to-primary-container"></div>
+ <div className="absolute top-0 inset-x-0 h-1.5 bg-primary-container"></div>
 
               {/* Card Header */}
               <div className="flex items-start justify-between border-b border-outline-variant/20 pb-5 mb-6">
@@ -427,7 +427,6 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
               {/* Section A: QR Code Visualizer */}
               <div className="flex flex-col items-center justify-center text-center space-y-4 py-2">
                 <div className="relative group">
-                  <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-primary/30 to-blue-400/30 blur-md opacity-75 group-hover:opacity-100 transition duration-500"></div>
                   {/* QR Frame */}
                   <div className="relative p-5 bg-white rounded-2xl border-2 border-primary/20 shadow-md flex items-center justify-center">
                     {ticketEligible && booking?.qrPayload && tokenSeconds > 0 ? (
@@ -459,7 +458,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
 
                 {/* Real-time Refresh Pulse Indicator */}
                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-surface-container-low rounded-full text-xs font-medium text-secondary">
-                  <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                  <span className="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span>
                   <span>Mã đổi sau <strong className="text-on-surface">{tokenSeconds}s</strong> (Anti-screenshot security)</span>
                 </div>
               </div>
@@ -559,7 +558,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                           ? 'bg-amber-500'
                           : ['COMPLETED', 'COMPLETED_MANUAL'].includes(status)
                             ? 'bg-emerald-500'
-                            : 'bg-primary'
+                            : 'bg-primary-container'
                       }`}
                       style={{ width: `${progress}%` }}
                     ></div>
@@ -784,9 +783,9 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
             </p>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-on-surface-variant">
-            <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>Bảo mật</a>
-            <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }}>Điều khoản dịch vụ</a>
-            <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}>Hỗ trợ</a>
+            <a className="link-target hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>Bảo mật</a>
+            <a className="link-target hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }}>Điều khoản dịch vụ</a>
+            <a className="link-target hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}>Hỗ trợ</a>
           </div>
         </div>
       </footer>

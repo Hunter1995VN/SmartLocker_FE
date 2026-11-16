@@ -20,6 +20,7 @@ import {
     formatDate,
     getInitials,
 } from './userConstants';
+import Pagination, { usePagination } from '../Pagination';
 
 interface UserTableProps {
     users: UserAdminListItemDto[];
@@ -50,6 +51,8 @@ export default function UserTable({
     onTriggerActivate,
     onTriggerChangeRole,
 }: UserTableProps) {
+    const pg = usePagination(users, 15);
+
     if (isLoading) {
         return (
             <div className="bg-white rounded-2xl border border-slate-200/80 p-12 text-center shadow-xs">
@@ -123,7 +126,7 @@ export default function UserTable({
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 text-xs">
-                        {users.map((user) => {
+                        {pg.pageItems.map((user) => {
                             const isSelected = selectedUserId === user.id;
                             const roleCfg = getRoleConfig(user.role);
                             const accountStatus = getUserAccountStatus(user);
@@ -266,6 +269,10 @@ export default function UserTable({
                         })}
                     </tbody>
                 </table>
+            </div>
+
+            <div className="px-4 pb-3">
+                <Pagination page={pg.page} totalPages={pg.totalPages} total={users.length} from={pg.from} to={pg.to} onPageChange={pg.setPage} label="tài khoản" />
             </div>
 
             {/* Footer Table Summary */}

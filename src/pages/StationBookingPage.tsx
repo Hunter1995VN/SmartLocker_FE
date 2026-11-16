@@ -4,7 +4,6 @@ import {
   Calendar,
   Clock,
   MapPin,
-  Video,
   QrCode,
   Plug,
   Snowflake,
@@ -398,8 +397,8 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                 className="w-full h-full object-cover"
               />
               <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-lg flex items-center text-xs font-medium">
-                <Video className="w-4 h-4 mr-1.5 text-emerald-400" />
-                24-Camera Guarded Vault
+                <ShieldCheck className="w-4 h-4 mr-1.5 text-emerald-400" />
+                Cảm biến cửa từng ô tủ
               </div>
             </div>
             
@@ -437,7 +436,7 @@ const StationBookingPage: React.FC<StationBookingPageProps> = ({ onNavigate, sta
                 <p className="text-xs font-medium text-slate-500 mb-3 uppercase tracking-wider">Tiện ích & an ninh</p>
                 <div className="flex flex-wrap gap-2">
                   <div className="flex items-center bg-slate-100 text-slate-600 text-xs px-3 py-1.5 rounded-full border border-slate-200">
-                    <Video className="w-3.5 h-3.5 mr-1.5 text-blue-600" /> CCTV 24/7
+                    <ShieldCheck className="w-3.5 h-3.5 mr-1.5 text-blue-600" /> Cảm biến cửa 24/7
                   </div>
                   <div className="flex items-center bg-slate-100 text-slate-600 text-xs px-3 py-1.5 rounded-full border border-slate-200">
                     <QrCode className="w-3.5 h-3.5 mr-1.5 text-indigo-600" /> QR Access

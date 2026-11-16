@@ -187,7 +187,7 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                     <div className="w-full px-4 md:px-8 max-w-7xl mx-auto flex items-center justify-between h-[72px]">
                         {/* Logo */}
                         <a href="#" className="flex items-center gap-3 group">
-                            <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-all duration-200">
+ <div className="relative w-11 h-11 rounded-xl bg-primary-container flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-all duration-200">
                                 <Lock className="w-5 h-5" />
                                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white animate-pulse" />
                             </div>
@@ -320,7 +320,7 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
                         </button>
                         {/* User badge */}
                         <div className="flex items-center gap-2 pl-2 py-1 pr-3 rounded-xl bg-white border border-outline-variant hover:bg-surface-container-low cursor-pointer transition-colors">
-                            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold shrink-0">
+                            <div className="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-white text-sm font-bold shrink-0">
                                 {user.fullName?.charAt(0).toUpperCase() ?? 'U'}
                             </div>
                             <div className="hidden md:flex flex-col leading-none">
@@ -604,7 +604,7 @@ function ActiveBookingCard({ booking, timeLeft }: { booking: Booking; timeLeft: 
     const isCheckedIn = booking.status === 'CHECKED_IN';
 
     return (
-        <div className={`mx-4 mt-4 mb-1 rounded-2xl border-2 p-4 ${isCheckedIn ? 'border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50' : 'border-blue-200 bg-blue-50'}`}>
+ <div className={`mx-4 mt-4 mb-1 rounded-2xl border-2 p-4 ${isCheckedIn ? 'border-emerald-200 bg-tertiary-fixed/30' : 'border-blue-200 bg-blue-50'}`}>
             <div className="flex items-start justify-between mb-3">
                 <div>
                     <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Booking hiện tại</p>
@@ -797,7 +797,7 @@ function MapInfoWindow({ station, onBook }: { station: Station; onBook?: (s: Sta
 function MapErrorFallback({ stations, onSelect }: { stations: Station[]; onSelect: (s: Station) => void }) {
     return (
         <div className="w-full h-full flex flex-col">
-            <div className="flex-1 bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+ <div className="flex-1 bg-primary-fixed/40 flex items-center justify-center">
                 <div className="text-center p-6">
                     <MapPin className="w-12 h-12 text-blue-400 mx-auto mb-3 opacity-50" />
                     <p className="text-gray-500 text-sm mb-1">Cần Google Maps API Key</p>

@@ -27,6 +27,7 @@ import adminUserService, {
     type UserAdminListItemDto,
 } from '../../../api/adminUserService';
 import { formatDate, getInitials } from './userConstants';
+import Pagination, { usePagination } from '../Pagination';
 
 interface NotificationState {
     type: 'success' | 'error';
@@ -163,6 +164,7 @@ export default function CustomerDebtManagementView({
 
         return result;
     }, [travelers, searchQuery, debtFilter]);
+    const pgTravelers = usePagination(filteredTravelers, 15);
 
     // 8. Handle Xử lý thu nợ (Gạch nợ 0đ & Tự động mở lại quyền đặt tủ theo BR-P08)
     const handleExecuteClearDebt = async (customer: UserAdminListItemDto) => {
@@ -294,7 +296,7 @@ export default function CustomerDebtManagementView({
         }
 
         const headers = ['Mã khách', 'Họ và tên', 'Email', 'Số điện thoại', 'Dư nợ cước (VNĐ)', 'Quyền đặt tủ', 'Trạng thái tài khoản', 'Ngày tạo'];
-        const rows = filteredTravelers.map((u) => [
+        const rows = pgTravelers.pageItems.map((u) => [
             u.id,
             `"${u.fullName || ''}"`,
             u.email,
@@ -739,6 +741,7 @@ export default function CustomerDebtManagementView({
                             </tbody>
                         </table>
                     </div>
+                    <Pagination page={pgTravelers.page} totalPages={pgTravelers.totalPages} total={filteredTravelers.length} from={pgTravelers.from} to={pgTravelers.to} onPageChange={pgTravelers.setPage} label="khách hàng" />
                 </div>
 
                 {/* Right Column: Sliding Customer Debt Detail Drawer */}

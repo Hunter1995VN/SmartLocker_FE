@@ -43,6 +43,7 @@ import adminUserService, {
 } from '../../../api/adminUserService';
 import InternalUserFormModal from './InternalUserFormModal';
 import ResetStaffPasswordModal from './ResetStaffPasswordModal';
+import Pagination, { usePagination } from '../Pagination';
 
 interface InternalRbacManagementViewProps {
     onNavigateAudit?: () => void;
@@ -492,6 +493,7 @@ export default function InternalRbacManagementView({
             return true;
         });
     }, [internalUsers, roleFilter, statusFilter, searchQuery]);
+    const pgUsers = usePagination(filteredUsers, 15);
 
     // 7. Permission Matrix & Role Overviews (live API with fallback)
     const permissionMatrix = useMemo<RbacPermissionItemDto[]>(() => {
@@ -598,6 +600,7 @@ export default function InternalRbacManagementView({
             return true;
         });
     }, [rbacSummary, auditActionFilter, auditSearch]);
+    const pgAudit = usePagination(filteredAuditLogs, 20);
 
     // 8. CRUD & RBAC Action Handlers
     const handleCreateInternalUser = async (payload: CreateStaffRequest): Promise<boolean> => {
@@ -1257,6 +1260,7 @@ export default function InternalRbacManagementView({
                                     </button>
                                 </div>
                             ) : (
+                                <>
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left border-collapse">
                                         <thead>
@@ -1271,7 +1275,7 @@ export default function InternalRbacManagementView({
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-100 text-xs">
-                                            {filteredUsers.map((u) => {
+                                            {pgUsers.pageItems.map((u) => {
                                                 const uRole = (u.role || '').toUpperCase();
                                                 const uStatus = (u.status || '').toUpperCase();
                                                 const statusBadge = getStatusBadge(uStatus);
@@ -1429,6 +1433,8 @@ export default function InternalRbacManagementView({
                                         </tbody>
                                     </table>
                                 </div>
+                                <Pagination page={pgUsers.page} totalPages={pgUsers.totalPages} total={filteredUsers.length} from={pgUsers.from} to={pgUsers.to} onPageChange={pgUsers.setPage} label="tài khoản" />
+                                </>
                             )}
                         </div>
 
@@ -2035,6 +2041,7 @@ export default function InternalRbacManagementView({
                             </p>
                         </div>
                     ) : (
+                        <>
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead>
@@ -2047,7 +2054,7 @@ export default function InternalRbacManagementView({
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100 text-xs">
-                                    {filteredAuditLogs.map((log) => {
+                                    {pgAudit.pageItems.map((log) => {
                                         const badge = getActionLabel(log.action);
                                         return (
                                             <tr key={log.id} className="hover:bg-slate-50/70 transition">
@@ -2084,6 +2091,8 @@ export default function InternalRbacManagementView({
                                 </tbody>
                             </table>
                         </div>
+                        <Pagination page={pgAudit.page} totalPages={pgAudit.totalPages} total={filteredAuditLogs.length} from={pgAudit.from} to={pgAudit.to} onPageChange={pgAudit.setPage} label="nhật ký" />
+                        </>
                     )}
                 </div>
             )}

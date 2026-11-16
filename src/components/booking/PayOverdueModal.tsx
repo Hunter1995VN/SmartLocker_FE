@@ -227,7 +227,7 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
     <ModalOverlay onClose={onClose} className="overflow-y-auto">
       <div className="bg-white rounded-3xl max-w-lg w-full border border-red-100 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Top Banner */}
-        <div className="bg-gradient-to-r from-red-600 to-rose-600 px-6 py-4 text-white flex items-center justify-between">
+ <div className="bg-error px-6 py-4 text-white flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
               <AlertTriangle className="w-5 h-5 text-white" />

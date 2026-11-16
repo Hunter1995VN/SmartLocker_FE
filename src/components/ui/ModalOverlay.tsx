@@ -42,10 +42,14 @@ interface ModalOverlayProps {
     zClass?: string;
     /** Lớp bổ sung cho lớp phủ, ví dụ `overflow-y-auto`. */
     className?: string;
+    /** `side`: bảng trượt sát mép phải (không đệm), dùng cho hộp xem xét chi tiết. Mặc định `center`. */
+    placement?: 'center' | 'side';
+    /** `dark`: nền tối hơn cho xem ảnh phóng to. */
+    scrim?: 'default' | 'dark';
     children: ReactNode;
 }
 
-export default function ModalOverlay({ onClose, closeOnBackdrop = false, closeOnEscape = true, label, zClass = "z-50", className = "", children }: ModalOverlayProps) {
+export default function ModalOverlay({ onClose, closeOnBackdrop = false, closeOnEscape = true, label, zClass = "z-50", className = "", placement = "center", scrim = "default", children }: ModalOverlayProps) {
     const ref = useRef<HTMLDivElement>(null);
     const onCloseRef = useRef(onClose);
     onCloseRef.current = onClose;
@@ -107,7 +111,7 @@ export default function ModalOverlay({ onClose, closeOnBackdrop = false, closeOn
             aria-modal="true"
             aria-label={label}
             tabIndex={-1}
-            className={`fixed inset-0 ${zClass} flex items-center justify-center p-4 bg-slate-900/55 backdrop-blur-xs animate-in fade-in duration-150 outline-none ${className}`}
+            className={`fixed inset-0 ${zClass} flex ${placement === "side" ? "items-start justify-end" : "items-center justify-center p-4"} ${scrim === "dark" ? "bg-black/80" : "bg-slate-900/55"} backdrop-blur-xs animate-in fade-in duration-150 outline-none ${className}`}
             onMouseDown={(e) => {
                 if (closeOnBackdrop && onClose && e.target === e.currentTarget) onClose();
             }}

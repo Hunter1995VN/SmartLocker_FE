@@ -22,6 +22,7 @@ import type {
     PaymentReconciliationItemDto,
     BatchReconciliationResultDto,
 } from '../../../api/adminReconciliationService';
+import Pagination, { usePagination } from '../Pagination';
 
 const FALLBACK_ITEMS: PaymentReconciliationItemDto[] = [
     {
@@ -199,6 +200,7 @@ export default function FinancialReconciliationView({
         const matchKind = kindFilter === 'ALL' || item.kind === kindFilter;
         return matchSearch && matchStatus && matchKind;
     });
+    const pgItems = usePagination(filteredItems, 15);
 
     const grossRevenue =
         dashboard?.totalGrossRevenue ??
@@ -214,7 +216,7 @@ export default function FinancialReconciliationView({
 
     const handleExportCsv = () => {
         const headers = ['OrderCode_PayOS', 'MaBooking', 'KhachHang', 'Tram', 'LoaiGiaoDich', 'SoTien_VND', 'TrangThai_DB', 'TrangThai_DoiSoat', 'ThoiDiemThanhToan'];
-        const rows = filteredItems.map((i) => [
+        const rows = pgItems.pageItems.map((i) => [
             i.orderCode,
             i.bookingCode,
             `"${(i.customerName || '').replace(/"/g, '""')}"`,
@@ -569,6 +571,7 @@ export default function FinancialReconciliationView({
                         </tbody>
                     </table>
                 </div>
+                <Pagination page={pgItems.page} totalPages={pgItems.totalPages} total={filteredItems.length} from={pgItems.from} to={pgItems.to} onPageChange={pgItems.setPage} label="giao dịch" />
             </div>
         </div>
     );

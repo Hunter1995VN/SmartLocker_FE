@@ -26,7 +26,7 @@ export default function LostItemQueue() {
       finally { setBusy(false); }
     }}>
       <p>{selected.description}</p>
-      {selected.photo && <img src={selected.photo} alt="Ảnh đồ vật khách báo quên" className="max-w-sm rounded-lg" />}
+      {selected.photo && <img loading="lazy" decoding="async" src={selected.photo} alt="Ảnh đồ vật khách báo quên" className="max-w-sm rounded-lg" />}
       <label className="block">Kết quả <select aria-label="Kết quả" disabled={selected.status === 'RETURNED'} className="border p-2" value={status} onChange={e => setStatus(e.target.value)}><option value="FOUND">Đã tìm thấy</option><option value="NOT_FOUND">Chưa tìm thấy</option><option value="RETURNED" disabled={selected.status !== 'FOUND' && selected.status !== 'RETURNED'}>Đã trả khách</option></select></label>
       <label className="block">Phản hồi cho khách<textarea aria-label="Phản hồi cho khách" disabled={selected.status === 'RETURNED'} className="border rounded w-full p-2" required maxLength={2000} value={response} onChange={e => setResponse(e.target.value)} /></label>
       <button disabled={busy || selected.status === 'RETURNED'} className="bg-blue-700 text-white rounded p-3">Lưu kết quả</button>
