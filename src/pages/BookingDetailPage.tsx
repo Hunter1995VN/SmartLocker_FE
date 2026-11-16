@@ -29,6 +29,7 @@ import { getBookingById, extendBooking, getOfflineTicket, upgradeOnlineTicket, t
 import { offlineTicketStore } from '../utils/offlineTicketStore';
 import { QRCodeSVG } from 'qrcode.react';
 import CustomerHeader from '../components/layout/CustomerHeader';
+import { useT } from '../i18n';
 
 interface BookingDetailPageProps {
   onNavigate: (page: string, props?: any) => void;
@@ -47,6 +48,7 @@ interface BookingDetailPageProps {
 }
 
 const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, bookingId }) => {
+    const t = useT();
   const [booking, setBooking] = useState<BookingDto | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -101,12 +103,12 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
   }, [bookingId, booking]);
 
   // Only display credentials returned for the current booking.
-  const stationName = booking?.stationName || 'Chưa có tên trạm';
-  const stationAddress = booking?.stationAddress || 'Chưa có địa chỉ';
+  const stationName = booking?.stationName || t('Chưa có tên trạm');
+  const stationAddress = booking?.stationAddress || t('Chưa có địa chỉ');
   const size = booking?.size || '';
   const duration = booking?.durationHours ?? 0;
   const amount = booking?.baseAmount ?? 0;
-  const orderId = booking?.bookingCode || 'Chưa có mã đơn';
+  const orderId = booking?.bookingCode || t('Chưa có mã đơn');
   const rawBayCode = booking?.lockerCode;
   const isLockerAssigned = Boolean(rawBayCode);
   const bayCode = isLockerAssigned
@@ -116,20 +118,20 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
   // Only a valid eight-digit PIN returned for the current booking may be copied.
   const getDisplayPin = () => {
     if (booking?.status === 'PENDING_PAYMENT') {
-      return 'Chờ thanh toán';
+      return t('Chờ thanh toán');
     }
-    if (!booking || !['CONFIRMED', 'STORED'].includes(booking.status)) return 'Vé không còn hiệu lực';
+    if (!booking || !['CONFIRMED', 'STORED'].includes(booking.status)) return t('Vé không còn hiệu lực');
     const raw = booking.accessCode;
     if (raw) {
       const clean = raw.replace(/\s+/g, '');
       if (/^\d{8}$/.test(clean)) {
         return `${clean.substring(0, 4)} ${clean.substring(4, 8)}`;
       }
-      return 'Chưa có PIN hợp lệ';
+      return t('Chưa có PIN hợp lệ');
     }
-    if (booking?.status === 'NO_SHOW') return 'Hết hạn nhận';
-    if (booking?.status === 'CANCELLED') return 'Đã hủy';
-    return 'Chưa cấp';
+    if (booking?.status === 'NO_SHOW') return t('Hết hạn nhận');
+    if (booking?.status === 'CANCELLED') return t('Đã hủy');
+    return t('Chưa cấp');
   };
   const passcode = getDisplayPin();
 
@@ -290,10 +292,10 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
 
   if (!booking || booking.id !== bookingId) return (
     <main className="min-h-screen bg-slate-50 flex flex-col items-center justify-center gap-4 p-6">
-      <h1 className="text-lg font-bold">Không tải được thông tin đơn đặt tủ</h1>
-      <p>Vui lòng kiểm tra kết nối và quyền truy cập đơn.</p>
-      <button className="rounded bg-blue-700 text-white px-4 py-2" onClick={() => window.location.reload()}>Thử lại</button>
-      <button onClick={() => onNavigate('my-bookings')}>Về danh sách đơn</button>
+      <h1 className="text-lg font-bold">{t('Không tải được thông tin đơn đặt tủ')}</h1>
+      <p>{t('Vui lòng kiểm tra kết nối và quyền truy cập đơn.')}</p>
+      <button className="rounded bg-blue-700 text-white px-4 py-2" onClick={() => window.location.reload()}>{t('Thử lại')}</button>
+      <button onClick={() => onNavigate('my-bookings')}>{t('Về danh sách đơn')}</button>
     </main>
   );
 
@@ -312,8 +314,8 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
            <div className="p-4 rounded-xl bg-red-50 border border-red-200 flex items-start gap-3.5 shadow-xs mb-4">
              <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5 shrink-0" />
              <div className="flex-1">
-               <p className="text-sm text-red-900 font-bold">Tủ đã quá hạn</p>
-               <p className="text-sm text-red-800 mt-0.5">Tủ này đang quá hạn. Phí quá hạn hiện tại: <strong>{formatCurrency(booking.currentOverdueFee || 0)} VND</strong>.</p>
+               <p className="text-sm text-red-900 font-bold">{t('Tủ đã quá hạn')}</p>
+               <p className="text-sm text-red-800 mt-0.5">{t('Tủ này đang quá hạn. Phí quá hạn hiện tại:')} <strong>{formatCurrency(booking.currentOverdueFee || 0)} VND</strong>.</p>
              </div>
            </div>
         )}
@@ -322,9 +324,9 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
         <section className="space-y-3">
           {/* Breadcrumb trail */}
           <nav className="flex items-center gap-2 text-on-surface-variant text-xs">
-            <button onClick={() => onNavigate('home')} className="link-target hover:text-primary transition-colors cursor-pointer">Trang chủ</button>
+            <button onClick={() => onNavigate('home')} className="link-target hover:text-primary transition-colors cursor-pointer">{t('Trang chủ')}</button>
             <ChevronRight className="w-3.5 h-3.5 text-outline" />
-            <button onClick={() => onNavigate('my-bookings')} className="link-target hover:text-primary transition-colors cursor-pointer">Đơn đặt chỗ của tôi</button>
+            <button onClick={() => onNavigate('my-bookings')} className="link-target hover:text-primary transition-colors cursor-pointer">{t('Đơn đặt chỗ của tôi')}</button>
             <ChevronRight className="w-3.5 h-3.5 text-outline" />
             <span className="text-on-surface font-semibold">Booking #{orderId}</span>
           </nav>
@@ -353,9 +355,9 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                   </span>
                   <span>
                     {status === 'CONFIRMED'
-                      ? 'ĐANG GIỮ CHỖ (30M HOLD)'
+                      ? t('ĐANG GIỮ CHỖ (30M HOLD)')
                       : status === 'STORED'
-                        ? 'ĐANG GỬI ĐỒ (STORED)'
+                        ? t('ĐANG GỬI ĐỒ (STORED)')
                         : status.replace('_', ' ')}
                   </span>
                 </div>
@@ -364,7 +366,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                 <span className="hidden sm:inline-block text-outline-variant">•</span>
                 <span className="text-on-surface-variant text-xs flex items-center gap-1">
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  Vé xác thực tại Kiosk
+                  {t('Vé xác thực tại Kiosk')}
                 </span>
               </div>
               <h1 className="text-2xl md:text-3xl font-bold text-on-surface tracking-tight">
@@ -384,10 +386,10 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                 <DoorOpen className="w-6 h-6" />
               </div>
               <div>
-                <div className="text-xs uppercase tracking-wider text-secondary font-bold">Ngăn tủ được gán</div>
+                <div className="text-xs uppercase tracking-wider text-secondary font-bold">{t('Ngăn tủ được gán')}</div>
                 <div className="text-lg text-primary font-bold">{bayCode}</div>
                 <div className="text-xs text-on-surface-variant">
-                  {size === 'S' ? 'Cỡ nhỏ (S)' : size === 'M' ? 'Cỡ vừa (M)' : 'Cỡ lớn (L)'}
+                  {size === 'S' ? t('Cỡ nhỏ (S)') : size === 'M' ? t('Cỡ vừa (M)') : t('Cỡ lớn (L)')}
                 </div>
               </div>
             </div>
@@ -410,7 +412,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <Key className="w-5 h-5 text-primary" />
-                    <h2 className="text-xl font-bold text-on-surface">Vé số &amp; mã mở tủ</h2>
+                    <h2 className="text-xl font-bold text-on-surface">{t('Vé số & mã mở tủ')}</h2>
                   </div>
                   <p className="text-sm text-on-surface-variant">
                     {isLockerAssigned
@@ -420,7 +422,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                 </div>
                 <div className="hidden sm:flex items-center gap-1 text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full text-xs font-semibold">
                   <DoorOpen className="w-3.5 h-3.5 text-emerald-600" />
-                  {ticketEligible && tokenSeconds > 0 ? 'Vé đang có hiệu lực' : 'Vé chưa sẵn sàng'}
+                  {ticketEligible && tokenSeconds > 0 ? t('Vé đang có hiệu lực') : t('Vé chưa sẵn sàng')}
                 </div>
               </div>
 
@@ -432,7 +434,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                     {ticketEligible && booking?.qrPayload && tokenSeconds > 0 ? (
                       <QRCodeSVG
                         role="img"
-                        aria-label="Mã QR mở tủ trực tuyến"
+                        aria-label={t('Mã QR mở tủ trực tuyến')}
                         value={booking!.qrPayload!}
                         size={300}
                         level="L"
@@ -440,11 +442,11 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                       />
                     ) : booking?.status === 'PENDING_PAYMENT' ? (
                       <div className="p-8 text-center text-xs text-amber-700 font-medium">
-                        Đang chờ thanh toán để kích hoạt vé mở tủ
+                        {t('Đang chờ thanh toán để kích hoạt vé mở tủ')}
                       </div>
                     ) : (
                       <div className="p-8 text-center text-xs text-slate-500 font-medium">
-                        Vé chưa sẵn sàng hoặc đang xoay mã bảo mật…
+                        {t('Vé chưa sẵn sàng hoặc đang xoay mã bảo mật…')}
                       </div>
                     )}
                   </div>
@@ -453,13 +455,13 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                 {/* Optical Scanner Cue */}
                 <div className="flex items-center justify-center gap-2 text-on-surface-variant text-xs pt-1">
                   <QrCode className="w-4 h-4 text-primary" />
-                  <span>Đưa mã cách camera kiosk 10–15 cm</span>
+                  <span>{t('Đưa mã cách camera kiosk 10–15 cm')}</span>
                 </div>
 
                 {/* Real-time Refresh Pulse Indicator */}
                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-surface-container-low rounded-full text-xs font-medium text-secondary">
                   <span className="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span>
-                  <span>Mã đổi sau <strong className="text-on-surface">{tokenSeconds}s</strong> (Anti-screenshot security)</span>
+                  <span>{t('Mã đổi sau')} <strong className="text-on-surface">{tokenSeconds}s</strong> (Anti-screenshot security)</span>
                 </div>
               </div>
 
@@ -467,7 +469,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
               <div className="mt-6 pt-6 border-t border-outline-variant/30 space-y-3">
                 <div className="text-center">
                   <span className="text-xs text-secondary tracking-wider uppercase font-bold">
-                    HOẶC NHẬP MÃ PIN 8 SỐ TẠI BÀN PHÍM KIOSK
+                    {t('HOẶC NHẬP MÃ PIN 8 SỐ TẠI BÀN PHÍM KIOSK')}
                   </span>
                 </div>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -492,15 +494,15 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                     ) : (
                       <>
                         <Copy className="w-4 h-4 text-primary" />
-                        <span>Sao chép mã</span>
+                        <span>{t('Sao chép mã')}</span>
                       </>
                     )}
                   </button>
                 </div>
-                <p className="text-center text-sm text-on-surface-variant">Bấm &quot;Mở tủ&quot; trên màn hình kiosk, rồi nhập mã này.</p>
-                {copyFailed && <p role="status">Không sao chép được. Bạn có thể nhập 8 số đang hiển thị tại Kiosk.</p>}
+                <p className="text-center text-sm text-on-surface-variant">{t('Bấm "Mở tủ" trên màn hình kiosk, rồi nhập mã này.')}</p>
+                {copyFailed && <p role="status">{t('Không sao chép được. Bạn có thể nhập 8 số đang hiển thị tại Kiosk.')}</p>}
                 {ticketEligible && status === 'CONFIRMED' && !validPin && <div className="text-sm space-y-2">
-                  <p>Vé chưa có PIN 8 số hợp lệ. Thay vé cũ sẽ làm PIN và QR online cũ hết hiệu lực.</p>
+                  <p>{t('Vé chưa có PIN 8 số hợp lệ. Thay vé cũ sẽ làm PIN và QR online cũ hết hiệu lực.')}</p>
                   <button disabled={upgradingTicket} className="border rounded px-4 py-2" onClick={async () => {
                     if (!bookingId || upgradingTicket) return;
                     setUpgradingTicket(true); setTicketError('');
@@ -509,9 +511,9 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                       const result = await getBookingById(bookingId);
                       if (result.success && result.data) setBooking(result.data);
                     } catch (error) {
-                      setTicketError((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Không thay được vé. Vui lòng liên hệ nhân viên.');
+                      setTicketError((error as { response?: { data?: { message?: string } } }).response?.data?.message || t('Không thay được vé. Vui lòng liên hệ nhân viên.'));
                     } finally { setUpgradingTicket(false); }
-                  }}>{upgradingTicket ? 'Đang thay vé…' : 'Thay vé cũ bằng PIN 8 số'}</button>
+                  }}>{upgradingTicket ? t('Đang thay vé…') : t('Thay vé cũ bằng PIN 8 số')}</button>
                   {ticketError && <p role="alert">{ticketError}</p>}
                 </div>}
               </div>
@@ -534,13 +536,13 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                     <div>
                       <span className="text-sm font-bold text-on-surface">
                         {isHoldPeriod
-                          ? 'Thời gian giữ chỗ tủ (30 phút để đến trạm)'
+                          ? t('Thời gian giữ chỗ tủ (30 phút để đến trạm)')
                           : ['COMPLETED', 'COMPLETED_MANUAL'].includes(status)
-                            ? 'Lượt thuê tủ đã hoàn tất'
-                            : 'Thời gian lưu trữ còn lại'}
+                            ? t('Lượt thuê tủ đã hoàn tất')
+                            : t('Thời gian lưu trữ còn lại')}
                       </span>
                       {isHoldPeriod && (
-                        <p className="text-sm text-amber-800 font-medium">Giờ thuê thực tế chỉ bắt đầu tính khi bạn mở tủ tại trạm</p>
+                        <p className="text-sm text-amber-800 font-medium">{t('Giờ thuê thực tế chỉ bắt đầu tính khi bạn mở tủ tại trạm')}</p>
                       )}
                     </div>
                   </div>
@@ -575,12 +577,11 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                     <div className="flex items-start gap-2 text-xs text-amber-900 leading-relaxed bg-white/70 p-3 rounded-xl border border-amber-200/50">
                       <Info className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
                       <span>
-                        Hệ thống đang giữ chỗ ô tủ ({size === 'S' ? 'Size S' : size === 'M' ? 'Size M' : 'Size L'}) cho bạn.
-                        Thời gian đặt thuê <strong>{duration} tiếng</strong> chỉ được bắt đầu đếm khi bạn có mặt tại trạm và mở tủ.
+                        {t('Hệ thống đang giữ chỗ ô tủ (')}{size === 'S' ? 'Size S' : size === 'M' ? 'Size M' : 'Size L'}{t(') cho bạn. Thời gian đặt thuê')} <strong>{duration} {t('tiếng')}</strong> {t('chỉ được bắt đầu đếm khi bạn có mặt tại trạm và mở tủ.')}
                       </span>
                     </div>
 
-                    <p className="text-sm font-semibold text-blue-900 bg-blue-50 border border-blue-200 p-3 rounded-xl">Tại Kiosk của trạm, chọn Gửi đồ rồi quét QR hoặc nhập PIN trên vé. Đặt hành lý vào tủ và đóng chặt cửa để xác nhận gửi đồ.</p>
+                    <p className="text-sm font-semibold text-blue-900 bg-blue-50 border border-blue-200 p-3 rounded-xl">{t('Tại Kiosk của trạm, chọn Gửi đồ rồi quét QR hoặc nhập PIN trên vé. Đặt hành lý vào tủ và đóng chặt cửa để xác nhận gửi đồ.')}</p>
                   </div>
                 )}
 
@@ -589,12 +590,11 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                     <div className="flex items-start gap-2 text-xs text-on-surface-variant leading-relaxed">
                       <Info className="w-4 h-4 text-blue-600 mt-0.5 shrink-0" />
                       <span>
-                        Thời gian thuê đang được tính từ khoảnh khắc bạn check-in lúc {startedText}.
-                        Gia hạn thêm giờ bất cứ lúc nào trước khi hết hạn.
+                        {t('Thời gian thuê đang được tính từ khoảnh khắc bạn check-in lúc')} {startedText}{t('. Gia hạn thêm giờ bất cứ lúc nào trước khi hết hạn.')}
                       </span>
                     </div>
 
-                    <p className="text-sm font-semibold text-blue-900 bg-blue-50 border border-blue-200 p-3 rounded-xl">Tại Kiosk của trạm, chọn Lấy đồ rồi quét QR hoặc nhập PIN. Thanh toán phụ phí nếu có, lấy hết hành lý và đóng chặt cửa để hoàn tất.</p>
+                    <p className="text-sm font-semibold text-blue-900 bg-blue-50 border border-blue-200 p-3 rounded-xl">{t('Tại Kiosk của trạm, chọn Lấy đồ rồi quét QR hoặc nhập PIN. Thanh toán phụ phí nếu có, lấy hết hành lý và đóng chặt cửa để hoàn tất.')}</p>
                   </div>
                 )}
               </div>
@@ -607,11 +607,11 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                   </div>
                   <div className="space-y-0.5">
                     <div className="text-sm font-semibold text-on-surface flex items-center gap-1.5">
-                      <span>Vé ngoại tuyến</span>
+                      <span>{t('Vé ngoại tuyến')}</span>
                       <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">HMAC JWS</span>
                     </div>
                     <p className="text-sm text-on-surface-variant leading-relaxed">
-                      Vé ngoại tuyến được hiển thị riêng. Mã QR động phía trên chỉ dùng để xác thực trực tuyến.
+                      {t('Vé ngoại tuyến được hiển thị riêng. Mã QR động phía trên chỉ dùng để xác thực trực tuyến.')}
                     </p>
                   </div>
                 </div>
@@ -622,7 +622,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                   className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-300 text-xs font-bold text-slate-800 flex items-center justify-center gap-2 shadow-xs transition-all active:scale-95 cursor-pointer shrink-0"
                 >
                   <WifiOff className="w-4 h-4 text-primary" />
-                  <span>Xem vé ngoại tuyến</span>
+                  <span>{t('Xem vé ngoại tuyến')}</span>
                 </button>
               </div>
 
@@ -634,21 +634,21 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                   className={`h-11 px-3 bg-white border border-primary/40 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors shadow-xs ${booking?.canExtend === false ? 'opacity-50 cursor-not-allowed text-gray-500 border-gray-300' : 'hover:bg-surface-container-low text-primary cursor-pointer'}`}
                 >
                   <PlusCircle className="w-4 h-4" />
-                  <span>Gia hạn thời gian</span>
+                  <span>{t('Gia hạn thời gian')}</span>
                 </button>
                 <button
                   onClick={() => onNavigate('find-station', { stationId: booking?.stationId })}
                   className="h-11 px-3 bg-white hover:bg-surface-container-low border border-outline-variant rounded-xl text-xs text-on-surface font-medium flex items-center justify-center gap-1.5 transition-colors shadow-xs cursor-pointer"
                 >
                   <Navigation className="w-4 h-4 text-primary" />
-                  <span>Đường đến kiosk</span>
+                  <span>{t('Đường đến kiosk')}</span>
                 </button>
                 <a
                   href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}
                   className="h-11 px-3 bg-white hover:bg-surface-container-low border border-outline-variant rounded-xl text-xs text-on-surface font-medium flex items-center justify-center gap-1.5 transition-colors shadow-xs"
                 >
                   <Headphones className="w-4 h-4 text-secondary" />
-                  <span>Hỗ trợ: 1900 1234</span>
+                  <span>{t('Hỗ trợ: 1900 1234')}</span>
                 </a>
               </div>
             </div>
@@ -658,7 +658,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
           <div className="lg:col-span-5 space-y-6">
             <div className="bg-white rounded-2xl border p-5 space-y-2">
               <h3 className="font-bold">{stationName}</h3><p className="text-sm">{stationAddress}</p>
-              <button className="text-primary" onClick={() => onNavigate('find-station', { stationId: booking?.stationId })}>Xem bản đồ trạm</button>
+              <button className="text-primary" onClick={() => onNavigate('find-station', { stationId: booking?.stationId })}>{t('Xem bản đồ trạm')}</button>
             </div>
 
             {/* Locker Compartment Schematic Matrix */}
@@ -669,7 +669,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                     {isLockerAssigned ? 'Assigned Locker Location' : 'Station Locker Layout'}
                   </h3>
                   <p className="text-sm text-on-surface-variant">
-                    {isLockerAssigned ? `Ô tủ ${rawBayCode}` : `Size ${size} Tier · Assigned at Kiosk Check-in`}
+                    {isLockerAssigned ? t('Ô tủ {code}', { code: rawBayCode ?? '' }) : t('Cỡ {size} · Được gán khi gửi đồ tại kiosk', { size: size ?? '' })}
                   </p>
                 </div>
                 <span className={`text-xs px-2.5 py-1 rounded-md font-mono font-bold ${
@@ -690,7 +690,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
                 </div>
               )}
 
-              <p className="text-sm text-secondary">{isLockerAssigned ? 'Ô tủ được cấp: ' + rawBayCode : 'Mã ô tủ sẽ xuất hiện sau khi xác thực tại Kiosk.'}</p>
+              <p className="text-sm text-secondary">{isLockerAssigned ? t('Ô tủ được cấp: ') + rawBayCode : t('Mã ô tủ sẽ xuất hiện sau khi xác thực tại Kiosk.')}</p>
             </div>
 
             {/* Baggage & Security Ledger Details */}
@@ -698,20 +698,20 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
               <h3 className="text-base font-bold text-on-surface">Storage &amp; Security Audit</h3>
               <div className="divide-y divide-outline-variant/20 text-xs">
                 <div className="py-2.5 flex justify-between">
-                  <span className="text-on-surface-variant">Thời điểm gửi đồ</span>
-                  <span className="font-mono text-on-surface font-medium">{booking?.checkedInAt ? new Date(parseServerTime(booking.checkedInAt)).toLocaleString('vi-VN') : 'Chưa gửi đồ'}</span>
+                  <span className="text-on-surface-variant">{t('Thời điểm gửi đồ')}</span>
+                  <span className="font-mono text-on-surface font-medium">{booking?.checkedInAt ? new Date(parseServerTime(booking.checkedInAt)).toLocaleString('vi-VN') : t('Chưa gửi đồ')}</span>
                 </div>
                 <div className="py-2.5 flex justify-between">
-                  <span className="text-on-surface-variant">Kích cỡ tủ</span>
+                  <span className="text-on-surface-variant">{t('Kích cỡ tủ')}</span>
                   <span className="text-on-surface font-medium">{size}</span>
                 </div>
                 <div className="py-2.5 flex justify-between">
-                  <span className="text-on-surface-variant">Mã đơn đặt tủ</span>
+                  <span className="text-on-surface-variant">{t('Mã đơn đặt tủ')}</span>
                   <span className="font-mono font-semibold text-primary">{orderId}</span>
                 </div>
                 <div className="py-2.5 flex justify-between">
-                  <span className="text-on-surface-variant">Tổng tiền đã tính</span>
-                  <span className="text-on-surface font-bold">{formatCurrency(amount)} VND ({booking.payments?.some(p => p.kind === 'BASE' && p.status === 'PAID') ? 'Đã thanh toán' : 'Chưa thanh toán'})</span>
+                  <span className="text-on-surface-variant">{t('Tổng tiền đã tính')}</span>
+                  <span className="text-on-surface font-bold">{formatCurrency(amount)} VND ({booking.payments?.some(p => p.kind === 'BASE' && p.status === 'PAID') ? t('Đã thanh toán') : t('Chưa thanh toán')})</span>
                 </div>
               </div>
 
@@ -747,7 +747,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
               window.open(res.data.paymentUrl, '_blank');
               setExtendSuccessToast(`Đang chuyển hướng thanh toán gia hạn +${addedHours} giờ...`);
             } else {
-              setExtendSuccessToast(res.message || 'Gia hạn thành công.');
+              setExtendSuccessToast(res.message || t('Gia hạn thành công.'));
             }
             setShowExtendModal(false);
             const refreshRes = await getBookingById(bookingId);
@@ -756,7 +756,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
               setExtendSuccessToast(null);
             }, 4000);
           } catch {
-            setExtendSuccessToast('Có lỗi xảy ra khi gia hạn đơn hàng.');
+            setExtendSuccessToast(t('Có lỗi xảy ra khi gia hạn đơn hàng.'));
           }
         }}
         lockerCode={bayCode}
@@ -779,13 +779,13 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
             <span className="text-base text-primary font-bold">SmartLocker SLMS</span>
             <span className="hidden sm:inline-block text-outline-variant">•</span>
             <p className="text-sm text-on-surface-variant">
-              © {new Date().getFullYear()} SmartLocker. Bản quyền thuộc về SmartLocker.
+              © {new Date().getFullYear()} {t('SmartLocker. Bản quyền thuộc về SmartLocker.')}
             </p>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-on-surface-variant">
-            <a className="link-target hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>Bảo mật</a>
-            <a className="link-target hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }}>Điều khoản dịch vụ</a>
-            <a className="link-target hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}>Hỗ trợ</a>
+            <a className="link-target hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>{t('Bảo mật')}</a>
+            <a className="link-target hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }}>{t('Điều khoản dịch vụ')}</a>
+            <a className="link-target hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}>{t('Hỗ trợ')}</a>
           </div>
         </div>
       </footer>

@@ -6,6 +6,8 @@ import {
     ChevronDown, LogOut, Bell, User, DollarSign
 } from 'lucide-react';
 import NotificationPreferencesModal from '../customer/NotificationPreferencesModal';
+import { useT } from '../../i18n';
+import LanguageSwitcher from '../ui/LanguageSwitcher';
 
 export interface CustomerHeaderProps {
     currentPage?: 'dashboard' | 'find-station' | 'my-bookings' | 'station-booking' | 'booking-payment' | 'booking-detail' | 'profile';
@@ -18,6 +20,7 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
     onNavigate,
     onLogout
 }) => {
+    const t = useT();
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [notifPrefsOpen, setNotifPrefsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -39,7 +42,7 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
         // Ignore JSON error
     }
 
-    const userName = user.fullName || 'Khách hàng';
+    const userName = user.fullName || t('Khách hàng');
     const initials = userName
         .split(' ')
         .filter(Boolean)
@@ -85,7 +88,7 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                         <button
                             onClick={() => onNavigate('dashboard')}
                             className="flex items-center gap-2.5 transition-transform active:scale-[0.98] cursor-pointer"
-                            title="Về trang tổng quan"
+                            title={t('Về trang tổng quan')}
                         >
                             <div className="w-9 h-9 rounded-xl bg-primary-container flex items-center justify-center shadow-sm">
                                 <Lock className="w-[18px] h-[18px] text-white" />
@@ -118,8 +121,8 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                                 }`}
                             >
                                 <Compass className="w-4 h-4" />
-                                <span className="lg:hidden">Tìm trạm</span>
-                                <span className="hidden lg:inline">Tìm trạm & Đặt tủ</span>
+                                <span className="lg:hidden">{t('Tìm trạm')}</span>
+                                <span className="hidden lg:inline">{t('Tìm trạm & Đặt tủ')}</span>
                             </button>
 
                             <button
@@ -131,8 +134,8 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                                 }`}
                             >
                                 <Clock className="w-4 h-4" />
-                                <span className="lg:hidden">Lịch sử</span>
-                                <span className="hidden lg:inline">Lịch sử đặt chỗ</span>
+                                <span className="lg:hidden">{t('Lịch sử')}</span>
+                                <span className="hidden lg:inline">{t('Lịch sử đặt chỗ')}</span>
                             </button>
 
                             <a
@@ -140,13 +143,14 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                                 className="flex items-center gap-2 px-2.5 lg:px-3.5 py-1.5 rounded-xl text-sm font-semibold whitespace-nowrap text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all"
                             >
                                 <Headphones className="w-4 h-4" />
-                                <span>Hỗ trợ</span>
+                                <span>{t('Hỗ trợ')}</span>
                             </a>
                         </nav>
                     </div>
 
                     {/* 2. Trailing System Status & User Profile */}
                     <div className="flex items-center gap-3">
+                        <LanguageSwitcher />
                         {/* User Dropdown */}
                         <div className="relative" ref={dropdownRef}>
                             <button
@@ -168,7 +172,7 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                                         {userName}
                                     </span>
                                     <span className="text-xs text-on-surface-muted uppercase tracking-wide font-medium leading-none mt-0.5">
-                                        Khách hàng
+                                        {t('Khách hàng')}
                                     </span>
                                 </div>
                                 <ChevronDown className="w-3.5 h-3.5 text-on-surface-muted" />
@@ -187,7 +191,7 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                                         className="w-full text-left px-4 py-2.5 text-xs font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-primary-container flex items-center gap-2.5 transition-colors cursor-pointer"
                                     >
                                         <LayoutDashboard className="w-4 h-4 text-primary-container" />
-                                        <span>Trang tổng quan (Dashboard)</span>
+                                        <span>{t('Trang tổng quan (Dashboard)')}</span>
                                     </button>
 
                                     <button
@@ -195,7 +199,7 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                                         className="w-full text-left px-4 py-2.5 text-xs font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-primary-container flex items-center gap-2.5 transition-colors cursor-pointer"
                                     >
                                         <Compass className="w-4 h-4 text-primary-container" />
-                                        <span>Tìm trạm & Đặt tủ</span>
+                                        <span>{t('Tìm trạm & Đặt tủ')}</span>
                                     </button>
 
                                     <button
@@ -203,7 +207,7 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                                         className="w-full text-left px-4 py-2.5 text-xs font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-primary-container flex items-center gap-2.5 transition-colors cursor-pointer"
                                     >
                                         <Clock className="w-4 h-4 text-primary-container" />
-                                        <span>Lịch sử đơn đặt</span>
+                                        <span>{t('Lịch sử đơn đặt')}</span>
                                     </button>
 
                                     <button
@@ -211,7 +215,7 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                                         className="w-full text-left px-4 py-2.5 text-xs font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-primary-container flex items-center gap-2.5 transition-colors cursor-pointer"
                                     >
                                         <User className="w-4 h-4 text-primary-container" />
-                                        <span>Thông tin cá nhân</span>
+                                        <span>{t('Thông tin cá nhân')}</span>
                                     </button>
 
                                     <button
@@ -219,7 +223,7 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                                         className="w-full text-left px-4 py-2.5 text-xs font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-primary-container flex items-center gap-2.5 transition-colors cursor-pointer"
                                     >
                                         <DollarSign className="w-4 h-4 text-primary-container" />
-                                        <span>Tra cứu dư nợ quá hạn</span>
+                                        <span>{t('Tra cứu dư nợ quá hạn')}</span>
                                     </button>
 
                                     <button
@@ -227,7 +231,7 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                                         className="w-full text-left px-4 py-2.5 text-xs font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-primary-container flex items-center gap-2.5 transition-colors cursor-pointer"
                                     >
                                         <Bell className="w-4 h-4 text-primary-container" />
-                                        <span>Kênh nhận thông báo</span>
+                                        <span>{t('Kênh nhận thông báo')}</span>
                                     </button>
 
                                     <hr className="my-1 border-surface-container-low" />
@@ -237,7 +241,7 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                                         className="w-full text-left px-4 py-2.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2.5 transition-colors cursor-pointer"
                                     >
                                         <LogOut className="w-4 h-4" />
-                                        <span>Đăng xuất</span>
+                                        <span>{t('Đăng xuất')}</span>
                                     </button>
                                 </div>
                             )}

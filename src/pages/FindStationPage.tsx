@@ -9,6 +9,7 @@ import { calcDistance, getStations } from '../api/stationService';
 import type { Station } from '../api/stationService';
 import CustomerHeader from '../components/layout/CustomerHeader';
 import InteractiveStationMap from '../components/map/InteractiveStationMap';
+import { useT } from '../i18n';
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 const MAP_CENTER_DANANG = { lat: 16.0544, lng: 108.2022 };
@@ -56,6 +57,7 @@ export default function FindStationPage({
     onNavigateStationDetail,
     onNavigateBooking,
 }: Props) {
+    const t = useT();
     const [stations, setStations] = useState<Station[]>([]);
     const [selectedStation, setSelectedStation] = useState<Station | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
@@ -113,7 +115,7 @@ export default function FindStationPage({
         } catch (err) {
             console.error('Lỗi tải danh sách trạm:', err);
             setStations([]);
-            setApiError('Không thể kết nối máy chủ Backend.');
+            setApiError(t('Không thể kết nối máy chủ Backend.'));
         } finally {
             setIsLoading(false);
         }
@@ -240,7 +242,7 @@ export default function FindStationPage({
 
     return (
         <div className="h-screen w-screen flex flex-col overflow-hidden bg-white" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-            <h1 className="sr-only">Tìm trạm gửi hành lý</h1>
+            <h1 className="sr-only">{t('Tìm trạm gửi hành lý')}</h1>
             <CustomerHeader
                 currentPage="find-station"
                 onNavigate={(page) => {
@@ -265,8 +267,8 @@ export default function FindStationPage({
                                     value={searchQuery}
                                     onChange={e => setSearchQuery(e.target.value)}
                                     className="w-full h-10 pl-10 pr-8 rounded-xl bg-slate-50 border border-slate-200/80 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all"
-                                    placeholder="Tìm tên trạm, đường, quận..."
-                                    aria-label="Tìm trạm theo tên, đường hoặc quận"
+                                    placeholder={t('Tìm tên trạm, đường, quận...')}
+                                    aria-label={t('Tìm trạm theo tên, đường hoặc quận')}
                                 />
                                 {searchQuery && (
                                     <button
@@ -281,7 +283,7 @@ export default function FindStationPage({
                                 id="find-station-near-me"
                                 onClick={() => fetchUserLocation()}
                                 className="h-10 w-10 shrink-0 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center transition-colors cursor-pointer"
-                                title="Định vị GPS của tôi"
+                                title={t('Định vị GPS của tôi')}
                             >
                                 <Navigation className="w-4 h-4" />
                             </button>
@@ -293,7 +295,7 @@ export default function FindStationPage({
                                         ? 'bg-blue-600 text-white border-blue-600'
                                         : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
                                 }`}
-                                title="Bộ lọc cỡ tủ & bán kính"
+                                title={t('Bộ lọc cỡ tủ & bán kính')}
                             >
                                 <SlidersHorizontal className="w-4 h-4" />
                             </button>
@@ -312,24 +314,24 @@ export default function FindStationPage({
                                         : 'bg-amber-50 text-amber-800 border-amber-200'
                             }`}
                         >
-                            {locationStatus === 'locating' && 'Đang xác định vị trí của bạn...'}
+                            {locationStatus === 'locating' && t('Đang xác định vị trí của bạn...')}
                             {locationStatus === 'granted' && (locationAccuracyM != null && locationAccuracyM > 3000
-                                ? `Vị trí chỉ chính xác khoảng ${(locationAccuracyM / 1000).toFixed(1)} km (định vị theo mạng). Kéo ghim đỏ trên bản đồ để chỉnh lại.`
-                                : `Đã xác định vị trí của bạn${locationAccuracyM != null ? ` (±${locationAccuracyM} m)` : ''}.`)}
-                            {locationStatus === 'manual' && 'Đang dùng vị trí bạn tự ghim trên bản đồ.'}
-                            {locationStatus === 'denied' && 'Trình duyệt đang chặn quyền vị trí. Hãy cho phép vị trí cho trang này rồi bấm nút định vị, hoặc bấm vào bản đồ để tự ghim.'}
-                            {locationStatus === 'os-blocked' && `${GEO_OS_BLOCKED_HINT} Hoặc bấm vào bản đồ để tự ghim.`}
-                            {locationStatus === 'unavailable' && 'Thiết bị chưa xác định được vị trí. Bấm nút định vị để thử lại hoặc tự ghim trên bản đồ.'}
-                            {locationStatus === 'timeout' && 'Định vị quá thời gian. Bấm nút định vị để thử lại hoặc tự ghim trên bản đồ.'}
-                            {locationStatus === 'unsupported' && 'Trình duyệt không hỗ trợ định vị. Hãy tự ghim vị trí trên bản đồ.'}
+                                ? t('Vị trí chỉ chính xác khoảng {km} km (định vị theo mạng). Kéo ghim đỏ trên bản đồ để chỉnh lại.', { km: (locationAccuracyM / 1000).toFixed(1) })
+                                : t('Đã xác định vị trí của bạn') + (locationAccuracyM != null ? ` (±${locationAccuracyM} m)` : '') + '.')}
+                            {locationStatus === 'manual' && t('Đang dùng vị trí bạn tự ghim trên bản đồ.')}
+                            {locationStatus === 'denied' && t('Trình duyệt đang chặn quyền vị trí. Hãy cho phép vị trí cho trang này rồi bấm nút định vị, hoặc bấm vào bản đồ để tự ghim.')}
+                            {locationStatus === 'os-blocked' && `${GEO_OS_BLOCKED_HINT} ${t('Hoặc bấm vào bản đồ để tự ghim.')}`}
+                            {locationStatus === 'unavailable' && t('Thiết bị chưa xác định được vị trí. Bấm nút định vị để thử lại hoặc tự ghim trên bản đồ.')}
+                            {locationStatus === 'timeout' && t('Định vị quá thời gian. Bấm nút định vị để thử lại hoặc tự ghim trên bản đồ.')}
+                            {locationStatus === 'unsupported' && t('Trình duyệt không hỗ trợ định vị. Hãy tự ghim vị trí trên bản đồ.')}
                         </p>
 
                         {/* Clean City Tabs */}
                         <div className="flex items-center justify-between gap-2">
                             <div className="flex items-center gap-1 bg-slate-100/80 p-1 rounded-xl flex-1">
                                 {[
-                                    { key: 'ALL' as CityFilter, label: 'Tất cả' },
-                                    { key: 'DANANG' as CityFilter, label: 'Đà Nẵng' },
+                                    { key: 'ALL' as CityFilter, label: t('Tất cả') },
+                                    { key: 'DANANG' as CityFilter, label: t('Đà Nẵng') },
                                     { key: 'HCMC' as CityFilter, label: 'TP.HCM' },
                                 ].map(tab => (
                                     <button
@@ -347,7 +349,7 @@ export default function FindStationPage({
                                 ))}
                             </div>
                             <span className="text-xs font-medium text-slate-500 shrink-0 px-1">
-                                {filtered.length} trạm
+                                {filtered.length} {t('trạm')}
                             </span>
                         </div>
 
@@ -355,7 +357,7 @@ export default function FindStationPage({
                         {showExtraFilters && (
                             <div className="pt-2 border-t border-slate-100 flex flex-col gap-2 animate-fade-in-down">
                                 <div className="flex items-center justify-between gap-1.5">
-                                    <span className="text-xs font-medium text-slate-500">Cỡ tủ:</span>
+                                    <span className="text-xs font-medium text-slate-500">{t('Cỡ tủ:')}</span>
                                     <div className="flex items-center gap-1">
                                         {(['ALL', 'S', 'M', 'L'] as SizeFilter[]).map(sz => (
                                             <button
@@ -367,16 +369,16 @@ export default function FindStationPage({
                                                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                                                 }`}
                                             >
-                                                {sz === 'ALL' ? 'Tất cả' : `Size ${sz}`}
+                                                {sz === 'ALL' ? t('Tất cả') : `Size ${sz}`}
                                             </button>
                                         ))}
                                     </div>
                                 </div>
                                 <div className="flex items-center justify-between gap-1.5">
-                                    <span className="text-xs font-medium text-slate-500">Bán kính:</span>
+                                    <span className="text-xs font-medium text-slate-500">{t('Bán kính:')}</span>
                                     <div className="flex items-center gap-1">
                                         {[
-                                            { val: null, label: 'Mọi nơi' },
+                                            { val: null, label: t('Mọi nơi') },
                                             { val: 5, label: '< 5km' },
                                             { val: 15, label: '< 15km' },
                                         ].map(({ val, label }) => (
@@ -403,7 +405,7 @@ export default function FindStationPage({
                         {isLoading && stations.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-16 text-center px-6">
                                 <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mb-3" />
-                                <p className="text-sm font-medium text-slate-500">Đang tải danh sách trạm...</p>
+                                <p className="text-sm font-medium text-slate-500">{t('Đang tải danh sách trạm...')}</p>
                             </div>
                         ) : apiError ? (
                             <div className="flex flex-col items-center justify-center py-14 text-center px-6">
@@ -413,13 +415,13 @@ export default function FindStationPage({
                                     onClick={() => fetchStationsData(searchQuery)}
                                     className="mt-3 px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 cursor-pointer flex items-center gap-1.5"
                                 >
-                                    <RefreshCw className="w-3.5 h-3.5" /> Thử lại
+                                    <RefreshCw className="w-3.5 h-3.5" /> {t('Thử lại')}
                                 </button>
                             </div>
                         ) : filtered.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-16 text-center px-6">
                                 <MapPin className="w-8 h-8 text-slate-300 mb-2" />
-                                <p className="text-sm font-semibold text-slate-700">Không tìm thấy trạm phù hợp</p>
+                                <p className="text-sm font-semibold text-slate-700">{t('Không tìm thấy trạm phù hợp')}</p>
                                 <button
                                     onClick={() => {
                                         setSearchQuery('');
@@ -429,7 +431,7 @@ export default function FindStationPage({
                                     }}
                                     className="mt-2 text-xs text-blue-600 font-semibold hover:underline cursor-pointer"
                                 >
-                                    Xóa bộ lọc
+                                    {t('Xóa bộ lọc')}
                                 </button>
                             </div>
                         ) : (
@@ -460,7 +462,7 @@ export default function FindStationPage({
                             setMapZoom(14);
                         }}
                         className="absolute bottom-24 right-3 z-[400] bg-white shadow-md rounded-full p-3 hover:bg-slate-50 transition-colors border border-slate-200 cursor-pointer"
-                        title="Về vị trí của bạn"
+                        title={t('Về vị trí của bạn')}
                     >
                         <LocateFixed className="w-5 h-5 text-red-600" />
                     </button>
@@ -500,6 +502,7 @@ function StationCard({
     onViewDetail: () => void;
     onBook: () => void;
 }) {
+    const t = useT();
     const availS = Math.min(station.totalS ?? 0, station.availableS ?? 0);
     const availM = Math.min(station.totalM ?? 0, station.availableM ?? 0);
     const availL = Math.min(station.totalL ?? 0, station.availableL ?? 0);
@@ -548,7 +551,7 @@ function StationCard({
                         totalAvail > 0 ? 'text-emerald-600' : 'text-amber-600'
                     }`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${totalAvail > 0 ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-                        {totalAvail > 0 ? `Còn ${totalAvail} ô` : 'Hết ô'}
+                        {totalAvail > 0 ? t('Còn {n} ô', { n: totalAvail }) : t('Hết ô')}
                     </span>
                     <span className="text-slate-300">·</span>
                     <div className="flex items-center gap-1 text-xs font-medium text-slate-600">
@@ -560,7 +563,7 @@ function StationCard({
 
                 {Number.isFinite(minPrice) && (
                     <span className="text-xs font-bold text-blue-600 shrink-0">
-                        Từ {(minPrice / 1000).toFixed(0)}k/h
+                        {t('Từ')} {(minPrice / 1000).toFixed(0)}k/h
                     </span>
                 )}
             </div>
@@ -575,7 +578,7 @@ function StationCard({
                     }}
                     className="flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200/80 transition-colors cursor-pointer"
                 >
-                    Chi tiết
+                    {t('Chi tiết')}
                 </button>
                 {totalAvail > 0 && (
                     <button
@@ -586,7 +589,7 @@ function StationCard({
                         }}
                         className="flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors flex items-center justify-center gap-1 cursor-pointer shadow-2xs"
                     >
-                        Đặt tủ <ArrowRight className="w-3.5 h-3.5" />
+                        {t('Đặt tủ')} <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                 )}
             </div>

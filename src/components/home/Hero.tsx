@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNetworkStats } from '../../utils/useNetworkStats';
 import { MapPin, Clock, Package, Search, Zap, Shield, Wifi, RotateCw, ChevronDown, QrCode, MapPinned } from 'lucide-react';
 import { getStations } from '../../api/stationService';
+import { useT } from '../../i18n';
 
 /** Sự kiện để các khối khác (bảng giá) chọn sẵn cỡ tủ trong widget này. */
 export const SELECT_SIZE_EVENT = 'smartlocker:select-size';
@@ -11,6 +12,7 @@ export const SELECT_SIZE_EVENT = 'smartlocker:select-size';
  * Được thiết kế lại với spacing và visual hierarchy cân bằng hơn
  */
 const Hero = () => {
+    const t = useT();
   const { lockers } = useNetworkStats();
   const [selectedSize, setSelectedSize] = useState('M');
   const [selectedStation, setSelectedStation] = useState('');
@@ -38,7 +40,7 @@ const Hero = () => {
     { 
       code: 'S', 
       name: 'Size S', 
-      desc: 'Balo / Túi xách',
+      desc: t('Balo / Túi xách'),
       selected: selectedSize === 'S',
       onClick: () => setSelectedSize('S')
     },
@@ -53,17 +55,17 @@ const Hero = () => {
     { 
       code: 'L', 
       name: 'Size L', 
-      desc: 'Vali lớn 28"',
+      desc: t('Vali lớn 28"'),
       selected: selectedSize === 'L',
       onClick: () => setSelectedSize('L')
     },
   ];
 
   const valueProps = [
-    { icon: Zap, text: 'Nhận tủ trong 30s', color: 'text-on-warning-container', bg: 'bg-warning-container' },
-    { icon: Shield, text: 'Có bảo hiểm hành lý', color: 'text-primary', bg: 'bg-primary-fixed' },
-    { icon: Wifi, text: 'Mở tủ Offline chuẩn JWS', color: 'text-tertiary', bg: 'bg-tertiary-fixed' },
-    { icon: RotateCw, text: 'Hoàn tiền linh hoạt', color: 'text-on-secondary-container', bg: 'bg-secondary-container' },
+    { icon: Zap, text: t('Nhận tủ trong 30s'), color: 'text-on-warning-container', bg: 'bg-warning-container' },
+    { icon: Shield, text: t('Có bảo hiểm hành lý'), color: 'text-primary', bg: 'bg-primary-fixed' },
+    { icon: Wifi, text: t('Mở tủ Offline chuẩn JWS'), color: 'text-tertiary', bg: 'bg-tertiary-fixed' },
+    { icon: RotateCw, text: t('Hoàn tiền linh hoạt'), color: 'text-on-secondary-container', bg: 'bg-secondary-container' },
   ];
 
   const handleSearch = () => {
@@ -84,13 +86,13 @@ const Hero = () => {
           <div className="max-w-5xl mx-auto text-center mb-12">
             {/* Headline */}
             <h1 className="max-w-3xl mx-auto text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-on-surface tracking-tight mb-6 leading-[1.1] text-balance">
-              Gửi Hành Lý Thông Minh 24/7 — <br className="hidden sm:inline"/>
-              <span className="text-gradient">Tự Do Khám Phá</span> Từng Góc Phố
+              {t('Gửi Hành Lý Thông Minh 24/7 —')} <br className="hidden sm:inline"/>
+              <span className="text-gradient">{t('Tự Do Khám Phá')}</span> {t('Từng Góc Phố')}
             </h1>
             
             {/* Subtitle */}
             <p className="text-base sm:text-lg text-secondary max-w-2xl mx-auto leading-relaxed mb-8">
-              Đặt tủ trực tuyến chỉ trong <strong className="text-primary font-semibold">30 giây</strong>. Quét mã QR mở tủ tại ga tàu metro, phố đi bộ và sân bay. An toàn tuyệt đối, mở khóa tức thì kể cả khi mất kết nối Internet.
+              {t('Đặt tủ trực tuyến chỉ trong')} <strong className="text-primary font-semibold">{t('30 giây')}</strong>{t('. Quét mã QR mở tủ tại ga tàu metro, phố đi bộ và sân bay. An toàn tuyệt đối, mở khóa tức thì kể cả khi mất kết nối Internet.')}
             </p>
 
             {/* Value Props Pill Row */}
@@ -116,8 +118,8 @@ const Hero = () => {
           >
             <div className="flex items-center gap-2 mb-5">
               <MapPinned className="w-5 h-5 text-primary" />
-              <h2 className="text-base font-bold text-on-surface">Tìm tủ trống gần bạn</h2>
-              <span className="text-xs text-secondary">(theo vị trí thời gian thực)</span>
+              <h2 className="text-base font-bold text-on-surface">{t('Tìm tủ trống gần bạn')}</h2>
+              <span className="text-xs text-secondary">{t('(theo vị trí thời gian thực)')}</span>
             </div>
 
             <form className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5 items-end" onSubmit={(e) => { e.preventDefault(); handleSearch(); }}>
@@ -125,7 +127,7 @@ const Hero = () => {
               <div className="md:col-span-4 flex flex-col gap-2">
                 <label htmlFor="hero-station" className="text-xs font-bold text-on-surface uppercase tracking-wider flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5 text-primary" />
-                  Chọn trạm gửi
+                  {t('Chọn trạm gửi')}
                 </label>
                 <div className="relative">
                   <select 
@@ -134,7 +136,7 @@ const Hero = () => {
                     value={selectedStation}
                     onChange={(e) => setSelectedStation(e.target.value)}
                   >
-                    <option value="">📍 Chọn trạm gửi gần bạn...</option>
+                    <option value="">{t('📍 Chọn trạm gửi gần bạn...')}</option>
                     {stationOptions.map((station) => (
                       <option key={station.id} value={station.id}>📍 {station.name}</option>
                     ))}
@@ -147,11 +149,11 @@ const Hero = () => {
               <div className="md:col-span-3 flex flex-col gap-2">
                 <label htmlFor="hero-station" className="text-xs font-bold text-on-surface uppercase tracking-wider flex items-center gap-1.5">
                   <Clock className="w-3.5 h-3.5 text-primary" />
-                  Thời gian gửi
+                  {t('Thời gian gửi')}
                 </label>
                 <div className="h-14 bg-surface-container-low/40 border border-outline-variant/60 rounded-xl px-4 flex items-center justify-between text-on-surface text-sm font-semibold cursor-pointer hover:border-primary/40 transition-all">
                   <div className="flex items-center gap-2 truncate">
-                    <span className="truncate">Hôm nay, 14:00 - 19:00</span>
+                    <span className="truncate">{t('Hôm nay, 14:00 - 19:00')}</span>
                   </div>
                   <span className="px-2.5 py-1 text-xs font-bold bg-primary-container/10 text-primary rounded-md">5h</span>
                 </div>
@@ -161,7 +163,7 @@ const Hero = () => {
               <div className="md:col-span-5 flex flex-col gap-2">
                 <label htmlFor="hero-station" className="text-xs font-bold text-on-surface uppercase tracking-wider flex items-center gap-1.5">
                   <Package className="w-3.5 h-3.5 text-primary" />
-                  Kích thước ngăn tủ
+                  {t('Kích thước ngăn tủ')}
                 </label>
                 <div className="grid grid-cols-3 gap-2">
                   {lockerSizes.map((size) => (
@@ -204,14 +206,14 @@ const Hero = () => {
                     <span className="w-2.5 h-2.5 rounded-full bg-tertiary-container"></span>
                     <span className="absolute w-2.5 h-2.5 rounded-full bg-tertiary-container animate-ping motion-reduce:animate-none opacity-75"></span>
                   </span>
-                  <span>{lockers != null ? <><strong className="text-on-surface font-bold">{lockers} ô tủ</strong> thuộc mạng lưới trạm đang hoạt động</> : "Mạng lưới trạm tủ đang hoạt động"}</span>
+                  <span>{lockers != null ? <><strong className="text-on-surface font-bold">{lockers} {t('ô tủ')}</strong> {t('thuộc mạng lưới trạm đang hoạt động')}</> : t('Mạng lưới trạm tủ đang hoạt động')}</span>
                 </div>
                 <button 
                   type="submit"
                   className="w-full sm:w-auto px-8 h-14 bg-primary-container hover:bg-on-primary-fixed-variant active:bg-on-primary-fixed-variant text-on-primary rounded-xl text-base font-bold flex items-center justify-center gap-2 shadow-elevation-2 hover:shadow-elevation-3 transition-all active:scale-[0.98]"
                 >
                   <Search className="w-5 h-5" />
-                  <span>Tìm tủ trống ngay</span>
+                  <span>{t('Tìm tủ trống ngay')}</span>
                 </button>
               </div>
             </form>
@@ -221,19 +223,19 @@ const Hero = () => {
           <div className="max-w-6xl mx-auto mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-secondary">
             <div className="flex items-center gap-2">
               <QrCode className="w-4 h-4 text-primary" />
-              <span>Mở tức thì với QR Code</span>
+              <span>{t('Mở tức thì với QR Code')}</span>
             </div>
             <div className="flex items-center gap-2">
               <Shield className="w-4 h-4 text-primary" />
-              <span>Bảo hiểm hành lý theo từng đơn</span>
+              <span>{t('Bảo hiểm hành lý theo từng đơn')}</span>
             </div>
             <div className="flex items-center gap-2">
               <Wifi className="w-4 h-4 text-primary" />
-              <span>Hoạt động kể cả khi offline</span>
+              <span>{t('Hoạt động kể cả khi offline')}</span>
             </div>
             <div className="flex items-center gap-2">
               <RotateCw className="w-4 h-4 text-primary" />
-              <span>Hoàn tiền 100% nếu hủy</span>
+              <span>{t('Hoàn tiền 100% nếu hủy')}</span>
             </div>
           </div>
 
@@ -254,10 +256,10 @@ const Hero = () => {
                       <Package className="w-16 h-16" />
                     </div>
                     <h3 className="text-2xl md:text-3xl font-bold mb-2 text-center text-balance">
-                      Trạm tủ thông minh SmartLocker
+                      {t('Trạm tủ thông minh SmartLocker')}
                     </h3>
                     <p className="text-base md:text-lg text-white/80 text-center max-w-md">
-                      Hệ thống kiosk hiện đại đặt tại các điểm nóng du lịch & giao thông công cộng
+                      {t('Hệ thống kiosk hiện đại đặt tại các điểm nóng du lịch & giao thông công cộng')}
                     </p>
                   </div>
                 </div>
@@ -270,8 +272,8 @@ const Hero = () => {
                       <span className="absolute w-3 h-3 rounded-full bg-emerald-400 animate-ping motion-reduce:animate-none opacity-75"></span>
                     </span>
                     <div>
-                      <div className="text-xs font-bold uppercase tracking-wider text-tertiary-fixed">Trạm #042</div>
-                      <div className="text-xs text-surface-variant">Metro Ga Bến Thành • Kiosk iPad Pro V4</div>
+                      <div className="text-xs font-bold uppercase tracking-wider text-tertiary-fixed">{t('Trạm #042')}</div>
+                      <div className="text-xs text-surface-variant">{t('Metro Ga Bến Thành • Kiosk iPad Pro V4')}</div>
                     </div>
                   </div>
                 </div>
@@ -283,8 +285,8 @@ const Hero = () => {
                       <Zap className="w-6 h-6" />
                     </div>
                     <div>
-                      <div className="text-xs font-semibold text-secondary">Tốc độ mở tủ</div>
-                      <div className="text-xl font-bold text-primary">0.8 giây</div>
+                      <div className="text-xs font-semibold text-secondary">{t('Tốc độ mở tủ')}</div>
+                      <div className="text-xl font-bold text-primary">{t('0.8 giây')}</div>
                     </div>
                   </div>
                 </div>
