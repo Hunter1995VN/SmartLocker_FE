@@ -69,7 +69,7 @@ const Pricing = () => {
 
   const guarantees = [
     { icon: ShieldCheck, text: 'Khóa điện tử Solenoid chịu lực cao' },
-    { icon: Shield, text: 'Cảm biến chống cạy cửa 24/7' },
+    { icon: Shield, text: 'Cảm biến đóng/mở cửa từng ô tủ' },
     { icon: Award, text: 'Tặng kèm bảo hiểm hành lý theo từng đơn' },
     { icon: Battery, text: 'Hỗ trợ kỹ thuật từ xa 24/7 tức thì' },
   ];
