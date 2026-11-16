@@ -394,6 +394,9 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
           </div>
         </section>
 
+        {/* Station rating: shown first once the booking is completed (renders nothing otherwise) */}
+        {booking && <StationReviewPanel bookingId={booking.id} status={booking.status} stationName={stationName} />}
+
         {/* TWO-COLUMN WORKSPACE: LEFT MAIN PASS & RIGHT TELEMETRY/MAP */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* HERO DIGITAL KEY CARD (Centerpiece Focus) - 7 Cols Desktop */}
@@ -728,7 +731,6 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
 
       {/* EXTEND BOOKING MODAL (UC-T07) */}
       {booking && <PickupDelegationPanel key={booking.id} bookingId={booking.id} status={booking.status} />}
-      {booking && <StationReviewPanel bookingId={booking.id} status={booking.status} />}
         {booking && <LostItemPanel bookingId={booking.id} status={booking.status} checkedOutAt={booking.checkedOutAt} />}
       <ExtendBookingModal
         isOpen={showExtendModal}

@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { classifyGeoError, watchGeoAvailability, GEO_OS_BLOCKED_HINT } from '../utils/geolocation';
 import {
     MapPin, Search, Navigation,
     X, RefreshCw, ArrowRight,
@@ -66,7 +67,7 @@ export default function FindStationPage({
     // Vị trí thật của người dùng: null cho tới khi trình duyệt trả về (hoặc người dùng tự ghim).
     // Không dùng tọa độ mặc định làm "vị trí của bạn" vì sẽ hiển thị sai chỗ.
     const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-    const [locationStatus, setLocationStatus] = useState<'locating' | 'granted' | 'manual' | 'denied' | 'unavailable' | 'timeout' | 'unsupported'>('locating');
+    const [locationStatus, setLocationStatus] = useState<'locating' | 'granted' | 'manual' | 'denied' | 'os-blocked' | 'unavailable' | 'timeout' | 'unsupported'>('locating');
     const [locationAccuracyM, setLocationAccuracyM] = useState<number | null>(null);
     const [mapCenter, setMapCenter] = useState(MAP_CENTER_HCMC);
     const [mapZoom, setMapZoom] = useState(13);
@@ -142,7 +143,7 @@ export default function FindStationPage({
             }
         };
         const onFail = (err: GeolocationPositionError) => {
-            setLocationStatus(err.code === 1 ? 'denied' : err.code === 2 ? 'unavailable' : 'timeout');
+            void classifyGeoError(err).then(setLocationStatus);
         };
         // Máy tính thường không có GPS: thử độ chính xác cao trước, hết thời gian thì dùng vị trí theo mạng/Wi-Fi.
         navigator.geolocation.getCurrentPosition(
@@ -158,6 +159,14 @@ export default function FindStationPage({
     useEffect(() => {
         fetchUserLocation();
     }, [fetchUserLocation]);
+
+    // Retry automatically once the site permission is granted or the user comes back after enabling OS location.
+    // A manually pinned location is never overwritten.
+    const locationStatusRef = useRef(locationStatus);
+    useEffect(() => { locationStatusRef.current = locationStatus; }, [locationStatus]);
+    useEffect(() => watchGeoAvailability(() => {
+        if (['denied', 'os-blocked', 'unavailable', 'timeout'].includes(locationStatusRef.current)) fetchUserLocation();
+    }), [fetchUserLocation]);
 
     const handleManualLocationChange = (newLoc: { lat: number; lng: number }) => {
         setUserLocation(newLoc);
@@ -307,6 +316,7 @@ export default function FindStationPage({
                                 : `Đã xác định vị trí của bạn${locationAccuracyM != null ? ` (±${locationAccuracyM} m)` : ''}.`)}
                             {locationStatus === 'manual' && 'Đang dùng vị trí bạn tự ghim trên bản đồ.'}
                             {locationStatus === 'denied' && 'Trình duyệt đang chặn quyền vị trí. Hãy cho phép vị trí cho trang này rồi bấm nút định vị, hoặc bấm vào bản đồ để tự ghim.'}
+                            {locationStatus === 'os-blocked' && `${GEO_OS_BLOCKED_HINT} Hoặc bấm vào bản đồ để tự ghim.`}
                             {locationStatus === 'unavailable' && 'Thiết bị chưa xác định được vị trí. Bấm nút định vị để thử lại hoặc tự ghim trên bản đồ.'}
                             {locationStatus === 'timeout' && 'Định vị quá thời gian. Bấm nút định vị để thử lại hoặc tự ghim trên bản đồ.'}
                             {locationStatus === 'unsupported' && 'Trình duyệt không hỗ trợ định vị. Hãy tự ghim vị trí trên bản đồ.'}

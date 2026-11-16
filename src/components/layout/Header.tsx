@@ -27,6 +27,7 @@ const Header = ({ onNavigate }: HeaderProps) => {
     { href: '#how-it-works', label: 'Cách hoạt động' },
     { href: '#pricing', label: 'Kích thước & Bảng giá' },
     { href: '#security', label: 'Bảo mật & Công nghệ' },
+    { href: '#customer-reviews', label: 'Đánh giá' },
     { href: '#support', label: 'Hỗ trợ' },
   ];
 

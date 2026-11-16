@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
     Search, MapPin, Navigation, Zap,
     Shield, User, Clock, RefreshCw, ChevronRight,
-    ArrowRight, Phone, Package, ReceiptText, Lock, CheckCircle,
+    ArrowRight, Phone, Package, ReceiptText, Lock, CheckCircle, Star,
 } from 'lucide-react';
 import { getStations, calcDistance } from '../api/stationService';
 import type { Station } from '../api/stationService';
@@ -12,6 +12,7 @@ import { getApiErrorMessage, resolveAssetUrl } from '../api/client';
 import CustomerHeader from '../components/layout/CustomerHeader';
 import { CONTACT, openLegal, openSupport } from '../utils/contact';
 import { parseServerTime } from '../utils/serverTime';
+import { classifyGeoError, watchGeoAvailability, GEO_OS_BLOCKED_HINT } from '../utils/geolocation';
 
 // ─── Types ───────────────────────────────────────────────
 interface AuthUser {
@@ -30,7 +31,7 @@ interface DashboardPageProps {
     onNavigate?: (page: string, data?: any) => void;
 }
 
-type LocationState = 'locating' | 'granted' | 'denied' | 'unavailable' | 'timeout' | 'unsupported';
+type LocationState = 'locating' | 'granted' | 'denied' | 'os-blocked' | 'unavailable' | 'timeout' | 'unsupported';
 
 const STATUS_LABEL: Record<string, { label: string; className: string }> = {
     PENDING_PAYMENT: { label: 'CHỜ THANH TOÁN', className: 'bg-[#fff1c2] text-[#6b4a00]' },
@@ -146,11 +147,17 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
         setLocState('locating');
         navigator.geolocation.getCurrentPosition(
             (pos) => { setUserLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude }); setLocState('granted'); },
-            (err) => setLocState(err.code === 1 ? 'denied' : err.code === 2 ? 'unavailable' : 'timeout'),
+            (err) => { void classifyGeoError(err).then(setLocState); },
             { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 },
         );
     }, []);
     useEffect(() => { locate(); }, [locate]);
+    // Allowing location in the address bar or switching on OS location services takes effect without a reload.
+    const locStateRef = useRef(locState);
+    useEffect(() => { locStateRef.current = locState; }, [locState]);
+    useEffect(() => watchGeoAvailability(() => {
+        if (['denied', 'os-blocked', 'unavailable', 'timeout'].includes(locStateRef.current)) locate();
+    }), [locate]);
 
     // Đơn đang hoạt động thật: ưu tiên đơn đang gửi đồ, sau đó đơn đã thanh toán chờ gửi
     const activeBooking = useMemo(
@@ -215,6 +222,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
         if (locState === 'locating') return 'Đang xác định vị trí...';
         if (locState === 'granted') return nearestStation ? `Trạm gần bạn: ${nearestStation.name} (${formatDistance(nearestStation.distanceKm ?? 0)})` : 'Đã xác định vị trí của bạn';
         if (locState === 'denied') return 'Vị trí đang bị chặn. Cho phép vị trí để thấy trạm gần bạn.';
+        if (locState === 'os-blocked') return GEO_OS_BLOCKED_HINT;
         if (locState === 'unsupported') return 'Trình duyệt không hỗ trợ định vị.';
         return 'Chưa xác định được vị trí của bạn.';
     })();
@@ -311,7 +319,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                         >
                                             {locationText}
                                         </span>
-                                        {(locState === 'denied' || locState === 'unavailable' || locState === 'timeout') && (
+                                        {(locState === 'denied' || locState === 'os-blocked' || locState === 'unavailable' || locState === 'timeout') && (
                                             <button type="button" onClick={locate} className="text-xs font-bold text-[#004ac6] underline cursor-pointer">Thử lại</button>
                                         )}
                                     </p>
@@ -675,6 +683,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                 <footer className="border-t border-[#e5eeff] mt-4 px-4 md:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
                     <p className="text-xs text-[#5c5f70]">© {new Date().getFullYear()} SmartLocker. Bản quyền thuộc về SmartLocker.</p>
                     <div className="flex items-center gap-4 text-xs text-[#434655]">
+                        <a href="/?view=reviews" className="hover:text-[#004ac6] transition-colors">Đánh giá khách hàng</a>
                         <button type="button" onClick={() => openLegal('privacy')} className="hover:text-[#004ac6] transition-colors cursor-pointer">Chính sách bảo mật</button>
                         <button type="button" onClick={() => openLegal('terms')} className="hover:text-[#004ac6] transition-colors cursor-pointer">Điều khoản dịch vụ</button>
                         <button type="button" onClick={openSupport} className="hover:text-[#004ac6] transition-colors cursor-pointer">Trợ giúp khẩn cấp 24/7</button>
@@ -728,6 +737,12 @@ function BookingRow({ booking, onOpen }: { booking: BookingListItemDto; onOpen: 
                 <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${status.className}`}>
                     {status.label}
                 </span>
+                {(booking.status === 'COMPLETED' || booking.status === 'COMPLETED_MANUAL') && (
+                    <button type="button" onClick={onOpen} title="Đánh giá trạm sau khi lấy đồ"
+                        className="text-xs font-semibold text-amber-700 hover:text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full flex items-center gap-1 transition-colors cursor-pointer">
+                        <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />Đánh giá
+                    </button>
+                )}
                 <button type="button" onClick={onOpen} className="text-xs font-semibold text-[#2563eb] hover:text-[#004ac6] flex items-center gap-0.5 transition-colors cursor-pointer">
                     {booking.status === 'COMPLETED' ? <>Biên lai <ReceiptText className="w-4 h-4" /></> : <>Chi tiết <ChevronRight className="w-4 h-4" /></>}
                 </button>

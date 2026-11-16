@@ -49,6 +49,8 @@ interface PageData {
     bookingId?: string;
     bookingData?: any;
     tab?: 'info' | 'debt';
+    reviewLanding?: boolean;
+    reviewPage?: number;
 }
 
 /** Chuyển đổi từ URL Pathname sang mã Page tương ứng */
@@ -94,6 +96,7 @@ const parseQueryAndState = (): PageData => {
     const email = searchParams.get('email') || undefined;
     const tabParam = searchParams.get('tab');
     const tab: 'info' | 'debt' | undefined = (tabParam === 'debt' || tabParam === 'info') ? tabParam : undefined;
+    const reviewPage = Number(searchParams.get('reviewPage'));
 
     let bookingData = undefined;
     try {
@@ -107,6 +110,8 @@ const parseQueryAndState = (): PageData => {
         email,
         bookingData,
         tab,
+        reviewLanding: searchParams.get('view') === 'reviews',
+        reviewPage: Number.isSafeInteger(reviewPage) && reviewPage >= 1 && reviewPage <= 1_000_000 ? reviewPage : undefined,
     };
 };
 
@@ -147,7 +152,7 @@ function App() {
             return pageFromUrl;
         }
 
-        if (savedUser) {
+        if (savedUser && new URLSearchParams(window.location.search).get('view') !== 'reviews') {
             return isAdminOrStaff ? 'admin' : 'dashboard';
         }
         return 'home';
@@ -162,7 +167,7 @@ function App() {
             const userRole = getUserRole(savedUser);
             const isAdminOrStaff = userRole === 'admin' || userRole === 'staff';
 
-            if (window.location.pathname === '/') {
+            if (window.location.pathname === '/' && new URLSearchParams(window.location.search).get('view') !== 'reviews') {
                 const targetPage = isAdminOrStaff ? 'admin' : 'dashboard';
                 window.history.replaceState({ page: targetPage }, '', `/${targetPage}`);
                 setCurrentPage(targetPage);
@@ -172,6 +177,12 @@ function App() {
             }
         }
     }, [savedUser]);
+
+    useEffect(() => {
+        if (currentPage === 'home' && pageData.reviewLanding) {
+            document.getElementById('customer-reviews')?.scrollIntoView({ behavior: 'instant' });
+        }
+    }, [currentPage, pageData.reviewLanding]);
 
     // Lắng nghe sự kiện người dùng bấm Back / Forward (mũi tên quay lại / tiến tới trên trình duyệt)
     useEffect(() => {
@@ -193,6 +204,8 @@ function App() {
         if (data.bookingId) params.set('bookingId', data.bookingId);
         if (data.email) params.set('email', data.email);
         if (data.tab) params.set('tab', data.tab);
+        if (data.reviewLanding) params.set('view', 'reviews');
+        if (data.reviewPage && data.reviewPage > 1) params.set('reviewPage', String(data.reviewPage));
         const queryString = params.toString();
         if (queryString) targetUrl += `?${queryString}`;
 
@@ -207,7 +220,7 @@ function App() {
                 sessionStorage.setItem('smartlocker_booking_data', JSON.stringify(data.bookingData));
             } catch {}
         }
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (page !== 'home' || !data.reviewLanding) window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const handleLogout = () => {
@@ -236,7 +249,7 @@ function App() {
                 <Homepage onNavigate={(mode) => {
                     if (mode === 'login') navigateTo('login');
                     else if (mode === 'register') navigateTo('register');
-                }} />
+                }} initialReviewPage={pageData.reviewPage} onReviewLogin={reviewPage => navigateTo('login', { reviewLanding: true, reviewPage })} />
             )}
 
             {currentPage === 'login' && (
@@ -248,6 +261,8 @@ function App() {
                     const role = getUserRole(currentStored);
                     if (role === 'admin' || role === 'staff') {
                         navigateTo('admin');
+                    } else if (pageData.reviewLanding) {
+                        navigateTo('home', { reviewLanding: true, reviewPage: pageData.reviewPage });
                     } else {
                         navigateTo('dashboard');
                     }
