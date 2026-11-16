@@ -43,7 +43,7 @@ export default function ManualConfirmQueue() {
     {items.map(item => <button key={item.id} className="border rounded-lg p-3 mr-2" onClick={() => setSelected(item)}>{item.bookingCode}</button>)}
     {selected && <div className="space-y-3">
       <p>Đơn {selected.bookingCode} · Trạm {selected.stationId} · Tủ {selected.lockerId}</p>
-      {photo && <img src={photo} alt="Ảnh khách gửi để xác minh ngăn tủ" className="max-w-md rounded-lg" />}
+      {photo && <img loading="lazy" decoding="async" src={photo} alt="Ảnh khách gửi để xác minh ngăn tủ" className="max-w-md rounded-lg" />}
       <label className="block">Kết quả kiểm tra và lý do xác nhận<textarea className="block border rounded w-full p-2" value={reason} maxLength={500} onChange={e => setReason(e.target.value)} /></label>
       <button className="rounded bg-blue-700 text-white p-3 disabled:opacity-50" disabled={busy || !photo || !reason.trim()} onClick={() => void approve()}>Xác nhận đóng đơn và bảo trì tủ</button>
     </div>}

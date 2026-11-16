@@ -29,7 +29,7 @@ export default function SensorPhotoConfirmation({ lang, stationId, bookingId, lo
         <section className="my-auto w-full max-w-lg space-y-4 rounded-2xl bg-white p-6 text-slate-900">
             <h2 className="text-xl font-bold">{x('sensorTitle')}</h2><p>{x('sensorHint')}</p>
             <video ref={video} autoPlay playsInline muted onLoadedData={()=>setReady(true)} className={photo?'hidden':'w-full rounded'}/>
-            {photo && <img src={photo} alt={x('photoPreview')} className="w-full rounded"/>}
+            {photo && <img loading="lazy" decoding="async" src={photo} alt={x('photoPreview')} className="w-full rounded"/>}
             {error && <p role="alert" className="text-red-700">{error}</p>}
             {!photo ? <button type="button" disabled={!ready || !!error} onClick={capture} className="rounded border p-3 disabled:opacity-50">{x('capturePhoto')}</button>
                 : <><button type="button" disabled={busy} onClick={()=>setPhoto('')} className="rounded border p-3">{x('retakePhoto')}</button>

@@ -428,7 +428,7 @@ export default function IncidentDetailPanel({
                                 onClick={() => setShowImageLightbox(true)}
                                 className="relative rounded-xl overflow-hidden border border-slate-200/90 bg-slate-50 flex items-center justify-center max-h-52 cursor-pointer group"
                             >
-                                <img
+                                <img loading="lazy" decoding="async"
                                     src={incident.evidenceImageUrl}
                                     alt={`Bằng chứng ${incident.incidentCode}`}
                                     className="w-full h-auto max-h-52 object-contain transition group-hover:scale-[1.02]"
@@ -684,7 +684,7 @@ export default function IncidentDetailPanel({
                             </button>
                         </div>
                         <div className="p-2 flex items-center justify-center overflow-auto max-h-[78vh] bg-slate-900/5 rounded-xl">
-                            <img
+                            <img loading="lazy" decoding="async"
                                 src={incident.evidenceImageUrl}
                                 alt={`Bằng chứng ${incident.incidentCode}`}
                                 className="max-h-[75vh] w-auto rounded-lg object-contain"
