@@ -42,7 +42,7 @@ export default function DashboardHeader({
                         <input
                             type="text"
                             readOnly
-                            placeholder="Search station, locker bay, MAC, booking ID..."
+                            placeholder="Tìm trạm, ô tủ, mã MAC, mã đặt chỗ..."
                             aria-label="Tìm trạm, ngăn tủ, MAC hoặc mã đặt chỗ"
                             className="w-full pl-9 pr-3 py-1.5 bg-slate-100/80 border border-slate-200/80 rounded-xl text-xs text-slate-700 placeholder-slate-400 focus:outline-none cursor-default"
                         />
@@ -53,7 +53,7 @@ export default function DashboardHeader({
                 <div className="flex items-center gap-2 flex-wrap">
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold text-xs">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        <span>Mesh Stream: Active</span>
+                        <span>Luồng thiết bị: đang hoạt động</span>
                     </span>
 
                     {offlineDevicesCount > 0 ? (

@@ -391,7 +391,7 @@ export default function OccupancyTurnoverAnalyticsView({
                             </span>
                         </div>
                         <p className="text-xs text-slate-500 mt-1">
-                            Đo lường công suất lấp đầy thực tế theo giờ-tủ (<code className="font-mono">Locker-Hours</code>), tốc độ luân chuyển lượt thuê trên từng khoang tủ, thời gian trống chờ khách và hiệu quả doanh thu <code className="font-mono">RevPAL</code>.
+                            Đo lường công suất lấp đầy thực tế theo giờ-tủ (<code className="font-mono">Giờ-tủ</code>), tốc độ luân chuyển lượt thuê trên từng khoang tủ, thời gian trống chờ khách và hiệu quả doanh thu <code className="font-mono">RevPAL</code>.
                         </p>
                     </div>
                 </div>

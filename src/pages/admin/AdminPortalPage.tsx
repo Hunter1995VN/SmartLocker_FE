@@ -11,7 +11,7 @@
  * - Quản lý Khách hàng & Kiểm soát Nợ xấu (UC-A06)
  * - Đối soát tài chính định kỳ PayOS & CSDL (UC-A12)
  * - Xuất Báo cáo Doanh thu Tài chính & Lưu lượng Giao dịch Thanh toán (UC-A10)
- * - Tra cứu Nhật ký Truy vết An ninh toàn hệ thống Audit Logs (UC-A08)
+ * - Tra cứu Nhật ký Truy vết An ninh toàn hệ thống Nhật ký kiểm tra (UC-A08)
  */
 import { Suspense, lazy, useState, useEffect, useCallback } from 'react';
 import type { AuthResponse } from '../../api/authService';

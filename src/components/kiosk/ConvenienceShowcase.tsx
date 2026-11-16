@@ -1,3 +1,4 @@
+import { kioskText } from '../../utils/kioskMessages';
 import { useState, useEffect, useRef } from 'react';
 import {
   LuggageDilemmaGraphic,
@@ -215,7 +216,7 @@ export default function ConvenienceShowcase({
                 ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700' 
                 : 'bg-slate-900 hover:bg-slate-800 border-slate-700 text-slate-300'
             }`}
-            title="Previous"
+            title={kioskText(lang)('previous')}
           >
             <PrevIconBespoke className="w-3.5 h-3.5" />
           </button>
@@ -227,7 +228,7 @@ export default function ConvenienceShowcase({
                 ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700' 
                 : 'bg-slate-900 hover:bg-slate-800 border-slate-700 text-slate-300'
             }`}
-            title="Next"
+            title={kioskText(lang)('next')}
           >
             <NextIconBespoke className="w-3.5 h-3.5" />
           </button>

@@ -2020,7 +2020,7 @@ export default function InternalRbacManagementView({
                                     onClick={onNavigateAudit}
                                     className="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-xs font-bold transition cursor-pointer inline-flex items-center gap-1"
                                 >
-                                    <span>Mở Audit Logs toàn hệ thống</span>
+                                    <span>Mở Nhật ký kiểm tra toàn hệ thống</span>
                                     <ExternalLink className="w-3.5 h-3.5" />
                                 </button>
                             )}
@@ -2160,7 +2160,7 @@ export default function InternalRbacManagementView({
                                         <strong className="text-slate-900">
                                             {confirmDialog.targetUser.fullName}
                                         </strong>{' '}
-                                        (chuyển trạng thái sang <strong className="text-rose-700">DELETED</strong>, bảo toàn lịch sử biên bản & Audit Logs).
+                                        (chuyển trạng thái sang <strong className="text-rose-700">DELETED</strong>, bảo toàn lịch sử biên bản & Nhật ký kiểm tra).
                                     </>
                                 )}
                                 {confirmDialog.kind === 'CHANGE_ROLE' && (

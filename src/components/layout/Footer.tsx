@@ -178,7 +178,7 @@ const Footer = () => {
           {/* Bottom Meta & Copyright Row */}
           <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-secondary">
             <div className="flex items-center gap-2 flex-wrap justify-center md:justify-start">
-              <span>© 2025 SmartLocker Technologies Inc.</span>
+              <span>© {new Date().getFullYear()} SmartLocker.</span>
               <span className="hidden md:inline">•</span>
               <span className="flex items-center gap-1">
                 Made with <Heart className="w-3 h-3 fill-red-500 text-red-500" /> in Vietnam

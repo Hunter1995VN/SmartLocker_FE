@@ -1387,7 +1387,7 @@ export default function PromotionVoucherManagementView({
                                 onClick={onNavigateAudit}
                                 className="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-xs font-bold text-blue-600 flex items-center gap-1.5 cursor-pointer"
                             >
-                                <span>Mở Audit Logs toàn cục</span>
+                                <span>Mở Nhật ký kiểm tra toàn cục</span>
                                 <ExternalLink className="w-3.5 h-3.5" />
                             </button>
                         )}

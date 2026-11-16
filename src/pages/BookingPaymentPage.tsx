@@ -807,7 +807,7 @@ const BookingPaymentPage: React.FC<BookingPaymentPageProps> = ({ onNavigate, boo
                 <span className="text-xs text-slate-500 font-medium">Hệ thống tủ lưu trữ hành lý thông minh</span>
               </div>
               <p className="text-sm text-slate-500">
-                © 2026 SmartLocker Systems. Cổng thanh toán tích hợp PayOS &amp; VietQR Napas 24/7.
+                © {new Date().getFullYear()} SmartLocker. Cổng thanh toán tích hợp PayOS &amp; VietQR Napas 24/7.
               </p>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-500">

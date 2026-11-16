@@ -176,7 +176,7 @@ export default function AdminReviewDialog({ record, onApproved, onClose }: Admin
                             <DetailRow label="Mã biên bản" value={record.recordCode} mono />
                             <DetailRow label="Trạm" value={record.stationName} accent />
                             <DetailRow label="Tủ (Locker)" value={record.lockerCode} mono />
-                            <DetailRow label="Booking" value={`#${record.bookingCode}`} mono />
+                            <DetailRow label="Đơn đặt chỗ" value={`#${record.bookingCode}`} mono />
                             <DetailRow
                                 label="Quá hạn"
                                 value={overdueDisplay(record.overdueHours)}

@@ -91,7 +91,7 @@ export default function RemoteUnlockConfirmModal({
                     <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200/80 space-y-2">
                         <InfoRow label="Mã sự cố" value={incident.incidentCode} mono />
                         {incident.bookingCode && (
-                            <InfoRow label="Booking" value={`#${incident.bookingCode}`} mono />
+                            <InfoRow label="Đơn đặt chỗ" value={`#${incident.bookingCode}`} mono />
                         )}
                         <InfoRow label="Trạm" value={incident.stationName} />
                         <InfoRow label="Tủ" value={incident.lockerCode} mono />

@@ -118,7 +118,7 @@ export default function ResetStaffPasswordModal({
                     <div className="p-3 rounded-xl bg-amber-50/70 border border-amber-200/80 text-xs text-amber-900 flex items-start gap-2.5">
                         <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                         <span>
-                            Mật khẩu cũ của nhân sự <strong>{user.fullName}</strong> sẽ bị thu hồi ngay lập tức và sự kiện này được ghi vết vào <strong>Audit Logs</strong>.
+                            Mật khẩu cũ của nhân sự <strong>{user.fullName}</strong> sẽ bị thu hồi ngay lập tức và sự kiện này được ghi vết vào <strong>Nhật ký kiểm tra</strong>.
                         </span>
                     </div>
 

@@ -488,7 +488,7 @@ export default function ManualRefundManagementView({
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="Tìm mã lệnh MRF-..., mã đơn BK-..., OrderCode PayOS, tên khách..."
+                                placeholder="Tìm mã lệnh MRF-..., mã đơn BK-..., Mã đơn PayOS, tên khách..."
                                 className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 text-xs focus:border-purple-600 focus:outline-none"
                             />
                         </div>
@@ -696,7 +696,7 @@ export default function ManualRefundManagementView({
                         <table className="w-full text-left border-collapse text-xs">
                             <thead>
                                 <tr className="bg-slate-50 border-b border-slate-200 text-xs font-bold uppercase text-slate-500">
-                                    <th className="py-3 px-4">OrderCode PayOS</th>
+                                    <th className="py-3 px-4">Mã đơn PayOS</th>
                                     <th className="py-3 px-4">Đơn đặt & Trạng thái</th>
                                     <th className="py-3 px-4">Khách hàng & Trạm</th>
                                     <th className="py-3 px-4">Thực thu Gốc</th>
@@ -807,7 +807,7 @@ export default function ManualRefundManagementView({
                                     onClick={onNavigateAudit}
                                     className="text-blue-600 hover:underline font-bold flex items-center gap-1 cursor-pointer"
                                 >
-                                    <span>Mở Audit Logs</span>
+                                    <span>Mở Nhật ký kiểm tra</span>
                                     <ExternalLink className="w-3.5 h-3.5" />
                                 </button>
                             )}

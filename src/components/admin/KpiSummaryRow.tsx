@@ -78,7 +78,7 @@ export default function KpiSummaryRow({ stats, isLoading }: KpiSummaryRowProps) 
             subtext: `${occupiedPct}% đang lưu trữ`,
         },
         {
-            title: 'ACTIVE BOOKINGS',
+            title: 'ĐƠN ĐANG HOẠT ĐỘNG',
             icon: Clock,
             iconBg: 'bg-slate-100 text-slate-600 border-slate-200',
             value: activeBookings,

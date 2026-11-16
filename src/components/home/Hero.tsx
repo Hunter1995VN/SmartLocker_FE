@@ -272,7 +272,7 @@ const Hero = () => {
                       <span className="absolute w-3 h-3 rounded-full bg-emerald-400 animate-ping opacity-75"></span>
                     </span>
                     <div>
-                      <div className="text-xs font-bold uppercase tracking-wider text-tertiary-fixed">Station Hub #042</div>
+                      <div className="text-xs font-bold uppercase tracking-wider text-tertiary-fixed">Trạm #042</div>
                       <div className="text-xs text-surface-variant">Metro Ga Bến Thành • Kiosk iPad Pro V4</div>
                     </div>
                   </div>

@@ -349,7 +349,7 @@ export default function CreateManualRefundModal({
                         )}
                     </div>
 
-                    {/* Step 2: Exception Category */}
+                    {/* Bước 2: Exception Category */}
                     <div>
                         <label className="block font-extrabold text-slate-800 mb-1.5">
                             2. Phân loại Trường hợp Ngoại lệ <span className="text-rose-500">*</span>
@@ -381,7 +381,7 @@ export default function CreateManualRefundModal({
                         </div>
                     </div>
 
-                    {/* Step 3: Requested Refund Amount + Incident Ref */}
+                    {/* Bước 3: Requested Refund Amount + Incident Ref */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         <div>
                             <div className="flex items-center justify-between mb-1">

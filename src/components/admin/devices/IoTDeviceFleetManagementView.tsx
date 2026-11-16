@@ -563,7 +563,7 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                             </div>
                             <div>
                                 <h4 className="text-sm font-bold text-slate-900">Khởi động lại vi điều khiển?</h4>
-                                <p className="text-xs text-slate-500">UC-S09: Remote MQTT Reboot</p>
+                                <p className="text-xs text-slate-500">UC-S09: Khởi động lại từ xa qua MQTT</p>
                             </div>
                         </div>
 

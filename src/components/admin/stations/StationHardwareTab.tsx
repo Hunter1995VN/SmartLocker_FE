@@ -298,7 +298,7 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                         <div className="flex items-center gap-2 text-slate-300">
                             <Wifi className={`w-4 h-4 ${isOnline ? 'text-emerald-400' : 'text-slate-500'} shrink-0`} />
                             <div>
-                                <span className="text-xs text-slate-500 block">Wi-Fi Signal</span>
+                                <span className="text-xs text-slate-500 block">Cường độ Wi-Fi</span>
                                 <span className="font-mono font-bold">
                                     {device?.wifiRssi ? `${device.wifiRssi} dBm` : 'Mất tín hiệu'}
                                 </span>
@@ -657,7 +657,7 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                             </div>
                             <div>
                                 <h4 className="text-sm font-bold text-slate-900">Khởi động lại ESP32?</h4>
-                                <p className="text-xs text-slate-500">UC-S09: Remote MQTT Reboot</p>
+                                <p className="text-xs text-slate-500">UC-S09: Khởi động lại từ xa qua MQTT</p>
                             </div>
                         </div>
 
