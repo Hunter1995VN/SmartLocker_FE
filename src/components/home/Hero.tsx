@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNetworkStats } from '../../utils/useNetworkStats';
 import { MapPin, Clock, Package, Search, Zap, Shield, Wifi, RotateCw, ChevronDown, QrCode, Sparkles, MapPinned } from 'lucide-react';
 import { getStations } from '../../api/stationService';
 
@@ -10,6 +11,7 @@ export const SELECT_SIZE_EVENT = 'smartlocker:select-size';
  * Được thiết kế lại với spacing và visual hierarchy cân bằng hơn
  */
 const Hero = () => {
+  const { lockers } = useNetworkStats();
   const [selectedSize, setSelectedSize] = useState('M');
   const [selectedStation, setSelectedStation] = useState('');
   const [stationOptions, setStationOptions] = useState<{ id: string; name: string }[]>([]);
@@ -209,7 +211,7 @@ const Hero = () => {
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
                     <span className="absolute w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping opacity-75"></span>
                   </span>
-                  <span><strong className="text-on-surface font-bold">450+ ô tủ</strong> đang sẵn sàng phục vụ trên toàn mạng lưới</span>
+                  <span>{lockers != null ? <><strong className="text-on-surface font-bold">{lockers} ô tủ</strong> thuộc mạng lưới trạm đang hoạt động</> : "Mạng lưới trạm tủ đang hoạt động"}</span>
                 </div>
                 <button 
                   type="submit"

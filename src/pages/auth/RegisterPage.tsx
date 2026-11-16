@@ -1,4 +1,5 @@
 import { openLegal } from '../../utils/contact';
+import { useNetworkStats } from '../../utils/useNetworkStats';
 import { Lock, Eye, EyeOff, ChevronLeft, ArrowRight, AlertCircle, Check, X, Package, Zap } from 'lucide-react';
 import { useState } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
@@ -17,6 +18,7 @@ interface RegisterPageProps {
  * - Cột phải: Form đăng ký có layout 2 cột cho các trường ngắn
  */
 export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPageProps) {
+    const { stations, lockers } = useNetworkStats();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [fullName, setFullName] = useState('');
@@ -156,9 +158,9 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                     {/* Stats */}
                     <div className="grid grid-cols-3 gap-3">
                         {[
-                            { num: '85+', label: 'Trạm tủ' },
+                            { num: stations != null ? String(stations) : '—', label: 'Trạm tủ' },
                             { num: '24/7', label: 'Hoạt động' },
-                            { num: '20M', label: 'Bảo hiểm' },
+                            { num: lockers != null ? String(lockers) : '—', label: 'Ô tủ' },
                         ].map(({ num, label }) => (
                             <div key={label} className="text-center py-3 px-2 rounded-xl" style={{background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)'}}>
                                 <div className="text-xl font-black text-white">{num}</div>

@@ -3,18 +3,20 @@
  * Bảng thống kê tình trạng trạm tủ: Station Fleet Status.
  * Hiển thị danh sách các trạm, sức chứa ô tủ, thanh tỷ lệ lấp đầy, kết nối thiết bị và trạng thái vận hành.
  */
-import { Layers, Download, CheckCircle2, Wifi } from 'lucide-react';
+import { Layers, Download, CheckCircle2 } from 'lucide-react';
 import type { StationOccupancyItemDto } from '../../api/adminDashboardService';
 import Pagination, { usePagination } from './Pagination';
 
 interface StationFleetTableProps {
     stations: StationOccupancyItemDto[];
     isLoading: boolean;
+    /** Mở màn hình lưới tủ thời gian thực; không truyền thì ẩn nút thao tác. */
+    onInspect?: () => void;
 }
 
 const PAGE_SIZE = 8;
 
-export default function StationFleetTable({ stations, isLoading }: StationFleetTableProps) {
+export default function StationFleetTable({ stations, isLoading, onInspect }: StationFleetTableProps) {
     const { page, setPage, totalPages, pageItems, from, to } = usePagination(stations, PAGE_SIZE);
     return (
         <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs select-none">
@@ -74,9 +76,8 @@ export default function StationFleetTable({ stations, isLoading }: StationFleetT
                             <tr className="border-b border-slate-200/80 text-xs font-bold text-slate-500 uppercase tracking-wider">
                                 <th className="py-3 px-3">STATION ID & NAME</th>
                                 <th className="py-3 px-3">BAY CAPACITY</th>
-                                <th className="py-3 px-3">DEVICE CONNECTIVITY</th>
-                                <th className="py-3 px-3">STATION STATUS</th>
-                                <th className="py-3 px-3 text-right">ACTION</th>
+                                <th className="py-3 px-3">MỨC LẤP ĐẦY</th>
+                                <th className="py-3 px-3 text-right"><span className="sr-only">Thao tác</span></th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
@@ -121,27 +122,31 @@ export default function StationFleetTable({ stations, isLoading }: StationFleetT
                                             </div>
                                         </td>
 
-                                        {/* Device Connectivity */}
+                                        {/* Mức lấp đầy thật theo số ô đang dùng (trước đây hiển thị "ONLINE · 18ms" cố định) */}
                                         <td className="py-3 px-3">
-                                            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200">
-                                                <Wifi className="w-3 h-3 text-emerald-600" />
-                                                <span>Optimal · 18ms</span>
-                                            </span>
-                                        </td>
-
-                                        {/* Station Status */}
-                                        <td className="py-3 px-3">
-                                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
+                                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold border ${
+                                                isHighOccupancy
+                                                    ? 'bg-rose-50 text-rose-700 border-rose-200'
+                                                    : rate > 50
+                                                        ? 'bg-blue-50 text-blue-700 border-blue-200'
+                                                        : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                            }`}>
                                                 <CheckCircle2 className="w-3 h-3" />
-                                                <span>ONLINE</span>
+                                                <span>{isHighOccupancy ? 'Gần đầy' : rate > 50 ? 'Khá đông' : 'Còn nhiều chỗ'}</span>
                                             </span>
                                         </td>
 
                                         {/* Action */}
                                         <td className="py-3 px-3 text-right">
-                                            <span className="text-xs font-semibold text-blue-600 hover:text-blue-700 cursor-pointer">
-                                                Inspect Bays
-                                            </span>
+                                            {onInspect ? (
+                                                <button
+                                                    type="button"
+                                                    onClick={onInspect}
+                                                    className="text-xs font-semibold text-blue-700 hover:text-blue-800 hover:underline cursor-pointer"
+                                                >
+                                                    Xem lưới tủ
+                                                </button>
+                                            ) : null}
                                         </td>
                                     </tr>
                                 );

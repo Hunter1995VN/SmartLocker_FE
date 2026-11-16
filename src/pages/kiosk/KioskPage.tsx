@@ -722,8 +722,8 @@ export default function KioskPage() {
                   style={{ animationDelay: `${index * 80}ms` }}
                   className={`kiosk-enter group relative overflow-hidden p-7 rounded-[28px] border-2 transition-all duration-200 flex flex-col items-start justify-center gap-8 text-left cursor-pointer max-h-[440px] active:scale-[0.98] hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-4 ${
                     tone === 'sky'
-                      ? (outdoorMode ? 'bg-white border-slate-200 hover:border-sky-500 shadow-md hover:shadow-xl focus-visible:ring-sky-400/60' : 'bg-[#131b28] border-slate-800 hover:border-sky-500 focus-visible:ring-sky-400/40')
-                      : (outdoorMode ? 'bg-white border-slate-200 hover:border-emerald-500 shadow-md hover:shadow-xl focus-visible:ring-emerald-400/60' : 'bg-[#131b28] border-slate-800 hover:border-emerald-500 focus-visible:ring-emerald-400/40')
+                      ? (outdoorMode ? 'bg-white border-slate-200 hover:border-sky-500 shadow-md hover:shadow-xl focus-visible:ring-sky-400/60' : 'bg-kiosk-bg border-slate-800 hover:border-sky-500 focus-visible:ring-sky-400/40')
+                      : (outdoorMode ? 'bg-white border-slate-200 hover:border-emerald-500 shadow-md hover:shadow-xl focus-visible:ring-emerald-400/60' : 'bg-kiosk-bg border-slate-800 hover:border-emerald-500 focus-visible:ring-emerald-400/40')
                   }`}
                 >
                   {/* Door seam: a thin handle bar that slides on hover, like pulling a locker door */}
@@ -744,7 +744,7 @@ export default function KioskPage() {
             <div className={`kiosk-enter lg:col-span-5 border rounded-2xl relative flex flex-col overflow-y-auto min-h-0 h-full ${
               outdoorMode
                 ? 'bg-white border-slate-200 shadow-sm text-slate-900'
-                : 'bg-[#131b28] border-slate-800 shadow-lg text-slate-100'
+                : 'bg-kiosk-bg border-slate-800 shadow-lg text-slate-100'
             }`} style={{ animationDelay: '160ms' }}>
               <KioskLockerStatus status={stationStatus} lang={lang} activeLockerId={activeLockerId} />
             </div>
@@ -758,7 +758,7 @@ export default function KioskPage() {
           <div className={`kiosk-enter w-full max-w-lg border rounded-[28px] p-5 shadow-xl relative my-auto max-h-full overflow-y-auto ${
             outdoorMode
               ? 'bg-white border-slate-200 text-slate-900'
-              : 'bg-[#131b28] border-slate-800 text-slate-100'
+              : 'bg-kiosk-bg border-slate-800 text-slate-100'
           }`}>
             <div className="flex items-center gap-3 mb-5">
               <button
@@ -894,7 +894,7 @@ export default function KioskPage() {
           <div className={`kiosk-enter w-full max-w-3xl border rounded-[28px] p-6 shadow-xl grid grid-cols-1 md:grid-cols-2 gap-6 items-center my-auto ${
             outdoorMode
               ? 'bg-white border-slate-200 text-slate-900'
-              : 'bg-[#131b28] border-slate-800 text-slate-100'
+              : 'bg-kiosk-bg border-slate-800 text-slate-100'
           }`}>
             {/* The door drawing follows the real sensor state only: it swings open on OPEN, shut otherwise */}
             <div role="status" aria-label={x('status')} className={`relative rounded-3xl p-6 min-h-[260px] flex items-center justify-center overflow-hidden ${
@@ -957,7 +957,7 @@ export default function KioskPage() {
 
         {step === 'OVERDUE' && (
           <div className={`kiosk-enter w-full max-w-md border rounded-[28px] p-7 text-center space-y-5 my-auto shadow-xl ${
-            outdoorMode ? 'bg-white border-amber-300 text-slate-900' : 'bg-[#131b28] border-amber-500/50 text-white'
+            outdoorMode ? 'bg-white border-amber-300 text-slate-900' : 'bg-kiosk-bg border-amber-500/50 text-white'
           }`}>
             <div>
               <h2 className="text-lg font-black text-amber-700 dark:text-amber-400">{t.overdueTitle}</h2>
@@ -989,7 +989,7 @@ export default function KioskPage() {
         )}
 
         {step === 'REVIEW_PENDING' && (
-          <section className={`kiosk-enter w-full max-w-md rounded-[28px] p-8 text-center space-y-4 my-auto shadow-xl ${outdoorMode ? 'bg-white text-slate-900' : 'bg-[#131b28] text-white'}`}>
+          <section className={`kiosk-enter w-full max-w-md rounded-[28px] p-8 text-center space-y-4 my-auto shadow-xl ${outdoorMode ? 'bg-white text-slate-900' : 'bg-kiosk-bg text-white'}`}>
             <div className="mx-auto w-14 h-14 rounded-full border-4 border-amber-200 border-t-amber-500 animate-spin motion-reduce:animate-none" aria-hidden="true" />
             <h2 className="text-2xl font-black">{x('pending')}</h2>
             <p className="text-sm text-slate-500 dark:text-slate-500">{x('pendingHint')}</p>
@@ -999,7 +999,7 @@ export default function KioskPage() {
 
         {step === 'SUCCESS' && (
           <div className={`kiosk-enter w-full max-w-md rounded-[28px] p-8 text-center space-y-6 my-auto shadow-xl overflow-hidden relative ${
-            outdoorMode ? 'bg-white text-slate-900' : 'bg-[#131b28] text-white'
+            outdoorMode ? 'bg-white text-slate-900' : 'bg-kiosk-bg text-white'
           }`}>
             <svg viewBox="0 0 64 64" className="kiosk-pop mx-auto w-24 h-24" aria-hidden="true">
               <circle cx="32" cy="32" r="30" className="fill-emerald-500" />

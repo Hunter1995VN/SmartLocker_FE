@@ -272,7 +272,7 @@ export default function Locker3DCanvas({
                 <div className={`absolute inset-0 rounded-lg border-2 p-2.5 flex items-center justify-between shadow-lg ${
                   outdoorMode
                     ? 'bg-gradient-to-r from-slate-100 via-slate-200 to-slate-100 border-slate-300 text-slate-900'
-                    : 'bg-gradient-to-r from-[#2a384f] via-[#354664] to-[#253247] border-slate-600 text-white'
+                    : 'bg-gradient-to-r from-kiosk-surface-high via-kiosk-border to-kiosk-surface border-slate-600 text-white'
                 }`}>
                   {/* Left: Solenoid LED Status Dot */}
                   <div className="flex items-center gap-2">
@@ -357,7 +357,7 @@ export default function Locker3DCanvas({
                 <div className={`absolute inset-0 rounded-lg border-2 p-3 flex items-center justify-between shadow-lg ${
                   outdoorMode
                     ? 'bg-gradient-to-r from-slate-100 via-slate-200 to-slate-100 border-slate-300 text-slate-900'
-                    : 'bg-gradient-to-r from-[#2a384f] via-[#354664] to-[#253247] border-slate-600 text-white'
+                    : 'bg-gradient-to-r from-kiosk-surface-high via-kiosk-border to-kiosk-surface border-slate-600 text-white'
                 }`}>
                   <div className="flex items-center gap-2">
                     <span className={`w-3 h-3 rounded-full border border-black/30 shadow-sm ${
@@ -439,7 +439,7 @@ export default function Locker3DCanvas({
                 <div className={`absolute inset-0 rounded-lg border-2 p-3.5 flex items-center justify-between shadow-lg ${
                   outdoorMode
                     ? 'bg-gradient-to-r from-slate-100 via-slate-200 to-slate-100 border-slate-300 text-slate-900'
-                    : 'bg-gradient-to-r from-[#2a384f] via-[#354664] to-[#253247] border-slate-600 text-white'
+                    : 'bg-gradient-to-r from-kiosk-surface-high via-kiosk-border to-kiosk-surface border-slate-600 text-white'
                 }`}>
                   <div className="flex items-center gap-2">
                     <span className={`w-3 h-3 rounded-full border border-black/30 shadow-sm ${

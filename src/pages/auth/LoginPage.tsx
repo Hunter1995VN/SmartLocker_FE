@@ -1,4 +1,5 @@
 import { openLegal } from '../../utils/contact';
+import { useNetworkStats } from '../../utils/useNetworkStats';
 import { Lock, Eye, EyeOff, ArrowRight, ChevronLeft, AlertCircle, Shield, Sparkles, Package } from 'lucide-react';
 import { useState } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
@@ -17,6 +18,7 @@ interface LoginPageProps {
  * - Cột phải: Form đăng nhập gọn đẹp
  */
 export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps) {
+    const { stations } = useNetworkStats();
     const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
     const [email, setEmail] = useState('');
@@ -125,7 +127,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                         <div className="mt-10 space-y-3">
                             {[
                                 { icon: Shield, title: 'Bảo mật chuẩn ngân hàng', desc: 'Mã hóa JWS & BCrypt' },
-                                { icon: Package, title: '85+ trạm tủ toàn quốc', desc: 'Sân bay, metro, phố đi bộ' },
+                                { icon: Package, title: stations != null ? `${stations} trạm tủ đang hoạt động` : 'Mạng lưới trạm tủ', desc: 'Sân bay, metro, phố đi bộ' },
                                 { icon: Sparkles, title: 'Hoạt động 24/7', desc: 'Hỗ trợ kỹ thuật liên tục' },
                             ].map(({ icon: Icon, title, desc }, i) => (
                                 <div key={i} className="flex items-center gap-3.5 p-3.5 rounded-2xl" style={{background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', backdropFilter: 'blur(8px)'}}>
@@ -206,7 +208,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                         )}
 
                         {/* Social Login */}
-                        <div className="grid grid-cols-2 gap-3 mb-6">
+                        <div className="grid grid-cols-1 gap-3 mb-6">
                             <button
                                 type="button"
                                 onClick={() => handleGoogleLogin()}
@@ -220,12 +222,6 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
                                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                                 </svg>
                                 Google
-                            </button>
-                            <button type="button" className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-sm font-semibold transition-all hover:border-gray-300 hover:shadow-sm">
-                                <svg className="w-4.5 h-4.5" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M16.365 1.43c0 1.14-.493 2.27-1.177 3.08-.744.9-1.99 1.57-2.987 1.57-.12-1.03.35-2.09 1.012-2.86C13.755 4.34 14.785 3.66 16.365 1.43zm3.495 16.74c-.6 1.41-.84 2.04-1.59 3.27-1.04 1.71-2.5 3.84-4.32 3.85-1.6.02-2.02-1.04-4.2-1.04-2.18 0-2.62 1.02-4.21 1.06-1.81.04-3.18-1.84-4.21-3.55-2.99-4.96-3.31-10.79-1.46-13.88 1.31-2.18 3.39-3.45 5.34-3.45 1.95 0 3.18 1.07 4.79 1.07 1.55 0 2.5-1.07 4.79-1.07 1.7 0 3.51 1.18 4.79 3.21-4.21 2.31-3.52 8.34.69 10.46z"/>
-                                </svg>
-                                Apple
                             </button>
                         </div>
 

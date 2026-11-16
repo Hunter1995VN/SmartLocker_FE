@@ -59,6 +59,12 @@
   --color-warning-container: #fff6d6;
   --color-on-warning-container: #6b4a00;
 
+  /* Kiosk (màn hình tối tại trạm) */
+  --color-kiosk-bg: #131b28;
+  --color-kiosk-surface: #253247;
+  --color-kiosk-surface-high: #2a384f;
+  --color-kiosk-border: #354664;
+
   /* Font Family */
   --font-family-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 

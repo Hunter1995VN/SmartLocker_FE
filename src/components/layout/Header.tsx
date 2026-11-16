@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNetworkStats } from '../../utils/useNetworkStats';
 import { Menu, X, Lock, ArrowRight, Zap } from 'lucide-react';
 import { openSupport } from '../../utils/contact';
 
@@ -13,6 +14,7 @@ interface HeaderProps {
 }
 
 const Header = ({ onNavigate }: HeaderProps) => {
+  const { stations } = useNetworkStats();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -81,7 +83,7 @@ const Header = ({ onNavigate }: HeaderProps) => {
                 <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                 <span className="absolute w-2 h-2 rounded-full bg-emerald-500 animate-ping opacity-75"></span>
               </span>
-              <span>Tất cả trạm Online</span>
+              <span>{stations != null ? `${stations} trạm đang hoạt động` : "Trạm đang hoạt động"}</span>
             </div>
 
             {/* Secondary Sign In */}
@@ -128,7 +130,7 @@ const Header = ({ onNavigate }: HeaderProps) => {
                 <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                 <span className="absolute w-2 h-2 rounded-full bg-emerald-500 animate-ping opacity-75"></span>
               </span>
-              <span>Hệ thống 85+ trạm tủ đang Online sẵn sàng</span>
+              <span>{stations != null ? `${stations} trạm tủ đang hoạt động` : "Mạng lưới trạm tủ đang hoạt động"}</span>
             </div>
             
             {/* Navigation Links */}
