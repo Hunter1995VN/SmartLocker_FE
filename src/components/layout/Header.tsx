@@ -43,7 +43,7 @@ const Header = ({ onNavigate }: HeaderProps) => {
       >
         <div className="w-full px-4 md:px-8 max-w-7xl mx-auto flex items-center justify-between h-[72px]">
           {/* Brand Logo */}
-          <a href="#" className="flex items-center gap-3 group">
+          <a href="#" className="flex items-center gap-3 group shrink-0">
             <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-primary-container to-primary flex items-center justify-center text-white shadow-elevation-1 group-hover:scale-105 group-hover:shadow-elevation-2 transition-all duration-200">
               <Lock className="w-5 h-5" />
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white animate-pulse"></div>
@@ -97,20 +97,22 @@ const Header = ({ onNavigate }: HeaderProps) => {
             {/* Primary Action CTA */}
             <a 
               href="#booking-widget"
-              className="inline-flex items-center justify-center gap-2 bg-primary-container hover:bg-primary text-white px-4 sm:px-5 py-2.5 rounded-xl text-sm font-bold shadow-elevation-1 hover:shadow-elevation-2 transition-all duration-200"
+              className="inline-flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap bg-primary-container hover:bg-primary text-white px-3 sm:px-5 py-2.5 rounded-xl text-sm font-bold shadow-elevation-1 hover:shadow-elevation-2 transition-all duration-200"
               onClick={(e) => { e.preventDefault(); onNavigate?.('register'); }}
               role="button"
             >
               <Zap className="w-4 h-4 hidden sm:block" />
-              <span>Đặt tủ ngay</span>
+              <span className="sm:hidden">Đặt tủ</span>
+              <span className="hidden sm:inline">Đặt tủ ngay</span>
               <ArrowRight className="w-4 h-4" />
             </a>
 
             {/* Mobile Menu Toggle Button */}
             <button 
-              className="lg:hidden p-2 text-on-surface rounded-lg hover:bg-surface-container-low transition-colors"
+              className="lg:hidden p-2.5 text-on-surface rounded-lg hover:bg-surface-container-low transition-colors"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-label="Mở menu"
+              aria-label={isMobileMenuOpen ? 'Đóng menu' : 'Mở menu'}
+              aria-expanded={isMobileMenuOpen}
             >
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>

@@ -94,6 +94,48 @@
   }
 }
 
+/*
+ * Touch targets: chỉ áp dụng cho thiết bị cảm ứng (pointer: coarse) nên giao diện máy tính giữ nguyên mật độ.
+ * Mục tiêu 44px (WCAG 2.5.8 yêu cầu tối thiểu 24px; 44px là mức nên đạt cho ngón tay cái).
+ * Đặt trong @layer base để các class tiện ích (hidden, md:inline-flex) vẫn ghi đè được display;
+ * min-height và min-width vẫn thắng các class chiều cao/chiều rộng cố định nên mục tiêu chạm không bị thu nhỏ lại.
+ */
+@media (pointer: coarse) {
+  @layer base {
+  button,
+  [role="button"],
+  [role="tab"],
+  summary,
+  select {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  /* Nút chỉ có biểu tượng: đủ rộng để chạm */
+  button:has(> svg:only-child),
+  button[aria-label]:not(:has(> :not(svg))):not(:has(span)) {
+    min-width: 44px;
+  }
+  /* Liên kết đứng riêng (menu, chân trang, hàng liên kết), không phải liên kết nằm trong đoạn văn */
+  nav a[href],
+  footer a[href],
+  li > a[href],
+  a[href][role="button"] {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]),
+  textarea {
+    min-height: 44px;
+  }
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-width: 24px;
+    min-height: 24px;
+  }
+}
+}
+
 /* Custom utilities */
 @layer utilities {
   /* Selection colors */

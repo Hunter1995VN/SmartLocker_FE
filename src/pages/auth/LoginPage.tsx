@@ -168,7 +168,7 @@ export default function LoginPage({ onNavigate, onLoginSuccess }: LoginPageProps
             <main className="w-full lg:w-[48%] flex flex-col bg-white">
                 {/* Top navigation bar */}
                 <div className="flex items-center justify-between px-8 py-5 border-b border-gray-100">
-                    <a href="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-blue-600 transition-colors group">
+                    <a href="/" className="inline-flex items-center gap-1.5 min-h-11 text-sm font-semibold text-gray-500 hover:text-blue-600 transition-colors group">
                         <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
                         Về trang chủ
                     </a>

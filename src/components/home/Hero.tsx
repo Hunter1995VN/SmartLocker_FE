@@ -100,11 +100,11 @@ const Hero = () => {
             </p>
 
             {/* Value Props Pill Row */}
-            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-3">
               {valueProps.map((prop, index) => (
-                <span 
+                <span
                   key={index}
-                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white border border-outline-variant/40 text-on-surface text-sm font-semibold shadow-elevation-1 hover-lift"
+                  className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-full bg-white border border-outline-variant/40 text-on-surface text-xs sm:text-sm font-semibold shadow-elevation-1 hover-lift"
                 >
                   <span className={`w-5 h-5 rounded-md ${prop.bg} flex items-center justify-center`}>
                     <prop.icon className={`w-3 h-3 ${prop.color}`} />

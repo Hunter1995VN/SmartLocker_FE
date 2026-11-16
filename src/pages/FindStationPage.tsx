@@ -240,6 +240,7 @@ export default function FindStationPage({
 
     return (
         <div className="h-screen w-screen flex flex-col overflow-hidden bg-white" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            <h1 className="sr-only">Tìm trạm gửi hành lý</h1>
             <CustomerHeader
                 currentPage="find-station"
                 onNavigate={(page) => {

@@ -130,7 +130,7 @@ const Security = () => {
                   <ShieldCheck className="w-4 h-4" />
                   <span>Cam kết minh bạch tài chính tuyệt đối</span>
                 </div>
-                <a href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }} className="text-sm font-bold text-primary hover:underline flex items-center gap-1">
+                <a href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }} className="text-sm font-bold text-primary hover:underline inline-flex items-center gap-1 min-h-11">
                   Tìm hiểu thêm
                   <ArrowRight className="w-3.5 h-3.5" />
                 </a>

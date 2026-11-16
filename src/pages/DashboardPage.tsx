@@ -304,7 +304,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                     )}
                                 </div>
                                 <div className="flex flex-col gap-1 min-w-0">
-                                    <h1 className="text-2xl md:text-[28px] font-bold leading-9 tracking-tight text-[#0b1c30] truncate">
+                                    <h1 className="text-2xl md:text-[28px] font-bold leading-9 tracking-tight text-[#0b1c30] break-words">
                                         {getGreeting(user.fullName)} <span aria-hidden="true">👋</span>
                                     </h1>
                                     <p className="text-sm text-[#434655] flex flex-wrap items-center gap-x-3 gap-y-1 mt-0.5">
