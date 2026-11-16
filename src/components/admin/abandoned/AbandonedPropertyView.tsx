@@ -1112,7 +1112,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                                 onClick={() => setLightboxUrl(photoUrl)}
                                                 className="group relative h-24 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 cursor-pointer shadow-xs hover:border-indigo-400 transition"
                                             >
-                                                <img
+                                                <img loading="lazy" decoding="async"
                                                     src={photoUrl}
                                                     alt={`Bằng chứng #${idx + 1}`}
                                                     className="w-full h-full object-cover group-hover:scale-105 transition duration-200"
@@ -1678,7 +1678,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                     />
                                     {handoverProofUrl && (
                                         <div className="relative w-20 h-20 rounded-xl overflow-hidden border border-slate-200">
-                                            <img
+                                            <img loading="lazy" decoding="async"
                                                 src={handoverProofUrl}
                                                 alt="Bằng chứng bàn giao"
                                                 className="w-full h-full object-cover"
@@ -1874,7 +1874,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                         >
                             <X className="w-5 h-5" />
                         </button>
-                        <img
+                        <img loading="lazy" decoding="async"
                             src={lightboxUrl}
                             alt="Ảnh bằng chứng kích thước đầy đủ"
                             className="max-w-full max-h-[85vh] object-contain mx-auto"

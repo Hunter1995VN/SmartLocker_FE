@@ -838,7 +838,7 @@ function CreateIncidentModal({
 
                         {evidenceImage ? (
                             <div className="relative rounded-xl border border-slate-200 overflow-hidden bg-slate-50 p-2 flex items-center gap-3">
-                                <img
+                                <img loading="lazy" decoding="async"
                                     src={evidenceImage}
                                     alt="Bằng chứng sự cố"
                                     className="w-20 h-20 rounded-lg object-cover border border-slate-200"

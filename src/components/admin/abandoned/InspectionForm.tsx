@@ -863,7 +863,7 @@ export default function InspectionForm({ prefill, onSubmitted, onCancel }: Inspe
                                     key={idx}
                                     className="relative rounded-xl border border-slate-200 overflow-hidden group bg-slate-50 aspect-video flex items-center justify-center"
                                 >
-                                    <img
+                                    <img loading="lazy" decoding="async"
                                         src={url}
                                         alt={`Bằng chứng #${idx + 1}`}
                                         className="w-full h-full object-cover"
