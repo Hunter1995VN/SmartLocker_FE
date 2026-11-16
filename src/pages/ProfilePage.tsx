@@ -308,7 +308,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                     <div>
                         <button
                             onClick={() => onNavigate('dashboard')}
-                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline mb-2 transition-colors cursor-pointer"
+                            className="link-target inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline mb-2 transition-colors cursor-pointer"
                         >
                             <ArrowLeft className="w-3.5 h-3.5" />
                             <span>Quay lại Trang tổng quan</span>
@@ -342,9 +342,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                 <AlertTriangle className="w-5 h-5" />
                             </div>
                             <div>
-                                <h4 className="text-sm font-bold text-rose-900">
+                                <h2 className="text-sm font-bold text-rose-900">
                                     Tài khoản có dư nợ quá hạn: {formatCurrency(debtData?.totalOverdueDebt || 0)} VNĐ
-                                </h4>
+                                </h2>
                                 <p className="text-sm text-rose-700 mt-0.5">
                                     Theo quy tắc <strong>BR-P08</strong>, bạn cần thanh toán toàn bộ nợ quá hạn để mở khóa tính năng đặt tủ mới.
                                 </p>

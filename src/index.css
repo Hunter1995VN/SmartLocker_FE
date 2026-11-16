@@ -138,6 +138,16 @@
  * Đặt trong @layer base để các class tiện ích (hidden, md:inline-flex) vẫn ghi đè được display;
  * min-height và min-width vẫn thắng các class chiều cao/chiều rộng cố định nên mục tiêu chạm không bị thu nhỏ lại.
  */
+/* Liên kết chữ đứng riêng (chân trang, "Chi tiết", "Quay lại"): vùng bấm tối thiểu 24px theo WCAG 2.5.8 trên mọi thiết bị.
+ * Máy cảm ứng được luật 44px bên dưới nâng thêm. Không dùng cho liên kết nằm giữa đoạn văn. */
+@layer base {
+  .link-target {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.5rem;
+  }
+}
+
 @media (pointer: coarse) {
   @layer base {
   button,
