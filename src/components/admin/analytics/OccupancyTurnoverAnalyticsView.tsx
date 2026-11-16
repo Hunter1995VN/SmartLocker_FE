@@ -169,7 +169,8 @@ export default function OccupancyTurnoverAnalyticsView({
 
     // Data & Loading States
     const [data, setData] = useState<OccupancyTurnoverOverviewDto | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [loadedKey, setLoadedKey] = useState<string>('');
+    const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
     const [exportingFormat, setExportingFormat] = useState<ReportExportFormat | null>(null);
     const [toast, setToast] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -181,39 +182,47 @@ export default function OccupancyTurnoverAnalyticsView({
         }, 5000);
     }, []);
 
-    const fetchOverview = useCallback(async () => {
-        setIsLoading(true);
-        setErrorMsg(null);
-        try {
-            const res = await adminOccupancyAnalyticsService.getOverview({
-                fromDate,
-                toDate,
-                stationId,
-                lockerSize,
-                granularity,
-            });
-            if (res.success && res.data) {
-                setData(res.data);
-                setSelectedPointIdx(
-                    res.data.timeSeries.length > 0 ? res.data.timeSeries.length - 1 : null
-                );
-            } else {
-                setErrorMsg(res.message || 'Không thể tải dữ liệu phân tích lấp đầy & xoay vòng ngăn tủ.');
-            }
-        } catch (err: unknown) {
-            const axiosErr = err as { response?: { data?: { message?: string } } };
-            setErrorMsg(
-                axiosErr.response?.data?.message ||
-                    'Không thể kết nối máy chủ phân tích hiệu suất ngăn tủ. Vui lòng kiểm tra Backend API.'
-            );
-        } finally {
-            setIsLoading(false);
-        }
-    }, [fromDate, toDate, stationId, lockerSize, granularity]);
+    // Đang tải = bộ lọc hiện tại chưa có kết quả, hoặc người dùng vừa bấm làm mới (suy ra từ state, không đặt trong effect).
+    const filterKey = [fromDate, toDate, stationId, lockerSize, granularity].join('|');
+    const isLoading = loadedKey !== filterKey || isRefreshing;
 
+    const applyOverview = useCallback((res: Awaited<ReturnType<typeof adminOccupancyAnalyticsService.getOverview>>) => {
+        if (res.success && res.data) {
+            setErrorMsg(null);
+            setData(res.data);
+            setSelectedPointIdx(res.data.timeSeries.length > 0 ? res.data.timeSeries.length - 1 : null);
+        } else {
+            setErrorMsg(res.message || 'Không thể tải dữ liệu phân tích lấp đầy & xoay vòng ngăn tủ.');
+        }
+    }, []);
+
+    const applyOverviewError = useCallback((err: unknown) => {
+        const axiosErr = err as { response?: { data?: { message?: string } } };
+        setErrorMsg(
+            axiosErr.response?.data?.message ||
+                'Không thể kết nối máy chủ phân tích hiệu suất ngăn tủ. Vui lòng kiểm tra Backend API.'
+        );
+    }, []);
+
+    // Bấm làm mới: bật trạng thái đang tải rồi gọi lại với bộ lọc hiện tại.
+    const refreshOverview = useCallback(() => {
+        setIsRefreshing(true);
+        setErrorMsg(null);
+        adminOccupancyAnalyticsService.getOverview({ fromDate, toDate, stationId, lockerSize, granularity })
+            .then(applyOverview)
+            .catch(applyOverviewError)
+            .finally(() => { setLoadedKey(filterKey); setIsRefreshing(false); });
+    }, [fromDate, toDate, stationId, lockerSize, granularity, filterKey, applyOverview, applyOverviewError]);
+
+    // Đổi bộ lọc (và lần đầu): chỉ đặt state trong callback `.then`; bỏ kết quả cũ nếu bộ lọc đã đổi.
     useEffect(() => {
-        void fetchOverview();
-    }, [fetchOverview]);
+        let alive = true;
+        adminOccupancyAnalyticsService.getOverview({ fromDate, toDate, stationId, lockerSize, granularity })
+            .then((res) => { if (alive) applyOverview(res); })
+            .catch((err) => { if (alive) applyOverviewError(err); })
+            .finally(() => { if (alive) setLoadedKey(filterKey); });
+        return () => { alive = false; };
+    }, [fromDate, toDate, stationId, lockerSize, granularity, filterKey, applyOverview, applyOverviewError]);
 
     const applyPreset = (preset: 'TODAY' | '7D' | '30D' | '90D' | 'YTD') => {
         const now = new Date();
@@ -399,7 +408,7 @@ export default function OccupancyTurnoverAnalyticsView({
                 <div className="flex flex-wrap items-center gap-2 shrink-0">
                     <button
                         type="button"
-                        onClick={() => void fetchOverview()}
+                        onClick={refreshOverview}
                         disabled={isLoading}
                         className="px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-60 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
                     >
@@ -591,7 +600,7 @@ export default function OccupancyTurnoverAnalyticsView({
                     <span>{errorMsg}</span>
                     <button
                         type="button"
-                        onClick={() => void fetchOverview()}
+                        onClick={refreshOverview}
                         className="px-3 py-1.5 rounded-lg bg-rose-600 text-white font-bold cursor-pointer"
                     >
                         Thử lại

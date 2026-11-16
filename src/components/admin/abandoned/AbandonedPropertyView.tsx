@@ -111,12 +111,10 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
 
     // ─── Fetch API ─────────────────────────────────────────────────────────────
 
-    const fetchRecords = useCallback(async (showSpinner = true) => {
-        if (showSpinner) setIsLoading(true);
-        setLoadError(null);
-        try {
-            const res = await abandonedPropertyService.getRecords();
+    // Áp kết quả API vào state (gọi trong `.then`/sau await, không đồng bộ trong effect).
+    const applyRecordsResult = useCallback((res: Awaited<ReturnType<typeof abandonedPropertyService.getRecords>>) => {
             if (res.success && Array.isArray(res.data)) {
+                setLoadError(null);
                 setRecords(res.data);
                 if (res.data.length > 0) {
                     setSelectedRecordId((prev) => {
@@ -132,17 +130,29 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
             } else {
                 setLoadError(res.message ?? 'Không thể tải danh sách tài sản bỏ quên.');
             }
+    }, []);
+
+    const fetchRecords = useCallback(async (showSpinner = true) => {
+        if (showSpinner) setIsLoading(true);
+        try {
+            applyRecordsResult(await abandonedPropertyService.getRecords());
         } catch {
             setLoadError('Lỗi kết nối API. Vui lòng kiểm tra backend server.');
         } finally {
             setIsLoading(false);
             setIsRefreshing(false);
         }
-    }, []);
+    }, [applyRecordsResult]);
 
+    // Lần đầu: isLoading đã là true từ useState; chỉ đặt state trong callback `.then`.
     useEffect(() => {
-        void fetchRecords();
-    }, [fetchRecords]);
+        let alive = true;
+        abandonedPropertyService.getRecords()
+            .then((res) => { if (alive) applyRecordsResult(res); })
+            .catch(() => { if (alive) setLoadError('Lỗi kết nối API. Vui lòng kiểm tra backend server.'); })
+            .finally(() => { if (alive) { setIsLoading(false); setIsRefreshing(false); } });
+        return () => { alive = false; };
+    }, [applyRecordsResult]);
 
     const handleRefresh = () => {
         setIsRefreshing(true);
