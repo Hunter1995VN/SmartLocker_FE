@@ -167,6 +167,17 @@
     -moz-osx-font-smoothing: grayscale;
   }
   
+  /* Vòng focus bàn phím theo màu thương hiệu (chỉ khi dùng phím; chuột và chạm không hiện) và màu bôi chọn chữ */
+  :focus-visible {
+    outline: 2px solid var(--color-primary-container);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--color-primary-fixed);
+    color: var(--color-on-primary-fixed);
+  }
+
   body {
     @apply bg-background text-on-surface;
     font-family: var(--font-family-sans);
@@ -190,6 +201,16 @@
  * Đặt trong @layer base để các class tiện ích (hidden, md:inline-flex) vẫn ghi đè được display;
  * min-height và min-width vẫn thắng các class chiều cao/chiều rộng cố định nên mục tiêu chạm không bị thu nhỏ lại.
  */
+/* Liên kết chữ đứng riêng (chân trang, "Chi tiết", "Quay lại"): vùng bấm tối thiểu 24px theo WCAG 2.5.8 trên mọi thiết bị.
+ * Máy cảm ứng được luật 44px bên dưới nâng thêm. Không dùng cho liên kết nằm giữa đoạn văn. */
+@layer base {
+  .link-target {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.5rem;
+  }
+}
+
 @media (pointer: coarse) {
   @layer base {
   button,

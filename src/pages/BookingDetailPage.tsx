@@ -322,9 +322,9 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
         <section className="space-y-3">
           {/* Breadcrumb trail */}
           <nav className="flex items-center gap-2 text-on-surface-variant text-xs">
-            <button onClick={() => onNavigate('home')} className="hover:text-primary transition-colors cursor-pointer">Home</button>
+            <button onClick={() => onNavigate('home')} className="link-target hover:text-primary transition-colors cursor-pointer">Home</button>
             <ChevronRight className="w-3.5 h-3.5 text-outline" />
-            <button onClick={() => onNavigate('my-bookings')} className="hover:text-primary transition-colors cursor-pointer">My Bookings</button>
+            <button onClick={() => onNavigate('my-bookings')} className="link-target hover:text-primary transition-colors cursor-pointer">My Bookings</button>
             <ChevronRight className="w-3.5 h-3.5 text-outline" />
             <span className="text-on-surface font-semibold">Booking #{orderId}</span>
           </nav>
@@ -783,9 +783,9 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
             </p>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-on-surface-variant">
-            <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>Bảo mật</a>
-            <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }}>Điều khoản dịch vụ</a>
-            <a className="hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}>Hỗ trợ</a>
+            <a className="link-target hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('privacy'); }}>Bảo mật</a>
+            <a className="link-target hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openLegal('terms'); }}>Điều khoản dịch vụ</a>
+            <a className="link-target hover:text-primary transition-colors" href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}>Hỗ trợ</a>
           </div>
         </div>
       </footer>
