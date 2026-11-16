@@ -101,10 +101,8 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
     return (
         <div className="min-h-screen flex bg-surface-container-low font-sans">
             {/* LEFT SIDE */}
-            <aside className="hidden lg:flex lg:w-[44%] relative overflow-hidden shrink-0" style={{background: 'linear-gradient(135deg, #0f2977 0%, #1a4ac4 40%, #2563eb 70%, #3b82f6 100%)'}}>
+            <aside className="hidden lg:flex lg:w-[44%] relative overflow-hidden shrink-0" style={{background: '#0f2977'}}>
                 {/* Ambient blobs */}
-                <div className="absolute -top-28 -left-28 w-[400px] h-[400px] rounded-full opacity-20" style={{background: 'radial-gradient(circle, #c4b5fd 0%, transparent 70%)'}}></div>
-                <div className="absolute -bottom-32 -right-20 w-[380px] h-[380px] rounded-full opacity-15" style={{background: 'radial-gradient(circle, #60a5fa 0%, transparent 70%)'}}></div>
                 <div className="absolute inset-0 dot-pattern opacity-10"></div>
 
                 <div className="relative z-10 flex flex-col justify-between p-10 xl:p-14 w-full">
@@ -127,7 +125,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                         </div>
                         <h1 className="text-3xl xl:text-4xl font-extrabold text-white leading-[1.1] tracking-tight mb-4">
                             Tạo tài khoản<br />
-                            <span style={{background: 'linear-gradient(90deg, #93c5fd, #c4b5fd)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
+                            <span style={{color: '#93c5fd'}}>
                                 miễn phí
                             </span>
                         </h1>
@@ -429,7 +427,7 @@ export default function RegisterPage({ onNavigate, onLoginSuccess }: RegisterPag
                                 disabled={isLoading}
                                 className="w-full h-12 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                 style={{
-                                    background: isLoading ? '#93c5fd' : 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+                                    background: isLoading ? '#93c5fd' : '#2563eb',
                                     color: 'white',
                                     boxShadow: isLoading ? 'none' : '0 4px 15px rgba(37, 99, 235, 0.35)',
                                 }}

@@ -50,7 +50,7 @@ export default function ReviewReportDialog({ reviewId, onClose, onReported }: Pr
         {error && <p role="alert" className="text-sm text-error">{error}</p>}
         <div className="flex flex-wrap justify-end gap-2">
           <button type="button" onClick={onClose} disabled={busy} className="rounded-xl border border-outline-variant px-4 py-2 text-sm font-semibold">Hủy</button>
-          <button type="submit" disabled={busy || !reason.trim()} className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
+          <button type="submit" disabled={busy || !reason.trim()} className="rounded-xl bg-primary-container px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
             {busy ? 'Đang gửi…' : 'Gửi báo cáo'}
           </button>
         </div>

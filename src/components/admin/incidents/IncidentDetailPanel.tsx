@@ -38,6 +38,7 @@ import type {
 import adminIncidentService from '../../../api/adminIncidentService';
 import RemoteUnlockConfirmModal from './RemoteUnlockConfirmModal';
 import { parseIncidentType } from './EmergencyIncidentListView';
+import ModalOverlay from '../../ui/ModalOverlay';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -428,7 +429,7 @@ export default function IncidentDetailPanel({
                                 onClick={() => setShowImageLightbox(true)}
                                 className="relative rounded-xl overflow-hidden border border-slate-200/90 bg-slate-50 flex items-center justify-center max-h-52 cursor-pointer group"
                             >
-                                <img
+                                <img loading="lazy" decoding="async"
                                     src={incident.evidenceImageUrl}
                                     alt={`Bằng chứng ${incident.incidentCode}`}
                                     className="w-full h-auto max-h-52 object-contain transition group-hover:scale-[1.02]"
@@ -662,10 +663,7 @@ export default function IncidentDetailPanel({
 
             {/* Lightbox Image Preview Modal */}
             {showImageLightbox && incident.evidenceImageUrl && (
-                <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
-                    onClick={() => setShowImageLightbox(false)}
-                >
+                <ModalOverlay onClose={() => setShowImageLightbox(false)} closeOnBackdrop scrim="dark">
                     <div
                         className="relative max-w-4xl max-h-[90vh] bg-white rounded-2xl overflow-hidden shadow-2xl p-2 w-full"
                         onClick={(e) => e.stopPropagation()}
@@ -684,14 +682,14 @@ export default function IncidentDetailPanel({
                             </button>
                         </div>
                         <div className="p-2 flex items-center justify-center overflow-auto max-h-[78vh] bg-slate-900/5 rounded-xl">
-                            <img
+                            <img loading="lazy" decoding="async"
                                 src={incident.evidenceImageUrl}
                                 alt={`Bằng chứng ${incident.incidentCode}`}
                                 className="max-h-[75vh] w-auto rounded-lg object-contain"
                             />
                         </div>
                     </div>
-                </div>
+                </ModalOverlay>
             )}
         </>
     );

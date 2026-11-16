@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
     ArrowLeft, MapPin, Phone, Navigation, Share2, CheckCircle,
-    AlertTriangle, Clock, Shield, Wifi, QrCode, Video,
+    AlertTriangle, Clock, Shield, Wifi, QrCode,
     ChevronRight, Star, RefreshCw, ExternalLink, Calendar,
 } from 'lucide-react';
 import { getStationById, calcDistance } from '../api/stationService';
@@ -609,7 +609,7 @@ export default function StationDetailPage({
                                     {[
                                         { icon: Wifi, label: 'Kết nối IoT MQTT', title: 'Đồng bộ Thời gian thực', sub: 'Phản hồi mở khóa < 1 giây', color: 'text-tertiary-container' },
                                         { icon: QrCode, label: 'Xác thực Đa phương thức', title: 'QR Code & Mã PIN', sub: 'Hỗ trợ mở khóa ngoại tuyến', color: 'text-primary-container' },
-                                        { icon: Video, label: 'Giám sát An ninh', title: 'Camera CCTV 24/7', sub: 'Cảm biến từ trường cửa tủ', color: 'text-tertiary-container' },
+                                        { icon: Shield, label: 'Giám sát An ninh', title: 'Cảm biến cửa từng ô tủ', sub: 'Báo đóng/mở theo thời gian thực', color: 'text-tertiary-container' },
                                     ].map((item, i) => (
                                         <div key={i} className="p-4 rounded-xl bg-surface-bright border border-surface-container flex flex-col gap-1.5">
                                             <div className="flex items-center justify-between text-on-surface-muted">

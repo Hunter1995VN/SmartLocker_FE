@@ -107,10 +107,8 @@ export default function ForgotPasswordPage({ onNavigate }: ForgotPasswordPagePro
     return (
         <div className="min-h-screen flex bg-surface-container-low font-sans">
             {/* LEFT SIDE */}
-            <aside className="hidden lg:flex lg:w-[48%] relative overflow-hidden" style={{background: 'linear-gradient(135deg, #0f2977 0%, #1a4ac4 40%, #2563eb 70%, #3b82f6 100%)'}}>
+            <aside className="hidden lg:flex lg:w-[48%] relative overflow-hidden" style={{background: '#0f2977'}}>
                 {/* Ambient blobs */}
-                <div className="absolute -top-32 -right-32 w-[450px] h-[450px] rounded-full opacity-20" style={{background: 'radial-gradient(circle, #60a5fa 0%, transparent 70%)'}}></div>
-                <div className="absolute -bottom-36 -left-24 w-[420px] h-[420px] rounded-full opacity-15" style={{background: 'radial-gradient(circle, #a78bfa 0%, transparent 70%)'}}></div>
                 <div className="absolute inset-0 grid-pattern opacity-10"></div>
 
                 <div className="relative z-10 flex flex-col justify-between p-12 xl:p-16 w-full">
@@ -137,9 +135,9 @@ export default function ForgotPasswordPage({ onNavigate }: ForgotPasswordPagePro
 
                         <h1 className="text-4xl xl:text-5xl font-extrabold text-white leading-[1.1] tracking-tight mb-5">
                             {step === 'email' ? (
-                                <>Quên<br /><span style={{background: 'linear-gradient(90deg, #93c5fd, #c4b5fd)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>mật khẩu?</span></>
+                                <>Quên<br /><span style={{color: '#93c5fd'}}>mật khẩu?</span></>
                             ) : (
-                                <>Đặt lại<br /><span style={{background: 'linear-gradient(90deg, #93c5fd, #c4b5fd)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>mật khẩu</span></>
+                                <>Đặt lại<br /><span style={{color: '#93c5fd'}}>mật khẩu</span></>
                             )}
                         </h1>
 
@@ -214,7 +212,7 @@ export default function ForgotPasswordPage({ onNavigate }: ForgotPasswordPagePro
 
                         {/* Step icon */}
                         <div className="mb-6 flex items-start gap-4">
-                            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0" style={{background: 'linear-gradient(135deg, #eff6ff, #dbeafe)'}}>
+                            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0" style={{background: '#dbeafe'}}>
                                 {step === 'email'
                                     ? <Mail className="w-7 h-7 text-blue-600" />
                                     : <KeyRound className="w-7 h-7 text-blue-600" />}
@@ -272,7 +270,7 @@ export default function ForgotPasswordPage({ onNavigate }: ForgotPasswordPagePro
                                     disabled={isLoading}
                                     className="w-full h-12 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                     style={{
-                                        background: isLoading ? '#93c5fd' : 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+                                        background: isLoading ? '#93c5fd' : '#2563eb',
                                         color: 'white',
                                         boxShadow: isLoading ? 'none' : '0 4px 15px rgba(37, 99, 235, 0.35)',
                                     }}
@@ -404,7 +402,7 @@ export default function ForgotPasswordPage({ onNavigate }: ForgotPasswordPagePro
                                     style={{
                                         background: isLoading || code.join('').length < 6
                                             ? '#e5e7eb'
-                                            : 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+                                            : '#2563eb',
                                         color: isLoading || code.join('').length < 6 ? '#9ca3af' : 'white',
                                         boxShadow: isLoading || code.join('').length < 6
                                             ? 'none'

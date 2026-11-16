@@ -169,11 +169,11 @@ const Stations = () => {
                   className="absolute inset-0 origin-center transition-transform duration-300"
                   style={{ transform: `scale(${zoom})` }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+ <div className="absolute inset-0 bg-primary-fixed/40">
                     <div
                       className="absolute inset-0 opacity-40"
                       style={{
-                        backgroundImage: 'linear-gradient(to right, rgba(99, 102, 241, 0.15) 1px, transparent 1px), linear-gradient(to bottom, rgba(99, 102, 241, 0.15) 1px, transparent 1px)',
+                        backgroundImage: 'linear-gradient(to right, rgba(37, 99, 235, 0.15) 1px, transparent 1px), linear-gradient(to bottom, rgba(37, 99, 235, 0.15) 1px, transparent 1px)',
                         backgroundSize: '40px 40px',
                       }}
                     ></div>
@@ -237,7 +237,7 @@ const Stations = () => {
                 <button
                   type="button"
                   onClick={locate}
-                  className="absolute top-4 left-4 bg-white/95 backdrop-blur px-3.5 py-2 rounded-xl border border-outline-variant/40 shadow-elevation-2 flex items-center gap-2 text-xs font-bold text-primary cursor-pointer hover:bg-primary hover:text-white transition-all z-30"
+                  className="absolute top-4 left-4 bg-white/95 backdrop-blur px-3.5 py-2 rounded-xl border border-outline-variant/40 shadow-elevation-2 flex items-center gap-2 text-xs font-bold text-primary cursor-pointer hover:bg-on-primary-fixed-variant hover:text-white transition-all z-30"
                 >
                   <Navigation className="w-4 h-4" />
                   <span>Định vị gần tôi</span>
@@ -365,7 +365,7 @@ const Stations = () => {
                               onClick={() => goBook(station.id)}
                               className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all inline-flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
                                 primary
-                                  ? 'bg-primary-container hover:bg-primary text-white shadow-elevation-1'
+                                  ? 'bg-primary-container hover:bg-on-primary-fixed-variant text-white shadow-elevation-1'
                                   : 'bg-surface-container-low hover:bg-primary-container text-primary hover:text-white border border-outline-variant/40 hover:border-primary'
                               }`}
                             >

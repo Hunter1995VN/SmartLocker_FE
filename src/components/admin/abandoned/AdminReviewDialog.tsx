@@ -37,6 +37,7 @@ import abandonedPropertyService, {
     DISPOSAL_ACTIONS,
 } from '../../../api/abandonedPropertyService';
 import { StatusBadge, DetailRow, overdueDisplay, disposalLabel } from './AbandonedPropertyHelpers';
+import ModalOverlay from '../../ui/ModalOverlay';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -107,11 +108,7 @@ export default function AdminReviewDialog({ record, onApproved, onClose }: Admin
     // ── Render ─────────────────────────────────────────────────────────────────
 
     return (
-        <div
-            className="fixed inset-0 z-50 flex items-start justify-end bg-black/40 backdrop-blur-sm"
-            role="dialog"
-            aria-modal="true"
-        >
+        <ModalOverlay onClose={phase === 'submitting' ? undefined : onClose} placement="side">
             {/* Side panel */}
             <div className="w-full max-w-lg h-full bg-white border-l border-slate-200 flex flex-col shadow-2xl overflow-hidden">
                 {/* Header */}
@@ -353,7 +350,7 @@ export default function AdminReviewDialog({ record, onApproved, onClose }: Admin
                     )}
                 </div>
             </div>
-        </div>
+        </ModalOverlay>
     );
 }
 

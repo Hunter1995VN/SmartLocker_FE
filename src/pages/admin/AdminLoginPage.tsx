@@ -133,7 +133,7 @@ export default function AdminLoginPage({ onLoginSuccess, onNavigateHome }: Admin
             {/* Top Navigation Bar */}
             <header className="relative z-10 w-full px-6 py-4 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-md">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-900/30 border border-blue-400/20">
+ <div className="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center shadow-lg shadow-blue-900/30 border border-blue-400/20">
                         <Lock className="w-5 h-5 text-white" />
                     </div>
                     <div>
@@ -286,7 +286,7 @@ export default function AdminLoginPage({ onLoginSuccess, onNavigateHome }: Admin
                                 <button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="w-full py-2.5 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-sm font-semibold rounded-xl shadow-lg shadow-blue-600/30 hover:shadow-blue-600/40 focus:outline-none focus:ring-2 focus:ring-blue-500/40 active:scale-[0.99] transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+ className="w-full py-2.5 px-4 bg-primary-container hover:bg-primary-container text-white text-sm font-semibold rounded-xl shadow-lg shadow-blue-600/30 hover:shadow-blue-600/40 focus:outline-none focus:ring-2 focus:ring-blue-500/40 active:scale-[0.99] transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
                                 >
                                     {isLoading ? (
                                         <>

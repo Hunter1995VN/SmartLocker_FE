@@ -71,7 +71,7 @@ export default function LostItemPanel({ bookingId, status, checkedOutAt }: { boo
         reader.readAsDataURL(file);
       }} /></label>
       {photoError && <p role="alert">{photoError}</p>}
-      {photo && <img className="max-w-sm rounded" src={photo} alt="Ảnh minh họa sẽ gửi" />}
+      {photo && <img loading="lazy" decoding="async" className="max-w-sm rounded" src={photo} alt="Ảnh minh họa sẽ gửi" />}
       <button disabled={busy || readingPhoto || !!photoError} className="bg-blue-700 text-white px-4 py-2 rounded">{busy ? 'Đang gửi…' : 'Gửi báo quên đồ'}</button>
     </form>}
     {data?.lostReports?.map(report => <article key={report.id} className="border rounded p-3"><p>{report.description}</p><p>Trạng thái: {report.status}</p>{report.staffResponse && <p>Nhân viên: {report.staffResponse}</p>}</article>)}

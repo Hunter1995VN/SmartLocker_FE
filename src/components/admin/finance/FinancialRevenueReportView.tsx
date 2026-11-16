@@ -568,7 +568,7 @@ export default function FinancialRevenueReportView({
             {/* ROW 1: 4 Primary Financial Revenue KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                 {/* 1. Net Revenue */}
-                <div className="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-2xl p-4 text-white shadow-sm relative overflow-hidden">
+ <div className="bg-primary-container rounded-2xl p-4 text-white shadow-sm relative overflow-hidden">
                     <div className="flex items-center justify-between">
                         <span className="text-xs font-bold uppercase tracking-wider text-indigo-100">
                             Doanh Thu Thuần Thực Nhận
