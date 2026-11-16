@@ -286,12 +286,12 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                         )}
 
                         {/* ── WELCOME HERO ── */}
-                        <div className="relative overflow-hidden rounded-2xl bg-white shadow-xs p-6 md:p-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                        <div className="relative overflow-hidden rounded-2xl bg-white shadow-xs p-4 sm:p-6 md:p-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
                             <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-primary-fixed opacity-40 blur-3xl pointer-events-none" />
                             <div className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full bg-secondary-container opacity-30 blur-2xl pointer-events-none" />
 
-                            <div className="relative z-10 flex items-center gap-4">
-                                <div className="w-14 h-14 rounded-full bg-primary text-white flex items-center justify-center font-bold text-lg overflow-hidden shrink-0">
+                            <div className="relative z-10 flex items-center gap-3 sm:gap-4">
+                                <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-primary text-white flex items-center justify-center font-bold text-lg overflow-hidden shrink-0">
                                     {user.avatarUrl ? (
                                         <img
                                             src={resolveAssetUrl(user.avatarUrl)}
@@ -304,7 +304,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                     )}
                                 </div>
                                 <div className="flex flex-col gap-1 min-w-0">
-                                    <h1 className="text-2xl md:text-[28px] font-bold leading-9 tracking-tight text-on-surface break-words">
+                                    <h1 className="text-xl sm:text-2xl md:text-[28px] font-bold leading-8 sm:leading-9 tracking-tight text-on-surface break-words">
                                         {getGreeting(user.fullName)} <span aria-hidden="true">👋</span>
                                     </h1>
                                     <p className="text-sm text-on-surface-variant flex flex-wrap items-center gap-x-3 gap-y-1 mt-0.5">
@@ -312,29 +312,29 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                             <Calendar className="w-3.5 h-3.5 text-primary-container" aria-hidden="true" />
                                             {formatDate()}
                                         </span>
-                                        <span className="text-outline-variant">·</span>
+                                        <span className="text-outline-variant hidden sm:inline">·</span>
                                         <span
                                             role="status"
-                                            className={`text-xs font-semibold px-2 py-0.5 rounded-md ${locState === 'granted' ? 'text-primary-container bg-surface-container-low' : 'text-on-warning-container bg-warning-container'}`}
+                                            className={`hidden sm:inline text-xs font-semibold px-2 py-0.5 rounded-md ${locState === 'granted' ? 'text-primary-container bg-surface-container-low' : 'text-on-warning-container bg-warning-container'}`}
                                         >
                                             {locationText}
                                         </span>
                                         {(locState === 'denied' || locState === 'os-blocked' || locState === 'unavailable' || locState === 'timeout') && (
-                                            <button type="button" onClick={locate} className="text-xs font-bold text-primary underline cursor-pointer">Thử lại</button>
+                                            <button type="button" onClick={locate} className="hidden sm:inline text-xs font-bold text-primary underline cursor-pointer">Thử lại</button>
                                         )}
                                     </p>
                                 </div>
                             </div>
 
-                            <div className="relative z-10 flex flex-wrap items-center gap-2">
-                                <div className={`flex items-center gap-2 px-4 py-2 rounded-xl ${storedCount > 0 ? 'bg-tertiary-container text-white shadow-sm' : 'bg-surface-container text-on-surface'}`}>
+                            <div className="relative z-10 grid grid-cols-1 min-[400px]:grid-cols-2 sm:flex sm:flex-wrap items-center gap-2">
+                                <div className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl ${storedCount > 0 ? 'bg-tertiary-container text-white shadow-sm' : 'bg-surface-container text-on-surface'}`}>
                                     <Lock className="w-5 h-5" />
                                     <div className="flex flex-col leading-none">
                                         <span className="text-xs font-bold uppercase tracking-wider opacity-80">Đang sử dụng</span>
                                         <span className="text-sm font-bold">{storedCount > 0 ? `${storedCount} tủ đang gửi` : 'Chưa gửi tủ nào'}</span>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2 px-4 py-2 bg-surface-container text-on-surface rounded-xl">
+                                <div className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-surface-container text-on-surface rounded-xl">
                                     <CheckCircle className="w-5 h-5 text-primary" />
                                     <div className="flex flex-col leading-none">
                                         <span className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Lịch sử</span>
@@ -345,7 +345,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                         </div>
 
                         {/* Tip bar */}
-                        <div className="w-full rounded-xl bg-surface-container-low px-4 py-2.5 flex items-center justify-between gap-3 text-on-surface-variant">
+                        <div className="w-full rounded-xl bg-surface-container-low px-4 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-3 text-on-surface-variant">
                             <p className="text-sm min-w-0">
                                 <span className="font-semibold text-on-surface">Mẹo thao tác nhanh:</span>{' '}
                                 Mã QR và mã PIN mở tủ nằm trong trang chi tiết đặt chỗ. Đưa mã trước kiosk tại trạm để mở tủ.
@@ -448,7 +448,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                                     <button
                                                         type="button"
                                                         onClick={() => goDetail(activeBooking.id)}
-                                                        className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary-container text-white text-sm font-semibold hover:bg-primary transition-colors cursor-pointer"
+                                                        className="basis-full sm:basis-auto sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary-container text-white text-sm font-semibold hover:bg-primary transition-colors cursor-pointer"
                                                     >
                                                         <Lock className="w-5 h-5" />
                                                         Xem vé &amp; mã mở tủ
@@ -457,7 +457,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                                         <button
                                                             type="button"
                                                             onClick={() => goDetail(activeBooking.id)}
-                                                            className="inline-flex items-center gap-1.5 px-4 py-3 min-h-11 rounded-xl bg-white border border-outline-soft text-on-surface text-sm font-semibold hover:bg-surface-bright transition-colors cursor-pointer"
+                                                            className="flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-4 py-3 min-h-11 rounded-xl bg-white border border-outline-soft text-on-surface text-sm font-semibold hover:bg-surface-bright transition-colors cursor-pointer"
                                                         >
                                                             <Clock className="w-4 h-4 text-primary-container" />
                                                             Gia hạn
@@ -468,7 +468,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                                         onClick={() => openDirections(activeStation)}
                                                         disabled={!activeStation}
                                                         title={activeStation ? 'Mở Google Maps chỉ đường tới trạm' : 'Chưa có tọa độ trạm'}
-                                                        className="inline-flex items-center gap-1.5 px-4 py-3 min-h-11 rounded-xl bg-white border border-outline-soft text-on-surface text-sm font-semibold hover:bg-surface-bright transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        className="flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-4 py-3 min-h-11 rounded-xl bg-white border border-outline-soft text-on-surface text-sm font-semibold hover:bg-surface-bright transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                                     >
                                                         <Navigation className="w-4 h-4 text-tertiary-container" />
                                                         Chỉ đường
@@ -562,7 +562,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                             </div>
 
                             {/* ── RIGHT COLUMN ── */}
-                            <div className="lg:col-span-4 flex flex-col gap-6 min-w-0">
+                            <div className="lg:col-span-4 grid grid-cols-1 md:grid-cols-2 lg:flex lg:flex-col gap-6 min-w-0 items-start lg:items-stretch">
 
                                 <div className="rounded-2xl bg-white shadow-xs p-6 flex flex-col gap-4">
                                     <div className="flex items-center gap-2">
@@ -641,7 +641,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                     </div>
                                 </div>
 
-                                <div className="rounded-2xl bg-surface-container-low p-4 flex items-start gap-3">
+                                <div className="md:col-span-2 lg:col-span-1 w-full rounded-2xl bg-surface-container-low p-4 flex items-start gap-3">
                                     <div className="w-8 h-8 rounded-full bg-primary-container text-white flex items-center justify-center shrink-0">
                                         <Shield className="w-4 h-4" />
                                     </div>
@@ -681,7 +681,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
 
                 <footer className="border-t border-surface-container mt-4 px-4 md:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
                     <p className="text-sm text-on-surface-muted">© {new Date().getFullYear()} SmartLocker. Bản quyền thuộc về SmartLocker.</p>
-                    <div className="flex items-center gap-4 text-xs text-on-surface-variant">
+                    <div className="flex flex-wrap items-center justify-center sm:justify-end gap-x-4 gap-y-2 text-xs text-on-surface-variant">
                         <a href="/?view=reviews" className="hover:text-primary transition-colors">Đánh giá khách hàng</a>
                         <button type="button" onClick={() => openLegal('privacy')} className="hover:text-primary transition-colors cursor-pointer">Chính sách bảo mật</button>
                         <button type="button" onClick={() => openLegal('terms')} className="hover:text-primary transition-colors cursor-pointer">Điều khoản dịch vụ</button>
