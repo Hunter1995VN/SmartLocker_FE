@@ -83,9 +83,9 @@ const Hero = () => {
         
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           {/* Top Badges & Main Copy */}
-          <div className="max-w-3xl mx-auto text-center mb-12">
+          <div className="max-w-5xl mx-auto text-center mb-12">
             {/* Headline */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-on-surface tracking-tight mb-6 leading-[1.1] text-balance">
+            <h1 className="max-w-3xl mx-auto text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-on-surface tracking-tight mb-6 leading-[1.1] text-balance">
               Gửi Hành Lý Thông Minh 24/7 — <br className="hidden sm:inline"/>
               <span className="text-gradient">Tự Do Khám Phá</span> Từng Góc Phố
             </h1>
@@ -96,7 +96,7 @@ const Hero = () => {
             </p>
 
             {/* Value Props Pill Row */}
-            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-3">
+            <div className="grid grid-cols-2 gap-2 max-w-xl mx-auto sm:gap-3 lg:max-w-none lg:flex lg:flex-nowrap lg:items-center lg:justify-center">
               {valueProps.map((prop, index) => (
                 <span
                   key={index}
