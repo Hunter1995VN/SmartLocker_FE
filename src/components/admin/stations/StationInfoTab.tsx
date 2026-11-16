@@ -280,12 +280,12 @@ export default function StationInfoTab({
                 </div>
             </div>
 
-            {/* Row 4: Visual Location & Geofence Boundary Preview */}
+            {/* Row 4: Vị trí trên bản đồ & vùng giới hạn Preview */}
             <div className="bg-slate-50/70 rounded-2xl border border-slate-200/80 p-4">
                 <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
                         <MapPin className="w-4 h-4 text-blue-600" />
-                        <span>Visual Location & Geofence Boundary</span>
+                        <span>Vị trí trên bản đồ & vùng giới hạn</span>
                     </span>
                     <span className="text-xs font-bold text-blue-700 bg-blue-100/60 px-2 py-0.5 rounded-lg border border-blue-200">
                         Bán kính BLE / Geofence: 50 mét
@@ -351,7 +351,7 @@ export default function StationInfoTab({
 
                 <div className="text-slate-600">
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">Weight Sensor</span>
-                    <span className="font-semibold text-emerald-600">Calibrated (Active)</span>
+                    <span className="font-semibold text-emerald-600">Đã hiệu chuẩn (đang hoạt động)</span>
                 </div>
             </div>
 

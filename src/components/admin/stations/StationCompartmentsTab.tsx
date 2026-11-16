@@ -123,7 +123,7 @@ export default function StationCompartmentsTab({ station }: StationCompartmentsT
                 {/* Small */}
                 <div className="p-3.5 bg-blue-50/60 rounded-xl border border-blue-200/80">
                     <div className="flex items-center justify-between text-blue-700 mb-1">
-                        <span className="text-xs font-bold uppercase tracking-wider">Cỡ Small (S)</span>
+                        <span className="text-xs font-bold uppercase tracking-wider">Cỡ Nhỏ (S)</span>
                         <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-blue-100/80">Tủ nhỏ</span>
                     </div>
                     <div className="flex items-baseline gap-1.5">
@@ -138,7 +138,7 @@ export default function StationCompartmentsTab({ station }: StationCompartmentsT
                 {/* Medium */}
                 <div className="p-3.5 bg-indigo-50/60 rounded-xl border border-indigo-200/80">
                     <div className="flex items-center justify-between text-indigo-700 mb-1">
-                        <span className="text-xs font-bold uppercase tracking-wider">Cỡ Medium (M)</span>
+                        <span className="text-xs font-bold uppercase tracking-wider">Cỡ Vừa (M)</span>
                         <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-indigo-100/80">Tủ vừa</span>
                     </div>
                     <div className="flex items-baseline gap-1.5">
@@ -153,7 +153,7 @@ export default function StationCompartmentsTab({ station }: StationCompartmentsT
                 {/* Large */}
                 <div className="p-3.5 bg-purple-50/60 rounded-xl border border-purple-200/80">
                     <div className="flex items-center justify-between text-purple-700 mb-1">
-                        <span className="text-xs font-bold uppercase tracking-wider">Cỡ Large (L)</span>
+                        <span className="text-xs font-bold uppercase tracking-wider">Cỡ Lớn (L)</span>
                         <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-purple-100/80">Tủ lớn</span>
                     </div>
                     <div className="flex items-baseline gap-1.5">

@@ -173,7 +173,7 @@ export default function StationManagementView() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <div className="text-xs font-semibold text-slate-500 mb-1">
-                        Operations / <span className="text-blue-600 font-bold">Manage Stations & Lockers</span>
+                        Operations / <span className="text-blue-600 font-bold">Quản lý trạm & ô tủ</span>
                     </div>
                     <div className="flex items-center gap-2.5 flex-wrap">
                         <h1 className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight">
@@ -196,14 +196,14 @@ export default function StationManagementView() {
                         <span>MQTT Edge Sync: <b>{activeStationsCount} Stations Active</b></span>
                     </div>
 
-                    {/* Batch Apply Pricing */}
+                    {/* Áp dụng giá hàng loạt */}
                     <button
                         type="button"
                         onClick={() => setIsBatchPricingOpen(true)}
                         className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold shadow-xs transition cursor-pointer"
                     >
                         <Tag className="w-3.5 h-3.5 text-blue-600" />
-                        <span>Batch Apply Pricing</span>
+                        <span>Áp dụng giá hàng loạt</span>
                     </button>
 
                     {/* Add New Station */}
@@ -213,7 +213,7 @@ export default function StationManagementView() {
                         className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm shadow-blue-500/20 transition cursor-pointer"
                     >
                         <Plus className="w-4 h-4" />
-                        <span>+ Add New Station</span>
+                        <span>+ Thêm trạm mới</span>
                     </button>
                 </div>
             </div>

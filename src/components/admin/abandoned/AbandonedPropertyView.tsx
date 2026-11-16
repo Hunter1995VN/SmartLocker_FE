@@ -1505,7 +1505,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                     </div>
                                 </div>
 
-                                {/* Step 2: Admin Approval */}
+                                {/* Bước 2: Admin Approval */}
                                 <div className="flex items-start gap-2.5">
                                     <div
                                         className={`w-5 h-5 rounded-full flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 ${
@@ -1533,7 +1533,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
                                     </div>
                                 </div>
 
-                                {/* Step 3: Resolution */}
+                                {/* Bước 3: Resolution */}
                                 <div className="flex items-start gap-2.5">
                                     <div
                                         className={`w-5 h-5 rounded-full flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 ${

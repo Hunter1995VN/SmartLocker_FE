@@ -79,7 +79,7 @@ export default function AdminSidebar({
                                 SLMS
                             </span>
                         </div>
-                        <p className="text-xs text-slate-500">Operations Control</p>
+                        <p className="text-xs text-slate-500">Điều hành trạm</p>
                     </div>
                 </div>
 
@@ -352,7 +352,7 @@ export default function AdminSidebar({
                                 }`}
                             >
                                 <CreditCard className={`w-4 h-4 ${activeMenu === 'refunds' ? 'text-white' : 'text-slate-500'}`} />
-                                <span>Refund Requests</span>
+                                <span>Yêu cầu hoàn tiền</span>
                             </button>
                         </div>
                     </div>

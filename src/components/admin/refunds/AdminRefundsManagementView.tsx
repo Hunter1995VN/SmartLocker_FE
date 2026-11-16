@@ -21,7 +21,7 @@ export default function AdminRefundsManagementView() {
   const [toastMsg, setToastMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const formatVnd = (val: number) => {
-    return new Intl.NumberFormat('en-US').format(Math.round(val)) + ' VND';
+    return new Intl.NumberFormat('vi-VN').format(Math.round(val)) + ' VND';
   };
 
   const fetchRefunds = useCallback(async () => {
@@ -104,9 +104,9 @@ export default function AdminRefundsManagementView() {
       {/* Header & Filter Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
         <div>
-          <h2 className="text-lg font-bold text-slate-900">Refund Requests Review (UC-T20)</h2>
+          <h2 className="text-lg font-bold text-slate-900">Duyệt yêu cầu hoàn tiền (UC-T20)</h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Audit customer booking cancellations and approve or reject automated PayOS refund requests.
+            Kiểm tra các yêu cầu hủy đơn của khách, duyệt hoặc từ chối yêu cầu hoàn tiền PayOS tự động.
           </p>
         </div>
 
@@ -119,10 +119,10 @@ export default function AdminRefundsManagementView() {
             }}
             className="h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="">All Statuses</option>
-            <option value="PENDING">Pending Approval</option>
-            <option value="PAID">Approved &amp; Refunded</option>
-            <option value="FAILED">Rejected</option>
+            <option value="">Tất cả trạng thái</option>
+            <option value="PENDING">Chờ duyệt</option>
+            <option value="PAID">Đã duyệt &amp; hoàn tiền</option>
+            <option value="FAILED">Đã từ chối</option>
           </select>
 
           <button
@@ -131,7 +131,7 @@ export default function AdminRefundsManagementView() {
             className="h-9 px-3 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl text-xs font-bold text-slate-700 flex items-center gap-1.5 cursor-pointer shadow-xs"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-blue-600' : ''}`} />
-            <span>Refresh</span>
+            <span>Làm mới</span>
           </button>
         </div>
       </div>
@@ -142,13 +142,13 @@ export default function AdminRefundsManagementView() {
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                <th className="py-3 px-4">Booking / Reference</th>
+                <th className="py-3 px-4">Đơn đặt chỗ / Mã tham chiếu</th>
                 <th className="py-3 px-4">Customer</th>
-                <th className="py-3 px-4">Station &amp; Compartment</th>
-                <th className="py-3 px-4">Refund Amount</th>
-                <th className="py-3 px-4">Reason / Policy</th>
-                <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4 text-right">Actions</th>
+                <th className="py-3 px-4">Trạm &amp; ngăn tủ</th>
+                <th className="py-3 px-4">Số tiền hoàn</th>
+                <th className="py-3 px-4">Lý do / Chính sách</th>
+                <th className="py-3 px-4">Trạng thái</th>
+                <th className="py-3 px-4 text-right">Thao tác</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -156,15 +156,15 @@ export default function AdminRefundsManagementView() {
                 <tr>
                   <td colSpan={7} className="py-12 text-center text-slate-500">
                     <RefreshCw className="w-6 h-6 animate-spin mx-auto text-blue-600 mb-2" />
-                    <p className="font-medium">Loading refund requests...</p>
+                    <p className="font-medium">Đang tải yêu cầu hoàn tiền...</p>
                   </td>
                 </tr>
               ) : refunds.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="py-12 text-center text-slate-500">
                     <ShieldCheck className="w-8 h-8 mx-auto text-slate-300 mb-2" />
-                    <p className="font-semibold text-slate-600">No refund requests found</p>
-                    <p className="text-xs">There are no cancellation refund records matching current criteria.</p>
+                    <p className="font-semibold text-slate-600">Không có yêu cầu hoàn tiền</p>
+                    <p className="text-xs">Không có yêu cầu hoàn tiền nào khớp với bộ lọc hiện tại.</p>
                   </td>
                 </tr>
               ) : (
@@ -179,7 +179,7 @@ export default function AdminRefundsManagementView() {
                         <span className="font-mono font-bold text-slate-900 block">#{ref.bookingCode}</span>
                         <span className="text-xs text-slate-500 font-mono block">{ref.orderCode}</span>
                         <span className="text-xs text-slate-500 block mt-0.5">
-                          {new Date(ref.requestedAt).toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })}
+                          {new Date(ref.requestedAt).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })}
                         </span>
                       </td>
 
@@ -225,7 +225,7 @@ export default function AdminRefundsManagementView() {
                           {isPending && <Clock className="w-3 h-3 animate-spin text-amber-600" />}
                           {isApproved && <CheckCircle2 className="w-3 h-3 text-emerald-600" />}
                           {isRejected && <XCircle className="w-3 h-3 text-slate-500" />}
-                          <span>{isApproved ? 'Approved' : isPending ? 'Pending' : 'Rejected'}</span>
+                          <span>{isApproved ? 'Đã duyệt' : isPending ? 'Chờ duyệt' : 'Đã từ chối'}</span>
                         </span>
                       </td>
 
@@ -236,7 +236,7 @@ export default function AdminRefundsManagementView() {
                               onClick={() => handleApprove(ref.paymentId, ref.bookingCode)}
                               disabled={actionInProgressId === ref.paymentId}
                               className="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 cursor-pointer transition-colors disabled:opacity-50"
-                              title="Approve refund"
+                              title="Duyệt hoàn tiền"
                             >
                               <Check className="w-3 h-3" />
                               <span>Approve</span>
@@ -245,14 +245,14 @@ export default function AdminRefundsManagementView() {
                               onClick={() => handleReject(ref.paymentId, ref.bookingCode)}
                               disabled={actionInProgressId === ref.paymentId}
                               className="px-2.5 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs flex items-center gap-1 cursor-pointer transition-colors disabled:opacity-50"
-                              title="Reject refund"
+                              title="Từ chối hoàn tiền"
                             >
                               <X className="w-3 h-3" />
                               <span>Reject</span>
                             </button>
                           </div>
                         ) : (
-                          <span className="text-xs text-slate-500 italic">Completed</span>
+                          <span className="text-xs text-slate-500 italic">Hoàn tất</span>
                         )}
                       </td>
                     </tr>
@@ -265,7 +265,7 @@ export default function AdminRefundsManagementView() {
 
         {/* Footer info */}
         <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-          <span>Total Requests: <strong>{totalCount}</strong></span>
+          <span>Tổng yêu cầu: <strong>{totalCount}</strong></span>
           <span>Showing Page {page}</span>
         </div>
       </div>

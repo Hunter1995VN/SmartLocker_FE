@@ -667,7 +667,7 @@ export default function StationDetailPage({
                                     </div>
                                 </div>
 
-                                {/* Step 2: Duration */}
+                                {/* Bước 2: Duration */}
                                 <div className="flex flex-col gap-2">
                                     <div className="flex items-center justify-between">
                                         <label className="text-sm font-semibold text-on-surface">2. Thời gian gửi dự kiến</label>

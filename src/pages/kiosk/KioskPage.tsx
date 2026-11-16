@@ -572,10 +572,10 @@ export default function KioskPage() {
                   ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700'
                   : 'bg-slate-900 hover:bg-slate-800 border-slate-700 text-slate-300'
             }`}
-            title="Bật/Tắt chế độ Ngoại Tuyến (UC-T13: Lấy hành lý khi mất Internet)"
+            title={x('offlineToggle')}
           >
             <span className={`w-2 h-2 rounded-full ${isOfflineMode ? 'bg-amber-400' : 'bg-emerald-500'}`} />
-            <span>{isOfflineMode ? 'Ngoại tuyến (Offline)' : 'Trực tuyến (Online)'}</span>
+            <span>{isOfflineMode ? x('offlineMode') : x('onlineMode')}</span>
           </button>
 
           {/* Sunlight Contrast Mode Toggle */}
