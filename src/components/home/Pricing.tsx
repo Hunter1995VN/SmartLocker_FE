@@ -17,10 +17,9 @@ const Pricing = () => {
       dimensions: '45 × 45 × 65 cm',
       price: 10000,
       priceDay: 70000,
-      insurance: '10.000.000đ',
       capacity: '1 balo lớn + 1 túi xách phụ kiện',
       features: [
-        'Bảo hiểm bồi thường 10.000.000đ',
+        'Bảo hiểm hành lý theo từng đơn',
         'Mở tủ không giới hạn số lần',
         'Khóa điện tử solenoid bảo mật',
       ],
@@ -37,13 +36,12 @@ const Pricing = () => {
       dimensions: '65 × 45 × 65 cm',
       price: 20000,
       priceDay: 140000,
-      insurance: '20.000.000đ',
       capacity: '1 vali xách tay 20" + áo khoác, quà lưu niệm',
       features: [
         'Cổng sạc pin dự phòng tích hợp trong tủ',
-        'Bảo hiểm bồi thường 20.000.000đ',
+        'Bảo hiểm hành lý theo từng đơn',
         'Mở tủ không giới hạn số lần',
-        'Cảm biến chống cạy cửa 24/7',
+        'Cảm biến đóng/mở cửa từng ô tủ',
       ],
       popular: true,
       color: 'primary',
@@ -58,10 +56,9 @@ const Pricing = () => {
       dimensions: '95 × 55 × 65 cm',
       price: 30000,
       priceDay: 210000,
-      insurance: '20.000.000đ',
       capacity: '1 vali lớn 28" + 1 balo kéo hoặc 2 vali cỡ vừa',
       features: [
-        'Bảo hiểm bồi thường 20.000.000đ',
+        'Bảo hiểm hành lý theo từng đơn',
         'Mở tủ không giới hạn số lần',
         'Phù hợp nhóm 3-4 người',
       ],
@@ -72,8 +69,8 @@ const Pricing = () => {
 
   const guarantees = [
     { icon: ShieldCheck, text: 'Khóa điện tử Solenoid chịu lực cao' },
-    { icon: Shield, text: 'Cảm biến chống cạy cửa 24/7' },
-    { icon: Award, text: 'Tặng kèm bảo hiểm bồi hoàn tới 20 triệu' },
+    { icon: Shield, text: 'Cảm biến đóng/mở cửa từng ô tủ' },
+    { icon: Award, text: 'Tặng kèm bảo hiểm hành lý theo từng đơn' },
     { icon: Battery, text: 'Hỗ trợ kỹ thuật từ xa 24/7 tức thì' },
   ];
 

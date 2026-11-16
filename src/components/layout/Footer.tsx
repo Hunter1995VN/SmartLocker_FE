@@ -65,7 +65,7 @@ const Footer = () => {
 
               {/* Description */}
               <p className="text-sm text-secondary max-w-sm leading-relaxed">
-                Hạ tầng mạng lưới tủ gửi đồ tự động thông minh 24/7 hàng đầu Việt Nam. Tích hợp thanh toán số VietQR, mã hóa bảo mật JWS không phụ thuộc internet và bảo hiểm đồ họa toàn diện.
+                Hạ tầng mạng lưới tủ gửi đồ tự động thông minh 24/7 hàng đầu Việt Nam. Tích hợp thanh toán số VietQR, mã hóa bảo mật JWS không phụ thuộc internet và bảo hiểm hành lý theo từng đơn.
               </p>
 
               {/* Contact Info */}
