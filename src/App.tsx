@@ -359,6 +359,7 @@ function App() {
                 <FindStationPage
                     onLogout={handleLogout}
                     initialStationId={pageData.stationId}
+                    onNavigate={(page, data) => navigateTo(page as Page, data)}
                     onNavigateDashboard={() => navigateTo('dashboard')}
                     onNavigateHistory={() => navigateTo('my-bookings')}
                     onNavigateStationDetail={(stationId, station) =>

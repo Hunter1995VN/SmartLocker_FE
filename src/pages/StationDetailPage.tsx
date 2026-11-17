@@ -46,6 +46,7 @@ interface Props {
     station?: Station;
     onBack: () => void;
     onLogout: () => void;
+    onNavigate?: (page: string, data?: any) => void;
     onNavigateDashboard?: () => void;
     onNavigateHistory?: () => void;
     onNavigateBooking?: (stationId: string, initialData?: { size?: 'S' | 'M' | 'L'; duration?: number }) => void;
@@ -79,6 +80,7 @@ export default function StationDetailPage({
     station: initialStation,
     onBack,
     onLogout,
+    onNavigate,
     onNavigateDashboard,
     onNavigateHistory,
     onNavigateBooking,
@@ -152,14 +154,17 @@ export default function StationDetailPage({
         onLogout();
     };
 
+    const handleHeaderNavigate = (page: string, data?: any) => {
+        if (onNavigate) onNavigate(page, data);
+        else if (page === 'dashboard') onNavigateDashboard?.();
+        else if (page === 'my-bookings') onNavigateHistory?.();
+        else if (page === 'find-station') onBack();
+    };
+
     if (isLoading && !detail) {
         return (
             <div className="min-h-screen bg-surface-bright flex flex-col" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                <CustomerHeader currentPage="find-station" onNavigate={(p) => {
-                    if (p === 'dashboard') onNavigateDashboard?.();
-                    else if (p === 'my-bookings') onNavigateHistory?.();
-                    else if (p === 'find-station') onBack();
-                }} onLogout={handleLogout} />
+                <CustomerHeader currentPage="find-station" onNavigate={handleHeaderNavigate} onLogout={handleLogout} />
                 <div className="flex-1 flex items-center justify-center p-6">
                     <div className="text-center">
                         <div className="w-12 h-12 border-4 border-primary-container border-t-transparent rounded-full animate-spin mx-auto mb-4" />
@@ -173,11 +178,7 @@ export default function StationDetailPage({
     if (error && !detail) {
         return (
             <div className="min-h-screen bg-surface-bright flex flex-col" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                <CustomerHeader currentPage="find-station" onNavigate={(p) => {
-                    if (p === 'dashboard') onNavigateDashboard?.();
-                    else if (p === 'my-bookings') onNavigateHistory?.();
-                    else if (p === 'find-station') onBack();
-                }} onLogout={handleLogout} />
+                <CustomerHeader currentPage="find-station" onNavigate={handleHeaderNavigate} onLogout={handleLogout} />
                 <div className="flex-1 flex items-center justify-center p-6">
                     <div className="bg-white rounded-2xl shadow-md border border-surface-container p-8 max-w-md w-full text-center">
                         <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-3" />
@@ -266,11 +267,7 @@ export default function StationDetailPage({
             {/* ══ UNIFIED CUSTOMER HEADER ══ */}
             <CustomerHeader
                 currentPage="find-station"
-                onNavigate={(page) => {
-                    if (page === 'dashboard') onNavigateDashboard?.();
-                    else if (page === 'my-bookings') onNavigateHistory?.();
-                    else if (page === 'find-station') onBack();
-                }}
+                onNavigate={handleHeaderNavigate}
                 onLogout={handleLogout}
             />
 

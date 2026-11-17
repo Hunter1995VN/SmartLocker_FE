@@ -21,6 +21,7 @@ type SizeFilter = 'ALL' | 'S' | 'M' | 'L';
 interface Props {
     onLogout: () => void;
     initialStationId?: string;
+    onNavigate?: (page: string, data?: any) => void;
     onNavigateDashboard?: () => void;
     onNavigateHistory?: () => void;
     onNavigateStationDetail?: (stationId: string, station?: Station) => void;
@@ -52,6 +53,7 @@ function isDaNangStation(s: Station): boolean {
 export default function FindStationPage({
     onLogout,
     initialStationId,
+    onNavigate,
     onNavigateDashboard,
     onNavigateHistory,
     onNavigateStationDetail,
@@ -245,8 +247,9 @@ export default function FindStationPage({
             <h1 className="sr-only">{t('Tìm trạm gửi hành lý')}</h1>
             <CustomerHeader
                 currentPage="find-station"
-                onNavigate={(page) => {
-                    if (page === 'dashboard') onNavigateDashboard?.();
+                onNavigate={(page, data) => {
+                    if (onNavigate) onNavigate(page, data);
+                    else if (page === 'dashboard') onNavigateDashboard?.();
                     else if (page === 'my-bookings') onNavigateHistory?.();
                 }}
                 onLogout={handleLogout}
