@@ -10,7 +10,7 @@ import { useT } from '../../i18n';
 import LanguageSwitcher from '../ui/LanguageSwitcher';
 
 export interface CustomerHeaderProps {
-    currentPage?: 'dashboard' | 'find-station' | 'my-bookings' | 'station-booking' | 'booking-payment' | 'booking-detail' | 'profile';
+    currentPage?: 'dashboard' | 'find-station' | 'my-bookings' | 'station-booking' | 'booking-payment' | 'booking-detail' | 'profile' | 'overdue-debt';
     onNavigate: (page: string, data?: any) => void;
     onLogout?: () => void;
 }
@@ -211,7 +211,7 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                                     </button>
 
                                     <button
-                                        onClick={() => { setUserMenuOpen(false); onNavigate('profile', { tab: 'info' }); }}
+                                        onClick={() => { setUserMenuOpen(false); onNavigate('profile'); }}
                                         className="w-full text-left px-4 py-2.5 text-xs font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-primary-container flex items-center gap-2.5 transition-colors cursor-pointer"
                                     >
                                         <User className="w-4 h-4 text-primary-container" />
@@ -219,7 +219,7 @@ export const CustomerHeader: React.FC<CustomerHeaderProps> = ({
                                     </button>
 
                                     <button
-                                        onClick={() => { setUserMenuOpen(false); onNavigate('profile', { tab: 'debt' }); }}
+                                        onClick={() => { setUserMenuOpen(false); onNavigate('overdue-debt'); }}
                                         className="w-full text-left px-4 py-2.5 text-xs font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-primary-container flex items-center gap-2.5 transition-colors cursor-pointer"
                                     >
                                         <DollarSign className="w-4 h-4 text-primary-container" />

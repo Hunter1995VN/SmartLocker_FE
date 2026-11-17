@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
     User, Phone, Shield, Key, AlertTriangle, CheckCircle2,
-    Clock, CreditCard, ArrowLeft, Lock, Save,
-    RefreshCw, AlertCircle, Calendar, DollarSign, Building,
+    Clock, ArrowLeft, Lock, Save,
+    RefreshCw, AlertCircle, Calendar,
     ChevronRight, Camera, Trash2
 } from 'lucide-react';
 import CustomerHeader from '../components/layout/CustomerHeader';
@@ -31,7 +31,6 @@ function syncStoredUser(patch: { fullName?: string; phone?: string; avatarUrl?: 
 interface ProfilePageProps {
     onLogout: () => void;
     onNavigate: (page: string, data?: any) => void;
-    initialTab?: 'info' | 'debt';
 }
 
 const formatCurrency = (val: number): string => {
@@ -54,9 +53,8 @@ const formatDate = (isoString?: string): string => {
     }
 };
 
-export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, initialTab = 'info' }) => {
+export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate }) => {
     const t = useT();
-    const [activeTab, setActiveTab] = useState<'info' | 'debt'>(initialTab);
     const [loading, setLoading] = useState<boolean>(true);
     const [refreshing, setRefreshing] = useState<boolean>(false);
 
@@ -78,17 +76,14 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
     const [pwdSuccessMsg, setPwdSuccessMsg] = useState<string>('');
     const [pwdErrorMsg, setPwdErrorMsg] = useState<string>('');
 
-    // Overdue Debt State
+    // Optional debt summary (for blocking warning pill linking to /overdue-debt)
     const [debtData, setDebtData] = useState<UserOverdueDebtResponse | null>(null);
-    const [payingBookingId, setPayingBookingId] = useState<string | null>(null);
-    const [debtActionMsg, setDebtActionMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-    // Fetch Profile & Debt Data
+    // Fetch Profile Data
     const loadData = async (isSilent = false) => {
         if (!isSilent) setLoading(true);
         else setRefreshing(true);
         setProfileErrorMsg('');
-        setDebtActionMsg(null);
 
         try {
             const [profileRes, debtRes] = await Promise.all([
@@ -265,43 +260,12 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
         }
     };
 
-    // Handle Pay Overdue Fee
-    const handlePayOverdue = async (bookingId: string) => {
-        setPayingBookingId(bookingId);
-        setDebtActionMsg(null);
-
-        try {
-            const res = await profileService.payOverdueDebt(bookingId);
-            if (res && res.success && res.data?.paymentUrl) {
-                setDebtActionMsg({
-                    type: 'success',
-                    text: t('Đang chuyển hướng tới cổng thanh toán PayOS...')
-                });
-                // Redirect user to PayOS Checkout
-                window.location.href = res.data.paymentUrl;
-            } else {
-                setDebtActionMsg({
-                    type: 'error',
-                    text: res?.message || t('Không thể tạo liên kết thanh toán. Vui lòng thử lại.')
-                });
-            }
-        } catch (err: any) {
-            const msg = err.response?.data?.message || err.message || t('Lỗi khi xử lý thanh toán quá hạn.');
-            setDebtActionMsg({
-                type: 'error',
-                text: msg
-            });
-        } finally {
-            setPayingBookingId(null);
-        }
-    };
-
     const hasOverdueDebt = (debtData?.totalOverdueDebt || 0) > 0 || (debtData?.overdueBookings?.length || 0) > 0;
 
     return (
         <div className="min-h-screen bg-surface-bright flex flex-col font-sans">
             {/* Top Navigation */}
-            <CustomerHeader onLogout={onLogout} onNavigate={onNavigate} />
+            <CustomerHeader currentPage="profile" onLogout={onLogout} onNavigate={onNavigate} />
 
             {/* Main Content */}
             <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -316,10 +280,10 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                             <span>{t('Quay lại Trang tổng quan')}</span>
                         </button>
                         <h1 className="text-2xl sm:text-3xl font-extrabold text-on-surface tracking-tight">
-                            {t('Quản lý tài khoản & Dư nợ')}
+                            {t('Thông tin cá nhân & Bảo mật')}
                         </h1>
                         <p className="text-sm text-on-surface-muted mt-1">
-                            {t('Xem thông tin cá nhân, cập nhật bảo mật và tra cứu chi tiết dư nợ quá hạn')}
+                            {t('Xem và cập nhật thông tin hồ sơ, ảnh đại diện và bảo mật tài khoản')}
                         </p>
                     </div>
 
@@ -352,47 +316,15 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                                 </p>
                             </div>
                         </div>
-                        {activeTab !== 'debt' && (
-                            <button
-                                onClick={() => setActiveTab('debt')}
-                                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition-colors shrink-0 shadow-xs cursor-pointer flex items-center gap-1.5"
-                            >
-                                <span>{t('Xem & Thanh toán')}</span>
-                                <ChevronRight className="w-3.5 h-3.5" />
-                            </button>
-                        )}
+                        <button
+                            onClick={() => onNavigate('overdue-debt')}
+                            className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition-colors shrink-0 shadow-xs cursor-pointer flex items-center gap-1.5"
+                        >
+                            <span>{t('Xem & Thanh toán')}</span>
+                            <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
                     </div>
                 )}
-
-                {/* Tabs Switch */}
-                <div className="flex border-b border-[#e1e7f5] mb-8 gap-2">
-                    <button
-                        onClick={() => setActiveTab('info')}
-                        className={`flex items-center gap-2 py-3 px-4 text-sm font-bold border-b-2 transition-all cursor-pointer ${
-                            activeTab === 'info'
-                                ? 'border-primary text-primary'
-                                : 'border-transparent text-on-surface-muted hover:text-on-surface'
-                        }`}
-                    >
-                        <User className="w-4 h-4" />
-                        <span>{t('Thông tin cá nhân & Bảo mật')}</span>
-                    </button>
-
-                    <button
-                        onClick={() => setActiveTab('debt')}
-                        className={`flex items-center gap-2 py-3 px-4 text-sm font-bold border-b-2 transition-all cursor-pointer relative ${
-                            activeTab === 'debt'
-                                ? 'border-primary text-primary'
-                                : 'border-transparent text-on-surface-muted hover:text-on-surface'
-                        }`}
-                    >
-                        <DollarSign className="w-4 h-4" />
-                        <span>{t('Tra cứu dư nợ quá hạn')}</span>
-                        {hasOverdueDebt && (
-                            <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
-                        )}
-                    </button>
-                </div>
 
                 {/* Loading Skeleton */}
                 {loading && (
@@ -402,8 +334,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                     </div>
                 )}
 
-                {/* TAB 1: THÔNG TIN CÁ NHÂN & BẢO MẬT */}
-                {!loading && activeTab === 'info' && profile && (
+                {/* THÔNG TIN CÁ NHÂN & BẢO MẬT */}
+                {!loading && profile && (
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         {/* Left Card: Profile Overview */}
                         <div className="space-y-6">
@@ -703,251 +635,6 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onLogout, onNavigate, 
                     </div>
                 )}
 
-                {/* TAB 2: TRA CỨU DƯ NỢ QUÁ HẠN */}
-                {!loading && activeTab === 'debt' && debtData && (
-                    <div className="space-y-8">
-                        {/* Financial Standing Banner */}
-                        <div className={`p-6 sm:p-8 rounded-3xl border shadow-xs relative overflow-hidden ${
-                            hasOverdueDebt
- ? 'bg-error-container/40 border-rose-200'
- : 'bg-tertiary-fixed/30 border-emerald-200'
-                        }`}>
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                                <div className="flex items-start gap-4">
-                                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${
-                                        hasOverdueDebt ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/20' : 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
-                                    }`}>
-                                        {hasOverdueDebt ? <AlertTriangle className="w-7 h-7" /> : <CheckCircle2 className="w-7 h-7" />}
-                                    </div>
-
-                                    <div>
-                                        <span className={`text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
-                                            hasOverdueDebt
-                                                ? 'bg-rose-100/70 text-rose-800 border-rose-300'
-                                                : 'bg-emerald-100/70 text-emerald-800 border-emerald-300'
-                                        }`}>
-                                            {hasOverdueDebt ? t('Tài khoản có dư nợ') : t('Tài khoản sạch nợ')}
-                                        </span>
-
-                                        <h2 className="text-xl sm:text-2xl font-extrabold text-on-surface mt-1.5">
-                                            {hasOverdueDebt ? t('Phát sinh dư nợ quá hạn chưa thanh toán') : t('Không có bất kỳ dư nợ quá hạn nào')}
-                                        </h2>
-
-                                        <p className="text-xs sm:text-sm text-on-surface-variant mt-1 max-w-2xl leading-relaxed">
-                                            {debtData.statusMessage}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="text-left sm:text-right shrink-0 bg-white/70 p-4 rounded-2xl border border-white/60 backdrop-blur-xs">
-                                    <span className="text-xs text-on-surface-muted font-semibold block uppercase">
-                                        {t('Tổng nợ quá hạn')}
-                                    </span>
-                                    <span className={`text-2xl sm:text-3xl font-extrabold ${
-                                        hasOverdueDebt ? 'text-rose-600' : 'text-emerald-600'
-                                    }`}>
-                                        {formatCurrency(debtData.totalOverdueDebt)} {t('VNĐ')}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Debt Action Notification */}
-                        {debtActionMsg && (
-                            <div className={`p-4 rounded-2xl text-xs font-semibold flex items-center gap-2.5 animate-fade-in ${
-                                debtActionMsg.type === 'success'
-                                    ? 'bg-emerald-50 border border-emerald-200 text-emerald-900'
-                                    : 'bg-rose-50 border border-rose-200 text-rose-900'
-                            }`}>
-                                {debtActionMsg.type === 'success' ? (
-                                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                                ) : (
-                                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-                                )}
-                                <span>{debtActionMsg.text}</span>
-                            </div>
-                        )}
-
-                        {/* 3 Metric Cards */}
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                            <div className="bg-white p-5 rounded-2xl border border-surface-container shadow-xs">
-                                <span className="text-xs font-semibold text-on-surface-muted block">{t('Dư nợ tài khoản (BR-P08)')}</span>
-                                <span className="text-xl font-bold text-on-surface mt-1 block">
-                                    {formatCurrency(debtData.accountOverdueDebt)} {t('VNĐ')}
-                                </span>
-                                <span className="text-xs text-on-surface-muted mt-0.5 block">{t('Khoản nợ ghi nhận trên hồ sơ')}</span>
-                            </div>
-
-                            <div className="bg-white p-5 rounded-2xl border border-surface-container shadow-xs">
-                                <span className="text-xs font-semibold text-on-surface-muted block">{t('Đơn đang quá hạn')}</span>
-                                <span className={`text-xl font-bold mt-1 block ${
-                                    debtData.overdueBookings.length > 0 ? 'text-rose-600' : 'text-on-surface'
-                                }`}>
-                                    {debtData.overdueBookings.length} {t('đơn')}
-                                </span>
-                                <span className="text-xs text-on-surface-muted mt-0.5 block">{t('Tủ đang lưu quá giờ hẹn')}</span>
-                            </div>
-
-                            <div className="bg-white p-5 rounded-2xl border border-surface-container shadow-xs">
-                                <span className="text-xs font-semibold text-on-surface-muted block">{t('Đã thanh toán nợ quá hạn')}</span>
-                                <span className="text-xl font-bold text-emerald-600 mt-1 block">
-                                    {debtData.paymentHistory.length} {t('giao dịch')}
-                                </span>
-                                <span className="text-xs text-on-surface-muted mt-0.5 block">{t('Các khoản nợ đã hoàn tất')}</span>
-                            </div>
-                        </div>
-
-                        {/* Section 1: Active Overdue Bookings */}
-                        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-surface-container shadow-sm">
-                            <div className="flex items-center justify-between mb-6">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
-                                        <AlertTriangle className="w-5 h-5" />
-                                    </div>
-                                    <div>
-                                        <h2 className="text-base font-bold text-on-surface">
-                                            {t('Danh sách đơn đặt tủ đang quá hạn (')}{debtData.overdueBookings.length})
-                                        </h2>
-                                        <p className="text-sm text-on-surface-muted">
-                                            {t('Các đơn tủ quá hạn gửi đồ cần được thanh toán phụ phí trước khi lấy đồ hoặc đặt đơn mới')}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {debtData.overdueBookings.length === 0 ? (
-                                <div className="text-center py-12 px-4 bg-surface-bright rounded-2xl border border-dashed border-outline-soft">
-                                    <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto mb-2" />
-                                    <h4 className="text-sm font-bold text-on-surface">{t('Không có đơn nào bị quá hạn')}</h4>
-                                    <p className="text-sm text-on-surface-muted mt-1 max-w-md mx-auto">
-                                        {t('Tất cả các lượt gửi tủ của bạn đều đang trong khung giờ quy định hoặc đã được hoàn tất đúng hạn.')}
-                                    </p>
-                                </div>
-                            ) : (
-                                <div className="space-y-4">
-                                    {debtData.overdueBookings.map((b) => (
-                                        <div
-                                            key={b.bookingId}
-                                            className="p-5 rounded-2xl bg-white border border-rose-200 hover:border-rose-300 shadow-xs transition-all flex flex-col md:flex-row md:items-center justify-between gap-5"
-                                        >
-                                            <div className="space-y-2">
-                                                <div className="flex flex-wrap items-center gap-2">
-                                                    <span className="font-mono text-xs font-bold text-rose-700 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200">
-                                                        {b.bookingCode}
-                                                    </span>
-                                                    <span className="text-xs font-bold text-on-surface flex items-center gap-1">
-                                                        <Building className="w-3.5 h-3.5 text-on-surface-muted" />
-                                                        {b.stationName}
-                                                    </span>
-                                                    <span className="text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">
-                                                        {t('Tủ')} {b.lockerCode} ({b.lockerSize})
-                                                    </span>
-                                                </div>
-
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-xs text-on-surface-muted">
-                                                    <div>
-                                                        <span>{t('Bắt đầu quá hạn từ:')} </span>
-                                                        <strong className="text-rose-600">{formatDate(b.overdueSince)}</strong>
-                                                    </div>
-                                                    <div>
-                                                        <span>{t('Thời gian quá hạn:')} </span>
-                                                        <strong className="text-rose-600">{b.overdueHours} {t('giờ')}</strong>
-                                                    </div>
-                                                    <div>
-                                                        <span>{t('Đơn giá quá hạn:')} </span>
-                                                        <span className="font-semibold text-on-surface">{formatCurrency(b.overdueFeePerHour)}{t('đ/giờ')}</span>
-                                                    </div>
-                                                    <div>
-                                                        <span>{t('Địa chỉ trạm:')} </span>
-                                                        <span className="truncate">{b.stationAddress || t('Tại trạm')}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex sm:flex-col items-center sm:items-end justify-between gap-3 shrink-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-surface-container-low">
-                                                <div className="text-left sm:text-right">
-                                                    <span className="text-xs text-on-surface-muted uppercase font-bold block">{t('Phụ phí quá hạn')}</span>
-                                                    <span className="text-lg font-extrabold text-rose-600">
-                                                        {formatCurrency(b.estimatedOverdueFee)} {t('VNĐ')}
-                                                    </span>
-                                                </div>
-
-                                                <button
-                                                    onClick={() => handlePayOverdue(b.bookingId)}
-                                                    disabled={payingBookingId === b.bookingId}
-                                                    className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-rose-600/20 disabled:opacity-60 flex items-center gap-1.5 cursor-pointer shrink-0"
-                                                >
-                                                    <CreditCard className="w-3.5 h-3.5" />
-                                                    <span>{payingBookingId === b.bookingId ? t('Đang tạo link...') : t('Thanh toán ngay')}</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Section 2: Settlement History */}
-                        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-surface-container shadow-sm">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="w-9 h-9 rounded-xl bg-blue-50 text-primary flex items-center justify-center">
-                                    <Clock className="w-5 h-5" />
-                                </div>
-                                <div>
-                                    <h2 className="text-base font-bold text-on-surface">{t('Lịch sử thanh toán phụ phí quá hạn')}</h2>
-                                    <p className="text-sm text-on-surface-muted">{t('Các giao dịch thanh toán quá hạn đã được đối soát thành công qua PayOS')}</p>
-                                </div>
-                            </div>
-
-                            {debtData.paymentHistory.length === 0 ? (
-                                <div className="text-center py-8 text-xs text-on-surface-muted bg-surface-bright rounded-2xl border border-surface-container">
-                                    {t('Chưa có giao dịch thanh toán phụ phí quá hạn nào.')}
-                                </div>
-                            ) : (
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-left text-xs">
-                                        <thead>
-                                            <tr className="border-b border-surface-container text-on-surface-muted font-bold">
-                                                <th className="pb-3 px-3">{t('Mã đơn hàng')}</th>
-                                                <th className="pb-3 px-3">{t('Mã đơn đặt tủ')}</th>
-                                                <th className="pb-3 px-3">{t('Số tiền')}</th>
-                                                <th className="pb-3 px-3">{t('Cổng thanh toán')}</th>
-                                                <th className="pb-3 px-3">{t('Thời gian')}</th>
-                                                <th className="pb-3 px-3 text-right">{t('Trạng thái')}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-surface-container-low">
-                                            {debtData.paymentHistory.map((p) => (
-                                                <tr key={p.paymentId} className="hover:bg-surface-bright transition-colors">
-                                                    <td className="py-3 px-3 font-mono font-bold text-on-surface">
-                                                        {p.orderCode}
-                                                    </td>
-                                                    <td className="py-3 px-3 font-mono text-primary">
-                                                        {p.bookingCode}
-                                                    </td>
-                                                    <td className="py-3 px-3 font-bold text-rose-600">
-                                                        {formatCurrency(p.amount)} {t('VNĐ')}
-                                                    </td>
-                                                    <td className="py-3 px-3 text-on-surface-muted">
-                                                        {p.gateway}
-                                                    </td>
-                                                    <td className="py-3 px-3 text-on-surface-muted">
-                                                        {formatDate(p.paidAt)}
-                                                    </td>
-                                                    <td className="py-3 px-3 text-right">
-                                                        <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
-                                                            {t('Thành công')}
-                                                        </span>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                )}
             </main>
         </div>
     );

@@ -1159,5 +1159,7 @@ export const EN: Record<string, string> = {
   "Ảnh quá lớn. Vui lòng chọn ảnh dưới 2 MB.": "The photo is too large. Please choose a photo under 2 MB.",
   "Ảnh đại diện": "Profile photo",
   "Ủy quyền lấy đồ": "Delegate pickup",
+  "Xem và cập nhật thông tin hồ sơ, ảnh đại diện và bảo mật tài khoản": "View and update your profile details, avatar, and account security",
+  "Kiểm tra chi tiết các khoản phụ phí quá hạn, thanh toán trực tuyến và lịch sử đối soát": "Inspect overdue fee details, pay online, and review settlement history",
   "✓ ĐÃ KÝ SỐ MẬT MÃ HMAC · HOẠT ĐỘNG 100% NGOẠI TUYẾN": "✓ CRYPTOGRAPHICALLY SIGNED HMAC · WORKS 100% OFFLINE",
 };

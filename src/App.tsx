@@ -15,6 +15,7 @@ const BookingPaymentPage = lazy(() => import('./pages/BookingPaymentPage'));
 const BookingDetailPage = lazy(() => import('./pages/BookingDetailPage'));
 const MyBookingsPage = lazy(() => import('./pages/MyBookingsPage'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+const OverdueDebtPage = lazy(() => import('./pages/OverdueDebtPage'));
 const AdminLoginPage = lazy(() => import('./pages/admin/AdminLoginPage'));
 const AdminPortalPage = lazy(() => import('./pages/admin/AdminPortalPage'));
 const KioskPage = lazy(() => import('./pages/kiosk/KioskPage'));
@@ -46,6 +47,7 @@ type Page =
     | 'booking-detail'
     | 'my-bookings'
     | 'profile'
+    | 'overdue-debt'
     | 'admin-login'
     | 'admin'
     | 'kiosk'
@@ -90,6 +92,7 @@ const pathToPage = (pathname: string): Page => {
         case 'booking-detail': return 'booking-detail';
         case 'my-bookings': return 'my-bookings';
         case 'profile': return 'profile';
+        case 'overdue-debt': return 'overdue-debt';
         case 'kiosk': return 'kiosk';
         case 'walk-in': return 'walk-in';
         case 'tablet': return 'walk-in';
@@ -139,12 +142,15 @@ function App() {
 
     // Xác định trang khởi tạo trực tiếp từ URL trên thanh địa chỉ trình duyệt
     const getInitialPage = (): Page => {
-        const pageFromUrl = pathToPage(window.location.pathname);
+        const rawPage = pathToPage(window.location.pathname);
+        const pageFromUrl: Page = rawPage === 'profile' && new URLSearchParams(window.location.search).get('tab') === 'debt'
+            ? 'overdue-debt'
+            : rawPage;
         const userRole = getUserRole(savedUser);
         const isAdminOrStaff = userRole === 'admin' || userRole === 'staff';
 
         if (pageFromUrl !== 'home') {
-            if (['dashboard', 'my-bookings', 'profile'].includes(pageFromUrl) && !savedUser) {
+            if (['dashboard', 'my-bookings', 'profile', 'overdue-debt'].includes(pageFromUrl) && !savedUser) {
                 return 'login';
             }
             // Nếu người dùng có quyền Admin hoặc Staff truy cập /dashboard, ưu tiên chuyển về Admin Portal
@@ -337,7 +343,13 @@ function App() {
                 <ProfilePage
                     onLogout={handleLogout}
                     onNavigate={(mode, data) => navigateTo(mode as Page, data)}
-                    initialTab={pageData.tab || 'info'}
+                />
+            )}
+
+            {currentPage === 'overdue-debt' && (
+                <OverdueDebtPage
+                    onLogout={handleLogout}
+                    onNavigate={(mode, data) => navigateTo(mode as Page, data)}
                 />
             )}
 
