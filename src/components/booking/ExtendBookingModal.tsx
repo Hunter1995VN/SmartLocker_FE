@@ -36,6 +36,8 @@ interface ExtendBookingModalProps {
   hourlyRate?: number;
   maxHours?: number;
   overdueFee?: number;
+  initialHours?: number;
+  autoCreatePayment?: boolean;
   onExtended?: () => Promise<void> | void;
   onSuccess?: (addedHours: number, amount: number) => Promise<void> | void;
 }
@@ -54,12 +56,14 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
   hourlyRate,
   maxHours = 72,
   overdueFee = 0,
+  initialHours = 3,
+  autoCreatePayment = false,
   onExtended,
   onSuccess
 }) => {
-    const t = useT();
-  const [selectedHours, setSelectedHours] = useState<number>(3);
-  const [customHoursInput, setCustomHoursInput] = useState<string>('3');
+  const t = useT();
+  const [selectedHours, setSelectedHours] = useState<number>(initialHours);
+  const [customHoursInput, setCustomHoursInput] = useState<string>(String(initialHours));
   const [isCustom, setIsCustom] = useState<boolean>(false);
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -72,18 +76,58 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [statusNote, setStatusNote] = useState<string | null>(null);
 
-  // Reset modal state when opened/closed
+  // Compute current end Date object from real booking.endAt
+  const baseEndDate = currentEndAt ? new Date(currentEndAt) : new Date();
+  const baseStartDate = startAt ? new Date(startAt) : baseEndDate;
+  const currentTotalHours = Math.max(
+    1,
+    Math.round(((baseEndDate.getTime() - baseStartDate.getTime()) / 3600000) * 10) / 10
+  );
+  const maxAdditionalHours = Math.max(1, Math.floor(maxHours - currentTotalHours));
+
+  // Reset modal state when opened/closed (and auto-initiate PayOS if requested by Smart Alert)
   useEffect(() => {
-    if (isOpen) {
-      setSelectedHours(3);
-      setCustomHoursInput('3');
-      setIsCustom(false);
-      setErrorMsg(null);
-      setPaymentData(null);
-      setIsPaidSuccess(false);
-      setStatusNote(null);
+    if (!isOpen) return;
+
+    let cancelled = false;
+    const clampedHours = Math.max(1, Math.min(maxAdditionalHours, initialHours || 3));
+    setSelectedHours(clampedHours);
+    setCustomHoursInput(String(clampedHours));
+    setIsCustom(![1, 3, 6, 12].includes(clampedHours));
+    setErrorMsg(null);
+    setPaymentData(null);
+    setIsPaidSuccess(false);
+    setStatusNote(null);
+
+    if (autoCreatePayment && bookingId) {
+      setIsSubmitting(true);
+      const targetNewEndIso = new Date(baseEndDate.getTime() + clampedHours * 3600000).toISOString();
+      extendBooking(bookingId, { newEndAt: targetNewEndIso })
+        .then((res) => {
+          if (cancelled) return;
+          if (res.success && res.data) {
+            setPaymentData(res.data);
+          } else {
+            setErrorMsg(res.message || 'Không thể khởi tạo giao dịch gia hạn. Vui lòng thử lại.');
+          }
+        })
+        .catch((err: any) => {
+          if (cancelled) return;
+          setErrorMsg(
+            err.response?.data?.message ||
+              err.message ||
+              'Lỗi kết nối khi tạo yêu cầu gia hạn.'
+          );
+        })
+        .finally(() => {
+          if (!cancelled) setIsSubmitting(false);
+        });
     }
-  }, [isOpen, bookingId]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, bookingId, initialHours, autoCreatePayment]);
 
   // Compute real base hourly rate (from PricingPolicy in DB, or default by size)
   const effectiveHourlyRate =
@@ -94,15 +138,6 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
         : size === 'L'
           ? 20000
           : 15000;
-
-  // Compute current end Date object from real booking.endAt
-  const baseEndDate = currentEndAt ? new Date(currentEndAt) : new Date();
-  const baseStartDate = startAt ? new Date(startAt) : baseEndDate;
-  const currentTotalHours = Math.max(
-    1,
-    Math.round(((baseEndDate.getTime() - baseStartDate.getTime()) / 3600000) * 10) / 10
-  );
-  const maxAdditionalHours = Math.max(1, Math.floor(maxHours - currentTotalHours));
 
   const formatDateTime = (d: Date) => {
     const now = new Date();
@@ -444,6 +479,16 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
                   {statusNote}
                 </div>
               )}
+            </div>
+          ) : autoCreatePayment && isSubmitting ? (
+            <div className="py-10 text-center space-y-3">
+              <Loader2 className="w-10 h-10 text-blue-600 animate-spin mx-auto" />
+              <p className="text-sm font-bold text-slate-900">
+                Đang khởi tạo mã VietQR PayOS (+{selectedHours} giờ)...
+              </p>
+              <p className="text-xs text-slate-500">
+                Gia hạn 1 chạm từ cảnh báo thông minh để tránh phí phạt quá hạn.
+              </p>
             </div>
           ) : (
             /* STATE C: STEP 1 — SELECT EXTENSION HOURS & REAL COST BREAKDOWN */

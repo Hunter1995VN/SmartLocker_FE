@@ -4,6 +4,7 @@ import {
 } from 'lucide-react';
 import type { Station } from '../../api/stationService';
 import { useT } from '../../i18n';
+import { buildGoogleMapsDirectionsUrl, estimateTravelTime } from '../../utils/kioskNavigation';
 
 interface InteractiveStationMapProps {
     stations: Station[];
@@ -544,14 +545,27 @@ export default function InteractiveStationMap({
                             {t('Xem thông tin trạm')}
                         </button>
                         <a
-                            href={`https://www.google.com/maps/dir/?api=1&origin=${userLocation ? `${userLocation.lat},${userLocation.lng}` : ''}&destination=${selectedStation.latitude},${selectedStation.longitude}`}
+                            href={buildGoogleMapsDirectionsUrl({
+                                userLat: userLocation?.lat,
+                                userLng: userLocation?.lng,
+                                stationLat: Number(selectedStation.latitude),
+                                stationLng: Number(selectedStation.longitude),
+                                stationName: selectedStation.name,
+                                stationAddress: selectedStation.address,
+                                travelMode: (selectedStation.distanceKm ?? 2) <= 0.8 ? 'walking' : 'driving',
+                            })}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-on-surface text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1"
                             title={t('Mở Google Maps dẫn đường từ vị trí của bạn')}
                         >
                             <ExternalLink className="w-3.5 h-3.5 text-primary-container" />
-                            {t('Chỉ đường')}
+                            <span>{t('Chỉ đường đến Kiosk')}</span>
+                            {selectedStation.distanceKm != null && (() => {
+                                const eta = estimateTravelTime(selectedStation.distanceKm);
+                                const m = eta.recommendedMode === 'walking' ? eta.walkingMinutes : eta.drivingMinutes;
+                                return <span className="text-[10px] text-primary-container">(~{m}p)</span>;
+                            })()}
                         </a>
                         {selectedStation.status === 'ACTIVE' && (
                             <button

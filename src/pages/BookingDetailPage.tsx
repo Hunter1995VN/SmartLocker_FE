@@ -21,12 +21,15 @@ import {
   QrCode,
   AlertTriangle,
   Clock,
-  WifiOff
+  WifiOff,
+  ExternalLink
 } from 'lucide-react';
 import { ExtendBookingModal } from '../components/booking/ExtendBookingModal';
 import { OfflineTicketModal } from '../components/booking/OfflineTicketModal';
-import { getBookingById, extendBooking, getOfflineTicket, upgradeOnlineTicket, type BookingDto, type OfflineTicketDto } from '../api/bookingService';
+import { SmartKioskNavigationCard } from '../components/booking/SmartKioskNavigationCard';
+import { getBookingById, getOfflineTicket, upgradeOnlineTicket, type BookingDto, type OfflineTicketDto } from '../api/bookingService';
 import { offlineTicketStore } from '../utils/offlineTicketStore';
+import { buildGoogleMapsDirectionsUrl } from '../utils/kioskNavigation';
 import { QRCodeSVG } from 'qrcode.react';
 import CustomerHeader from '../components/layout/CustomerHeader';
 import { useT } from '../i18n';
@@ -213,6 +216,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
       return {
         isHoldPeriod: true,
         remainingText: holdRemaining > 0 ? `${minutes}m ${seconds}s remaining` : 'Hold expired',
+        remainingMinutes: Math.max(0, Math.round(holdRemaining / 60000)),
         progress: holdProgress,
         startedText: 'Booking confirmed',
         expiresText: `Hold until ${holdExpiresText}`,
@@ -230,7 +234,7 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
     const expiresText = new Date(endTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date(endTime).toLocaleDateString('vi-VN');
 
     if (now >= endTime) {
-      return { isHoldPeriod: false, remainingText: '0m remaining (Overdue)', progress: 100, startedText, expiresText };
+      return { isHoldPeriod: false, remainingText: '0m remaining (Overdue)', remainingMinutes: 0, progress: 100, startedText, expiresText };
     }
 
     const total = Math.max(1, endTime - startTime);
@@ -244,13 +248,14 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
     return {
       isHoldPeriod: false,
       remainingText: `${hours}h ${minutes}m remaining`,
+      remainingMinutes: Math.max(0, Math.ceil(remaining / 60000)),
       progress,
       startedText,
       expiresText
     };
   };
 
-  const { isHoldPeriod, remainingText, progress, startedText, expiresText } = calculateTimeInfo();
+  const { isHoldPeriod, remainingText, remainingMinutes, progress, startedText, expiresText } = calculateTimeInfo();
 
   // UC-T09: Dynamic QR token expiry countdown (xoay vòng mã mỗi 60s)
   let tokenSeconds = 0;
@@ -278,9 +283,27 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
     } catch { setCopied(false); setCopyFailed(true); }
   };
 
-  // Extend Modal state (UC-T07 preview)
+  // Extend Modal state (UC-T07 / UC-T14)
   const [showExtendModal, setShowExtendModal] = useState<boolean>(false);
+  const [quickExtendHours, setQuickExtendHours] = useState<number>(3);
+  const [autoStartExtendPayment, setAutoStartExtendPayment] = useState<boolean>(false);
   const [extendSuccessToast, setExtendSuccessToast] = useState<string | null>(null);
+  const [userGps, setUserGps] = useState<{ lat: number; lng: number } | null>(null);
+
+  useEffect(() => {
+    if (typeof navigator === 'undefined' || !navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => setUserGps({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => {},
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
+    );
+  }, []);
+
+  const handleOpenExtendModal = (hours = 3, autoPay = false) => {
+    setQuickExtendHours(hours);
+    setAutoStartExtendPayment(autoPay);
+    setShowExtendModal(true);
+  };
 
   if (isLoading) {
     return (
@@ -629,20 +652,31 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
               {/* Section 5: Quick Action Hub */}
               <div className="mt-6 pt-5 border-t border-outline-variant/20 grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <button
-                  onClick={() => setShowExtendModal(true)}
+                  onClick={() => handleOpenExtendModal(3, false)}
                   disabled={booking?.canExtend === false}
                   className={`h-11 px-3 bg-white border border-primary/40 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors shadow-xs ${booking?.canExtend === false ? 'opacity-50 cursor-not-allowed text-gray-500 border-gray-300' : 'hover:bg-surface-container-low text-primary cursor-pointer'}`}
                 >
                   <PlusCircle className="w-4 h-4" />
                   <span>{t('Gia hạn thời gian')}</span>
                 </button>
-                <button
-                  onClick={() => onNavigate('find-station', { stationId: booking?.stationId })}
-                  className="h-11 px-3 bg-white hover:bg-surface-container-low border border-outline-variant rounded-xl text-xs text-on-surface font-medium flex items-center justify-center gap-1.5 transition-colors shadow-xs cursor-pointer"
+                <a
+                  href={buildGoogleMapsDirectionsUrl({
+                    userLat: userGps?.lat,
+                    userLng: userGps?.lng,
+                    stationLat: booking.stationLatitude,
+                    stationLng: booking.stationLongitude,
+                    stationName,
+                    stationAddress,
+                    travelMode: 'driving',
+                  })}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="h-11 px-3 bg-white hover:bg-surface-container-low border border-outline-variant rounded-xl text-xs text-on-surface font-semibold flex items-center justify-center gap-1.5 transition-colors shadow-xs cursor-pointer"
                 >
                   <Navigation className="w-4 h-4 text-primary" />
-                  <span>{t('Đường đến kiosk')}</span>
-                </button>
+                  <span>{t('Chỉ đường đến Kiosk')}</span>
+                  <ExternalLink className="w-3 h-3 text-secondary" />
+                </a>
                 <a
                   href="#support" onClick={(e) => { e.preventDefault(); openSupport(); }}
                   className="h-11 px-3 bg-white hover:bg-surface-container-low border border-outline-variant rounded-xl text-xs text-on-surface font-medium flex items-center justify-center gap-1.5 transition-colors shadow-xs"
@@ -654,12 +688,26 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
             </div>
           </div>
 
-          {/* SECONDARY COLUMN: PHYSICAL SCHEMATIC & BOOKING DETAILS (5 Cols Desktop) */}
+          {/* SECONDARY COLUMN: SMART NAVIGATION & BOOKING DETAILS (5 Cols Desktop) */}
           <div className="lg:col-span-5 space-y-6">
-            <div className="bg-white rounded-2xl border p-5 space-y-2">
-              <h3 className="font-bold">{stationName}</h3><p className="text-sm">{stationAddress}</p>
-              <button className="text-primary" onClick={() => onNavigate('find-station', { stationId: booking?.stationId })}>{t('Xem bản đồ trạm')}</button>
-            </div>
+            <SmartKioskNavigationCard
+              bookingId={booking.id}
+              bookingCode={booking.bookingCode}
+              stationId={booking.stationId}
+              stationName={stationName}
+              stationAddress={stationAddress}
+              stationLat={booking.stationLatitude}
+              stationLng={booking.stationLongitude}
+              status={booking.status}
+              remainingMinutes={remainingMinutes}
+              isOverdue={booking.isOverdue}
+              canExtend={booking.canExtend}
+              size={booking.size}
+              hourlyRate={booking.hourlyRate}
+              overdueFeePerHour={booking.overdueFeePerHour}
+              onQuickExtend={(hours, autoPay) => handleOpenExtendModal(hours, autoPay)}
+              onOpenMap={() => onNavigate('find-station', { stationId: booking?.stationId })}
+            />
 
             {/* Locker Compartment Schematic Matrix */}
             <div className="bg-white rounded-2xl border border-outline-variant/40 shadow-sm p-5 space-y-4">
@@ -733,35 +781,32 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
         {booking && <LostItemPanel bookingId={booking.id} status={booking.status} checkedOutAt={booking.checkedOutAt} />}
       <ExtendBookingModal
         isOpen={showExtendModal}
-        onClose={() => setShowExtendModal(false)}
-        onSuccess={async (addedHours, _fee) => {
-          if (!bookingId) {
-            setShowExtendModal(false);
-            return;
-          }
-          try {
-            const currentEnd = booking?.endAt ? new Date(parseServerTime(booking.endAt)) : new Date();
-            const newEndAt = new Date(currentEnd.getTime() + addedHours * 3600000).toISOString();
-            const res = await extendBooking(bookingId, { newEndAt });
-            if (res.success && res.data?.paymentUrl) {
-              window.open(res.data.paymentUrl, '_blank');
-              setExtendSuccessToast(`Đang chuyển hướng thanh toán gia hạn +${addedHours} giờ...`);
-            } else {
-              setExtendSuccessToast(res.message || t('Gia hạn thành công.'));
-            }
-            setShowExtendModal(false);
-            const refreshRes = await getBookingById(bookingId);
-            if (refreshRes.success && refreshRes.data) setBooking(refreshRes.data);
-            setTimeout(() => {
-              setExtendSuccessToast(null);
-            }, 4000);
-          } catch {
-            setExtendSuccessToast(t('Có lỗi xảy ra khi gia hạn đơn hàng.'));
-          }
+        onClose={() => {
+          setShowExtendModal(false);
+          setAutoStartExtendPayment(false);
         }}
+        bookingId={booking.id}
+        bookingCode={booking.bookingCode}
         lockerCode={bayCode}
+        size={booking.size}
         stationName={stationName}
+        startAt={booking.startAt}
+        currentEndAt={booking.endAt}
         currentEndTime={expiresText}
+        hourlyRate={booking.hourlyRate}
+        maxHours={booking.maxHours}
+        overdueFee={booking.currentOverdueFee}
+        initialHours={quickExtendHours}
+        autoCreatePayment={autoStartExtendPayment}
+        onExtended={async () => {
+          if (!bookingId) return;
+          const refreshRes = await getBookingById(bookingId);
+          if (refreshRes.success && refreshRes.data) setBooking(refreshRes.data);
+          setExtendSuccessToast('Gia hạn thời gian lưu trữ thành công!');
+          setTimeout(() => {
+            setExtendSuccessToast(null);
+          }, 4000);
+        }}
       />
 
       {/* EXTEND SUCCESS TOAST */}

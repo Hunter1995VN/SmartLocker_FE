@@ -1,14 +1,22 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
-    Search, MapPin, Navigation,
+    Search, MapPin, Navigation, Zap,
     Shield, Clock, RefreshCw, ChevronRight,
-    ArrowRight, Phone, Package, ReceiptText, Lock, Star, Calendar,
+    ArrowRight, Phone, Package, ReceiptText, Lock, Star, Calendar, ExternalLink, AlertTriangle,
 } from 'lucide-react';
 import { getStations, calcDistance } from '../api/stationService';
 import type { Station } from '../api/stationService';
 import { getMyBookings } from '../api/bookingService';
 import type { BookingListItemDto } from '../api/bookingService';
 import { getApiErrorMessage, resolveAssetUrl } from '../api/client';
+import { ExtendBookingModal } from '../components/booking/ExtendBookingModal';
+import {
+    buildGoogleMapsDirectionsUrl,
+    calcDistanceKm,
+    estimateTravelTime,
+    evaluateSmartExtensionAlert,
+    sendSmartExpiryBrowserNotification,
+} from '../utils/kioskNavigation';
 import CustomerHeader from '../components/layout/CustomerHeader';
 import { CONTACT, openLegal, openSupport } from '../utils/contact';
 import { parseServerTime } from '../utils/serverTime';
@@ -101,6 +109,9 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
     const { lang } = useLanguage();
     const [user, setUser] = useState<AuthUser>(readUser);
     const isAdminOrStaff = (user?.role || '').toLowerCase() === 'admin' || (user?.role || '').toLowerCase() === 'staff';
+    const [showExtendModal, setShowExtendModal] = useState(false);
+    const [autoExtendPayOS, setAutoExtendPayOS] = useState(false);
+    const [extendHours, setExtendHours] = useState(1);
 
     const [bookings, setBookings] = useState<BookingListItemDto[]>([]);
     const [totalBookings, setTotalBookings] = useState(0);
@@ -222,6 +233,47 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
 
     const activeStation = stationsWithDistance.find((s) => s.id === activeBooking?.stationId);
 
+    // Compute live distance, ETA & smart alert for activeBooking
+    const activeStationLat = activeBooking?.stationLatitude ?? (activeStation ? Number(activeStation.latitude) : undefined);
+    const activeStationLng = activeBooking?.stationLongitude ?? (activeStation ? Number(activeStation.longitude) : undefined);
+    const activeDistanceKm =
+        activeBooking && userLoc && activeStationLat != null && activeStationLng != null
+            ? calcDistanceKm(userLoc.lat, userLoc.lng, activeStationLat, activeStationLng)
+            : null;
+    const activeTravel = activeDistanceKm != null ? estimateTravelTime(activeDistanceKm) : null;
+    const activeRemainingMinutes = activeBooking
+        ? Math.max(0, Math.round((new Date(parseServerTime(activeBooking.endAt)).getTime() - now) / 60000))
+        : 0;
+    const activeSmartAlert =
+        activeBooking && activeDistanceKm != null
+            ? evaluateSmartExtensionAlert({
+                remainingMinutes: activeRemainingMinutes,
+                distanceKm: activeDistanceKm,
+                status: activeBooking.status,
+                isOverdue: activeBooking.isOverdue,
+                canExtend: activeBooking.canExtend ?? activeBooking.status === 'STORED',
+                size: activeBooking.size,
+                hourlyRate: activeBooking.hourlyRate,
+                overdueFeePerHour: activeBooking.overdueFeePerHour,
+            })
+            : null;
+
+    useEffect(() => {
+        if (activeBooking && activeSmartAlert?.shouldAlert) {
+            void sendSmartExpiryBrowserNotification(
+                activeBooking.id,
+                activeBooking.stationName,
+                activeSmartAlert.message,
+                () => {
+                    setExtendHours(activeSmartAlert.recommendedHours);
+                    setAutoExtendPayOS(true);
+                    setShowExtendModal(true);
+                },
+                false
+            );
+        }
+    }, [activeBooking?.id, activeSmartAlert?.shouldAlert]);
+
     const handleLogout = () => {
         localStorage.clear();
         onLogout();
@@ -230,14 +282,6 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
     const goDetail = (id: string) => onNavigate?.('booking-detail', { bookingId: id });
     const goMap = () => { if (onNavigateToMap) onNavigateToMap(); else onNavigate?.('find-station'); };
     const goBook = (stationId: string) => onNavigate?.('station-booking', { stationId });
-
-    const openDirections = (station?: Station) => {
-        if (!station) return;
-        window.open(
-            `https://www.google.com/maps/dir/?api=1&destination=${Number(station.latitude)},${Number(station.longitude)}`,
-            '_blank', 'noopener,noreferrer',
-        );
-    };
 
     const locationText = (() => {
         if (locState === 'locating') return t('Đang xác định vị trí...');
@@ -379,7 +423,14 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                             <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-stretch">
                                                 <div className="md:col-span-7 flex flex-col justify-between gap-3 bg-surface-container-low p-4 rounded-xl">
                                                     <div className="flex flex-col gap-1">
-                                                        <h3 className="text-[22px] font-bold leading-7 text-on-surface">{activeBooking.stationName}</h3>
+                                                        <div className="flex items-center justify-between gap-2 flex-wrap">
+                                                            <h3 className="text-[22px] font-bold leading-7 text-on-surface">{activeBooking.stationName}</h3>
+                                                            {activeDistanceKm != null && activeTravel && (
+                                                                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-white text-primary border border-blue-200">
+                                                                    {formatDistance(activeDistanceKm)} · ~{activeTravel.recommendedMode === 'walking' ? activeTravel.walkingMinutes : activeTravel.drivingMinutes}p
+                                                                </span>
+                                                            )}
+                                                        </div>
                                                         {activeBooking.stationAddress && (
                                                             <p className="text-sm text-on-surface-variant flex items-start gap-1">
                                                                 <Navigation className="w-4 h-4 text-on-surface-muted shrink-0 mt-0.5" />
@@ -420,9 +471,35 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                                 </div>
                                             </div>
 
-                                            <div className="grid grid-cols-2 gap-2 p-3 bg-surface-bright rounded-xl text-center">
+                                            {/* Smart Distance & ETA Alert Banner */}
+                                            {activeSmartAlert?.shouldAlert && (
+                                                <div className="p-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                                    <div className="flex items-start gap-2.5">
+                                                        <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                                                        <div>
+                                                            <p className="text-xs font-extrabold text-amber-950">{activeSmartAlert.title}</p>
+                                                            <p className="text-xs text-amber-900 mt-0.5 leading-relaxed">{activeSmartAlert.message}</p>
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setExtendHours(activeSmartAlert.recommendedHours);
+                                                            setAutoExtendPayOS(true);
+                                                            setShowExtendModal(true);
+                                                        }}
+                                                        className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-extrabold flex items-center justify-center gap-1.5 shrink-0 shadow-xs cursor-pointer"
+                                                    >
+                                                        <Zap className="w-4 h-4" />
+                                                        <span>Gia hạn +{activeSmartAlert.recommendedHours}h ngay (PayOS)</span>
+                                                    </button>
+                                                </div>
+                                            )}
+
+                                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 p-3 bg-surface-bright rounded-xl text-center">
                                                 <InfoCell label={t('Thời lượng')} value={activeBooking.durationHours ? t('{n} giờ', { n: activeBooking.durationHours }) : '—'} />
                                                 <InfoCell label={t('Đã thanh toán')} value={`${activeBooking.baseAmount.toLocaleString('vi-VN')}đ`} />
+                                                <InfoCell label={t('Khoảng cách & ETA')} value={activeDistanceKm != null && activeTravel ? `${formatDistance(activeDistanceKm)} (~${activeTravel.drivingMinutes}p)` : '—'} />
                                             </div>
 
                                             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
@@ -438,23 +515,35 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                                     {activeBooking.canExtend && (
                                                         <button
                                                             type="button"
-                                                            onClick={() => goDetail(activeBooking.id)}
+                                                            onClick={() => {
+                                                                setExtendHours(1);
+                                                                setAutoExtendPayOS(false);
+                                                                setShowExtendModal(true);
+                                                            }}
                                                             className="flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-4 py-3 min-h-11 rounded-xl bg-white border border-outline-soft text-on-surface text-sm font-semibold hover:bg-surface-bright transition-colors cursor-pointer"
                                                         >
                                                             <Clock className="w-4 h-4 text-primary-container" />
                                                             {t('Gia hạn')}
                                                         </button>
                                                     )}
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => openDirections(activeStation)}
-                                                        disabled={!activeStation}
-                                                        title={activeStation ? t('Mở Google Maps chỉ đường tới trạm') : t('Chưa có tọa độ trạm')}
-                                                        className="flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-4 py-3 min-h-11 rounded-xl bg-white border border-outline-soft text-on-surface text-sm font-semibold hover:bg-surface-bright transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    <a
+                                                        href={buildGoogleMapsDirectionsUrl({
+                                                            userLat: userLoc?.lat,
+                                                            userLng: userLoc?.lng,
+                                                            stationLat: activeStationLat,
+                                                            stationLng: activeStationLng,
+                                                            stationName: activeBooking.stationName,
+                                                            stationAddress: activeBooking.stationAddress,
+                                                            travelMode: activeTravel?.recommendedMode ?? 'driving',
+                                                        })}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-4 py-3 min-h-11 rounded-xl bg-white border border-outline-soft text-on-surface text-sm font-semibold hover:bg-surface-bright transition-colors cursor-pointer"
                                                     >
                                                         <Navigation className="w-4 h-4 text-tertiary-container" />
-                                                        {t('Chỉ đường')}
-                                                    </button>
+                                                        <span>{t('Chỉ đường đến Kiosk')}</span>
+                                                        <ExternalLink className="w-3.5 h-3.5 text-on-surface-muted" />
+                                                    </a>
                                                 </div>
                                                 <button type="button" onClick={openSupport} className="text-sm text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center gap-1 py-2 cursor-pointer">
                                                     <Phone className="w-4 h-4" />
@@ -628,6 +717,31 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                     </div>
                 </footer>
             </main>
+            {activeBooking && (
+                <ExtendBookingModal
+                    isOpen={showExtendModal}
+                    onClose={() => {
+                        setShowExtendModal(false);
+                        setAutoExtendPayOS(false);
+                    }}
+                    bookingId={activeBooking.id}
+                    bookingCode={activeBooking.bookingCode}
+                    lockerCode={activeBooking.lockerCode || `Size ${activeBooking.size}`}
+                    size={activeBooking.size}
+                    stationName={activeBooking.stationName}
+                    startAt={activeBooking.startAt}
+                    currentEndAt={activeBooking.endAt}
+                    currentEndTime={new Date(activeBooking.endAt).toLocaleString('vi-VN')}
+                    hourlyRate={activeBooking.hourlyRate}
+                    maxHours={activeBooking.maxHours}
+                    overdueFee={activeBooking.currentOverdueFee}
+                    initialHours={extendHours}
+                    autoCreatePayment={autoExtendPayOS}
+                    onExtended={async () => {
+                        loadData();
+                    }}
+                />
+            )}
         </div>
     );
 }
