@@ -96,6 +96,8 @@ export interface BookingDto {
   stationId: string;
   stationName: string;
   stationAddress: string;
+  stationLatitude?: number;
+  stationLongitude?: number;
   lockerCode?: string;
   size: string;
   status: string;
@@ -134,8 +136,11 @@ export interface BookingDto {
 export interface BookingListItemDto {
   id: string;
   bookingCode: string;
+  stationId?: string;
   stationName: string;
   stationAddress?: string;
+  stationLatitude?: number;
+  stationLongitude?: number;
   lockerCode?: string;
   accessCode?: string;
   offlineHmacToken?: string;

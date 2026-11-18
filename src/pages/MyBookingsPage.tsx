@@ -16,13 +16,23 @@ import {
   LockOpen,
   Ban,
   CheckCircle,
-  WifiOff
+  WifiOff,
+  ExternalLink,
+  Zap
 } from 'lucide-react';
 import { ExtendBookingModal } from '../components/booking/ExtendBookingModal';
 import { CancelBookingModal } from '../components/booking/CancelBookingModal';
 import { OfflineTicketModal } from '../components/booking/OfflineTicketModal';
-import { getMyBookings, extendBooking, cancelBooking, payOverdueFee, getOfflineTicket, type BookingListItemDto, type OfflineTicketDto } from '../api/bookingService';
+import { getMyBookings, cancelBooking, payOverdueFee, getOfflineTicket, type BookingListItemDto, type OfflineTicketDto } from '../api/bookingService';
 import { offlineTicketStore } from '../utils/offlineTicketStore';
+import {
+  buildGoogleMapsDirectionsUrl,
+  calcDistanceKm,
+  estimateTravelTime,
+  evaluateSmartExtensionAlert,
+  formatDistance,
+  sendSmartExpiryBrowserNotification,
+} from '../utils/kioskNavigation';
 import CustomerHeader from '../components/layout/CustomerHeader';
 
 interface MyBookingsPageProps {
@@ -41,8 +51,11 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
   // Modals state
   const [showOverdueModal, setShowOverdueModal] = useState<boolean>(false);
   const [showExtendModal, setShowExtendModal] = useState<boolean>(false);
+  const [quickExtendHours, setQuickExtendHours] = useState<number>(3);
+  const [autoStartExtendPayment, setAutoStartExtendPayment] = useState<boolean>(false);
   const [showCancelModal, setShowCancelModal] = useState<boolean>(false);
   const [cancelledDetailBooking, setCancelledDetailBooking] = useState<BookingListItemDto | null>(null);
+  const [userGps, setUserGps] = useState<{ lat: number; lng: number } | null>(null);
 
   // Offline Ticket Modal state
   const [isOfflineModalOpen, setIsOfflineModalOpen] = useState<boolean>(false);
@@ -100,6 +113,54 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
     fetchBookings();
   }, []);
 
+  useEffect(() => {
+    if (typeof navigator === 'undefined' || !navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => setUserGps({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => {},
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
+    );
+  }, []);
+
+  const openQuickExtend = (booking: BookingListItemDto, hours = 3, autoPay = false) => {
+    setSelectedBooking(booking);
+    setQuickExtendHours(hours);
+    setAutoStartExtendPayment(autoPay);
+    setShowExtendModal(true);
+  };
+
+  // Evaluate smart distance-aware extension alerts & push browser notifications
+  const smartAlerts = activeBookings
+    .filter((b) => b.status === 'STORED' && !b.isOverdue && userGps && b.stationLatitude != null && b.stationLongitude != null)
+    .map((b) => {
+      const distKm = calcDistanceKm(userGps!.lat, userGps!.lng, b.stationLatitude!, b.stationLongitude!);
+      const remainingMinutes = Math.max(0, Math.round((new Date(b.endAt).getTime() - Date.now()) / 60000));
+      const alert = evaluateSmartExtensionAlert({
+        remainingMinutes,
+        distanceKm: distKm,
+        status: b.status,
+        isOverdue: b.isOverdue,
+        canExtend: b.canExtend ?? true,
+        size: b.size,
+        hourlyRate: b.hourlyRate,
+        overdueFeePerHour: b.overdueFeePerHour,
+      });
+      return { booking: b, alert };
+    })
+    .filter((x) => x.alert.shouldAlert);
+
+  useEffect(() => {
+    smartAlerts.forEach(({ booking, alert }) => {
+      void sendSmartExpiryBrowserNotification(
+        booking.id,
+        booking.stationName,
+        alert.message,
+        () => openQuickExtend(booking, alert.recommendedHours, true),
+        false
+      );
+    });
+  }, [activeBookings.length, userGps?.lat, userGps?.lng]);
+
   // Filter history
   const filteredHistory = historyBookings.filter(item =>
     item.stationName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -143,6 +204,52 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
 
         {/* NOTICES & ALERTS SECTION */}
         <div className="space-y-3">
+          {/* Smart Distance & ETA Alert + 1-Tap PayOS Upsell */}
+          {smartAlerts.map(({ booking: b, alert }) => (
+            <div key={`smart-eta-${b.id}`} className="p-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-xs animate-fade-in-up">
+              <div className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 mt-0.5">
+                  <AlertTriangle className="w-5 h-5" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-amber-950 font-extrabold">
+                    {alert.title} · Đơn #{b.bookingCode}
+                  </p>
+                  <p className="text-xs text-amber-900 leading-relaxed">{alert.message}</p>
+                  <p className="text-[11px] text-amber-800 font-semibold">
+                    Gia hạn +{alert.recommendedHours}h chỉ {formatCurrency(alert.extensionFee)}đ · Tránh phí quá hạn {formatCurrency(alert.effectiveOverdueFee)}đ/h
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0 self-end md:self-center">
+                <button
+                  onClick={() => openQuickExtend(b, alert.recommendedHours, true)}
+                  className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-extrabold rounded-xl transition-colors shadow-xs cursor-pointer active:scale-95 inline-flex items-center gap-1.5"
+                >
+                  <Zap className="w-3.5 h-3.5" />
+                  <span>Gia hạn +{alert.recommendedHours}h ngay (PayOS)</span>
+                </button>
+                <a
+                  href={buildGoogleMapsDirectionsUrl({
+                    userLat: userGps?.lat,
+                    userLng: userGps?.lng,
+                    stationLat: b.stationLatitude,
+                    stationLng: b.stationLongitude,
+                    stationName: b.stationName,
+                    stationAddress: b.stationAddress,
+                    travelMode: 'driving',
+                  })}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-2 bg-white hover:bg-amber-100/70 border border-amber-300 text-amber-950 text-xs font-bold rounded-xl transition-colors inline-flex items-center gap-1"
+                >
+                  <Navigation className="w-3.5 h-3.5" />
+                  <span>Chỉ đường</span>
+                </a>
+              </div>
+            </div>
+          ))}
+
           {activeBookings.filter(b => b.status === 'STORED' && !b.isOverdue).map((b) => (
              <div key={`notice-${b.id}`} className="p-4 rounded-xl bg-amber-50/90 border border-amber-200/80 flex items-start gap-3.5 shadow-xs">
                <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 shrink-0" />
@@ -284,6 +391,18 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                         <div className="space-y-1">
                           <h4 className="text-sm text-slate-900 font-bold">{booking.stationName}</h4>
                           <p className="text-xs text-secondary">{booking.stationAddress || 'Main Hub Location'}</p>
+                          {userGps && booking.stationLatitude != null && booking.stationLongitude != null && (() => {
+                            const distKm = calcDistanceKm(userGps.lat, userGps.lng, booking.stationLatitude!, booking.stationLongitude!);
+                            const eta = estimateTravelTime(distKm);
+                            return (
+                              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 border border-blue-100 text-[11px] font-semibold text-blue-800 mt-1">
+                                <Navigation className="w-3 h-3 text-blue-600 shrink-0" />
+                                <span>
+                                  Cách bạn {formatDistance(distKm)} · 🛵 ~{eta.drivingMinutes}p / 🚶 ~{eta.walkingMinutes}p
+                                </span>
+                              </div>
+                            );
+                          })()}
                           <div className="pt-1.5 flex items-center gap-3 text-xs text-primary-container font-semibold">
                             <a className="hover:underline flex items-center gap-1" href="tel:19001234">
                               <Phone className="w-3.5 h-3.5" />
@@ -393,24 +512,32 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                       </button>
                       {/* Outline Action: Extend Time */}
                       <button
-                        onClick={() => {
-                          setSelectedBooking(booking);
-                          setShowExtendModal(true);
-                        }}
+                        onClick={() => openQuickExtend(booking, 3, false)}
                         disabled={!booking.canExtend}
                         className={`inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-300 text-sm font-semibold rounded-xl transition-colors ${booking.canExtend ? 'text-slate-700 hover:bg-slate-50 cursor-pointer active:scale-95' : 'text-slate-400 opacity-50 cursor-not-allowed'}`}
                       >
                         <PlusCircle className={`w-4 h-4 ${booking.canExtend ? 'text-slate-500' : 'text-slate-300'}`} />
                         <span>Extend Time</span>
                       </button>
-                      {/* Directions Link */}
-                      <button
-                        onClick={() => onNavigate('map')}
+                      {/* Deep Link Google Maps Directions */}
+                      <a
+                        href={buildGoogleMapsDirectionsUrl({
+                          userLat: userGps?.lat,
+                          userLng: userGps?.lng,
+                          stationLat: booking.stationLatitude,
+                          stationLng: booking.stationLongitude,
+                          stationName: booking.stationName,
+                          stationAddress: booking.stationAddress,
+                          travelMode: 'driving',
+                        })}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 text-sm font-semibold rounded-xl transition-colors cursor-pointer active:scale-95"
                       >
-                        <Navigation className="w-4 h-4 text-slate-500" />
-                        <span>Get Terminal Directions</span>
-                      </button>
+                        <Navigation className="w-4 h-4 text-primary" />
+                        <span>Chỉ đường đến Kiosk</span>
+                        <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+                      </a>
                     </div>
                     {/* Danger Action: Cancel Booking */}
                     <div>
@@ -614,28 +741,31 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
         isLoading={isLoadingOfflineTicket}
       />
 
-      {/* EXTEND BOOKING MODAL (UC-T07) */}
+      {/* EXTEND BOOKING MODAL (UC-T07 / UC-T14) */}
       {selectedBooking && (
         <ExtendBookingModal
           isOpen={showExtendModal}
-          onClose={() => setShowExtendModal(false)}
-          onSuccess={async (addedHours, _amount) => {
-            try {
-              const newEndAt = new Date(new Date(selectedBooking.endAt).getTime() + addedHours * 3600000).toISOString();
-              const res = await extendBooking(selectedBooking.id, { newEndAt });
-              if (res.success && res.data?.paymentUrl) {
-                window.open(res.data.paymentUrl, '_blank');
-                showToast(`Đang chuyển hướng thanh toán gia hạn...`);
-              }
-              setShowExtendModal(false);
-              fetchBookings();
-            } catch (error) {
-              showToast('Có lỗi xảy ra khi gia hạn đơn hàng.');
-            }
+          onClose={() => {
+            setShowExtendModal(false);
+            setAutoStartExtendPayment(false);
           }}
-          lockerCode={selectedBooking.lockerCode}
+          bookingId={selectedBooking.id}
+          bookingCode={selectedBooking.bookingCode}
+          lockerCode={selectedBooking.lockerCode || `Size ${selectedBooking.size}`}
+          size={selectedBooking.size}
           stationName={selectedBooking.stationName}
+          startAt={selectedBooking.startAt}
+          currentEndAt={selectedBooking.endAt}
           currentEndTime={new Date(selectedBooking.endAt).toLocaleString('vi-VN')}
+          hourlyRate={selectedBooking.hourlyRate}
+          maxHours={selectedBooking.maxHours}
+          overdueFee={selectedBooking.currentOverdueFee}
+          initialHours={quickExtendHours}
+          autoCreatePayment={autoStartExtendPayment}
+          onExtended={async () => {
+            showToast('Gia hạn thời gian lưu trữ thành công!');
+            await fetchBookings();
+          }}
         />
       )}
 

@@ -2,10 +2,11 @@ import { useState, useEffect, useCallback } from 'react';
 import {
     MapPin, Search, Navigation,
     X, RefreshCw, ArrowRight,
-    AlertCircle, LocateFixed, SlidersHorizontal,
+    AlertCircle, LocateFixed, SlidersHorizontal, ExternalLink,
 } from 'lucide-react';
 import { calcDistance, getStations } from '../api/stationService';
 import type { Station } from '../api/stationService';
+import { buildGoogleMapsDirectionsUrl, estimateTravelTime } from '../utils/kioskNavigation';
 import CustomerHeader from '../components/layout/CustomerHeader';
 import InteractiveStationMap from '../components/map/InteractiveStationMap';
 
@@ -360,6 +361,7 @@ export default function FindStationPage({
                                 <StationCard
                                     key={station.id}
                                     station={station}
+                                    userLocation={userLocation}
                                     isSelected={selectedStation?.id === station.id}
                                     onClick={() => flyToStation(station)}
                                     onViewDetail={() => handleViewDetail(station)}
@@ -408,12 +410,14 @@ export default function FindStationPage({
 // ─── Minimalist StationCard ───────────────────────────────────────────────────
 function StationCard({
     station,
+    userLocation,
     isSelected,
     onClick,
     onViewDetail,
     onBook,
 }: {
     station: Station;
+    userLocation: { lat: number; lng: number };
     isSelected: boolean;
     onClick: () => void;
     onViewDetail: () => void;
@@ -424,11 +428,24 @@ function StationCard({
     const availL = Math.min(station.totalL ?? 0, station.availableL ?? 0);
     const totalAvail = availS + availM + availL;
 
+    const travel = station.distanceKm != null ? estimateTravelTime(station.distanceKm) : null;
     const distLabel = station.distanceKm != null
         ? station.distanceKm < 1
             ? `${Math.round(station.distanceKm * 1000)} m`
             : `${station.distanceKm.toFixed(1)} km`
         : null;
+    const etaMinutes = travel
+        ? (travel.recommendedMode === 'walking' ? travel.walkingMinutes : travel.drivingMinutes)
+        : null;
+    const mapsUrl = buildGoogleMapsDirectionsUrl({
+        userLat: userLocation.lat,
+        userLng: userLocation.lng,
+        stationLat: Number(station.latitude),
+        stationLng: Number(station.longitude),
+        stationName: station.name,
+        stationAddress: station.address,
+        travelMode: travel?.recommendedMode ?? 'driving',
+    });
 
     const minPrice = Math.min(
         ...[station.priceS, station.priceM, station.priceL].filter((p): p is number => p != null && p > 0)
@@ -443,14 +460,14 @@ function StationCard({
                     : 'hover:bg-slate-50/80 border-l-[3px] border-l-transparent'
             }`}
         >
-            {/* Row 1: Title + Distance */}
-            <div className="flex items-start justify-between gap-3">
+            {/* Row 1: Title + Distance & ETA */}
+            <div className="flex items-start justify-between gap-2">
                 <h3 className="text-sm font-bold text-slate-900 leading-snug line-clamp-1">
                     {station.name}
                 </h3>
                 {distLabel && (
-                    <span className="shrink-0 text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">
-                        {distLabel}
+                    <span className="shrink-0 text-[11px] font-semibold text-blue-700 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-md">
+                        {distLabel}{etaMinutes ? ` · ~${etaMinutes}p` : ''}
                     </span>
                 )}
             </div>
@@ -484,15 +501,27 @@ function StationCard({
                 )}
             </div>
 
-            {/* Row 4: Action buttons (shown cleanly when selected, or subtle links) */}
-            <div className="flex items-center gap-2 mt-3">
+            {/* Row 4: Action buttons */}
+            <div className="flex items-center gap-1.5 mt-3">
+                <a
+                    href={mapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={e => e.stopPropagation()}
+                    className="py-1.5 px-2.5 rounded-lg text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors flex items-center justify-center gap-1 shrink-0"
+                    title="Mở Google Maps chỉ đường đến Kiosk"
+                >
+                    <Navigation className="w-3.5 h-3.5" />
+                    <span>Chỉ đường</span>
+                    <ExternalLink className="w-3 h-3 opacity-70" />
+                </a>
                 <button
                     type="button"
                     onClick={e => {
                         e.stopPropagation();
                         onViewDetail();
                     }}
-                    className="flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200/80 transition-colors cursor-pointer"
+                    className="flex-1 py-1.5 px-2.5 rounded-lg text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200/80 transition-colors cursor-pointer"
                 >
                     Chi tiết
                 </button>
@@ -503,7 +532,7 @@ function StationCard({
                             e.stopPropagation();
                             onBook();
                         }}
-                        className="flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors flex items-center justify-center gap-1 cursor-pointer shadow-2xs"
+                        className="flex-1 py-1.5 px-2.5 rounded-lg text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors flex items-center justify-center gap-1 cursor-pointer shadow-2xs"
                     >
                         Đặt tủ <ArrowRight className="w-3.5 h-3.5" />
                     </button>

@@ -3,6 +3,7 @@ import {
     MapPin, Navigation, Clock, Phone, ArrowRight, ExternalLink, Layers, Sparkles, X, LocateFixed
 } from 'lucide-react';
 import type { Station } from '../../api/stationService';
+import { buildGoogleMapsDirectionsUrl, estimateTravelTime } from '../../utils/kioskNavigation';
 
 interface InteractiveStationMapProps {
     stations: Station[];
@@ -542,14 +543,27 @@ export default function InteractiveStationMap({
                             Xem thông tin trạm
                         </button>
                         <a
-                            href={`https://www.google.com/maps/dir/?api=1&origin=${userLocation ? `${userLocation.lat},${userLocation.lng}` : ''}&destination=${selectedStation.latitude},${selectedStation.longitude}`}
+                            href={buildGoogleMapsDirectionsUrl({
+                                userLat: userLocation?.lat,
+                                userLng: userLocation?.lng,
+                                stationLat: Number(selectedStation.latitude),
+                                stationLng: Number(selectedStation.longitude),
+                                stationName: selectedStation.name,
+                                stationAddress: selectedStation.address,
+                                travelMode: (selectedStation.distanceKm ?? 2) <= 0.8 ? 'walking' : 'driving',
+                            })}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-[#0b1c30] text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1"
-                            title="Mở Google Maps dẫn đường từ vị trí của bạn"
+                            title="Mở Google Maps dẫn đường đến Kiosk từ vị trí của bạn"
                         >
                             <ExternalLink className="w-3.5 h-3.5 text-[#2563eb]" />
-                            Chỉ đường
+                            Chỉ đường đến Kiosk
+                            {selectedStation.distanceKm != null && (() => {
+                                const t = estimateTravelTime(selectedStation.distanceKm);
+                                const m = t.recommendedMode === 'walking' ? t.walkingMinutes : t.drivingMinutes;
+                                return <span className="text-[10px] text-[#2563eb]">(~{m}p)</span>;
+                            })()}
                         </a>
                         {selectedStation.status === 'ACTIVE' && (
                             <button

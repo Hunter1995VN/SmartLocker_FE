@@ -3,12 +3,21 @@ import {
     Search, MapPin, Navigation, Zap,
     Shield, User, Clock, RefreshCw, X, ChevronRight,
     Wifi, Info, ArrowRight, Phone, CheckCircle,
-    Package, ReceiptText, Key, Lock,
+    Package, ReceiptText, Key, Lock, ExternalLink, AlertTriangle,
 } from 'lucide-react';
-import { MOCK_STATIONS, MOCK_ACTIVE_BOOKING, getStations } from '../api/stationService';
-import type { Station, Booking } from '../api/stationService';
+import { MOCK_STATIONS, getStations } from '../api/stationService';
+import type { Station } from '../api/stationService';
 import { getMyBookings } from '../api/bookingService';
 import type { BookingListItemDto } from '../api/bookingService';
+import { ExtendBookingModal } from '../components/booking/ExtendBookingModal';
+import {
+    buildGoogleMapsDirectionsUrl,
+    calcDistanceKm,
+    estimateTravelTime,
+    evaluateSmartExtensionAlert,
+    formatDistance,
+    sendSmartExpiryBrowserNotification,
+} from '../utils/kioskNavigation';
 import CustomerHeader from '../components/layout/CustomerHeader';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -104,7 +113,11 @@ function formatDate(): string {
 export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToAdmin, onNavigate }: DashboardPageProps) {
     const user: AuthUser = JSON.parse(localStorage.getItem('smartlocker_user') || '{}');
     const isAdminOrStaff = (user?.role || '').toLowerCase() === 'admin' || (user?.role || '').toLowerCase() === 'staff';
-    const activeBooking: Booking | null = MOCK_ACTIVE_BOOKING;
+    const [activeBooking, setActiveBooking] = useState<BookingListItemDto | null>(null);
+    const [userGps, setUserGps] = useState<{ lat: number; lng: number } | null>(null);
+    const [showExtendModal, setShowExtendModal] = useState(false);
+    const [autoExtendPayOS, setAutoExtendPayOS] = useState(false);
+    const [extendHours, setExtendHours] = useState(1);
 
     const [timeLeft, setTimeLeft] = useState('');
     const [showKeyModal, setShowKeyModal] = useState(false);
@@ -116,30 +129,50 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
     const [isLoadingBookings, setIsLoadingBookings] = useState(true);
     const [isLoadingStations, setIsLoadingStations] = useState(true);
 
+    const loadDashboardBookings = useCallback(async () => {
+        try {
+            const bRes = await getMyBookings(undefined, 1, 10);
+            if (bRes.success && bRes.data?.items) {
+                const items = bRes.data.items;
+                const liveActive =
+                    items.find(b => b.status === 'STORED') ||
+                    items.find(b => b.status === 'CONFIRMED') ||
+                    null;
+                setActiveBooking(liveActive);
+
+                const mappedBookings = items.slice(0, 5).map(b => ({
+                    id: b.id,
+                    bookingCode: b.bookingCode,
+                    stationName: b.stationName,
+                    lockerCode: b.lockerCode || `Size ${b.size}`,
+                    date: `${new Date(b.startAt).toLocaleDateString('vi-VN')} · ${new Date(b.startAt).getHours().toString().padStart(2, '0')}:${new Date(b.startAt).getMinutes().toString().padStart(2, '0')} - ${new Date(b.endAt).getHours().toString().padStart(2, '0')}:${new Date(b.endAt).getMinutes().toString().padStart(2, '0')}`,
+                    amount: `${b.baseAmount.toLocaleString('vi-VN')}đ`,
+                    status: b.status,
+                    type: 'walk',
+                    refundNote: null,
+                }));
+                setRecentBookings(mappedBookings as unknown as BookingListItemDto[]);
+            }
+        } catch (error) {
+            console.error("Failed to load bookings", error);
+        } finally {
+            setIsLoadingBookings(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (typeof navigator === 'undefined' || !navigator.geolocation) return;
+        navigator.geolocation.getCurrentPosition(
+            (pos) => setUserGps({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+            () => {},
+            { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
+        );
+    }, []);
+
     useEffect(() => {
         let isMounted = true;
         const fetchDashboardData = async () => {
-            try {
-                const bRes = await getMyBookings(undefined, 1, 5);
-                if (isMounted && bRes.success) {
-                    const mappedBookings = bRes.data.items.map(b => ({
-                        id: b.id,
-                        bookingCode: b.bookingCode,
-                        stationName: b.stationName,
-                        lockerCode: `Size ${b.size}`,
-                        date: `${new Date(b.startAt).toLocaleDateString('vi-VN')} · ${new Date(b.startAt).getHours().toString().padStart(2, '0')}:${new Date(b.startAt).getMinutes().toString().padStart(2, '0')} - ${new Date(b.endAt).getHours().toString().padStart(2, '0')}:${new Date(b.endAt).getMinutes().toString().padStart(2, '0')}`,
-                        amount: `${b.baseAmount.toLocaleString('vi-VN')}đ`,
-                        status: b.status,
-                        type: 'walk',
-                        refundNote: null,
-                    }));
-                    setRecentBookings(mappedBookings as unknown as BookingListItemDto[]);
-                }
-            } catch (error) {
-                console.error("Failed to load bookings", error);
-            } finally {
-                if (isMounted) setIsLoadingBookings(false);
-            }
+            await loadDashboardBookings();
 
             try {
                 const sRes = await getStations();
@@ -152,13 +185,16 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
         };
         fetchDashboardData();
         return () => { isMounted = false; };
-    }, []);
+    }, [loadDashboardBookings]);
 
     // Countdown timer
     useEffect(() => {
-        if (!activeBooking || activeBooking.status !== 'CHECKED_IN') return;
+        if (!activeBooking || !['STORED', 'CONFIRMED'].includes(activeBooking.status)) return;
+        const targetEnd = activeBooking.status === 'CONFIRMED' && activeBooking.holdExpiresAt
+            ? activeBooking.holdExpiresAt
+            : activeBooking.endAt;
         const update = () => {
-            const diff = new Date(activeBooking.endAt).getTime() - Date.now();
+            const diff = new Date(targetEnd).getTime() - Date.now();
             if (diff <= 0) { setTimeLeft('Đã hết giờ'); return; }
             const h = Math.floor(diff / 3_600_000);
             const m = Math.floor((diff % 3_600_000) / 60_000);
@@ -175,10 +211,49 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
     // Progress bar % for time remaining
     const timeProgress = useCallback((): number => {
         if (!activeBooking) return 0;
-        const total = new Date(activeBooking.endAt).getTime() - new Date(activeBooking.startAt).getTime();
+        const total = Math.max(1, new Date(activeBooking.endAt).getTime() - new Date(activeBooking.startAt).getTime());
         const elapsed = Date.now() - new Date(activeBooking.startAt).getTime();
         return Math.min(100, Math.max(0, ((total - elapsed) / total) * 100));
     }, [activeBooking]);
+
+    // Compute live distance, ETA & smart alert for activeBooking
+    const activeDistanceKm =
+        activeBooking && userGps && activeBooking.stationLatitude != null && activeBooking.stationLongitude != null
+            ? calcDistanceKm(userGps.lat, userGps.lng, activeBooking.stationLatitude, activeBooking.stationLongitude)
+            : null;
+    const activeTravel = activeDistanceKm != null ? estimateTravelTime(activeDistanceKm) : null;
+    const activeRemainingMinutes = activeBooking
+        ? Math.max(0, Math.round((new Date(activeBooking.endAt).getTime() - Date.now()) / 60000))
+        : 0;
+    const activeSmartAlert =
+        activeBooking && activeDistanceKm != null
+            ? evaluateSmartExtensionAlert({
+                remainingMinutes: activeRemainingMinutes,
+                distanceKm: activeDistanceKm,
+                status: activeBooking.status,
+                isOverdue: activeBooking.isOverdue,
+                canExtend: activeBooking.canExtend ?? activeBooking.status === 'STORED',
+                size: activeBooking.size,
+                hourlyRate: activeBooking.hourlyRate,
+                overdueFeePerHour: activeBooking.overdueFeePerHour,
+            })
+            : null;
+
+    useEffect(() => {
+        if (activeBooking && activeSmartAlert?.shouldAlert) {
+            void sendSmartExpiryBrowserNotification(
+                activeBooking.id,
+                activeBooking.stationName,
+                activeSmartAlert.message,
+                () => {
+                    setExtendHours(activeSmartAlert.recommendedHours);
+                    setAutoExtendPayOS(true);
+                    setShowExtendModal(true);
+                },
+                false
+            );
+        }
+    }, [activeBooking?.id, activeSmartAlert?.shouldAlert]);
 
     const handleLogout = () => {
         localStorage.clear();
@@ -347,7 +422,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                                 <div className="flex items-center gap-2">
                                                     <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-[#6ffbbe] text-[#002113] text-[11px] font-bold uppercase tracking-wider">
                                                         <span className="w-2 h-2 rounded-full bg-[#006242]" />
-                                                        Đang sử dụng
+                                                        {activeBooking.status === 'CONFIRMED' ? 'Đang giữ chỗ' : 'Đang sử dụng'}
                                                     </span>
                                                     <span className="text-sm text-[#434655] font-mono">#{activeBooking.bookingCode}</span>
                                                 </div>
@@ -362,20 +437,27 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                                 {/* Station info */}
                                                 <div className="md:col-span-7 flex flex-col justify-between gap-3 bg-[#eff4ff] p-4 rounded-xl">
                                                     <div className="flex flex-col gap-1">
-                                                        <div className="flex items-center gap-1.5 text-[#2563eb]">
-                                                            <span className="text-xs">🔗</span>
-                                                            <span className="text-[11px] font-bold uppercase tracking-wide">Trạm thông minh</span>
+                                                        <div className="flex items-center justify-between gap-2 flex-wrap">
+                                                            <div className="flex items-center gap-1.5 text-[#2563eb]">
+                                                                <span className="text-xs">🔗</span>
+                                                                <span className="text-[11px] font-bold uppercase tracking-wide">Trạm thông minh</span>
+                                                            </div>
+                                                            {activeDistanceKm != null && activeTravel && (
+                                                                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white text-[#2563eb] border border-blue-200">
+                                                                    Cách bạn {formatDistance(activeDistanceKm)} · ~{activeTravel.recommendedMode === 'walking' ? activeTravel.walkingMinutes : activeTravel.drivingMinutes}p
+                                                                </span>
+                                                            )}
                                                         </div>
                                                         <h3 className="text-[22px] font-bold leading-7 text-[#0b1c30]">{activeBooking.stationName}</h3>
                                                         <p className="text-sm text-[#434655] flex items-start gap-1">
                                                             <Navigation className="w-4 h-4 text-[#737686] shrink-0 mt-0.5" />
-                                                            <span>{activeBooking.stationAddress}</span>
+                                                            <span>{activeBooking.stationAddress || 'Đang cập nhật địa chỉ trạm'}</span>
                                                         </p>
                                                     </div>
                                                     <div className="flex items-center gap-4 pt-2">
                                                         <div className="flex items-center gap-1.5 text-sm text-[#0b1c30]">
                                                             <Package className="w-4 h-4 text-[#004ac6]" />
-                                                            <span>Ngăn: <strong className="font-bold text-[#2563eb]">Tủ {activeBooking.lockerCode}</strong></span>
+                                                            <span>Ngăn: <strong className="font-bold text-[#2563eb]">{activeBooking.lockerCode ? `Tủ ${activeBooking.lockerCode}` : 'Tự động gán tại Kiosk'}</strong></span>
                                                         </div>
                                                         <span className="text-[#c3c6d7]">|</span>
                                                         <span className="text-sm text-[#434655]">
@@ -387,7 +469,9 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                                 {/* Countdown */}
                                                 <div className="md:col-span-5 bg-[#e5eeff] p-4 rounded-xl flex flex-col justify-between gap-3">
                                                     <div className="flex items-center justify-between">
-                                                        <span className="text-[11px] font-bold uppercase tracking-wider text-[#434655]">Thời gian còn lại</span>
+                                                        <span className="text-[11px] font-bold uppercase tracking-wider text-[#434655]">
+                                                            {activeBooking.status === 'CONFIRMED' ? 'Thời gian giữ chỗ' : 'Thời gian còn lại'}
+                                                        </span>
                                                         <RefreshCw className="w-4 h-4 text-[#2563eb] animate-spin" />
                                                     </div>
                                                     <div className="flex flex-col">
@@ -395,7 +479,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                                             {timeLeft || '00:00:00'}
                                                         </div>
                                                         <span className="text-sm text-[#434655] mt-0.5">
-                                                            Hết hạn lúc: {new Date(activeBooking.endAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} chiều nay
+                                                            Hết hạn lúc: {new Date(activeBooking.endAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
                                                         </span>
                                                     </div>
                                                     {/* Progress bar */}
@@ -408,36 +492,91 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                                                 </div>
                                             </div>
 
+                                            {/* Smart Distance & ETA Alert Banner */}
+                                            {activeSmartAlert?.shouldAlert && (
+                                                <div className="p-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                                    <div className="flex items-start gap-2.5">
+                                                        <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                                                        <div>
+                                                            <p className="text-xs font-extrabold text-amber-950">{activeSmartAlert.title}</p>
+                                                            <p className="text-xs text-amber-900 mt-0.5 leading-relaxed">{activeSmartAlert.message}</p>
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setExtendHours(activeSmartAlert.recommendedHours);
+                                                            setAutoExtendPayOS(true);
+                                                            setShowExtendModal(true);
+                                                        }}
+                                                        className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-extrabold flex items-center justify-center gap-1.5 shrink-0 shadow-xs cursor-pointer"
+                                                    >
+                                                        <Zap className="w-4 h-4" />
+                                                        <span>Gia hạn +{activeSmartAlert.recommendedHours}h ngay (PayOS)</span>
+                                                    </button>
+                                                </div>
+                                            )}
+
                                             {/* IoT Telemetry row */}
                                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-3 bg-[#f8f9ff] rounded-xl text-center">
-                                                <TelemetryCell label="Trạng thái chốt" value="Khóa an toàn" icon={<Lock className="w-4 h-4" />} valueClass="text-[#006242]" />
-                                                <TelemetryCell label="Cảm biến trọng lượng" value="8.4 kg (Vali cabin)" mono />
-                                                <TelemetryCell label="Cảm biến hồng ngoại" value="Có vật thể (Hành lý)" valueClass="text-[#004ac6]" />
-                                                <TelemetryCell label="Mã PIN dự phòng" value="892041" mono bold />
+                                                <TelemetryCell label="Trạng thái chốt" value={activeBooking.status === 'STORED' ? 'Khóa an toàn' : 'Chờ check-in'} icon={<Lock className="w-4 h-4" />} valueClass="text-[#006242]" />
+                                                <TelemetryCell label="Khoảng cách & ETA" value={activeDistanceKm != null && activeTravel ? `${formatDistance(activeDistanceKm)} (~${activeTravel.drivingMinutes}p)` : 'Chưa bật GPS'} mono />
+                                                <TelemetryCell label="Trạng thái đơn" value={activeBooking.status} valueClass="text-[#004ac6]" />
+                                                <TelemetryCell label="Mã PIN mở tủ" value={activeBooking.accessCode || 'Xem chi tiết'} mono bold />
                                             </div>
 
                                             {/* Action buttons */}
                                             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
                                                 <div className="flex flex-wrap items-center gap-2 flex-1">
                                                     <button
-                                                        onClick={() => { setUnlockState('idle'); setShowKeyModal(true); }}
-                                                        className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#2563eb] text-white text-sm font-semibold shadow-sm hover:bg-[#1d4ed8] transition-all duration-150 active:scale-95"
+                                                        onClick={() => {
+                                                            if (onNavigate) onNavigate('booking-detail', { bookingId: activeBooking.id });
+                                                            else { setUnlockState('idle'); setShowKeyModal(true); }
+                                                        }}
+                                                        className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#2563eb] text-white text-sm font-semibold shadow-sm hover:bg-[#1d4ed8] transition-all duration-150 active:scale-95 cursor-pointer"
                                                     >
                                                         <Lock className="w-5 h-5" />
                                                         Mở Tủ Ngay / QR Key
                                                     </button>
-                                                    <button className="inline-flex items-center gap-1.5 px-4 py-3 rounded-xl bg-white border border-[#e2e8f0] text-[#0b1c30] text-sm font-semibold hover:bg-[#eff4ff] transition-colors">
+                                                    <button
+                                                        type="button"
+                                                        disabled={activeBooking.status !== 'STORED'}
+                                                        onClick={() => {
+                                                            setExtendHours(1);
+                                                            setAutoExtendPayOS(false);
+                                                            setShowExtendModal(true);
+                                                        }}
+                                                        className={`inline-flex items-center gap-1.5 px-4 py-3 rounded-xl bg-white border border-[#e2e8f0] text-sm font-semibold transition-colors ${activeBooking.status === 'STORED' ? 'text-[#0b1c30] hover:bg-[#eff4ff] cursor-pointer' : 'text-slate-400 opacity-60 cursor-not-allowed'}`}
+                                                    >
                                                         <Clock className="w-4 h-4 text-[#2563eb]" />
                                                         Gia hạn (+1h)
                                                     </button>
-                                                    <button className="inline-flex items-center gap-1.5 px-4 py-3 rounded-xl bg-white border border-[#e2e8f0] text-[#0b1c30] text-sm font-semibold hover:bg-[#eff4ff] transition-colors">
+                                                    <a
+                                                        href={buildGoogleMapsDirectionsUrl({
+                                                            userLat: userGps?.lat,
+                                                            userLng: userGps?.lng,
+                                                            stationLat: activeBooking.stationLatitude,
+                                                            stationLng: activeBooking.stationLongitude,
+                                                            stationName: activeBooking.stationName,
+                                                            stationAddress: activeBooking.stationAddress,
+                                                            travelMode: activeTravel?.recommendedMode ?? 'driving',
+                                                        })}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="inline-flex items-center gap-1.5 px-4 py-3 rounded-xl bg-white border border-[#e2e8f0] text-[#0b1c30] text-sm font-semibold hover:bg-[#eff4ff] transition-colors"
+                                                    >
                                                         <Navigation className="w-4 h-4 text-[#007d55]" />
-                                                        Chỉ đường
-                                                    </button>
+                                                        Chỉ đường đến Kiosk
+                                                        <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+                                                    </a>
                                                 </div>
-                                                <button className="text-sm text-[#434655] hover:text-[#004ac6] transition-colors flex items-center justify-center gap-1 py-2">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => onNavigate?.('booking-detail', { bookingId: activeBooking.id })}
+                                                    className="text-sm text-[#434655] hover:text-[#004ac6] transition-colors flex items-center justify-center gap-1 py-2 cursor-pointer"
+                                                >
                                                     <Phone className="w-4 h-4" />
-                                                    Cần trợ giúp khẩn cấp?
+                                                    Chi tiết &amp; Trợ giúp
                                                 </button>
                                             </div>
                                         </div>
@@ -739,6 +878,32 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                         </div>
                     </div>
                 </div>
+            )}
+
+            {activeBooking && (
+                <ExtendBookingModal
+                    isOpen={showExtendModal}
+                    onClose={() => {
+                        setShowExtendModal(false);
+                        setAutoExtendPayOS(false);
+                    }}
+                    bookingId={activeBooking.id}
+                    bookingCode={activeBooking.bookingCode}
+                    lockerCode={activeBooking.lockerCode || `Size ${activeBooking.size}`}
+                    size={activeBooking.size}
+                    stationName={activeBooking.stationName}
+                    startAt={activeBooking.startAt}
+                    currentEndAt={activeBooking.endAt}
+                    currentEndTime={new Date(activeBooking.endAt).toLocaleString('vi-VN')}
+                    hourlyRate={activeBooking.hourlyRate}
+                    maxHours={activeBooking.maxHours}
+                    overdueFee={activeBooking.currentOverdueFee}
+                    initialHours={extendHours}
+                    autoCreatePayment={autoExtendPayOS}
+                    onExtended={async () => {
+                        await loadDashboardBookings();
+                    }}
+                />
             )}
         </div>
     );
