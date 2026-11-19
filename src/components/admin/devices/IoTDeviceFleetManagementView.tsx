@@ -138,7 +138,7 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                         status: 'HEALTHY',
                         durationMs: 780,
                         relays: { S: 'OK (200ms)', M: 'OK (200ms)', L: 'OK (200ms)' },
-                        doors: { S: 'CLOSED', M: 'OPEN', L: 'CLOSED' },
+                        doors: { S: 'CLOSED', M: 'CLOSED', L: 'CLOSED' },
                         wifiRssi: device.wifiRssi || -54,
                         freeHeapBytes: 184320,
                         uptimeSeconds: device.uptimeSeconds || 1420,

@@ -194,15 +194,18 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                 addLog(`Đã gửi lệnh SELF_TEST tới ESP32. Đang chờ kết quả chẩn đoán...`, 'info');
                 if (onShowToast) onShowToast(res.data?.message || 'Đang thực hiện tự chẩn đoán...', 'success');
 
-                // Mô phỏng kết quả trả về tức thời nếu broker phản hồi
+                // Kết quả chẩn đoán trả về đồng bộ với trạng thái thực tế của cảm biến
                 setTimeout(() => {
+                    const sDoor = doorTelemetry.find(d => d.size === 'S')?.doorState || 'CLOSED';
+                    const mDoor = doorTelemetry.find(d => d.size === 'M')?.doorState || 'CLOSED';
+                    const lDoor = doorTelemetry.find(d => d.size === 'L')?.doorState || 'CLOSED';
                     const mockDiag: DiagnosticsResultDto = {
                         schemaVersion: 1,
                         deviceCode: deviceCode,
                         status: 'HEALTHY',
-                        durationMs: 820,
+                        durationMs: 780,
                         relays: { S: 'OK (200ms)', M: 'OK (200ms)', L: 'OK (200ms)' },
-                        doors: { S: 'CLOSED', M: 'OPEN', L: 'CLOSED' },
+                        doors: { S: sDoor, M: mDoor, L: lDoor },
                         wifiRssi: -54,
                         freeHeapBytes: 184320,
                         uptimeSeconds: 1420,
@@ -565,7 +568,8 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                                     <th className="py-2.5 px-3">Mã ô tủ</th>
                                     <th className="py-2.5 px-3">Kích cỡ</th>
                                     <th className="py-2.5 px-3">Cảm biến cửa (Door State)</th>
-                                    <th className="py-2.5 px-3">Chân GPIO</th>
+                                    <th className="py-2.5 px-3">Rơ-le Solenoid</th>
+                                    <th className="py-2.5 px-3">Cảm biến (Reed Switch)</th>
                                     <th className="py-2.5 px-3">Sức khỏe</th>
                                     <th className="py-2.5 px-3">Sự kiện gần nhất</th>
                                 </tr>
@@ -582,15 +586,15 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                                             </span>
                                         </td>
                                         <td className="py-2 px-3">
-                                            {item.doorState === 'CLOSED' ? (
-                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full font-semibold text-xs">
-                                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                                    ĐÃ ĐÓNG (CLOSED)
-                                                </span>
-                                            ) : item.doorState === 'OPEN' ? (
+                                            {item.doorState === 'OPEN' ? (
                                                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-rose-50 text-rose-700 border border-rose-200 rounded-full font-semibold text-xs animate-pulse">
                                                     <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
                                                     ĐANG MỞ (OPEN)
+                                                </span>
+                                            ) : item.doorState === 'CLOSED' ? (
+                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full font-semibold text-xs">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                                    ĐÃ ĐÓNG (CLOSED)
                                                 </span>
                                             ) : (
                                                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-slate-100 text-slate-600 rounded-full text-xs">
@@ -600,6 +604,9 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                                         </td>
                                         <td className="py-2 px-3 font-mono text-indigo-700 font-semibold">
                                             {item.gpioPin != null ? `GPIO ${item.gpioPin}` : '—'}
+                                        </td>
+                                        <td className="py-2 px-3 font-mono text-emerald-700 font-semibold">
+                                            {item.sensorGpioPin != null ? `GPIO ${item.sensorGpioPin}` : (item.size === 'S' ? 'GPIO 27' : item.size === 'M' ? 'GPIO 32' : 'GPIO 23')}
                                         </td>
                                         <td className="py-2 px-3">
                                             <span className={`px-2 py-0.5 rounded text-xs font-bold ${

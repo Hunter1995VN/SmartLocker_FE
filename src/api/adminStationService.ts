@@ -93,6 +93,7 @@ export interface DoorTelemetryItemDto {
     doorState: string;
     lastDoorEventAt?: string | null;
     gpioPin?: number | null;
+    sensorGpioPin?: number | null;
     healthStatus: string;
     deviceCode: string;
 }

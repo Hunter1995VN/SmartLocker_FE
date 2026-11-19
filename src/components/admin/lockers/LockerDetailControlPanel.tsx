@@ -121,7 +121,8 @@ export default function LockerDetailControlPanel({ locker, stationName, onUpdate
         { label: 'Sức khỏe', value: locker.healthStatus },
         { label: 'Kết nối', value: locker.connectivityStatus || 'UNKNOWN', className: locker.connectivityStatus === 'ONLINE' ? 'text-emerald-700' : 'text-slate-500' },
         { label: 'Thiết bị IoT', value: locker.deviceCode || 'Chưa gắn', className: 'font-mono' },
-        { label: 'Chân GPIO', value: locker.gpioPin != null ? `GPIO ${locker.gpioPin}` : 'Chưa gán', className: 'font-mono' },
+        { label: 'Rơ-le Solenoid', value: locker.gpioPin != null ? `GPIO ${locker.gpioPin}` : 'Chưa gán', className: 'font-mono text-indigo-700' },
+        { label: 'Cảm biến (Switch)', value: locker.size === 'S' ? 'GPIO 27' : locker.size === 'M' ? 'GPIO 32' : 'GPIO 23', className: 'font-mono text-emerald-700 font-semibold' },
         { label: 'Firmware', value: locker.firmwareVersion || '—', className: 'font-mono' },
         { label: 'Heartbeat', value: lastSeen },
         { label: 'Đơn hiện tại', value: locker.currentBooking?.bookingCode || 'Không có', className: 'font-mono text-blue-700' },
@@ -223,7 +224,7 @@ export default function LockerDetailControlPanel({ locker, stationName, onUpdate
 
                 {/* UC-A02 */}
                 <details className="border-t border-slate-100 pt-4 text-xs group">
-                    <summary className={`${sectionTitle} cursor-pointer list-none`}><Cpu className="w-3.5 h-3.5 text-indigo-600" />Ánh xạ chân GPIO
+                    <summary className={`${sectionTitle} cursor-pointer list-none`}><Cpu className="w-3.5 h-3.5 text-indigo-600" />Ánh xạ Rơ-le Solenoid (GPIO)
                         <span className="ml-auto font-mono normal-case tracking-normal text-indigo-700">{locker.gpioPin != null ? `GPIO ${locker.gpioPin}` : 'Chưa gán'}</span>
                     </summary>
                     <div className="mt-2 flex items-center gap-2">
