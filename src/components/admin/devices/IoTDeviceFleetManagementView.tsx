@@ -153,7 +153,7 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
             }
         } catch (err: unknown) {
             setTestingDeviceId(null);
-            const msg = err instanceof Error ? err.message : 'Lỗi kết nối';
+            const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || (err instanceof Error ? err.message : 'Lỗi kết nối');
             if (onShowToast) onShowToast(msg, 'error');
         }
     };

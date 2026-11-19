@@ -172,7 +172,7 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                 if (onShowToast) onShowToast(res.message || 'Không thể gửi lệnh Reboot', 'error');
             }
         } catch (err: unknown) {
-            const msg = err instanceof Error ? err.message : 'Lỗi kết nối';
+            const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || (err instanceof Error ? err.message : 'Lỗi kết nối');
             addLog(`Thất bại khi gửi lệnh: ${msg}`, 'warn');
             if (onShowToast) onShowToast(msg, 'error');
         } finally {
@@ -222,7 +222,7 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
             }
         } catch (err: unknown) {
             setIsTesting(false);
-            const msg = err instanceof Error ? err.message : 'Lỗi kết nối';
+            const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || (err instanceof Error ? err.message : 'Lỗi kết nối');
             addLog(`Lỗi thực hiện Self-Test: ${msg}`, 'warn');
             if (onShowToast) onShowToast(msg, 'error');
         }
