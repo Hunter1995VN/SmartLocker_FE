@@ -87,13 +87,13 @@ const adminBookingService = {
         page?: number;
         pageSize?: number;
     }): Promise<PagedAdminBookingsResponse> {
-        const res = await apiClient.get<ApiResponse<PagedAdminBookingsResponse>>('/admin/bookings', { params });
+        const res = await apiClient.get<ApiResponse<PagedAdminBookingsResponse>>('/api/admin/bookings', { params });
         if (!res.data.success) throw new Error(res.data.message || 'Không thể tải danh sách đơn hàng');
         return res.data.data;
     },
 
     async getStats(stationId?: string): Promise<AdminBookingStatsDto> {
-        const res = await apiClient.get<ApiResponse<AdminBookingStatsDto>>('/admin/bookings/stats', {
+        const res = await apiClient.get<ApiResponse<AdminBookingStatsDto>>('/api/admin/bookings/stats', {
             params: stationId ? { stationId } : undefined,
         });
         if (!res.data.success) throw new Error(res.data.message || 'Không thể tải thống kê đơn hàng');
@@ -101,19 +101,19 @@ const adminBookingService = {
     },
 
     async getDetail(id: string): Promise<AdminBookingDetailDto> {
-        const res = await apiClient.get<ApiResponse<AdminBookingDetailDto>>(`/admin/bookings/${id}`);
+        const res = await apiClient.get<ApiResponse<AdminBookingDetailDto>>(`/api/admin/bookings/${id}`);
         if (!res.data.success) throw new Error(res.data.message || 'Không tìm thấy đơn hàng');
         return res.data.data;
     },
 
     async cancelBooking(id: string, reason: string): Promise<AdminBookingDetailDto> {
-        const res = await apiClient.post<ApiResponse<AdminBookingDetailDto>>(`/admin/bookings/${id}/cancel`, { reason });
+        const res = await apiClient.post<ApiResponse<AdminBookingDetailDto>>(`/api/admin/bookings/${id}/cancel`, { reason });
         if (!res.data.success) throw new Error(res.data.message || 'Không thể hủy đơn hàng');
         return res.data.data;
     },
 
     async forceCompleteBooking(id: string, note?: string): Promise<AdminBookingDetailDto> {
-        const res = await apiClient.post<ApiResponse<AdminBookingDetailDto>>(`/admin/bookings/${id}/force-complete`, { note });
+        const res = await apiClient.post<ApiResponse<AdminBookingDetailDto>>(`/api/admin/bookings/${id}/force-complete`, { note });
         if (!res.data.success) throw new Error(res.data.message || 'Không thể hoàn tất đơn hàng');
         return res.data.data;
     },
