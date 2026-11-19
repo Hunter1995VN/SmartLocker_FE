@@ -21,6 +21,7 @@ const AdminPortalPage = lazy(() => import('./pages/admin/AdminPortalPage'));
 const KioskPage = lazy(() => import('./pages/kiosk/KioskPage'));
 const WalkInTabletPage = lazy(() => import('./pages/kiosk/WalkInTabletPage'));
 import GlobalDialogs from './components/support/GlobalDialogs';
+import SupportChatWidget from './components/chat/SupportChatWidget';
 
 /** Hiển thị khi một trang được tải theo yêu cầu (chia gói JS theo trang). */
 function PageFallback() {
@@ -389,6 +390,10 @@ function App() {
 
             {currentPage === 'walk-in' && (
                 <WalkInTabletPage />
+            )}
+
+            {currentPage !== 'kiosk' && currentPage !== 'walk-in' && (
+                <SupportChatWidget />
             )}
 
             <GlobalDialogs />
