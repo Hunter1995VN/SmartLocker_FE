@@ -217,7 +217,7 @@ export const SupportChatWidget: React.FC = () => {
                             <div>
                                 <h3 className="font-bold text-sm leading-tight flex items-center gap-1.5">
                                     SmartLocker Bot
-                                    <span className="text-[10px] font-normal px-1.5 py-0.2 bg-white/20 rounded-full">AI Gemini</span>
+                                    <span className="text-[10px] font-normal px-1.5 py-0.2 bg-white/20 rounded-full">AI Assistant</span>
                                 </h3>
                                 <p className="text-[11px] text-blue-100/90 leading-none mt-0.5">
                                     Hỗ trợ dịch vụ & trạm tủ 24/7
