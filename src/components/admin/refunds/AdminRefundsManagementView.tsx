@@ -10,6 +10,7 @@ import {
   X,
 } from 'lucide-react';
 import adminRefundService, { type AdminRefundDto } from '../../../api/adminRefundService';
+import Pagination from '../Pagination';
 
 export default function AdminRefundsManagementView() {
   const [refunds, setRefunds] = useState<AdminRefundDto[]>([]);
@@ -30,7 +31,7 @@ export default function AdminRefundsManagementView() {
       const res = await adminRefundService.getRefundRequests(
         statusFilter || undefined,
         page,
-        20
+        10
       );
       if (res.success && res.data) {
         setRefunds(res.data.items);
@@ -264,9 +265,16 @@ export default function AdminRefundsManagementView() {
         </div>
 
         {/* Footer info */}
-        <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-          <span>Tổng yêu cầu: <strong>{totalCount}</strong></span>
-          <span>Showing Page {page}</span>
+        <div className="px-4 pb-3 border-t border-slate-100">
+          <Pagination
+            page={page}
+            totalPages={Math.max(1, Math.ceil(totalCount / 10))}
+            total={totalCount}
+            from={totalCount === 0 ? 0 : (page - 1) * 10 + 1}
+            to={Math.min(page * 10, totalCount)}
+            onPageChange={setPage}
+            label="yêu cầu hoàn tiền"
+          />
         </div>
       </div>
     </div>

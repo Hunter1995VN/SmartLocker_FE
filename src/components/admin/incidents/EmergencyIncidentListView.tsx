@@ -209,7 +209,7 @@ export default function EmergencyIncidentListView({
             (inc.severity || '').toUpperCase() === severityFilter;
         return matchStatus && matchSeverity;
     });
-    const pgIncidents = usePagination(visibleIncidents, 15);
+    const pgIncidents = usePagination(visibleIncidents, 10);
 
     // ── Render ─────────────────────────────────────────────────────────────────
 

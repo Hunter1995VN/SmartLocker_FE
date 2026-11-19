@@ -44,6 +44,7 @@ import {
     disposalLabel,
 } from './AbandonedPropertyHelpers';
 import ModalOverlay from '../../ui/ModalOverlay';
+import Pagination, { usePagination } from '../Pagination';
 
 interface AbandonedPropertyViewProps {
     userRole: string;
@@ -258,6 +259,7 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
             return true;
         });
     }, [records, currentTab, selectedStation, searchQuery]);
+    const pgRecords = usePagination(filteredRecords, 10);
 
     // Active record object
     const activeRecord = useMemo(() => {
@@ -807,33 +809,36 @@ export default function AbandonedPropertyView({ userRole, currentUser }: Abandon
 
             {/* Quick Case Selector Pill Bar (if multiple records) */}
             {filteredRecords.length > 1 && (
-                <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
-                    <span className="text-slate-500 text-xs font-bold uppercase shrink-0">Chọn hồ sơ:</span>
-                    {filteredRecords.map((r) => {
-                        const isPending =
-                            (r.status || '').toUpperCase() === 'PENDING_APPROVAL' ||
-                            (r.status || '').toUpperCase() === 'REPORTED';
-                        const isResolved =
-                            (r.status || '').toUpperCase() === 'RETURNED' ||
-                            (r.status || '').toUpperCase() === 'DISPOSED';
-                        return (
-                            <button
-                                key={r.id}
-                                type="button"
-                                onClick={() => setSelectedRecordId(r.id)}
-                                className={`px-3 py-1 rounded-xl font-mono text-xs font-bold transition shrink-0 cursor-pointer flex items-center gap-1.5 border ${
-                                    activeRecord?.id === r.id
-                                        ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
-                                        : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-                                }`}
-                            >
-                                <span>{r.lockerCode}</span>
-                                <span className="text-xs opacity-70">({r.recordCode.slice(-4)})</span>
-                                {isPending && <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />}
-                                {isResolved && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />}
-                            </button>
-                        );
-                    })}
+                <div className="space-y-2">
+                    <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+                        <span className="text-slate-500 text-xs font-bold uppercase shrink-0">Chọn hồ sơ:</span>
+                        {pgRecords.pageItems.map((r) => {
+                            const isPending =
+                                (r.status || '').toUpperCase() === 'PENDING_APPROVAL' ||
+                                (r.status || '').toUpperCase() === 'REPORTED';
+                            const isResolved =
+                                (r.status || '').toUpperCase() === 'RETURNED' ||
+                                (r.status || '').toUpperCase() === 'DISPOSED';
+                            return (
+                                <button
+                                    key={r.id}
+                                    type="button"
+                                    onClick={() => setSelectedRecordId(r.id)}
+                                    className={`px-3 py-1 rounded-xl font-mono text-xs font-bold transition shrink-0 cursor-pointer flex items-center gap-1.5 border ${
+                                        activeRecord?.id === r.id
+                                            ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
+                                            : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                                    }`}
+                                >
+                                    <span>{r.lockerCode}</span>
+                                    <span className="text-xs opacity-70">({r.recordCode.slice(-4)})</span>
+                                    {isPending && <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />}
+                                    {isResolved && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />}
+                                </button>
+                            );
+                        })}
+                    </div>
+                    <Pagination page={pgRecords.page} totalPages={pgRecords.totalPages} total={filteredRecords.length} from={pgRecords.from} to={pgRecords.to} onPageChange={pgRecords.setPage} label="hồ sơ" />
                 </div>
             )}
 

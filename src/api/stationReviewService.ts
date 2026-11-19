@@ -49,11 +49,11 @@ export const stationReviewService = {
     await apiClient.post(`${publicPath}/${id}/reports`, { reason });
   },
   async adminReviews(status: ReviewFilter, page: number, signal: AbortSignal) {
-    const { data } = await apiClient.get<ReviewPage<AdminReview>>(adminPath, { params: { status, page }, signal });
+    const { data } = await apiClient.get<ReviewPage<AdminReview>>(adminPath, { params: { status, page, pageSize: 10 }, signal });
     return data;
   },
   async reports(id: string, page: number, signal: AbortSignal) {
-    const { data } = await apiClient.get<ReviewPage<ReviewReport>>(`${adminPath}/${id}/reports`, { params: { page }, signal });
+    const { data } = await apiClient.get<ReviewPage<ReviewReport>>(`${adminPath}/${id}/reports`, { params: { page, pageSize: 10 }, signal });
     return data;
   },
   async setVisibility(id: string, isHidden: boolean) {

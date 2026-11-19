@@ -199,7 +199,11 @@ export default function PromotionVoucherManagementView({
             );
         });
     }, [overview?.vouchers, searchQuery, selectedCampaignFilter, selectedStatusFilter]);
-    const pgVouchers = usePagination(filteredVouchers, 15);
+    const pgVouchers = usePagination(filteredVouchers, 10);
+    const campaignsList = overview?.campaigns ?? [];
+    const pgCampaigns = usePagination(campaignsList, 9);
+    const ledgerList = overview?.recentLedger ?? [];
+    const pgLedger = usePagination(ledgerList, 10);
 
     const handleCopyCode = async (code: string) => {
         try {
@@ -705,7 +709,7 @@ export default function PromotionVoucherManagementView({
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
                     {/* Left 2 cols: Campaign Cards */}
                     <div className="lg:col-span-2 space-y-3.5">
-                        {(overview?.campaigns ?? []).map((c) => {
+                        {pgCampaigns.pageItems.map((c) => {
                             const cat = CATEGORY_LABELS[c.category] || {
                                 label: c.category,
                                 badgeClass: 'bg-slate-100 text-slate-700 border-slate-200',
@@ -816,6 +820,7 @@ export default function PromotionVoucherManagementView({
                                 </div>
                             );
                         })}
+                        <Pagination page={pgCampaigns.page} totalPages={pgCampaigns.totalPages} total={campaignsList.length} from={pgCampaigns.from} to={pgCampaigns.to} onPageChange={pgCampaigns.setPage} label="chiến dịch" />
                     </div>
 
                     {/* Right col: Global Budget Guardrail Policy */}
@@ -1176,7 +1181,9 @@ export default function PromotionVoucherManagementView({
                             </tbody>
                         </table>
                     </div>
-                    <Pagination page={pgVouchers.page} totalPages={pgVouchers.totalPages} total={filteredVouchers.length} from={pgVouchers.from} to={pgVouchers.to} onPageChange={pgVouchers.setPage} label="voucher" />
+                    <div className="px-4 pb-3 border-t border-slate-100">
+                        <Pagination page={pgVouchers.page} totalPages={pgVouchers.totalPages} total={filteredVouchers.length} from={pgVouchers.from} to={pgVouchers.to} onPageChange={pgVouchers.setPage} label="voucher" />
+                    </div>
                 </div>
             )}
 
@@ -1409,14 +1416,14 @@ export default function PromotionVoucherManagementView({
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
-                                {(overview?.recentLedger ?? []).length === 0 ? (
+                                {ledgerList.length === 0 ? (
                                     <tr>
                                         <td colSpan={6} className="py-10 text-center text-slate-500">
                                             Chưa có bản ghi sổ cái khuyến mại nào.
                                         </td>
                                     </tr>
                                 ) : (
-                                    (overview?.recentLedger ?? []).map((item) => {
+                                    pgLedger.pageItems.map((item) => {
                                         const isRelease = item.eventType.includes('RELEASE');
                                         const isRedeem = item.eventType.includes('REDEEM');
                                         return (
@@ -1472,6 +1479,9 @@ export default function PromotionVoucherManagementView({
                                 )}
                             </tbody>
                         </table>
+                    </div>
+                    <div className="px-4 pb-3 border-t border-slate-100">
+                        <Pagination page={pgLedger.page} totalPages={pgLedger.totalPages} total={ledgerList.length} from={pgLedger.from} to={pgLedger.to} onPageChange={pgLedger.setPage} label="bản ghi" />
                     </div>
                 </div>
             )}

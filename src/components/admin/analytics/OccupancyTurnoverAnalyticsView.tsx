@@ -38,6 +38,7 @@ import type {
     LockerSizeFilterType,
 } from '../../../api/adminOccupancyAnalyticsService';
 import type { ReportGranularity, ReportExportFormat } from '../../../api/adminFinancialReportService';
+import Pagination, { usePagination } from '../Pagination';
 
 interface OccupancyTurnoverAnalyticsViewProps {
     userRole?: string;
@@ -321,6 +322,9 @@ export default function OccupancyTurnoverAnalyticsView({
             );
         });
     }, [data?.lockerTurnoverItems, unitSearch, unitTierFilter]);
+    const stationBreakdownList = data?.stationBreakdown ?? [];
+    const pgStations = usePagination(stationBreakdownList, 10);
+    const pgUnits = usePagination(filteredUnits, 10);
 
     const occDelta = data?.occupancyDeltaPercent ?? 0;
     const cyclesGrowth = data?.cyclesGrowthPercent ?? 0;
@@ -1219,14 +1223,14 @@ export default function OccupancyTurnoverAnalyticsView({
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
-                                {(data?.stationBreakdown ?? []).length === 0 ? (
+                                {stationBreakdownList.length === 0 ? (
                                     <tr>
                                         <td colSpan={8} className="py-8 text-center text-slate-500">
                                             Chưa có dữ liệu trạm.
                                         </td>
                                     </tr>
                                 ) : (
-                                    (data?.stationBreakdown ?? []).map((st) => {
+                                    pgStations.pageItems.map((st) => {
                                         const capBadge = getCapacityBadge(st.capacityStatus);
                                         return (
                                             <tr key={st.stationId} className="hover:bg-slate-50/70 transition">
@@ -1308,6 +1312,9 @@ export default function OccupancyTurnoverAnalyticsView({
                             </tbody>
                         </table>
                     </div>
+                    <div className="px-4 pb-3 border-t border-slate-100">
+                        <Pagination page={pgStations.page} totalPages={pgStations.totalPages} total={stationBreakdownList.length} from={pgStations.from} to={pgStations.to} onPageChange={pgStations.setPage} label="trạm" />
+                    </div>
                 </div>
             </div>
 
@@ -1353,7 +1360,7 @@ export default function OccupancyTurnoverAnalyticsView({
                         </div>
                     </div>
 
-                    <div className="overflow-x-auto max-h-[540px]">
+                    <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse text-xs">
                             <thead className="sticky top-0 bg-slate-50 z-10 shadow-2xs">
                                 <tr className="text-slate-500 font-bold uppercase text-xs tracking-wider border-b border-slate-200">
@@ -1377,7 +1384,7 @@ export default function OccupancyTurnoverAnalyticsView({
                                         </td>
                                     </tr>
                                 ) : (
-                                    filteredUnits.map((u) => {
+                                    pgUnits.pageItems.map((u) => {
                                         const tier = getTierBadge(u.utilizationTier);
                                         const TierIcon = tier.Icon;
                                         return (
@@ -1448,6 +1455,9 @@ export default function OccupancyTurnoverAnalyticsView({
                                 )}
                             </tbody>
                         </table>
+                    </div>
+                    <div className="px-4 pb-3 border-t border-slate-100">
+                        <Pagination page={pgUnits.page} totalPages={pgUnits.totalPages} total={filteredUnits.length} from={pgUnits.from} to={pgUnits.to} onPageChange={pgUnits.setPage} label="ngăn tủ" />
                     </div>
                 </div>
             )}

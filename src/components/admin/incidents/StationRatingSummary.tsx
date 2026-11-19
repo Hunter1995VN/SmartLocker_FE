@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Star, RefreshCw, AlertCircle } from 'lucide-react';
 import apiClient from '../../../api/client';
+import Pagination, { usePagination } from '../Pagination';
 
 interface Rating { stationId: string; stationName?: string; count: number; average: number }
 
@@ -21,6 +22,7 @@ export default function StationRatingSummary() {
   useEffect(() => { void load(); }, []);
 
   const sorted = [...(ratings ?? [])].sort((a, b) => a.average - b.average || b.count - a.count);
+  const pgRatings = usePagination(sorted, 10);
   const total = sorted.reduce((sum, r) => sum + r.count, 0);
   const overall = total ? sorted.reduce((sum, r) => sum + r.average * r.count, 0) / total : 0;
 
@@ -48,7 +50,7 @@ export default function StationRatingSummary() {
         <span className="text-xs font-semibold text-slate-500">/ 5 trung bình · {total} lượt · {sorted.length} trạm</span>
       </div>
       <ul className="divide-y divide-slate-100">
-        {sorted.map(item => <li key={item.stationId} className="py-2.5 flex items-center gap-3">
+        {pgRatings.pageItems.map(item => <li key={item.stationId} className="py-2.5 flex items-center gap-3">
           <span className="flex-1 min-w-0 text-xs font-semibold text-slate-800 truncate">{item.stationName || item.stationId}</span>
           <span className="hidden sm:block w-28 h-1.5 rounded-full bg-slate-100 overflow-hidden" aria-hidden="true">
             <span className="block h-full rounded-full bg-amber-400" style={{ width: `${(item.average / 5) * 100}%` }} />
@@ -59,6 +61,7 @@ export default function StationRatingSummary() {
           <span className="shrink-0 w-14 text-right text-xs text-slate-500">{item.count} lượt</span>
         </li>)}
       </ul>
+      <Pagination page={pgRatings.page} totalPages={pgRatings.totalPages} total={sorted.length} from={pgRatings.from} to={pgRatings.to} onPageChange={pgRatings.setPage} label="trạm" />
     </>}
   </section>;
 }

@@ -51,7 +51,7 @@ export default function UserTable({
     onTriggerActivate,
     onTriggerChangeRole,
 }: UserTableProps) {
-    const pg = usePagination(users, 15);
+    const pg = usePagination(users, 10);
 
     if (isLoading) {
         return (

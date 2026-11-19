@@ -13,7 +13,7 @@ interface CriticalTriageCardProps {
     isLoading: boolean;
 }
 
-const INCIDENT_PAGE_SIZE = 5;
+const INCIDENT_PAGE_SIZE = 9;
 
 export default function CriticalTriageCard({
     incidents,
