@@ -766,6 +766,10 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
             </div>
           </div>
         </div>
+
+        {/* ỦY QUYỀN NHẬN ĐỒ & BÁO QUÊN ĐỒ */}
+        {booking && <PickupDelegationPanel key={booking.id} bookingId={booking.id} status={booking.status} />}
+        {booking && <LostItemPanel bookingId={booking.id} status={booking.status} checkedOutAt={booking.checkedOutAt} />}
       </main>
 
       {/* OFFLINE TICKET PASS MODAL */}
@@ -777,8 +781,6 @@ const BookingDetailPage: React.FC<BookingDetailPageProps> = ({ onNavigate, booki
       />
 
       {/* EXTEND BOOKING MODAL (UC-T07) */}
-      {booking && <PickupDelegationPanel key={booking.id} bookingId={booking.id} status={booking.status} />}
-        {booking && <LostItemPanel bookingId={booking.id} status={booking.status} checkedOutAt={booking.checkedOutAt} />}
       <ExtendBookingModal
         isOpen={showExtendModal}
         onClose={() => {
