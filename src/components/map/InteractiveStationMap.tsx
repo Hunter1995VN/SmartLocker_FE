@@ -22,21 +22,27 @@ interface InteractiveStationMapProps {
 type MapStyleKey = 'osm' | 'esriStreet' | 'satellite';
 
 // 100% Free Map Tile Servers — Không bao giờ yêu cầu API Key
-const TILE_LAYERS: Record<MapStyleKey, { label: string; url: string; attribution: string }> = {
+// Lưu ý: tile.openstreetmap.org thường bị các ISP Việt Nam chặn/DNS sinkhole về 127.0.0.1
+// Sử dụng CARTO Voyager (dữ liệu OpenStreetMap qua CDN Edge quốc tế tốc độ cao, không bị chặn)
+const TILE_LAYERS: Record<MapStyleKey, { label: string; url: string; attribution: string; subdomains?: string; maxZoom?: number }> = {
     osm: {
         label: 'Bản đồ Đường phố',
-        url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-        attribution: '&copy; OpenStreetMap contributors',
+        url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+        subdomains: 'abcd',
+        maxZoom: 20,
     },
     esriStreet: {
         label: 'Giao thông (HD)',
         url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
         attribution: '&copy; Esri, HERE, Garmin, OpenStreetMap',
+        maxZoom: 19,
     },
     satellite: {
         label: 'Vệ tinh',
         url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
         attribution: '&copy; Esri',
+        maxZoom: 19,
     },
 };
 
@@ -143,7 +149,8 @@ export default function InteractiveStationMap({
 
         const cfg = TILE_LAYERS[mapStyle];
         tileLayerRef.current = L.tileLayer(cfg.url, {
-            maxZoom: 19,
+            maxZoom: cfg.maxZoom || 19,
+            subdomains: cfg.subdomains || 'abc',
             attribution: cfg.attribution,
         }).addTo(map);
 
@@ -183,7 +190,8 @@ export default function InteractiveStationMap({
         }
         const cfg = TILE_LAYERS[mapStyle];
         tileLayerRef.current = L.tileLayer(cfg.url, {
-            maxZoom: 19,
+            maxZoom: cfg.maxZoom || 19,
+            subdomains: cfg.subdomains || 'abc',
             attribution: cfg.attribution,
         }).addTo(map);
     }, [mapStyle, leafletReady]);
