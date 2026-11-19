@@ -20,6 +20,7 @@ import {
   syncPayment,
   type CreateBookingResponse
 } from '../../api/bookingService';
+import { parseServerTime } from '../../utils/serverTime';
 import { useT } from '../../i18n';
 
 interface ExtendBookingModalProps {
@@ -76,9 +77,9 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [statusNote, setStatusNote] = useState<string | null>(null);
 
-  // Compute current end Date object from real booking.endAt
-  const baseEndDate = currentEndAt ? new Date(currentEndAt) : new Date();
-  const baseStartDate = startAt ? new Date(startAt) : baseEndDate;
+  // Compute current end Date object from real booking.endAt (parsed as UTC)
+  const baseEndDate = currentEndAt ? new Date(parseServerTime(currentEndAt)) : new Date();
+  const baseStartDate = startAt ? new Date(parseServerTime(startAt)) : baseEndDate;
   const currentTotalHours = Math.max(
     1,
     Math.round(((baseEndDate.getTime() - baseStartDate.getTime()) / 3600000) * 10) / 10
@@ -230,7 +231,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
         }
         const res = await getBookingById(bookingId);
         if (res.success && res.data) {
-          const updatedEndMs = new Date(res.data.endAt).getTime();
+          const updatedEndMs = parseServerTime(res.data.endAt);
           if (updatedEndMs > oldEndTimeMs + 60000) {
             clearInterval(interval);
             setIsPaidSuccess(true);
@@ -254,7 +255,7 @@ export const ExtendBookingModal: React.FC<ExtendBookingModalProps> = ({
       }
       const res = await getBookingById(bookingId);
       if (res.success && res.data) {
-        const updatedEndMs = new Date(res.data.endAt).getTime();
+        const updatedEndMs = parseServerTime(res.data.endAt);
         if (updatedEndMs > baseEndDate.getTime() + 60000) {
           setIsPaidSuccess(true);
           if (onExtended) await onExtended();

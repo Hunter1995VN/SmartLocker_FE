@@ -20,6 +20,7 @@ import {
   confirmOverduePaymentDemo,
   type CreateBookingResponse,
 } from '../../api/bookingService';
+import { parseServerTime } from '../../utils/serverTime';
 import ModalOverlay from '../ui/ModalOverlay';
 import { useT } from '../../i18n';
 
@@ -67,7 +68,7 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
   const formatVnd = (val: number) => new Intl.NumberFormat('vi-VN').format(Math.round(val)) + ' VND';
 
   // Calculate overdue hours if not passed
-  const computedOverdueHours = overdueHours || Math.max(1, Math.ceil((Date.now() - new Date(endAt).getTime() - 15 * 60000) / 3600000));
+  const computedOverdueHours = overdueHours || Math.max(1, Math.ceil((Date.now() - parseServerTime(endAt) - 15 * 60000) / 3600000));
   const computedRate = overdueFeePerHour || (overdueFee > 0 ? Math.round(overdueFee / computedOverdueHours) : 15000);
   const finalOverdueAmount = paymentData?.amount || overdueFee || computedOverdueHours * computedRate;
 
@@ -268,8 +269,8 @@ export const PayOverdueModal: React.FC<PayOverdueModalProps> = ({
             <div className="flex items-center justify-between">
               <span className="text-slate-600">{t('Hạn gốc:')}</span>
               <span className="font-medium text-rose-700">
-                {new Date(endAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}{' '}
-                {new Date(endAt).toLocaleDateString('vi-VN')}
+                {new Date(parseServerTime(endAt)).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}{' '}
+                {new Date(parseServerTime(endAt)).toLocaleDateString('vi-VN')}
               </span>
             </div>
             <div className="flex items-center justify-between">

@@ -731,7 +731,7 @@ export default function DashboardPage({ onLogout, onNavigateToMap, onNavigateToA
                     stationName={activeBooking.stationName}
                     startAt={activeBooking.startAt}
                     currentEndAt={activeBooking.endAt}
-                    currentEndTime={new Date(activeBooking.endAt).toLocaleString('vi-VN')}
+                    currentEndTime={new Date(parseServerTime(activeBooking.endAt)).toLocaleString('vi-VN')}
                     hourlyRate={activeBooking.hourlyRate}
                     maxHours={activeBooking.maxHours}
                     overdueFee={activeBooking.currentOverdueFee}

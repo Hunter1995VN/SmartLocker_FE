@@ -35,6 +35,7 @@ import {
   sendSmartExpiryBrowserNotification,
 } from '../utils/kioskNavigation';
 import CustomerHeader from '../components/layout/CustomerHeader';
+import { parseServerTime } from '../utils/serverTime';
 import { useT } from '../i18n';
 
 interface MyBookingsPageProps {
@@ -137,7 +138,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
     .filter((b) => b.status === 'STORED' && !b.isOverdue && userGps && b.stationLatitude != null && b.stationLongitude != null)
     .map((b) => {
       const distKm = calcDistanceKm(userGps!.lat, userGps!.lng, b.stationLatitude!, b.stationLongitude!);
-      const remainingMinutes = Math.max(0, Math.round((new Date(b.endAt).getTime() - Date.now()) / 60000));
+      const remainingMinutes = Math.max(0, Math.round((parseServerTime(b.endAt) - Date.now()) / 60000));
       const alert = evaluateSmartExtensionAlert({
         remainingMinutes,
         distanceKm: distKm,
@@ -338,8 +339,8 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
 
             {/* Loop through Active Locker Cards */}
             {activeBookings.map((booking) => {
-              const start = new Date(booking.startAt).getTime();
-              const end = new Date(booking.endAt).getTime();
+              const start = parseServerTime(booking.startAt);
+              const end = parseServerTime(booking.endAt);
               const now = Date.now();
               const total = end - start;
               const elapsed = now - start;
@@ -442,7 +443,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                         ) : (
                           <>
                             <p className="text-sm text-slate-900 font-semibold">
-                              {new Date(booking.checkedInAt || booking.startAt).toLocaleString('vi-VN')} – {new Date(booking.endAt).toLocaleString('vi-VN')}
+                              {new Date(parseServerTime(booking.checkedInAt || booking.startAt)).toLocaleString('vi-VN')} – {new Date(parseServerTime(booking.endAt)).toLocaleString('vi-VN')}
                             </p>
                             <p className="text-sm text-secondary">{booking.durationHours} Hours Storage</p>
                           </>
@@ -460,9 +461,9 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                           }`} style={{ width: `${progress}%` }}></div>
                         </div>
                         <div className="flex justify-between text-xs text-slate-500">
-                          <span>{booking.status === 'CONFIRMED' ? t('Bắt đầu: Đã xác nhận') : t('Bắt đầu: {time}', { time: new Date(booking.checkedInAt || booking.startAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) })}</span>
+                          <span>{booking.status === 'CONFIRMED' ? t('Bắt đầu: Đã xác nhận') : t('Bắt đầu: {time}', { time: new Date(parseServerTime(booking.checkedInAt || booking.startAt)).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) })}</span>
                           <span className={booking.status === 'CONFIRMED' ? 'text-amber-700 font-semibold' : 'text-blue-700 font-semibold'}>
-                            {booking.status === 'CONFIRMED' ? t('Giữ chỗ 30 phút') : t('Hết hạn: {time}', { time: new Date(booking.endAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) })}
+                            {booking.status === 'CONFIRMED' ? t('Giữ chỗ 30 phút') : t('Hết hạn: {time}', { time: new Date(parseServerTime(booking.endAt)).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) })}
                           </span>
                         </div>
                       </div>
@@ -633,7 +634,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
                           </span>
                           <span className="font-mono text-xs text-slate-900 font-bold">{item.bookingCode}</span>
                           <span className="text-xs text-slate-500">·</span>
-                          <span className="text-xs text-secondary">{new Date(item.startAt).toLocaleDateString('vi-VN')}</span>
+                          <span className="text-xs text-secondary">{new Date(parseServerTime(item.startAt)).toLocaleDateString('vi-VN')}</span>
                         </div>
                         <h4 className="text-sm text-slate-900 font-bold">{item.stationName}</h4>
                         <p className="text-sm text-secondary">
@@ -759,7 +760,7 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
           stationName={selectedBooking.stationName}
           startAt={selectedBooking.startAt}
           currentEndAt={selectedBooking.endAt}
-          currentEndTime={new Date(selectedBooking.endAt).toLocaleString('vi-VN')}
+          currentEndTime={new Date(parseServerTime(selectedBooking.endAt)).toLocaleString('vi-VN')}
           hourlyRate={selectedBooking.hourlyRate}
           maxHours={selectedBooking.maxHours}
           overdueFee={selectedBooking.currentOverdueFee}
@@ -819,8 +820,8 @@ const MyBookingsPage: React.FC<MyBookingsPageProps> = ({ onNavigate }) => {
 
             {/* Calculation according to BR-T06 */}
             {(() => {
-              const start = new Date(cancelledDetailBooking.startAt).getTime();
-              const created = new Date(cancelledDetailBooking.createdAt).getTime();
+              const start = parseServerTime(cancelledDetailBooking.startAt);
+              const created = parseServerTime(cancelledDetailBooking.createdAt);
               const hoursBeforeStart = (start - created) / 3600000;
               
               let refundRate = 0;

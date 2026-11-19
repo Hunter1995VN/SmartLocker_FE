@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { MOCK_STATIONS, MOCK_ACTIVE_BOOKING, calcDistance, getStations } from '../api/stationService';
 import type { Station, Booking } from '../api/stationService';
+import { parseServerTime } from '../utils/serverTime';
 import { useT } from '../i18n';
 
 // ─── Config ──────────────────────────────────────────────────────────────────
@@ -143,7 +144,7 @@ export default function TravelerHomePage({ onLogout, onNavigateLogin, onNavigate
     useEffect(() => {
         if (!activeBooking || activeBooking.status !== 'CHECKED_IN') return;
         const update = () => {
-            const diff = new Date(activeBooking.endAt).getTime() - Date.now();
+            const diff = parseServerTime(activeBooking.endAt) - Date.now();
             if (diff <= 0) { setTimeLeft(t('Đã hết giờ')); return; }
             const h = Math.floor(diff / 3_600_000);
             const m = Math.floor((diff % 3_600_000) / 60_000);
