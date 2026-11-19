@@ -21,16 +21,14 @@ interface InteractiveStationMapProps {
 
 type MapStyleKey = 'osm' | 'esriStreet' | 'satellite';
 
-// 100% Free Map Tile Servers — Không bao giờ yêu cầu API Key
-// Lưu ý: tile.openstreetmap.org thường bị các ISP Việt Nam chặn/DNS sinkhole về 127.0.0.1
-// Sử dụng CARTO Voyager (dữ liệu OpenStreetMap qua CDN Edge quốc tế tốc độ cao, không bị chặn)
+// 100% Free Map Tile Servers — Hoàn toàn miễn phí, không cần API Key, không watermark, không bị chặn tại VN
 const TILE_LAYERS: Record<MapStyleKey, { label: string; url: string; attribution: string; subdomains?: string; maxZoom?: number }> = {
     osm: {
         label: 'Bản đồ Đường phố',
-        url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-        subdomains: 'abcd',
-        maxZoom: 20,
+        url: 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+        attribution: '&copy; OpenStreetMap contributors, Tiles style by Humanitarian OSM Team',
+        subdomains: 'abc',
+        maxZoom: 19,
     },
     esriStreet: {
         label: 'Giao thông (HD)',
