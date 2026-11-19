@@ -124,7 +124,7 @@ export default function AuditLogView() {
                 targetEntity: entityFilter !== 'ALL' ? entityFilter : undefined,
                 role: roleFilter !== 'ALL' ? roleFilter : undefined,
                 page: 1,
-                pageSize: 80,
+                pageSize: 200,
             });
             if (res.success && res.data && res.data.items.length > 0) {
                 setData(res.data);
@@ -156,7 +156,7 @@ export default function AuditLogView() {
         const matchRole = roleFilter === 'ALL' || item.userRole === roleFilter;
         return matchSearch && matchAction && matchEntity && matchRole;
     });
-    const pgLogs = usePagination(filteredLogs, 20);
+    const pgLogs = usePagination(filteredLogs, 10);
 
     const getActionBadge = (action: string) => {
         if (action.includes('UNLOCK')) {
@@ -176,7 +176,7 @@ export default function AuditLogView() {
 
     const handleExportCsv = () => {
         const headers = ['ID', 'ThoiGian', 'NguoiThucHien', 'Email', 'VaiTro', 'HanhDong', 'DoiTuong', 'MaDoiTuong', 'IP', 'ChiTiet'];
-        const rows = pgLogs.pageItems.map((l) => [
+        const rows = filteredLogs.map((l) => [
             l.id,
             new Date(l.createdAt).toLocaleString('vi-VN'),
             `"${(l.userName || '').replace(/"/g, '""')}"`,
@@ -378,7 +378,7 @@ export default function AuditLogView() {
                                     </td>
                                 </tr>
                             ) : (
-                                filteredLogs.map((log) => (
+                                pgLogs.pageItems.map((log) => (
                                     <tr
                                         key={log.id}
                                         onClick={() => setSelectedLog(log)}
@@ -450,7 +450,9 @@ export default function AuditLogView() {
                         </tbody>
                     </table>
                 </div>
-                <Pagination page={pgLogs.page} totalPages={pgLogs.totalPages} total={filteredLogs.length} from={pgLogs.from} to={pgLogs.to} onPageChange={pgLogs.setPage} label="nhật ký" />
+                <div className="px-4 pb-3 border-t border-slate-100">
+                    <Pagination page={pgLogs.page} totalPages={pgLogs.totalPages} total={filteredLogs.length} from={pgLogs.from} to={pgLogs.to} onPageChange={pgLogs.setPage} label="nhật ký" />
+                </div>
             </div>
 
             {/* Detail Modal */}

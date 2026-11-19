@@ -87,7 +87,7 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
             return true;
         });
     }, [devices, searchQuery, filterStatus]);
-    const pgDevices = usePagination(filteredDevices, 15);
+    const pgDevices = usePagination(filteredDevices, 10);
 
     // Handle Reboot (UC-S09)
     const handleConfirmReboot = async () => {
@@ -460,7 +460,9 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                         </tbody>
                     </table>
                 </div>
-                <Pagination page={pgDevices.page} totalPages={pgDevices.totalPages} total={filteredDevices.length} from={pgDevices.from} to={pgDevices.to} onPageChange={pgDevices.setPage} label="thiết bị" />
+                <div className="px-4 pb-3 border-t border-slate-100">
+                    <Pagination page={pgDevices.page} totalPages={pgDevices.totalPages} total={filteredDevices.length} from={pgDevices.from} to={pgDevices.to} onPageChange={pgDevices.setPage} label="thiết bị" />
+                </div>
             </div>
 
             {/* Self-Test Diagnostic Result Modal (UC-S07) */}

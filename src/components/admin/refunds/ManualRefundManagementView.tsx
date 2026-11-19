@@ -258,7 +258,8 @@ export default function ManualRefundManagementView({
     };
 
     const items = overview?.items ?? [];
-    const pgRefunds = usePagination(items, 15);
+    const pgRefunds = usePagination(items, 10);
+    const pgCandidates = usePagination(candidates, 10);
 
     return (
         <div className="space-y-5">
@@ -666,7 +667,9 @@ export default function ManualRefundManagementView({
                             </tbody>
                         </table>
                     </div>
-                    <Pagination page={pgRefunds.page} totalPages={pgRefunds.totalPages} total={items.length} from={pgRefunds.from} to={pgRefunds.to} onPageChange={pgRefunds.setPage} label="yêu cầu hoàn tiền" />
+                    <div className="px-4 pb-3 border-t border-slate-100">
+                        <Pagination page={pgRefunds.page} totalPages={pgRefunds.totalPages} total={items.length} from={pgRefunds.from} to={pgRefunds.to} onPageChange={pgRefunds.setPage} label="yêu cầu hoàn tiền" />
+                    </div>
                 </div>
             )}
 
@@ -716,7 +719,7 @@ export default function ManualRefundManagementView({
                                         </td>
                                     </tr>
                                 ) : (
-                                    candidates.map((c) => (
+                                    pgCandidates.pageItems.map((c) => (
                                         <tr key={c.paymentId} className="hover:bg-slate-50/70">
                                             <td className="py-3 px-4 whitespace-nowrap">
                                                 <p className="font-mono font-bold text-slate-900">{c.orderCode}</p>
@@ -768,6 +771,9 @@ export default function ManualRefundManagementView({
                                 )}
                             </tbody>
                         </table>
+                    </div>
+                    <div className="px-4 pb-3 border-t border-slate-100">
+                        <Pagination page={pgCandidates.page} totalPages={pgCandidates.totalPages} total={candidates.length} from={pgCandidates.from} to={pgCandidates.to} onPageChange={pgCandidates.setPage} label="giao dịch" />
                     </div>
                 </div>
             )}

@@ -36,6 +36,7 @@ import type {
     ReportExportFormat,
     FinancialTimeSeriesPointDto,
 } from '../../../api/adminFinancialReportService';
+import Pagination, { usePagination } from '../Pagination';
 
 interface FinancialRevenueReportViewProps {
     userRole?: string;
@@ -294,6 +295,9 @@ export default function FinancialRevenueReportView({
             );
         });
     }, [report?.ledgerItems, ledgerSearch, ledgerStatusFilter]);
+    const stationReportList = report?.stationBreakdown ?? [];
+    const pgStationReport = usePagination(stationReportList, 10);
+    const pgLedger = usePagination(filteredLedgerItems, 10);
 
     const growthVal = report?.netRevenueGrowthPercent ?? 0;
     const isPositiveGrowth = growthVal >= 0;
@@ -1138,17 +1142,17 @@ export default function FinancialRevenueReportView({
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
-                                {(report?.stationBreakdown ?? []).length === 0 ? (
+                                {stationReportList.length === 0 ? (
                                     <tr>
                                         <td colSpan={9} className="py-8 text-center text-slate-500">
                                             Chưa có dữ liệu trạm trong kỳ báo cáo.
                                         </td>
                                     </tr>
                                 ) : (
-                                    (report?.stationBreakdown ?? []).map((st, index) => (
+                                    pgStationReport.pageItems.map((st, index) => (
                                         <tr key={st.stationId} className="hover:bg-slate-50/70 transition">
                                             <td className="py-3 px-4 font-extrabold text-slate-500">
-                                                #{index + 1}
+                                                #{(pgStationReport.page - 1) * 10 + index + 1}
                                             </td>
                                             <td className="py-3 px-4">
                                                 <p className="font-bold text-slate-900">{st.stationName}</p>
@@ -1199,6 +1203,9 @@ export default function FinancialRevenueReportView({
                                 )}
                             </tbody>
                         </table>
+                    </div>
+                    <div className="px-4 pb-3 border-t border-slate-100">
+                        <Pagination page={pgStationReport.page} totalPages={pgStationReport.totalPages} total={stationReportList.length} from={pgStationReport.from} to={pgStationReport.to} onPageChange={pgStationReport.setPage} label="trạm" />
                     </div>
                 </div>
 
@@ -1340,7 +1347,7 @@ export default function FinancialRevenueReportView({
                         </div>
                     </div>
 
-                    <div className="overflow-x-auto max-h-[540px]">
+                    <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse text-xs">
                             <thead className="sticky top-0 bg-slate-50 z-10 shadow-2xs">
                                 <tr className="text-slate-500 font-bold uppercase text-xs tracking-wider border-b border-slate-200">
@@ -1362,7 +1369,7 @@ export default function FinancialRevenueReportView({
                                         </td>
                                     </tr>
                                 ) : (
-                                    filteredLedgerItems.map((row) => {
+                                    pgLedger.pageItems.map((row) => {
                                         const kindMeta = getKindBadge(row.kind);
                                         const statusMeta = getStatusBadge(row.status);
                                         return (
@@ -1433,6 +1440,9 @@ export default function FinancialRevenueReportView({
                                 )}
                             </tbody>
                         </table>
+                    </div>
+                    <div className="px-4 pb-3 border-t border-slate-100">
+                        <Pagination page={pgLedger.page} totalPages={pgLedger.totalPages} total={filteredLedgerItems.length} from={pgLedger.from} to={pgLedger.to} onPageChange={pgLedger.setPage} label="giao dịch" />
                     </div>
                 </div>
             )}

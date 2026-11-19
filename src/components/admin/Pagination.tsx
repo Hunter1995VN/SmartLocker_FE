@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 /** Phân trang phía client: tự quay về trang hợp lệ khi dữ liệu đổi (ví dụ làm mới còn ít dòng hơn). */
-export function usePagination<T>(items: T[], pageSize: number) {
+export function usePagination<T>(items: T[], pageSize = 10) {
     const [page, setPage] = useState(1);
     const totalPages = Math.max(1, Math.ceil(items.length / pageSize));
 
@@ -10,8 +10,9 @@ export function usePagination<T>(items: T[], pageSize: number) {
         if (page > totalPages) setPage(totalPages);
     }, [page, totalPages]);
 
-    const pageItems = useMemo(() => items.slice((page - 1) * pageSize, page * pageSize), [items, page, pageSize]);
-    return { page, setPage, totalPages, pageItems, from: items.length === 0 ? 0 : (page - 1) * pageSize + 1, to: Math.min(page * pageSize, items.length) };
+    const safePage = Math.min(page, totalPages);
+    const pageItems = useMemo(() => items.slice((safePage - 1) * pageSize, safePage * pageSize), [items, safePage, pageSize]);
+    return { page: safePage, setPage, totalPages, pageItems, from: items.length === 0 ? 0 : (safePage - 1) * pageSize + 1, to: Math.min(safePage * pageSize, items.length) };
 }
 
 interface PaginationProps {
@@ -24,10 +25,10 @@ interface PaginationProps {
     label?: string;
 }
 
-/** Thanh phân trang: "Hiển thị 1–8 / 25", nút trước/sau và các số trang (rút gọn bằng dấu …). */
+/** Thanh phân trang: "Hiển thị 1–10 / 25", nút trước/sau và các số trang (rút gọn bằng dấu …). */
 export default function Pagination({ page, totalPages, total, from, to, onPageChange, label = 'mục' }: PaginationProps) {
-    if (total === 0 || totalPages <= 1) {
-        return total > 0 ? <p className="mt-3 text-xs text-slate-500">Hiển thị {from}–{to} / {total} {label}</p> : null;
+    if (total === 0) {
+        return null;
     }
 
     const pages: (number | 'gap-left' | 'gap-right')[] = [];
@@ -39,7 +40,7 @@ export default function Pagination({ page, totalPages, total, from, to, onPageCh
 
     const btn = 'min-w-8 h-8 px-2 rounded-lg text-xs font-semibold border transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed';
     return (
-        <nav aria-label="Phân trang" className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <nav aria-label="Phân trang" className="mt-3 flex flex-col sm:flex-row items-center justify-between gap-2">
             <p className="text-xs text-slate-500">Hiển thị <strong>{from}–{to}</strong> / {total} {label}</p>
             <div className="flex items-center gap-1">
                 <button type="button" aria-label="Trang trước" disabled={page <= 1} onClick={() => onPageChange(page - 1)} className={`${btn} border-slate-200 text-slate-600 hover:bg-slate-50`}>

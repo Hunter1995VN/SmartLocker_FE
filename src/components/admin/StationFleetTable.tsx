@@ -14,7 +14,7 @@ interface StationFleetTableProps {
     onInspect?: () => void;
 }
 
-const PAGE_SIZE = 8;
+const PAGE_SIZE = 10;
 
 export default function StationFleetTable({ stations, isLoading, onInspect }: StationFleetTableProps) {
     const { page, setPage, totalPages, pageItems, from, to } = usePagination(stations, PAGE_SIZE);

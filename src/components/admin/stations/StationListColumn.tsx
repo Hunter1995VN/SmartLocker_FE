@@ -26,7 +26,7 @@ export default function StationListColumn({
 }: StationListColumnProps) {
     const [selectedCity, setSelectedCity] = useState<string>('all');
     const [currentPage, setCurrentPage] = useState<number>(1);
-    const PAGE_SIZE = 5;
+    const PAGE_SIZE = 9;
 
     // Detect cities from addresses
     const cityCounts = useMemo(() => {

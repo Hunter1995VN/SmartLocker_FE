@@ -200,7 +200,7 @@ export default function FinancialReconciliationView({
         const matchKind = kindFilter === 'ALL' || item.kind === kindFilter;
         return matchSearch && matchStatus && matchKind;
     });
-    const pgItems = usePagination(filteredItems, 15);
+    const pgItems = usePagination(filteredItems, 10);
 
     const grossRevenue =
         dashboard?.totalGrossRevenue ??
@@ -216,7 +216,7 @@ export default function FinancialReconciliationView({
 
     const handleExportCsv = () => {
         const headers = ['OrderCode_PayOS', 'MaBooking', 'KhachHang', 'Tram', 'LoaiGiaoDich', 'SoTien_VND', 'TrangThai_DB', 'TrangThai_DoiSoat', 'ThoiDiemThanhToan'];
-        const rows = pgItems.pageItems.map((i) => [
+        const rows = filteredItems.map((i) => [
             i.orderCode,
             i.bookingCode,
             `"${(i.customerName || '').replace(/"/g, '""')}"`,
@@ -472,7 +472,7 @@ export default function FinancialReconciliationView({
                                     </td>
                                 </tr>
                             ) : (
-                                filteredItems.map((item) => (
+                                pgItems.pageItems.map((item) => (
                                     <tr key={item.paymentId} className="hover:bg-slate-50/80 transition">
                                         <td className="py-3.5 px-4 whitespace-nowrap">
                                             <div className="font-mono font-bold text-slate-900">{item.orderCode}</div>
@@ -571,7 +571,9 @@ export default function FinancialReconciliationView({
                         </tbody>
                     </table>
                 </div>
-                <Pagination page={pgItems.page} totalPages={pgItems.totalPages} total={filteredItems.length} from={pgItems.from} to={pgItems.to} onPageChange={pgItems.setPage} label="giao dịch" />
+                <div className="px-4 pb-3 border-t border-slate-100">
+                    <Pagination page={pgItems.page} totalPages={pgItems.totalPages} total={filteredItems.length} from={pgItems.from} to={pgItems.to} onPageChange={pgItems.setPage} label="giao dịch" />
+                </div>
             </div>
         </div>
     );

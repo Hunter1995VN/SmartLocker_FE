@@ -164,7 +164,7 @@ export default function CustomerDebtManagementView({
 
         return result;
     }, [travelers, searchQuery, debtFilter]);
-    const pgTravelers = usePagination(filteredTravelers, 15);
+    const pgTravelers = usePagination(filteredTravelers, 10);
 
     // 8. Handle Xử lý thu nợ (Gạch nợ 0đ & Tự động mở lại quyền đặt tủ theo BR-P08)
     const handleExecuteClearDebt = async (customer: UserAdminListItemDto) => {
@@ -296,7 +296,7 @@ export default function CustomerDebtManagementView({
         }
 
         const headers = ['Mã khách', 'Họ và tên', 'Email', 'Số điện thoại', 'Dư nợ cước (VNĐ)', 'Quyền đặt tủ', 'Trạng thái tài khoản', 'Ngày tạo'];
-        const rows = pgTravelers.pageItems.map((u) => [
+        const rows = filteredTravelers.map((u) => [
             u.id,
             `"${u.fullName || ''}"`,
             u.email,
@@ -614,7 +614,7 @@ export default function CustomerDebtManagementView({
                                         </td>
                                     </tr>
                                 ) : (
-                                    filteredTravelers.map((user) => {
+                                    pgTravelers.pageItems.map((user) => {
                                         const debtAmount = Math.max(0, Number(user.overdueDebt || 0));
                                         const hasDebt = debtAmount > 0;
                                         const isSelected = selectedCustomer?.id === user.id;
@@ -741,7 +741,9 @@ export default function CustomerDebtManagementView({
                             </tbody>
                         </table>
                     </div>
-                    <Pagination page={pgTravelers.page} totalPages={pgTravelers.totalPages} total={filteredTravelers.length} from={pgTravelers.from} to={pgTravelers.to} onPageChange={pgTravelers.setPage} label="khách hàng" />
+                    <div className="px-4 pb-3 border-t border-slate-100">
+                        <Pagination page={pgTravelers.page} totalPages={pgTravelers.totalPages} total={filteredTravelers.length} from={pgTravelers.from} to={pgTravelers.to} onPageChange={pgTravelers.setPage} label="khách hàng" />
+                    </div>
                 </div>
 
                 {/* Right Column: Sliding Customer Debt Detail Drawer */}

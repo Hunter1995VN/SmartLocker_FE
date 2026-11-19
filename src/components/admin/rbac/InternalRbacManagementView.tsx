@@ -493,7 +493,7 @@ export default function InternalRbacManagementView({
             return true;
         });
     }, [internalUsers, roleFilter, statusFilter, searchQuery]);
-    const pgUsers = usePagination(filteredUsers, 15);
+    const pgUsers = usePagination(filteredUsers, 10);
 
     // 7. Permission Matrix & Role Overviews (live API with fallback)
     const permissionMatrix = useMemo<RbacPermissionItemDto[]>(() => {
@@ -600,7 +600,7 @@ export default function InternalRbacManagementView({
             return true;
         });
     }, [rbacSummary, auditActionFilter, auditSearch]);
-    const pgAudit = usePagination(filteredAuditLogs, 20);
+    const pgAudit = usePagination(filteredAuditLogs, 10);
 
     // 8. CRUD & RBAC Action Handlers
     const handleCreateInternalUser = async (payload: CreateStaffRequest): Promise<boolean> => {
@@ -1433,7 +1433,9 @@ export default function InternalRbacManagementView({
                                         </tbody>
                                     </table>
                                 </div>
-                                <Pagination page={pgUsers.page} totalPages={pgUsers.totalPages} total={filteredUsers.length} from={pgUsers.from} to={pgUsers.to} onPageChange={pgUsers.setPage} label="tài khoản" />
+                                <div className="px-4 pb-3 border-t border-slate-100">
+                                    <Pagination page={pgUsers.page} totalPages={pgUsers.totalPages} total={filteredUsers.length} from={pgUsers.from} to={pgUsers.to} onPageChange={pgUsers.setPage} label="tài khoản" />
+                                </div>
                                 </>
                             )}
                         </div>
@@ -2091,7 +2093,9 @@ export default function InternalRbacManagementView({
                                 </tbody>
                             </table>
                         </div>
-                        <Pagination page={pgAudit.page} totalPages={pgAudit.totalPages} total={filteredAuditLogs.length} from={pgAudit.from} to={pgAudit.to} onPageChange={pgAudit.setPage} label="nhật ký" />
+                        <div className="px-4 pb-3 border-t border-slate-100">
+                            <Pagination page={pgAudit.page} totalPages={pgAudit.totalPages} total={filteredAuditLogs.length} from={pgAudit.from} to={pgAudit.to} onPageChange={pgAudit.setPage} label="nhật ký" />
+                        </div>
                         </>
                     )}
                 </div>

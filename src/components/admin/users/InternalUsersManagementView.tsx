@@ -86,7 +86,7 @@ export default function InternalUsersManagementView({
         setFetchError(null);
 
         try {
-            const res = await adminUserService.getUsers();
+            const res = await adminUserService.getUsers({ pageSize: 200 });
             if (res.success && res.data) {
                 setUsers(res.data);
                 setSelectedUser((prev) => {
