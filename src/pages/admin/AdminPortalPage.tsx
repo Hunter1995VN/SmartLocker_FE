@@ -32,6 +32,7 @@ import IoTTelemetryCard from '../../components/admin/IoTTelemetryCard';
 import CriticalTriageCard from '../../components/admin/CriticalTriageCard';
 import StationFleetTable from '../../components/admin/StationFleetTable';
 const StationManagementView = lazy(() => import('../../components/admin/stations/StationManagementView'));
+const AdminBookingsManagementView = lazy(() => import('../../components/admin/bookings/AdminBookingsManagementView'));
 const PromotionVoucherManagementView = lazy(() => import('../../components/admin/promotions/PromotionVoucherManagementView'));
 const InternalUsersManagementView = lazy(() => import('../../components/admin/users/InternalUsersManagementView'));
 const CustomerDebtManagementView = lazy(() => import('../../components/admin/users/CustomerDebtManagementView'));
@@ -251,6 +252,10 @@ export default function AdminPortalPage({ onLogout }: AdminPortalPageProps) {
                     ) : activeMenu === 'debt' ? (
                         <CustomerDebtManagementView
                             onNavigateUsers={() => setActiveMenu('users')}
+                        />
+                    ) : activeMenu === 'bookings' ? (
+                        <AdminBookingsManagementView
+                            onNotify={(msg, type) => showToast(msg, type)}
                         />
                     ) : activeMenu === 'stations' ? (
                         <StationManagementView />

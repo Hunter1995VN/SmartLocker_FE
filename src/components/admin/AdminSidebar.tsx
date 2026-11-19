@@ -27,6 +27,7 @@ import type { AuthResponse } from '../../api/authService';
 
 export type AdminMenuKey =
     | 'dashboard'
+    | 'bookings'
     | 'stations'
     | 'promotions'
     | 'rbac'
@@ -230,6 +231,21 @@ export default function AdminSidebar({
                             Quản lý & Nghiệp vụ
                         </p>
                         <div className="space-y-0.5 text-slate-600">
+                            <button
+                                type="button"
+                                onClick={() => onSelectMenu?.('bookings')}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition cursor-pointer text-left ${
+                                    activeMenu === 'bookings'
+                                        ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-600/30'
+                                        : 'text-slate-600 hover:bg-slate-50'
+                                }`}
+                            >
+                                <span className="flex items-center gap-2.5">
+                                    <Receipt className={`w-4 h-4 ${activeMenu === 'bookings' ? 'text-white' : 'text-blue-600'}`} />
+                                    <span>Quản lý đơn hàng</span>
+                                </span>
+                            </button>
+
                             <button
                                 type="button"
                                 onClick={() => onSelectMenu?.('stations')}
