@@ -6,7 +6,6 @@ import {
     User, 
     RotateCcw, 
     Minimize2, 
-    Sparkles, 
     ChevronDown,
     HelpCircle,
     PhoneCall
@@ -33,7 +32,7 @@ export const SupportChatWidget: React.FC = () => {
     const [messages, setMessages] = useState<ChatMessage[]>([
         {
             role: 'model',
-            content: 'Xin chào! Em là **Trợ lý SmartLocker AI** 🤖\n\nEm có thể hỗ trợ anh/chị tìm hiểu bảng giá, cách đặt & mở tủ qua mã QR/PIN, gia hạn giờ gửi hoặc hướng dẫn xử lý sự cố. Anh/chị cần em hỗ trợ điều gì hôm nay ạ?',
+            content: 'Xin chào! Em là **Trợ lý SmartLocker** 🤖\n\nEm hỗ trợ giải đáp bảng giá, kích thước tủ, cách đặt/mở tủ và hướng dẫn sử dụng trạm tủ tại Đà Nẵng. Anh/chị cần em hỗ trợ gì hôm nay ạ?',
             timestamp: new Date()
         }
     ]);
@@ -116,7 +115,7 @@ export const SupportChatWidget: React.FC = () => {
         setMessages([
             {
                 role: 'model',
-                content: 'Cuộc trò chuyện đã được làm mới. Em là **Trợ lý SmartLocker AI**. Anh/chị có thắc mắc gì về việc gửi hoặc nhận đồ không ạ?',
+                content: 'Cuộc trò chuyện đã được làm mới. Em là **Trợ lý SmartLocker**. Anh/chị cần hỗ trợ gì về dịch vụ gửi tủ không ạ?',
                 timestamp: new Date()
             }
         ]);
@@ -174,18 +173,17 @@ export const SupportChatWidget: React.FC = () => {
                         setIsOpen(true);
                         setShowTeaser(false);
                     }}
-                    className="mb-3 max-w-[280px] bg-white p-3.5 rounded-2xl shadow-xl border border-blue-100 text-xs cursor-pointer animate-bounce transition-all hover:scale-102 flex items-start gap-2.5 text-slate-800"
+                    className="mb-2.5 max-w-[260px] bg-white p-3 rounded-2xl shadow-lg border border-blue-100 text-xs cursor-pointer transition-all hover:scale-102 flex items-start gap-2.5 text-slate-800"
                 >
-                    <div className="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-                        <Bot className="w-4 h-4" />
+                    <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                        <Bot className="w-3.5 h-3.5" />
                     </div>
                     <div className="flex-1">
-                        <div className="font-semibold text-slate-900 flex items-center gap-1">
-                            Trợ lý SmartLocker AI
-                            <Sparkles className="w-3 h-3 text-amber-500 fill-amber-500" />
+                        <div className="font-semibold text-slate-900 text-xs">
+                            Trợ lý SmartLocker
                         </div>
-                        <p className="text-slate-600 mt-0.5 line-clamp-2 leading-relaxed">
-                            Bạn cần tư vấn giá tủ, cách đặt hoặc hỗ trợ nhận đồ không? Nhắn với em nhé!
+                        <p className="text-slate-600 mt-0.5 line-clamp-2 leading-relaxed text-[11px]">
+                            Cần tư vấn giá tủ, kích thước hoặc hỗ trợ nhận đồ? Nhắn với em nhé!
                         </p>
                     </div>
                     <button 
@@ -196,61 +194,60 @@ export const SupportChatWidget: React.FC = () => {
                         className="text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
                         aria-label="Đóng gợi ý"
                     >
-                        <X className="w-3.5 h-3.5" />
+                        <X className="w-3 h-3" />
                     </button>
                 </div>
             )}
 
-            {/* Cửa sổ Chat - Đồng bộ chuẩn tone sáng sáng trắng/xanh của SmartLocker */}
+            {/* Cửa sổ Chat - Kích thước gọn gàng, tinh tế, không che màn hình */}
             {isOpen && (
                 <div 
-                    className={`bg-white rounded-2xl shadow-2xl border border-slate-200/90 flex flex-col transition-all duration-300 overflow-hidden ${
+                    className={`bg-white rounded-2xl shadow-xl border border-slate-200/90 flex flex-col transition-all duration-300 overflow-hidden ${
                         isMinimized 
-                            ? 'h-14 w-80' 
-                            : 'w-[92vw] sm:w-[410px] h-[580px] max-h-[85vh]'
+                            ? 'h-12 w-64' 
+                            : 'w-[calc(100vw-32px)] sm:w-[350px] h-[480px] sm:h-[490px] max-h-[78vh]'
                     }`}
                 >
                     {/* Header */}
-                    <div className="px-4 py-3 bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 text-white flex items-center justify-between shrink-0 shadow-sm">
-                        <div className="flex items-center gap-2.5">
+                    <div className="px-3.5 py-2.5 bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 text-white flex items-center justify-between shrink-0 shadow-xs">
+                        <div className="flex items-center gap-2">
                             <div className="relative">
-                                <div className="w-9 h-9 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/30">
-                                    <Bot className="w-5 h-5" />
+                                <div className="w-7 h-7 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/30">
+                                    <Bot className="w-4 h-4" />
                                 </div>
-                                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-blue-700" />
+                                <span className="absolute bottom-0 right-0 w-2 h-2 bg-emerald-400 rounded-full border border-blue-700" />
                             </div>
                             <div>
-                                <h3 className="font-bold text-sm leading-tight flex items-center gap-1.5">
+                                <h3 className="font-bold text-xs sm:text-sm leading-tight">
                                     SmartLocker Bot
-                                    <span className="text-[10px] font-medium px-2 py-0.5 bg-white/20 rounded-full">AI Assistant</span>
                                 </h3>
-                                <p className="text-[11px] text-blue-100/90 leading-none mt-0.5">
-                                    Hỗ trợ dịch vụ & trạm tủ 24/7
+                                <p className="text-[10px] text-blue-100/90 leading-none mt-0.5">
+                                    Hỗ trợ trạm tủ Đà Nẵng 24/7
                                 </p>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-0.5">
                             <button
                                 onClick={handleReset}
                                 title="Bắt đầu lại cuộc trò chuyện"
-                                className="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+                                className="p-1 text-white/80 hover:text-white hover:bg-white/10 rounded-md transition-colors cursor-pointer"
                             >
-                                <RotateCcw className="w-4 h-4" />
+                                <RotateCcw className="w-3.5 h-3.5" />
                             </button>
                             <button
                                 onClick={() => setIsMinimized(!isMinimized)}
                                 title={isMinimized ? "Phóng to" : "Thu nhỏ"}
-                                className="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+                                className="p-1 text-white/80 hover:text-white hover:bg-white/10 rounded-md transition-colors cursor-pointer"
                             >
-                                {isMinimized ? <ChevronDown className="w-4 h-4 rotate-180" /> : <Minimize2 className="w-4 h-4" />}
+                                {isMinimized ? <ChevronDown className="w-3.5 h-3.5 rotate-180" /> : <Minimize2 className="w-3.5 h-3.5" />}
                             </button>
                             <button
                                 onClick={() => setIsOpen(false)}
                                 title="Đóng chat"
-                                className="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+                                className="p-1 text-white/80 hover:text-white hover:bg-white/10 rounded-md transition-colors cursor-pointer"
                             >
-                                <X className="w-4 h-4" />
+                                <X className="w-3.5 h-3.5" />
                             </button>
                         </div>
                     </div>
@@ -336,13 +333,13 @@ export const SupportChatWidget: React.FC = () => {
                             )}
 
                             {/* Input Form - Nền trắng sáng, sạch sẽ */}
-                            <div className="p-3 bg-white border-t border-slate-200">
+                            <div className="p-2.5 bg-white border-t border-slate-200">
                                 <form
                                     onSubmit={(e) => {
                                         e.preventDefault();
                                         handleSend();
                                     }}
-                                    className="flex items-center gap-2"
+                                    className="flex items-center gap-1.5"
                                 >
                                     <input
                                         ref={inputRef}
@@ -352,24 +349,24 @@ export const SupportChatWidget: React.FC = () => {
                                         placeholder="Nhập câu hỏi (ví dụ: giá thuê tủ size S?)..."
                                         disabled={loading}
                                         maxLength={1000}
-                                        className="flex-1 bg-slate-100/80 text-slate-900 text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-slate-200/80 focus:border-blue-600 focus:bg-white focus:outline-none transition-all placeholder:text-slate-400"
+                                        className="flex-1 bg-slate-100/80 text-slate-900 text-xs px-3 py-2 rounded-xl border border-slate-200/80 focus:border-blue-600 focus:bg-white focus:outline-none transition-all placeholder:text-slate-400"
                                     />
                                     <button
                                         type="submit"
                                         disabled={!input.trim() || loading}
-                                        className="w-10 h-10 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white flex items-center justify-center transition-transform active:scale-95 shadow-md shadow-blue-500/20 cursor-pointer"
+                                        className="w-9 h-9 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white flex items-center justify-center transition-transform active:scale-95 shadow-sm shadow-blue-500/20 cursor-pointer shrink-0"
                                         title="Gửi câu hỏi"
                                     >
-                                        <Send className="w-4 h-4" />
+                                        <Send className="w-3.5 h-3.5" />
                                     </button>
                                 </form>
 
-                                <div className="mt-2 pt-1 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500">
+                                <div className="mt-1.5 pt-1 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500">
                                     <div className="flex items-center gap-1">
                                         <PhoneCall className="w-3 h-3 text-emerald-600" />
-                                        Hotline khẩn cấp 24/7: <span className="font-semibold text-slate-700">1900 8888</span>
+                                        Hotline: <span className="font-semibold text-slate-700">1900 8888</span>
                                     </div>
-                                    <span className="font-medium text-slate-400">SmartLocker AI</span>
+                                    <span className="font-medium text-slate-400">SmartLocker Support</span>
                                 </div>
                             </div>
                         </>
@@ -377,25 +374,20 @@ export const SupportChatWidget: React.FC = () => {
                 </div>
             )}
 
-            {/* Nút Floating Action Button (FAB) khi đang đóng */}
+            {/* Nút Floating Action Button (FAB) khi đang đóng - Tinh tế, không bị che màn hình, bỏ badge AI cam */}
             {!isOpen && (
                 <button
                     onClick={() => {
                         setIsOpen(true);
                         setShowTeaser(false);
                     }}
-                    className="relative group flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-tr from-blue-600 via-blue-700 to-indigo-600 text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 border-2 border-white/30 cursor-pointer"
-                    aria-label="Mở Trợ lý AI SmartLocker"
+                    className="relative group flex items-center justify-center w-12 h-12 sm:w-13 sm:h-13 rounded-full bg-gradient-to-tr from-blue-600 via-blue-700 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 border-2 border-white/40 cursor-pointer"
+                    aria-label="Mở Trợ lý SmartLocker"
                 >
-                    <Bot className="w-7 h-7 transition-transform group-hover:rotate-6" />
+                    <Bot className="w-6 h-6 transition-transform group-hover:rotate-6" />
                     
                     {/* Hiệu ứng pulse sóng tròn */}
-                    <span className="absolute -inset-1 rounded-full bg-blue-500/30 animate-ping -z-10" />
-
-                    {/* Huy hiệu AI */}
-                    <span className="absolute -top-1 -right-1 px-1.5 py-0.5 bg-amber-500 text-white text-[9px] font-extrabold rounded-full shadow-sm flex items-center gap-0.5">
-                        <Sparkles className="w-2.5 h-2.5" /> AI
-                    </span>
+                    <span className="absolute -inset-1 rounded-full bg-blue-500/25 animate-ping -z-10" />
                 </button>
             )}
         </div>
