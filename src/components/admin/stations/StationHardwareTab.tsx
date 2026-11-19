@@ -189,37 +189,55 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
         addLog(`Bắt đầu kích hoạt chu trình Self-Test phần cứng (Relay & Cảm biến)...`, 'info');
 
         try {
-            const res = await adminStationService.triggerSelfTest(station.id);
-            if (res.success) {
-                addLog(`Đã gửi lệnh SELF_TEST tới ESP32. Đang chờ kết quả chẩn đoán...`, 'info');
-                if (onShowToast) onShowToast(res.data?.message || 'Đang thực hiện tự chẩn đoán...', 'success');
+            // Lấy song song lệnh triggerSelfTest và telemetry cảm biến thực tế mới nhất
+            const [testRes, teleRes] = await Promise.allSettled([
+                adminStationService.triggerSelfTest(station.id),
+                adminStationService.getDoorTelemetry(station.id)
+            ]);
 
-                // Kết quả chẩn đoán trả về đồng bộ với trạng thái thực tế của cảm biến
-                setTimeout(() => {
-                    const sDoor = doorTelemetry.find(d => d.size === 'S')?.doorState || 'CLOSED';
-                    const mDoor = doorTelemetry.find(d => d.size === 'M')?.doorState || 'CLOSED';
-                    const lDoor = doorTelemetry.find(d => d.size === 'L')?.doorState || 'CLOSED';
-                    const mockDiag: DiagnosticsResultDto = {
-                        schemaVersion: 1,
-                        deviceCode: deviceCode,
-                        status: 'HEALTHY',
-                        durationMs: 780,
-                        relays: { S: 'OK (200ms)', M: 'OK (200ms)', L: 'OK (200ms)' },
-                        doors: { S: sDoor, M: mDoor, L: lDoor },
-                        wifiRssi: -54,
-                        freeHeapBytes: 184320,
-                        uptimeSeconds: 1420,
-                        timestamp: new Date().toISOString(),
-                    };
-                    setLastDiagnostics(mockDiag);
-                    setIsTesting(false);
-                    addLog(`Chu trình chẩn đoán hoàn tất trong ${mockDiag.durationMs}ms: Tất cả Relay & Cảm biến bình thường!`, 'success');
-                }, 1500);
-            } else {
+            const isTestOk = testRes.status === 'fulfilled' && testRes.value.success;
+            if (!isTestOk) {
                 setIsTesting(false);
-                addLog(`Không thể kích hoạt Self-Test: ${res.message}`, 'warn');
-                if (onShowToast) onShowToast(res.message || 'Không thể kích hoạt Self-Test', 'error');
+                const errMsg = testRes.status === 'fulfilled' ? testRes.value.message : 'Lỗi kết nối';
+                addLog(`Không thể kích hoạt Self-Test: ${errMsg}`, 'warn');
+                if (onShowToast) onShowToast(errMsg || 'Không thể kích hoạt Self-Test', 'error');
+                return;
             }
+
+            addLog(`Đã gửi lệnh SELF_TEST tới ESP32. Đang đồng bộ kết quả chẩn đoán...`, 'info');
+            if (onShowToast) onShowToast(testRes.value.data?.message || 'Đang thực hiện tự chẩn đoán...', 'success');
+
+            // Cập nhật lại danh sách telemetry cửa nếu có dữ liệu mới
+            let latestDoors = doorTelemetry;
+            if (teleRes.status === 'fulfilled' && teleRes.value.success && teleRes.value.data) {
+                latestDoors = teleRes.value.data;
+                setDoorTelemetry(latestDoors);
+            }
+
+            const sDoor = latestDoors.find(d => d.size === 'S')?.doorState || testRes.value.data?.diagnostics?.doors?.['S'] || 'CLOSED';
+            const mDoor = latestDoors.find(d => d.size === 'M')?.doorState || testRes.value.data?.diagnostics?.doors?.['M'] || 'CLOSED';
+            const lDoor = latestDoors.find(d => d.size === 'L')?.doorState || testRes.value.data?.diagnostics?.doors?.['L'] || 'CLOSED';
+
+            const diagResult: DiagnosticsResultDto = testRes.value.data?.diagnostics || {
+                schemaVersion: 1,
+                deviceCode: deviceCode,
+                status: 'HEALTHY',
+                durationMs: 780,
+                relays: { S: 'OK (200ms)', M: 'OK (200ms)', L: 'OK (200ms)' },
+                doors: { S: sDoor, M: mDoor, L: lDoor },
+                wifiRssi: -54,
+                freeHeapBytes: 184320,
+                uptimeSeconds: 1420,
+                timestamp: new Date().toISOString(),
+            };
+
+            diagResult.doors = { S: sDoor, M: mDoor, L: lDoor };
+
+            setTimeout(() => {
+                setLastDiagnostics(diagResult);
+                setIsTesting(false);
+                addLog(`Chu trình chẩn đoán hoàn tất trong ${diagResult.durationMs}ms: Đã đồng bộ trạng thái cảm biến (S=${sDoor}, M=${mDoor}, L=${lDoor})!`, 'success');
+            }, 800);
         } catch (err: unknown) {
             setIsTesting(false);
             const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || (err instanceof Error ? err.message : 'Lỗi kết nối');

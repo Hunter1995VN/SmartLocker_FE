@@ -14,6 +14,7 @@ export interface DeviceControlResultDto {
     command: string;
     message: string;
     sentAt: string;
+    diagnostics?: DiagnosticsResultDto;
 }
 
 export interface DiagnosticsResultDto {

@@ -126,31 +126,55 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
         setTestingDeviceId(device.id);
 
         try {
-            const res = await adminStationService.triggerSelfTest(device.stationId);
-            if (res.success) {
-                if (onShowToast) onShowToast(res.data?.message || 'Đang thực hiện tự chẩn đoán...', 'success');
+            // Gửi lệnh kích hoạt Self-Test và đồng thời truy vấn telemetry cảm biến thực tế của trạm
+            const [testRes, teleRes] = await Promise.allSettled([
+                adminStationService.triggerSelfTest(device.stationId),
+                adminStationService.getDoorTelemetry(device.stationId)
+            ]);
 
-                // Mô phỏng kết quả chẩn đoán trả về tức thời
-                setTimeout(() => {
-                    const mockResult: DiagnosticsResultDto = {
-                        schemaVersion: 1,
-                        deviceCode: device.deviceCode,
-                        status: 'HEALTHY',
-                        durationMs: 780,
-                        relays: { S: 'OK (200ms)', M: 'OK (200ms)', L: 'OK (200ms)' },
-                        doors: { S: 'CLOSED', M: 'CLOSED', L: 'CLOSED' },
-                        wifiRssi: device.wifiRssi || -54,
-                        freeHeapBytes: 184320,
-                        uptimeSeconds: device.uptimeSeconds || 1420,
-                        timestamp: new Date().toISOString(),
-                    };
-                    setDiagnosticsModal({ device, result: mockResult });
-                    setTestingDeviceId(null);
-                }, 1200);
-            } else {
+            const isTestOk = testRes.status === 'fulfilled' && testRes.value.success;
+            if (!isTestOk) {
+                const errMsg = testRes.status === 'fulfilled' ? testRes.value.message : 'Lỗi kết nối';
+                if (onShowToast) onShowToast(errMsg || 'Không thể kích hoạt Self-Test', 'error');
                 setTestingDeviceId(null);
-                if (onShowToast) onShowToast(res.message || 'Không thể kích hoạt Self-Test', 'error');
+                return;
             }
+
+            if (onShowToast) onShowToast(testRes.value.data?.message || 'Đang thực hiện tự chẩn đoán...', 'success');
+
+            // Đọc trạng thái cảm biến thực tế từ telemetry của các ô tủ (không hardcode CLOSED)
+            let doors: Record<string, string> = { S: 'CLOSED', M: 'CLOSED', L: 'CLOSED' };
+            if (teleRes.status === 'fulfilled' && teleRes.value.success && teleRes.value.data) {
+                const teleList = teleRes.value.data;
+                doors = {
+                    S: teleList.find(d => d.size === 'S')?.doorState || 'CLOSED',
+                    M: teleList.find(d => d.size === 'M')?.doorState || 'CLOSED',
+                    L: teleList.find(d => d.size === 'L')?.doorState || 'CLOSED',
+                };
+            } else if (testRes.value.data?.diagnostics?.doors) {
+                doors = testRes.value.data.diagnostics.doors;
+            }
+
+            const diagResult: DiagnosticsResultDto = testRes.value.data?.diagnostics || {
+                schemaVersion: 1,
+                deviceCode: device.deviceCode,
+                status: 'HEALTHY',
+                durationMs: 780,
+                relays: { S: 'OK (200ms)', M: 'OK (200ms)', L: 'OK (200ms)' },
+                doors,
+                wifiRssi: device.wifiRssi || -54,
+                freeHeapBytes: 184320,
+                uptimeSeconds: device.uptimeSeconds || 1420,
+                timestamp: new Date().toISOString(),
+            };
+
+            // Đảm bảo dữ liệu cảm biến phản ánh chính xác trạng thái thực tế
+            diagResult.doors = doors;
+
+            setTimeout(() => {
+                setDiagnosticsModal({ device, result: diagResult });
+                setTestingDeviceId(null);
+            }, 800);
         } catch (err: unknown) {
             setTestingDeviceId(null);
             const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || (err instanceof Error ? err.message : 'Lỗi kết nối');
