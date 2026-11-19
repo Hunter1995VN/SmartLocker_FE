@@ -15,10 +15,10 @@ import { chatSupportService, type ChatMessage } from '../../api/chatSupportServi
 
 const DEFAULT_SUGGESTIONS = [
     'Bảng giá thuê tủ các size?',
-    'Cách đặt & nhận tủ tại trạm?',
-    'Làm sao để gia hạn thêm giờ?',
-    'Quy định hàng cấm gửi?',
-    'Tủ kẹt hoặc quên mã PIN?'
+    'Cách nhận tủ tại Kiosk?',
+    'Hướng dẫn gia hạn thêm giờ',
+    'Quy định hàng cấm gửi',
+    'Tủ kẹt / Quên mã PIN'
 ];
 
 export const SupportChatWidget: React.FC = () => {
@@ -312,19 +312,21 @@ export const SupportChatWidget: React.FC = () => {
                                 <div ref={messagesEndRef} />
                             </div>
 
-                            {/* Suggestions - Cuộn ngang 1 dòng mượt mà, KHÔNG sinh thêm thanh cuộn dọc thứ 2 */}
+                            {/* Suggestions - Gợi ý câu hỏi nhanh: bọc dạng wrap gọn gàng, 100% không tràn viền */}
                             {suggestions.length > 0 && !loading && (
-                                <div className="px-3 py-2 bg-slate-50/90 border-t border-slate-200/80">
-                                    <div className="text-[11px] text-slate-500 flex items-center gap-1 font-medium mb-1.5">
-                                        <HelpCircle className="w-3.5 h-3.5 text-blue-600" />
-                                        Gợi ý câu hỏi nhanh:
+                                <div className="px-3.5 py-2.5 bg-slate-50/90 border-t border-slate-200/80">
+                                    <div className="flex items-center justify-between text-[11px] text-slate-500 font-medium mb-1.5">
+                                        <span className="flex items-center gap-1">
+                                            <HelpCircle className="w-3.5 h-3.5 text-blue-600" />
+                                            Gợi ý câu hỏi nhanh:
+                                        </span>
                                     </div>
-                                    <div className="flex items-center gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                                    <div className="flex flex-wrap gap-1.5">
                                         {suggestions.map((q, idx) => (
                                             <button
                                                 key={idx}
                                                 onClick={() => handleSend(q)}
-                                                className="text-[11px] whitespace-nowrap bg-white text-blue-700 hover:bg-blue-50 hover:border-blue-300 px-3 py-1.5 rounded-full border border-blue-200/80 transition-all shadow-xs shrink-0 active:scale-95 cursor-pointer font-medium"
+                                                className="text-[11px] leading-snug bg-white text-blue-700 hover:bg-blue-50 hover:border-blue-400 px-2.5 py-1.5 rounded-lg border border-blue-200/80 transition-all shadow-xs active:scale-95 cursor-pointer font-medium text-left"
                                             >
                                                 {q}
                                             </button>
