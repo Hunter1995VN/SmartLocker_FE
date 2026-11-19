@@ -12,7 +12,7 @@ import { useT } from '../i18n';
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string || '';
-const MAP_CENTER_DEFAULT = { lat: 10.7769, lng: 106.7009 }; // TP.HCM
+const MAP_CENTER_DEFAULT = { lat: 16.0544, lng: 108.2022 }; // Đà Nẵng
 
 const SIZE_LABEL: Record<string, string> = { S: 'Nhỏ', M: 'Vừa', L: 'Lớn' };
 const SIZE_COLOR: Record<string, string> = {

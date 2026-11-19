@@ -74,7 +74,7 @@ export default function FindStationPage({
     const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
     const [locationStatus, setLocationStatus] = useState<'locating' | 'granted' | 'manual' | 'denied' | 'os-blocked' | 'unavailable' | 'timeout' | 'unsupported'>('locating');
     const [locationAccuracyM, setLocationAccuracyM] = useState<number | null>(null);
-    const [mapCenter, setMapCenter] = useState(MAP_CENTER_HCMC);
+    const [mapCenter, setMapCenter] = useState(MAP_CENTER_DANANG);
     const [mapZoom, setMapZoom] = useState(13);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [apiError, setApiError] = useState<string | null>(null);
