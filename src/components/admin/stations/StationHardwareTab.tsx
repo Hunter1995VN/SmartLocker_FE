@@ -377,18 +377,16 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                                     Kiểm tra rơ-le khóa Solenoid (Relays)
                                 </span>
                                 <div className="space-y-1.5 font-mono">
-                                    <div className="flex items-center justify-between">
-                                        <span>Rơ-le Ngăn S (GPIO 26):</span>
-                                        <span className="text-emerald-600 font-bold px-1.5 py-0.5 bg-emerald-100/70 rounded">OK</span>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <span>Rơ-le Ngăn M (GPIO 25):</span>
-                                        <span className="text-emerald-600 font-bold px-1.5 py-0.5 bg-emerald-100/70 rounded">OK</span>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <span>Rơ-le Ngăn L (GPIO 33):</span>
-                                        <span className="text-emerald-600 font-bold px-1.5 py-0.5 bg-emerald-100/70 rounded">OK</span>
-                                    </div>
+                                    {(['S', 'M', 'L'] as const).map(size => {
+                                        const pin = size === 'S' ? 26 : size === 'M' ? 25 : 33;
+                                        const relayStatus = lastDiagnostics.relays?.[size] || 'OK (200ms)';
+                                        return (
+                                            <div key={size} className="flex items-center justify-between">
+                                                <span>Rơ-le Ngăn {size} (GPIO {pin}):</span>
+                                                <span className="text-emerald-600 font-bold px-1.5 py-0.5 bg-emerald-100/70 rounded">{relayStatus}</span>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
 
@@ -398,18 +396,21 @@ export default function StationHardwareTab({ station, onShowToast }: StationHard
                                     Cảm biến hành trình cửa (Limit Switches)
                                 </span>
                                 <div className="space-y-1.5 font-mono">
-                                    <div className="flex items-center justify-between">
-                                        <span>Cảm biến Cửa S (GPIO 27):</span>
-                                        <span className="text-slate-800 font-bold px-1.5 py-0.5 bg-slate-200 rounded">{lastDiagnostics.doors.S || 'CLOSED'}</span>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <span>Cảm biến Cửa M (GPIO 32):</span>
-                                        <span className="text-amber-700 font-bold px-1.5 py-0.5 bg-amber-100 rounded">{lastDiagnostics.doors.M || 'OPEN'}</span>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <span>Cảm biến Cửa L (GPIO 23):</span>
-                                        <span className="text-slate-800 font-bold px-1.5 py-0.5 bg-slate-200 rounded">{lastDiagnostics.doors.L || 'CLOSED'}</span>
-                                    </div>
+                                    {(['S', 'M', 'L'] as const).map(size => {
+                                        const pin = size === 'S' ? 27 : size === 'M' ? 32 : 23;
+                                        const state = lastDiagnostics.doors?.[size] || 'CLOSED';
+                                        const isOpen = state === 'OPEN';
+                                        return (
+                                            <div key={size} className="flex items-center justify-between">
+                                                <span>Cảm biến Cửa {size} (GPIO {pin}):</span>
+                                                <span className={`font-bold px-1.5 py-0.5 rounded ${
+                                                    isOpen ? 'text-amber-700 bg-amber-100' : 'text-slate-800 bg-slate-200'
+                                                }`}>
+                                                    {state}
+                                                </span>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </div>

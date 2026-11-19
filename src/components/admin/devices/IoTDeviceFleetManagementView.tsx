@@ -510,18 +510,16 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                                     Rơ-le khóa Solenoid
                                 </span>
                                 <div className="space-y-1 font-mono text-xs">
-                                    <div className="flex justify-between">
-                                        <span>Rơ-le S (GPIO 26):</span>
-                                        <span className="text-emerald-600 font-bold">OK (200ms)</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span>Rơ-le M (GPIO 25):</span>
-                                        <span className="text-emerald-600 font-bold">OK (200ms)</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span>Rơ-le L (GPIO 33):</span>
-                                        <span className="text-emerald-600 font-bold">OK (200ms)</span>
-                                    </div>
+                                    {(['S', 'M', 'L'] as const).map(size => {
+                                        const pin = size === 'S' ? 26 : size === 'M' ? 25 : 33;
+                                        const relayStatus = diagnosticsModal.result.relays?.[size] || 'OK (200ms)';
+                                        return (
+                                            <div key={size} className="flex justify-between items-center">
+                                                <span>Rơ-le {size} (GPIO {pin}):</span>
+                                                <span className="text-emerald-600 font-bold">{relayStatus}</span>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
 
@@ -530,18 +528,21 @@ export default function IoTDeviceFleetManagementView({ onShowToast }: IoTDeviceF
                                     Cảm biến hành trình cửa
                                 </span>
                                 <div className="space-y-1 font-mono text-xs">
-                                    <div className="flex justify-between">
-                                        <span>Cửa S (GPIO 27):</span>
-                                        <span className="text-slate-800 font-bold">CLOSED</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span>Cửa M (GPIO 32):</span>
-                                        <span className="text-amber-700 font-bold">OPEN</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span>Cửa L (GPIO 23):</span>
-                                        <span className="text-slate-800 font-bold">CLOSED</span>
-                                    </div>
+                                    {(['S', 'M', 'L'] as const).map(size => {
+                                        const pin = size === 'S' ? 27 : size === 'M' ? 32 : 23;
+                                        const state = diagnosticsModal.result.doors?.[size] || 'CLOSED';
+                                        const isOpen = state === 'OPEN';
+                                        return (
+                                            <div key={size} className="flex justify-between items-center">
+                                                <span>Cửa {size} (GPIO {pin}):</span>
+                                                <span className={`font-bold px-1.5 py-0.5 rounded text-xs ${
+                                                    isOpen ? 'text-amber-700 bg-amber-100' : 'text-slate-800 bg-slate-200'
+                                                }`}>
+                                                    {state}
+                                                </span>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </div>
